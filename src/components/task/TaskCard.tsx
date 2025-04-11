@@ -1,39 +1,23 @@
-import React from 'react';
-import { Box, Typography } from '@mui/material';
-import { Task, TaskStatus } from '../../features/task/types';
+// src/components/TaskCard.tsx
+import { Paper, Typography } from "@mui/material";
 
-interface TaskCardProperties {
-  task: Task;
-  onClick?: () => void;
-  onStatusChange?: (id: string, newStatus: TaskStatus) => void;
+interface TaskCardProps {
+  title: string;
+  status?: "TODO" | "IN_PROGRESS" | "DONE";
 }
 
-const TaskCard: React.FC<TaskCardProperties> = ({ task, onClick }) => {
+export default function TaskCard({ title, status = "TODO" }: TaskCardProps) {
   return (
-    <Box
-      onClick={onClick}
+    <Paper
       sx={{
-        backgroundColor: '#ffffff',
+        p: 1,
+        backgroundColor: "#fff",
+        borderLeft: `5px solid ${status === "DONE" ? "#66bb6a" : "#ffa726"}`,
         borderRadius: 1,
-        padding: 1.5,
-        marginBottom: 1.5,
-        boxShadow: 1,
-        cursor: 'pointer',
-        '&:hover': {
-          backgroundColor: '#f0f0f0',
-        },
+        mb: 1
       }}
     >
-      <Typography variant="body1" fontWeight="bold" gutterBottom noWrap>
-        {task.name}
-      </Typography>
-      {task.description && (
-        <Typography variant="body2" color="text.secondary" noWrap>
-          {task.description}
-        </Typography>
-      )}
-    </Box>
+      <Typography>{title}</Typography>
+    </Paper>
   );
-};
-
-export default TaskCard;
+}

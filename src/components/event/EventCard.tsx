@@ -1,59 +1,30 @@
-import React from 'react';
-import { Box, Typography, Tooltip } from '@mui/material';
+// src/components/EventCard.tsx
+import { Paper, Typography } from "@mui/material";
 
-interface EventCardProperties {
-  id: string;
-  title: string;
-  startDate: Date;
-  endDate: Date;
-  color: string;
-  onClick?: () => void;
+interface EventCardProps {
+  name: string;
+  start: string;
+  end: string;
+  color?: string;
 }
 
-const formatTime = (date: Date) =>
-  date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-
-const EventCard: React.FC<EventCardProperties> = ({
-  title,
-  startDate,
-  endDate,
-  color,
-  onClick,
-}) => {
+export default function EventCard({ name, start, end, color = "#42a5f5" }: EventCardProps) {
   return (
-    <Tooltip title={`${formatTime(startDate)} – ${formatTime(endDate)}`} placement="top">
-      <Box
-        onClick={onClick}
-        sx={{
-          position: 'absolute',
-          top: `${(startDate.getHours() * 60 + startDate.getMinutes())}px`, // will be adjusted by parent
-          height: `${(endDate.getTime() - startDate.getTime()) / 60000}px`, // height in px = duration in minutes
-          left: 4,
-          right: 4,
-          padding: '2px 6px',
-          backgroundColor: color,
-          borderRadius: 1,
-          boxShadow: 1,
-          color: '#fff',
-          fontSize: '0.75rem',
-          lineHeight: 1.2,
-          overflow: 'hidden',
-          textOverflow: 'ellipsis',
-          whiteSpace: 'nowrap',
-          cursor: 'pointer',
-          transition: 'background-color 0.2s ease',
-          '&:hover': {
-            backgroundColor: '#333',
-            opacity: 0.9,
-          },
-        }}
-      >
-        <Typography variant="caption" noWrap>
-          {title}
-        </Typography>
-      </Box>
-    </Tooltip>
+    <Paper
+      sx={{
+        p: 1,
+        backgroundColor: color,
+        color: "#fff",
+        borderRadius: 1,
+        fontSize: "0.75rem",
+        overflow: "hidden"
+      }}
+      elevation={3}
+    >
+      <Typography fontWeight="bold">{name}</Typography>
+      <Typography variant="caption">
+        {start} – {end}
+      </Typography>
+    </Paper>
   );
-};
-
-export default EventCard;
+}

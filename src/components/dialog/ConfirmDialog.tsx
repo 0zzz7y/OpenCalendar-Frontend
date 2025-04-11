@@ -1,48 +1,32 @@
-import React from 'react';
-import {
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  DialogContentText,
-  DialogActions,
-  Button,
-} from '@mui/material';
+import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
 
-interface ConfirmDialogProperties {
+interface ConfirmDialogProps {
   open: boolean;
-  title?: string;
-  message?: string;
-  confirmLabel?: string;
-  cancelLabel?: string;
+  title: string;
+  message: string;
   onConfirm: () => void;
-  onCancel: () => void;
+  onClose: () => void;
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProperties> = ({
+export default function ConfirmDialog({
   open,
-  title = 'Are you sure?',
-  message = 'This action cannot be undone.',
-  confirmLabel = 'Confirm',
-  cancelLabel = 'Cancel',
+  title,
+  message,
   onConfirm,
-  onCancel,
-}) => {
+  onClose,
+}: ConfirmDialogProps) {
   return (
-    <Dialog open={open} onClose={onCancel}>
+    <Dialog open={open} onClose={onClose}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onCancel} color="inherit">
-          {cancelLabel}
-        </Button>
-        <Button onClick={onConfirm} color="error" variant="contained">
-          {confirmLabel}
+        <Button onClick={onClose}>Anuluj</Button>
+        <Button color="error" onClick={onConfirm}>
+          Usuń
         </Button>
       </DialogActions>
     </Dialog>
   );
-};
-
-export default ConfirmDialog;
+}
