@@ -30,10 +30,13 @@ const calendars = [
 ];
 
 const categories = [
-  { id: "a", name: "Siłownia" },
-  { id: "b", name: "Ogród" },
-  { id: "c", name: "Dom" }
+  { id: "a", name: "Siłownia", color: "#f44336" },
+  { id: "b", name: "Ogród", color: "#4caf50" },
+  { id: "c", name: "Dom", color: "#2196f3" }
 ];
+
+const getCategoryColor = (categoryId: string | undefined) =>
+  categories.find((c) => c.id === categoryId)?.color || "#fffde7";
 
 export default function TasksPanel() {
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -41,7 +44,8 @@ export default function TasksPanel() {
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [taskToDelete, setTaskToDelete] = useState<string | null>(null);
   const [hoveredStatus, setHoveredStatus] = useState<TaskStatus | null>(null);
-
+  const [editingTitleId, setEditingTitleId] = useState<string | null>(null);
+  const [editedTitle, setEditedTitle] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dragIdRef = useRef<string | null>(null);
 
@@ -137,7 +141,9 @@ export default function TasksPanel() {
             onClickCapture={(e) => {
               const target = e.target as HTMLElement;
               const interactiveElements = ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "LI", "UL"];
-            
+
+              if (editingTitleId === task.id) return;
+
               if (
                 !interactiveElements.includes(target.tagName) &&
                 !target.closest("button") &&
@@ -153,20 +159,59 @@ export default function TasksPanel() {
               p: 1,
               mb: 1,
               fontSize: "0.85rem",
-              backgroundColor: "#fffde7",
               cursor: "move",
-              boxShadow: draggingId === task.id ? "0 0 10px #2196f3" : "none"
+              boxShadow: draggingId === task.id ? "0 0 10px #2196f3" : "none",
+              backgroundColor: task.categoryId ? getCategoryColor(task.categoryId) : "#fffde7"
+
             }}
           >
-            <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-                {task.editing ? <ExpandMore fontSize="small" /> : <ChevronRight fontSize="small" />}
-                <Typography fontWeight="bold">{task.title}</Typography>
-              </Box>
-              <IconButton size="small" onClick={(e) => confirmDelete(task.id, e)}>
-                <DeleteIcon fontSize="small" />
-              </IconButton>
-            </Box>
+<Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+  <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
+    {task.editing ? <ExpandMore fontSize="small" /> : <ChevronRight fontSize="small" />}
+    {editingTitleId === task.id ? (
+  <TextField
+    size="small"
+    value={editedTitle}
+    onChange={(e) => setEditedTitle(e.target.value)}
+    autoFocus
+    sx={{ fontWeight: "bold", input: { fontWeight: "bold" } }}
+  />
+) : (
+  <Typography fontWeight="bold">{task.title}</Typography>
+)}
+
+  </Box>
+  <Box sx={{ display: "flex", gap: 0.5 }}>
+  <IconButton
+  size="small"
+  onClick={(e) => {
+    e.stopPropagation();
+
+    if (editingTitleId === task.id) {
+      // kończymy edycję tytułu
+      updateTask(task.id, { title: editedTitle });
+      setEditingTitleId(null);
+    } else {
+      // zaczynamy edycję tytułu
+      setEditedTitle(task.title);
+      setEditingTitleId(task.id);
+
+      // dodatkowo otwieramy panel opisu, jeśli nieotwarty
+      if (!task.editing) updateTask(task.id, { editing: true });
+    }
+  }}
+>
+  {editingTitleId === task.id ? "✔️" : "✏️"}
+</IconButton>
+
+
+
+    <IconButton size="small" onClick={(e) => confirmDelete(task.id, e)}>
+      <DeleteIcon fontSize="small" />
+    </IconButton>
+  </Box>
+</Box>
+
 
             <Collapse in={task.editing}>
               <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 1 }}>
@@ -227,9 +272,27 @@ export default function TasksPanel() {
                   label="Kategoria"
                 >
                   {categories.map((c) => (
-                    <MenuItem key={c.id} value={c.id}>
-                      {c.name}
-                    </MenuItem>
+                    <MenuItem
+                    key={c.id}
+                    value={c.id}
+                    selected={task.categoryId === c.id}
+                    sx={{ display: "flex", alignItems: "center", gap: 1 }}
+                  >
+                    <Box
+                      component="span"
+                      sx={{
+                        display: "inline-block",
+                        width: 12,
+                        height: 12,
+                        borderRadius: "50%",
+                        backgroundColor: task.categoryId === c.id ? "#fff" : c.color,
+                        border: "1px solid #999",
+                        mr: 1,
+                      }}
+                    />
+                    {c.name}
+                  </MenuItem>
+                  
                   ))}
                 </Select>
               </FormControl>

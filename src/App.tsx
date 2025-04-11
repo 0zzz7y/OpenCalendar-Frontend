@@ -12,13 +12,12 @@ function App() {
     <LocalizationProvider dateAdapter={AdapterDateFns}>
       <CssBaseline />
       <Box sx={{ display: "flex", height: "100vh", overflow: "hidden" }}>
-        
+
         {/* Lewa kolumna: selektory + mały kalendarz */}
         <Box sx={{ width: 250, p: 2, borderRight: "1px solid #ccc" }}>
           <CalendarCategorySelector />
           <MonthlyCalendar />
         </Box>
-
 
         {/* Środkowa kolumna: główny widok */}
         <Box sx={{ flexGrow: 1, p: 2, overflow: "hidden", display: "flex", flexDirection: "column" }}>
@@ -27,7 +26,7 @@ function App() {
         </Box>
 
         {/* Prawa kolumna: notatki i zadania */}
-        <Box sx={{ width: 450, p: 1, borderLeft: "1px solid #ccc" }}>
+        <Box sx={{ width: 650, p: 1, borderLeft: "1px solid #ccc" }}>
           <RightPanel />
         </Box>
       </Box>
