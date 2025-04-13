@@ -309,6 +309,10 @@ const settingsOpen = Boolean(settingsAnchorEl);
   </>
 )}
 
+<IconButton size="small" onClick={(e) => { e.stopPropagation(); toggleMode(); }}>
+              {isDrawing ? <BrushIcon /> : <EditIcon />}
+            </IconButton>
+
 <IconButton
   size="small"
   onClick={(e) => {
@@ -326,6 +330,7 @@ const settingsOpen = Boolean(settingsAnchorEl);
     }}
   />
 </IconButton>
+
 
 <IconButton size="small" onClick={(e) => { 
   e.stopPropagation(); 

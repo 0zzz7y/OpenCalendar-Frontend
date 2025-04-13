@@ -26,7 +26,7 @@ function App() {
         </Box>
 
         {/* Prawa kolumna: notatki i zadania */}
-        <Box sx={{ width: 650, p: 1, borderLeft: "1px solid #ccc" }}>
+        <Box sx={{ width: 950, p: 1, borderLeft: "1px solid #ccc" }}>
           <RightPanel />
         </Box>
       </Box>

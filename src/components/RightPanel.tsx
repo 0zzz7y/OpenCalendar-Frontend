@@ -28,7 +28,7 @@ export default function RightPanel() {
   };
 
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: 2, height: "100%" }}>
+    <Box sx={{ display: "flex", flexDirection: "column", gap: 1, height: "50%" }}>
       <Box
         sx={{
           flexGrow: 1,
@@ -48,7 +48,7 @@ export default function RightPanel() {
 
       <Box
         sx={{
-          height: 250,
+          height: 450,
           border: "1px solid #ccc",
           borderRadius: 2,
           p: 1,
