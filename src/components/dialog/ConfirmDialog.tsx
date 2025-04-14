@@ -1,22 +1,25 @@
-import { Dialog, DialogActions, DialogContent, DialogContentText, DialogTitle, Button } from "@mui/material";
+import {
+  Dialog, 
+  DialogActions,
+  DialogContent,
+  DialogContentText,
+  DialogTitle,
+  Button,
+  DialogProps
+} from "@mui/material";
 
-interface ConfirmDialogProps {
+interface ConfirmDialogProperties {
   open: boolean;
   title: string;
   message: string;
   onConfirm: () => void;
   onClose: () => void;
+  paperProps: DialogProps["PaperProps"];
 }
 
-export default function ConfirmDialog({
-  open,
-  title,
-  message,
-  onConfirm,
-  onClose,
-}: ConfirmDialogProps) {
+export default function ConfirmDialog({ open, title, message, onConfirm, onClose, paperProps }: ConfirmDialogProperties) {
   return (
-    <Dialog open={open} onClose={onClose}>
+    <Dialog open={open} onClose={onClose} PaperProps={paperProps}>
       <DialogTitle>{title}</DialogTitle>
       <DialogContent>
         <DialogContentText>{message}</DialogContentText>
