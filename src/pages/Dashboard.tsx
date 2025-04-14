@@ -3,7 +3,11 @@ import { useState } from "react";
 import LeftPanel from "../layouts/LeftPanel";
 import RightPanel from "../layouts/RightPanel";
 
-export default function Dashboard() {
+export interface DashboardProperties {
+  toggleTheme: () => void;
+}
+
+export default function Dashboard({ toggleTheme }: DashboardProperties) {
   const [showSidebar, setShowSidebar] = useState(true);
 
   return (
@@ -20,7 +24,12 @@ export default function Dashboard() {
           zIndex: 2,
         }}
       >
-        <LeftPanel onHide={() => setShowSidebar(false)} onShow={() => setShowSidebar(true)} isOpen={showSidebar} />
+        <LeftPanel
+          onHide={() => setShowSidebar(false)}
+          onShow={() => setShowSidebar(true)}
+          isOpen={showSidebar}
+          toggleTheme={toggleTheme}
+        />
       </Box>
 
       {/* Main content */}

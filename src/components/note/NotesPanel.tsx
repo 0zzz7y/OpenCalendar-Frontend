@@ -4,17 +4,15 @@ import { useState } from "react";
 import NoteCard from "./NoteCard";
 
 export default function NotesPanel() {
-  const [notes, setNotes] = useState([
-    { id: "note-1", content: "Example note", x: 20, y: 20 }
-  ]);
+  const [notes, setNotes] = useState([{ id: "note-1", content: "", x: 20, y: 20 }]);
 
   const handleAddNote = () => {
     const newId = `note-${Date.now()}`;
     const newNote = {
       id: newId,
       content: "",
-      x: 40 + notes.length * 20,
-      y: 40 + notes.length * 20,
+      x: Math.random() * 100,
+      y: Math.random() * 100,
     };
     setNotes((prev) => [...prev, newNote]);
   };
@@ -44,12 +42,7 @@ export default function NotesPanel() {
         />
       ))}
       {/* Floating Add Button */}
-      <Box
-        position="absolute"
-        bottom={16}
-        right={16}
-        sx={{ pointerEvents: "auto" }}
-      >
+      <Box position="absolute" bottom={16} right={16} sx={{ pointerEvents: "auto" }}>
         <IconButton
           onClick={handleAddNote}
           color="primary"
@@ -68,4 +61,7 @@ export default function NotesPanel() {
       </Box>
     </Box>
   );
+}
+function useRef<T>(arg0: null) {
+  throw new Error("Function not implemented.");
 }

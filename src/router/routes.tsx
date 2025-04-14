@@ -7,7 +7,13 @@ import NotesPage from "../pages/NotesPage";
 export const appRoutes: RouteObject[] = [
   {
     path: "/",
-    element: <Dashboard />,
+    element: (
+      <Dashboard
+        toggleTheme={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+      />
+    ),
   },
   {
     path: "/notes",

@@ -63,24 +63,23 @@ export default function CategorySelector() {
           >
             {categories.map((category) => (
               <MenuItem key={category.id} value={category.id}>
-              <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
-                {category.name}
-                {category.id !== "all" && selectedId !== category.id && (
-                  <IconButton
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleRemoveCategory(category.id);
-                    }}
-                    color="error"
-                    size="small"
-                    sx={{ ml: 1 }}
-                  >
-                    <Delete sx={{ fontSize: 16 }} />
-                  </IconButton>
-                )}
-              </Box>
-            </MenuItem>
-            
+                <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
+                  {category.name}
+                  {category.id !== "all" && selectedId !== category.id && (
+                    <IconButton
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleRemoveCategory(category.id);
+                      }}
+                      color="error"
+                      size="small"
+                      sx={{ ml: 1 }}
+                    >
+                      <Delete sx={{ fontSize: 16 }} />
+                    </IconButton>
+                  )}
+                </Box>
+              </MenuItem>
             ))}
           </Select>
         </FormControl>

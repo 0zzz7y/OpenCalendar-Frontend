@@ -11,13 +11,13 @@ import {
   FormControl,
   InputLabel,
 } from "@mui/material";
-import { AddCircle, Delete,  } from "@mui/icons-material";
+import { AddCircle, Delete } from "@mui/icons-material";
 
 const initialCalendars = [
   { id: "all", name: "Wszystkie" },
   { id: "university", name: "Rok akademicki", color: "#ffeb3b" },
   { id: "vacation", name: "Wakacje" },
-  { id: "other", name: "Inne", },
+  { id: "other", name: "Inne" },
 ];
 
 export default function CalendarSelector() {

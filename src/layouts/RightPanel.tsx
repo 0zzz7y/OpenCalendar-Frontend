@@ -1,3 +1,4 @@
+import TaskBoard from "../components/task/TaskBoard";
 import NotesPanel from "../components/note/NotesPanel";
 import { Box, Typography } from "@mui/material";
 
@@ -15,7 +16,7 @@ export default function RightPanel() {
       <NotesPanel />
 
       <Box flex="1" overflow="auto" bgcolor="#fff" borderRadius={2} p={1}>
-        {/* Replace this with <TaskBoard /> */}
+        <TaskBoard />
       </Box>
     </Box>
   );

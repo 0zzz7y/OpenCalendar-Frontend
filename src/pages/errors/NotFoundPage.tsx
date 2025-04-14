@@ -3,4 +3,4 @@
 // export default function NotFoundPage() {
 //   return <NotFoundBackground />;
 // }
-export {}
+export {};

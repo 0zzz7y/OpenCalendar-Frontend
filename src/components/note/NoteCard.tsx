@@ -1,13 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 
-import {
-  Box,
-  Paper,
-  Collapse,
-  Menu,
-  MenuItem,
-  IconButton,
-} from "@mui/material";
+import { Box, Paper, Collapse, Menu, MenuItem, IconButton } from "@mui/material";
 
 import BrushIcon from "@mui/icons-material/Brush";
 import EditIcon from "@mui/icons-material/Edit";
@@ -184,79 +177,76 @@ export default function NoteCard({
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!dragging || !lastMousePos.current) return;
-  
+
     const dx = e.clientX - lastMousePos.current.x;
     const dy = e.clientY - lastMousePos.current.y;
     lastMousePos.current = { x: e.clientX, y: e.clientY };
-  
+
     positionRef.current = {
       x: Math.max(0, positionRef.current.x + dx),
       y: Math.max(0, positionRef.current.y + dy),
     };
-  
+
     if (animationFrameRef.current === null) {
       animationFrameRef.current = requestAnimationFrame(updatePosition);
     }
   };
 
-const positionRef = useRef({ x: initialX, y: initialY });
-const [position, setPosition] = useState(positionRef.current);
-const animationFrameRef = useRef<number | null>(null);
+  const positionRef = useRef({ x: initialX, y: initialY });
+  const [position, setPosition] = useState(positionRef.current);
+  const animationFrameRef = useRef<number | null>(null);
 
-
-// === Smooth dragging helpers ===
-
-const updatePosition = () => {
-  setPosition({ ...positionRef.current });
-  animationFrameRef.current = null;
-};
-
-const handleDrag = (e: MouseEvent) => {
-  if (!dragging || !lastMousePos.current) return;
-
-  const dx = e.clientX - lastMousePos.current.x;
-  const dy = e.clientY - lastMousePos.current.y;
-  lastMousePos.current = { x: e.clientX, y: e.clientY };
-
-  positionRef.current = {
-    x: Math.max(0, positionRef.current.x + dx),
-    y: Math.max(0, positionRef.current.y + dy),
+  const updatePosition = () => {
+    setPosition({ ...positionRef.current });
+    animationFrameRef.current = null;
   };
 
-  if (animationFrameRef.current === null) {
-    animationFrameRef.current = requestAnimationFrame(updatePosition);
-  }
-};
+  const handleDrag = (e: MouseEvent) => {
+    if (!dragging || !lastMousePos.current) return;
 
-const handleMouseDown = (e: React.MouseEvent) => {
-  if ((e.target as HTMLElement).closest("button")) return;
-
-  dragReady.current = false;
-  holdTimeout.current = setTimeout(() => {
-    dragReady.current = true;
-    setDragging(true);
+    const dx = e.clientX - lastMousePos.current.x;
+    const dy = e.clientY - lastMousePos.current.y;
     lastMousePos.current = { x: e.clientX, y: e.clientY };
-  }, 100);
-};
 
-const handleMouseUp = () => {
-  clearTimeout(holdTimeout.current!);
-  setDragging(false);
-  dragReady.current = false;
-  lastMousePos.current = null;
-};
+    positionRef.current = {
+      x: Math.max(0, positionRef.current.x + dx),
+      y: Math.max(0, positionRef.current.y + dy),
+    };
 
-useEffect(() => {
-  if (dragging) {
-    window.addEventListener("mousemove", handleDrag);
-    window.addEventListener("mouseup", handleMouseUp);
-  }
-
-  return () => {
-    window.removeEventListener("mousemove", handleDrag);
-    window.removeEventListener("mouseup", handleMouseUp);
+    if (animationFrameRef.current === null) {
+      animationFrameRef.current = requestAnimationFrame(updatePosition);
+    }
   };
-}, [dragging]);
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (isDrawing || (e.target as HTMLElement).closest("button")) return;
+
+    dragReady.current = false;
+    holdTimeout.current = setTimeout(() => {
+      dragReady.current = true;
+      setDragging(true);
+      lastMousePos.current = { x: e.clientX, y: e.clientY };
+    }, 100);
+  };
+
+  const handleMouseUp = () => {
+    clearTimeout(holdTimeout.current!);
+    setDragging(false);
+    dragReady.current = false;
+    lastMousePos.current = null;
+  };
+
+  useEffect(() => {
+    if (dragging) {
+      window.addEventListener("mousemove", handleDrag);
+      window.addEventListener("mouseup", handleMouseUp);
+    }
+
+    return () => {
+      window.removeEventListener("mousemove", handleDrag);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [dragging]);
 
   return (
     <Box
@@ -287,9 +277,13 @@ useEffect(() => {
         {/* === Toolbar === */}
         <Box display="flex" justifyContent="space-between" bgcolor="rgba(255,255,255,0.4)" p={0.5}>
           <IconButton size="small" onClick={() => setCollapsed((c) => !c)}>
-            {collapsed ? <ChevronRightIcon fontSize="small" sx={{ transform: "rotate(270deg)" }} /> : <ExpandMoreIcon fontSize="small" />}
+            {collapsed ? (
+              <ChevronRightIcon fontSize="small" sx={{ transform: "rotate(270deg)" }} />
+            ) : (
+              <ExpandMoreIcon fontSize="small" />
+            )}
           </IconButton>
-  
+
           <Box display="flex" gap={0.5} alignItems="center">
             {/* Drawing tools */}
             {isDrawing && (
@@ -298,15 +292,23 @@ useEffect(() => {
                   type="color"
                   value={brushColor}
                   onChange={(e) => setBrushColor(e.target.value)}
-                  style={{ width: 24, height: 24, border: "none", background: "none", cursor: "pointer" }}
+                  style={{
+                    width: 24,
+                    height: 24,
+                    border: "none",
+                    background: "none",
+                    cursor: "pointer",
+                  }}
                 />
                 <select
                   value={brushSize}
                   onChange={(e) => setBrushSize(parseInt(e.target.value))}
                   style={{ height: 24, fontSize: "12px", cursor: "pointer" }}
                 >
-                  {[1, 2, 4, 8, 12].map(size => (
-                    <option key={size} value={size}>{size}px</option>
+                  {[1, 2, 4, 8, 12].map((size) => (
+                    <option key={size} value={size}>
+                      {size}px
+                    </option>
                   ))}
                 </select>
                 <IconButton
@@ -320,17 +322,18 @@ useEffect(() => {
                 </IconButton>
               </>
             )}
-  
+
             {/* Text tools */}
             {!isDrawing && (
               <>
                 {["bold", "italic", "underline"].map((cmd) => {
-                  const Icon = cmd === "bold"
-                    ? FormatBoldIcon
-                    : cmd === "italic"
-                    ? FormatItalicIcon
-                    : FormatUnderlinedIcon;
-  
+                  const Icon =
+                    cmd === "bold"
+                      ? FormatBoldIcon
+                      : cmd === "italic"
+                        ? FormatItalicIcon
+                        : FormatUnderlinedIcon;
+
                   return (
                     <IconButton
                       key={cmd}
@@ -340,13 +343,17 @@ useEffect(() => {
                         formatText(cmd as "bold" | "italic" | "underline");
                         contentRef.current?.focus();
                       }}
-                      sx={{ bgcolor: activeFormats[cmd as keyof typeof activeFormats] ? "#ddd" : "transparent" }}
+                      sx={{
+                        bgcolor: activeFormats[cmd as keyof typeof activeFormats]
+                          ? "#ddd"
+                          : "transparent",
+                      }}
                     >
                       <Icon fontSize="small" />
                     </IconButton>
                   );
                 })}
-  
+
                 <IconButton
                   size="small"
                   onClick={(e) => {
@@ -358,7 +365,7 @@ useEffect(() => {
                 </IconButton>
               </>
             )}
-  
+
             {/* Toggle edit mode */}
             <IconButton
               size="small"
@@ -369,7 +376,7 @@ useEffect(() => {
             >
               {isDrawing ? <BrushIcon /> : <EditIcon />}
             </IconButton>
-  
+
             {/* Category selector */}
             <IconButton
               size="small"
@@ -388,20 +395,24 @@ useEffect(() => {
                 }}
               />
             </IconButton>
-  
+
             {/* Delete button */}
             <IconButton
               size="small"
               onClick={(e) => {
                 e.stopPropagation();
-                handleConfirm("Czy na pewno usunąć notatkę?", () => onDelete?.(id));
+                if (textContent.trim() !== "" || drawingDataURL) {
+                  handleConfirm("Czy na pewno usunąć notatkę?", () => onDelete?.(id));
+                } else {
+                  onDelete?.(id);
+                }
               }}
             >
               <DeleteIcon fontSize="small" />
             </IconButton>
           </Box>
         </Box>
-  
+
         {/* === Content === */}
         <Collapse in={!collapsed}>
           {isDrawing ? (
@@ -434,7 +445,7 @@ useEffect(() => {
           )}
         </Collapse>
       </Paper>
-  
+
       {/* === Confirm dialog === */}
       <ConfirmDialog
         open={confirmOpen}
@@ -447,7 +458,7 @@ useEffect(() => {
         }}
         onClose={() => setConfirmOpen(false)}
       />
-  
+
       {/* === Category menu === */}
       <Menu
         anchorEl={menuAnchorEl}

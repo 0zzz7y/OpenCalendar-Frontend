@@ -1,11 +1,11 @@
 import {
-  Dialog, 
+  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
   Button,
-  DialogProps
+  DialogProps,
 } from "@mui/material";
 
 interface ConfirmDialogProperties {
@@ -17,7 +17,14 @@ interface ConfirmDialogProperties {
   paperProps: DialogProps["PaperProps"];
 }
 
-export default function ConfirmDialog({ open, title, message, onConfirm, onClose, paperProps }: ConfirmDialogProperties) {
+export default function ConfirmDialog({
+  open,
+  title,
+  message,
+  onConfirm,
+  onClose,
+  paperProps,
+}: ConfirmDialogProperties) {
   return (
     <Dialog open={open} onClose={onClose} PaperProps={paperProps}>
       <DialogTitle>{title}</DialogTitle>
