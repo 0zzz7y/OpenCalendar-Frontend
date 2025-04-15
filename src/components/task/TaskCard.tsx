@@ -1,228 +1,216 @@
-import {
-  Box,
-  Collapse,
-  FormControl,
-  IconButton,
-  InputLabel,
-  MenuItem,
-  Paper,
-  Select,
-  SelectChangeEvent,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { ExpandMore, ChevronRight } from "@mui/icons-material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { RecurringPattern } from "../../types/shared";
-import { CalendarDto } from "../../types/calendar";
-import { CategoryDto } from "../../types/category";
-import { TaskDto } from "../../types/task";
+import React, { useState } from 'react';
+import { Task, TaskStatus } from '../../types/task';
+import { RecurringPattern } from '../../types/shared';
+import IconButton from '@mui/material/IconButton';
+import Card from '@mui/material/Card';
+import CardContent from '@mui/material/CardContent';
+import TextField from '@mui/material/TextField';
+import Select from '@mui/material/Select';
+import MenuItem from '@mui/material/MenuItem';
+import Box from '@mui/material/Box';
+import Stack from '@mui/material/Stack';
+import Typography from '@mui/material/Typography';
+// MUI Icons for actions
+import EditIcon from '@mui/icons-material/Edit';
+import CheckIcon from '@mui/icons-material/Check';
+import DeleteIcon from '@mui/icons-material/Delete';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+// Icon for the calendar dot indicator (using a small circle)
+import FiberManualRecordIcon from '@mui/icons-material/FiberManualRecord';
+import CalendarTodayIcon from '@mui/icons-material/CalendarToday';  // calendar icon for date field
 
-interface TaskCardProperties {
-  task: TaskDto & { editing: boolean };
-  calendars: CalendarDto[];
-  categories: CategoryDto[];
-  updateTask: (id: string, data: Partial<TaskDto & { editing?: boolean }>) => void;
-  confirmDelete: (id: string) => void;
-  dragIdRef: React.MutableRefObject<string | null>;
-  timeoutRef: React.MutableRefObject<NodeJS.Timeout | null>;
-  setDraggingId: (id: string | null) => void;
-  editingTitleId: string | null;
-  setEditingTitleId: (id: string | null) => void;
-  editedTitle: string;
-  setEditedTitle: (title: string) => void;
+interface TaskCardProps {
+  task: Task;
+  calendar?: { name: string; color: string };   // calendar info (name and color) for display
+  category?: { name: string; color: string };   // category info for display
+  onEdit: (updatedTask: Task) => void;          // callback to save edits
+  onDelete: (taskId: string) => void;           // callback to delete task
+  onUpdate?: (task: Task) => void;
 }
 
-export default function TaskCard({
-  task,
-  calendars,
-  categories,
-  updateTask,
-  confirmDelete,
-  dragIdRef,
-  timeoutRef,
-  setDraggingId,
-  editingTitleId,
-  setEditingTitleId,
-  editedTitle,
-  setEditedTitle,
-}: TaskCardProperties) {
-  const getCategoryColor = (id: string | undefined) =>
-    categories.find((c) => c.id === id)?.color || "#fffde7";
+const TaskCard: React.FC<TaskCardProps> = ({ task, calendar, category, onEdit, onDelete, onUpdate }) => {
+  // Local state for expansion and editing
+  const [expanded, setExpanded] = useState(false);
+  const [isEditing, setIsEditing] = useState(false);
 
-  const startDrag = (e: React.MouseEvent) => {
-    timeoutRef.current = setTimeout(() => {
-      dragIdRef.current = task.id;
-      setDraggingId(task.id);
-    }, 500);
+  // Local state for editable fields (so we can modify before confirming)
+  const [editName, setEditName] = useState(task.name);
+  const [editDescription, setEditDescription] = useState(task.description || '');
+  const [editDate, setEditDate] = useState(task.endDate || task.startDate || '');  // assuming endDate as due date if provided
+  const [editRecurring, setEditRecurring] = useState<RecurringPattern>(task.recurringPattern);
+
+  // Determine card background color (category color if available, otherwise a default)
+  const cardColor = category?.color || '#f5f5f5';  // use category color, or a light grey if no category
+
+  // Toggle expansion (collapse/expand)
+  const handleToggleExpand = () => {
+    setExpanded(prev => !prev);
   };
 
-  const cancelDrag = () => {
-    if (timeoutRef.current) clearTimeout(timeoutRef.current);
-    dragIdRef.current = null;
-    setDraggingId(null);
+  // Enter edit mode (also expand the card to show fields)
+  const handleStartEdit = () => {
+    setExpanded(true);
+    setIsEditing(true);
   };
 
-  const handleClickCapture = (e: React.MouseEvent) => {
-    const target = e.target as HTMLElement;
-    const ignore = ["INPUT", "TEXTAREA", "SELECT", "BUTTON", "LI", "UL"];
-    if (
-      !ignore.includes(target.tagName) &&
-      !target.closest("button") &&
-      !target.closest("div[role='button']")
-    ) {
-      if (editingTitleId !== task.id) {
-        updateTask(task.id, { editing: !task.editing });
-      }
-    }
+  // Save edits and exit edit mode
+  const handleConfirmEdit = () => {
+    // Construct updated task object
+    const updatedTask: Task = {
+      ...task,
+      name: editName,
+      description: editDescription || undefined,
+      // Assuming date field is endDate for due date (adjust based on actual usage)
+      endDate: editDate || undefined,
+      recurringPattern: editRecurring
+    };
+    onEdit(updatedTask);          // notify parent about the updated task
+    setIsEditing(false);          // exit edit mode
+    // (we keep the card expanded after editing so user can see changes; could also collapse if desired)
   };
 
-  const handleUpdateField = (field: keyof TaskDto, value: string) => {
-    updateTask(task.id, { [field]: value });
+  // Delete task handler
+  const handleDelete = () => {
+    onDelete(task.id);
+  };
+
+  const handleStatusChange = (newStatus: TaskStatus) => {
+    const updatedTask = { ...task, status: newStatus };
+    onUpdate?.(updatedTask);
   };
 
   return (
-    <Paper
-      key={task.id}
-      draggable
-      onMouseDown={startDrag}
-      onMouseUp={cancelDrag}
-      onMouseLeave={cancelDrag}
-      onDragStart={(e) => {
-        if (!dragIdRef.current) e.preventDefault();
-      }}
-      onClickCapture={handleClickCapture}
-      sx={{
-        p: 1,
-        mb: 1,
-        fontSize: "0.85rem",
-        cursor: "move",
-        boxShadow: dragIdRef.current === task.id ? "0 0 10px #2196f3" : "none",
-        backgroundColor: task.categoryId ? getCategoryColor(task.categoryId) : "#fffde7",
+    <Card 
+      sx={{ 
+        backgroundColor: cardColor, 
+        borderRadius: 2, 
+        boxShadow: 1, 
+        border: '1px solid rgba(0,0,0,0.1)', 
+        mb: 1 // margin-bottom between task cards
       }}
     >
-      <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-        <Box sx={{ display: "flex", alignItems: "center", gap: 0.5 }}>
-          {task.editing ? <ExpandMore fontSize="small" /> : <ChevronRight fontSize="small" />}
-          {editingTitleId === task.id ? (
-            <TextField
-              size="small"
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              autoFocus
-              sx={{ fontWeight: "bold", input: { fontWeight: "bold" } }}
+      <CardContent sx={{ p: 1 }}>
+        {/* Header: Collapse/Expand button on left, Edit/Confirm and Delete on right */}
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+          <IconButton onClick={handleToggleExpand} size="small">
+            {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+          </IconButton>
+          <Box>
+            {isEditing ? (
+              <IconButton onClick={handleConfirmEdit} size="small" sx={{ mr: 1 }}>
+                <CheckIcon />
+              </IconButton>
+            ) : (
+              <IconButton onClick={handleStartEdit} size="small" sx={{ mr: 1 }}>
+                <EditIcon />
+              </IconButton>
+            )}
+            <IconButton onClick={handleDelete} size="small">
+              <DeleteIcon />
+            </IconButton>
+          </Box>
+        </Box>
+
+        {/* Task Name field (always visible). 
+            In view mode, make it read-only; in edit mode, allow typing. */}
+        <TextField 
+          variant="outlined" 
+          size="small"
+          fullWidth 
+          value={isEditing ? editName : task.name}
+          onChange={(e) => setEditName(e.target.value)}
+          placeholder="Task name"
+          InputProps={{
+            readOnly: !isEditing
+          }}
+          sx={{ backgroundColor: '#ffffff' }}
+        />
+
+        {/* Only show additional fields if card is expanded (details visible) */}
+        { expanded && (
+          <Stack spacing={1} mt={1}>
+            {/* Description field */}
+            <TextField 
+              variant="outlined" 
+              size="small" 
+              fullWidth
+              value={isEditing ? editDescription : (task.description || '')}
+              onChange={(e) => setEditDescription(e.target.value)}
+              placeholder="Opis"  /* "Description" */
+              InputProps={{ readOnly: !isEditing }}
+              sx={{ backgroundColor: '#ffffff' }}
             />
-          ) : (
-            <Typography fontWeight="bold">{task.name}</Typography>
-          )}
-        </Box>
-
-        <Box sx={{ display: "flex", gap: 0.5 }}>
-          <IconButton
-            size="small"
-            onClick={(e) => {
-              e.stopPropagation();
-              if (editingTitleId === task.id) {
-                updateTask(task.id, { name: editedTitle });
-                setEditingTitleId(null);
-              } else {
-                setEditedTitle(task.name);
-                setEditingTitleId(task.id);
-                if (!task.editing) updateTask(task.id, { editing: true });
-              }
-            }}
-          >
-            {editingTitleId === task.id ? "✔️" : "✏️"}
-          </IconButton>
-
-          <IconButton size="small" onClick={() => confirmDelete(task.id)}>
-            <DeleteIcon fontSize="small" />
-          </IconButton>
-        </Box>
-      </Box>
-
-      <Collapse in={task.editing}>
-        <Box sx={{ display: "flex", flexDirection: "column", gap: 1, mt: 1 }}>
-          <TextField
-            size="small"
-            label="Opis"
-            value={task.description || ""}
-            onChange={(e) => handleUpdateField("description", e.target.value)}
-            multiline
-            rows={2}
-          />
-
-          <TextField
-            size="small"
-            label="Data"
-            type="datetime-local"
-            value={task.startDate || ""}
-            onChange={(e) => handleUpdateField("startDate", e.target.value)}
-            InputLabelProps={{ shrink: true }}
-          />
-
-          {!!task.startDate && (
-            <FormControl size="small" fullWidth>
-              <InputLabel>Powtarzalność</InputLabel>
-              <Select
-                value={task.recurringPattern || RecurringPattern.NONE}
-                onChange={(e: SelectChangeEvent) =>
-                  updateTask(task.id, { recurringPattern: e.target.value as RecurringPattern })
-                }
-                label="Powtarzalność"
+            {/* Date field (start or end date). Display with a calendar icon. */}
+            <TextField 
+              variant="outlined" 
+              size="small" 
+              fullWidth
+              value={isEditing ? editDate : (task.endDate || task.startDate || '')}
+              onChange={(e) => setEditDate(e.target.value)}
+              placeholder="Data (dd/MM/yyyy/hh:mm)"  /* Date placeholder format */
+              InputProps={{ 
+                readOnly: !isEditing,
+                endAdornment: (
+                  <IconButton size="small" disabled={!isEditing}>
+                    <CalendarTodayIcon fontSize="small" />
+                  </IconButton>
+                )
+              }}
+              sx={{ backgroundColor: '#ffffff' }}
+            />
+            {/* Recurring pattern field */}
+            { isEditing ? (
+              // Editable select dropdown for recurring pattern
+              <TextField 
+                variant="outlined" 
+                size="small" 
+                select 
+                fullWidth
+                label="Powtarzanie" /* "Repeat" label in Polish */
+                value={editRecurring}
+                onChange={(e) => setEditRecurring(e.target.value as RecurringPattern)}
+                sx={{ backgroundColor: '#ffffff' }}
               >
-                <MenuItem value="DAILY">Codziennie</MenuItem>
-                <MenuItem value="WEEKLY">Co tydzień</MenuItem>
-                <MenuItem value="MONTHLY">Co miesiąc</MenuItem>
-                <MenuItem value="YEARLY">Co rok</MenuItem>
-                <MenuItem value="NONE">Brak</MenuItem>
-              </Select>
-            </FormControl>
-          )}
-
-          <FormControl size="small" fullWidth>
-            <InputLabel>Kalendarz</InputLabel>
-            <Select
-              value={task.calendarId || ""}
-              onChange={(e) => handleUpdateField("calendarId", e.target.value)}
-              label="Kalendarz"
-            >
-              {calendars.map((c) => (
-                <MenuItem key={c.id} value={c.id}>
-                  {c.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-
-          <FormControl size="small" fullWidth>
-            <InputLabel>Kategoria</InputLabel>
-            <Select
-              value={task.categoryId || ""}
-              onChange={(e) => handleUpdateField("categoryId", e.target.value)}
-              label="Kategoria"
-            >
-              {categories.map((c) => (
-                <MenuItem key={c.id} value={c.id}>
-                  <Box
-                    component="span"
-                    sx={{
-                      display: "inline-block",
-                      width: 12,
-                      height: 12,
-                      borderRadius: "50%",
-                      backgroundColor: task.categoryId === c.id ? "#fff" : c.color,
-                      border: "1px solid #999",
-                      mr: 1,
-                    }}
-                  />
-                  {c.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
-      </Collapse>
-    </Paper>
+                {/* Menu options for each recurring pattern value */}
+                {Object.values(RecurringPattern).map(pattern => (
+                  <MenuItem key={pattern} value={pattern}>
+                    {pattern.charAt(0) + pattern.slice(1).toLowerCase()}
+                  </MenuItem>
+                ))}
+              </TextField>
+            ) : (
+              // Read-only display of recurring pattern (if any)
+              task.recurringPattern && task.recurringPattern !== RecurringPattern.NONE && (
+                <TextField 
+                  variant="outlined" 
+                  size="small" 
+                  fullWidth
+                  value={task.recurringPattern.charAt(0) + task.recurringPattern.slice(1).toLowerCase()}
+                  InputProps={{ readOnly: true }}
+                  sx={{ backgroundColor: '#ffffff' }}
+                />
+              )
+            )}
+            {/* Calendar and Category labels (read-only, with colored dots). 
+                Show these if the info is available. */}
+            {calendar && (
+              <Box display="flex" alignItems="center" sx={{ backgroundColor: '#ffffff', borderRadius: 1, p: '4px 8px' }}>
+                <FiberManualRecordIcon sx={{ color: calendar.color, fontSize: 'small', mr: 1 }} />
+                <Typography variant="body2">{calendar.name}</Typography>
+              </Box>
+            )}
+            {category && (
+              <Box display="flex" alignItems="center" sx={{ backgroundColor: '#ffffff', borderRadius: 1, p: '4px 8px' }}>
+                <FiberManualRecordIcon sx={{ color: category.color, fontSize: 'small', mr: 1 }} />
+                <Typography variant="body2">{category.name}</Typography>
+              </Box>
+            )}
+          </Stack>
+        )}
+      </CardContent>
+    </Card>
   );
-}
+};
+
+export default TaskCard;

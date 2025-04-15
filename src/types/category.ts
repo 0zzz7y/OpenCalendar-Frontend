@@ -1,7 +1,7 @@
 
 import { UUID } from "./shared";
 
-export interface CategoryDto {
+export interface Category {
   id: UUID;
   name: string;
   color: string;

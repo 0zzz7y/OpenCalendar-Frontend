@@ -1,7 +1,7 @@
 import { UUID } from "./shared";
 import { RecurringPattern } from "./shared";
 
-export interface EventDto {
+export interface Event {
   id: UUID;
   name: string;
   description?: string;

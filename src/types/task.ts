@@ -7,7 +7,7 @@ export enum TaskStatus {
   DONE = "DONE",
 }
 
-export interface TaskDto {
+export interface Task {
   id: UUID;
   name: string;
   description?: string;

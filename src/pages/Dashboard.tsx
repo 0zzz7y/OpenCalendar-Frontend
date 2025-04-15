@@ -2,6 +2,7 @@ import { Box } from "@mui/material";
 import { useState } from "react";
 import LeftPanel from "../layouts/LeftPanel";
 import RightPanel from "../layouts/RightPanel";
+import { StyledTextField } from "../components/common/StyledTextField";
 
 export interface DashboardProperties {
   toggleTheme: () => void;
@@ -35,6 +36,13 @@ export default function Dashboard({ toggleTheme }: DashboardProperties) {
       {/* Main content */}
       <Box flex={1} bgcolor="#fff" p={2}>
         Main calendar area
+
+        <StyledTextField
+          label="Username"
+          size="medium"
+          fullWidth
+        />
+
       </Box>
 
       <Box

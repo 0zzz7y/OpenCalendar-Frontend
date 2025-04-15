@@ -1,4 +1,3 @@
-export {};
 import {
   Box, Button, IconButton, InputLabel, MenuItem, Paper,
   Select, TextField, Typography, FormControl, Dialog,
@@ -49,7 +48,9 @@ export default function TasksPanel() {
   const [editedTitle, setEditedTitle] = useState("");
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
   const dragIdRef = useRef<string | null>(null);
-
+  const handleKeyDown = (str: string) => {
+      addTask()
+  };
   const addTask = () => {
     if (!newTitle.trim()) return;
     const newTask: Task = {
@@ -307,9 +308,18 @@ export default function TasksPanel() {
   return (
     <Box>
       <Box sx={{ display: "flex", gap: 1, mb: 2 }}>
-        <TextField size="small" label="Tytuł zadania" value={newTitle} onChange={(e) => setNewTitle(e.target.value)} fullWidth />
-        <Button variant="contained" onClick={addTask}>Dodaj</Button>
-      </Box>
+      <TextField
+  size="small"
+  label="Tytuł zadania"
+  value={newTitle}
+  onChange={(e) => setNewTitle(e.target.value)}
+  onKeyDown={(e) => {
+    if (e.key === 'Enter') {
+      handleKeyDown(newTitle); // or just handleEnter(newTitle) if you don't need the event
+    }
+  }}
+  fullWidth
+/>      </Box>
 
       <Box sx={{ display: "flex", gap: 2 }}>
         {renderColumn("TODO", "📝 Do zrobienia")}

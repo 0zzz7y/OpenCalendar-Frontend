@@ -1,6 +1,6 @@
 import { UUID } from "./shared";
 
-export interface CalendarDto {
+export interface Calendar {
   id: UUID;
   name: string;
 }

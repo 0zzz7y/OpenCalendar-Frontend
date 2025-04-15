@@ -1,6 +1,6 @@
 import { UUID } from "./shared";
 
-export interface NoteDto {
+export interface Note {
   id: UUID;
   name?: string;
   description: string;
