@@ -1,0 +1,47 @@
+name: Run Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+
+  checkout:
+    name: Checkout Repository
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+  install:
+    name: Install Dependencies
+    needs: checkout
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install
+        run: npm install
+
+  test:
+    name: Run Tests
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Install
+        run: npm install
+      - name: Run Tests
+        run: npm test -- --watchAll=false --ci
+
+  lint:
+    name: Lint Code
+    needs: install
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Lint
+        run: npm run lint
