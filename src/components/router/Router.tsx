@@ -1,5 +1,5 @@
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
-import { Dashboard } from "../../pages/dashboard/Dashboard";
+import Dashboard from "../../pages/dashboard/Dashboard";
 
 const router = createBrowserRouter([
   {
@@ -8,6 +8,12 @@ const router = createBrowserRouter([
   },
 ]);
 
-export function Router() {
-  return <RouterProvider router={router} />;
+function Router() {
+  return (
+    <>
+      <RouterProvider router={router} />;
+    </>
+  );
 }
+
+export default Router;

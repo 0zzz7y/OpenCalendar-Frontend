@@ -1,0 +1,69 @@
+.wrapper {
+  position: relative;
+  display: inline-block;
+  width: 100%;
+}
+
+/* Select component base style override */
+.selectInput {
+  position: relative;
+  z-index: 2;
+  background-color: white;
+  border: none;
+  box-shadow: none;
+  transition: box-shadow 0.5s ease;
+}
+
+/* Hover/focus shadows */
+.selectInput:hover {
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+}
+
+.selectInput:focus-within {
+  box-shadow: 0 0 0 2px var(--mantine-primary-color-filled);
+}
+
+/* Animated border lines */
+.animatedBorder {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.animatedBorder::before,
+.animatedBorder::after {
+  content: "";
+  position: absolute;
+  background-color: var(--mantine-primary-color-filled);
+  transition: transform 0.4s ease;
+}
+
+/* Top line */
+.animatedBorder::before {
+  height: 2px;
+  width: 0%;
+  top: 0;
+  left: 0;
+  transform-origin: left;
+}
+
+/* Left line */
+.animatedBorder::after {
+  width: 2px;
+  height: 0%;
+  top: 0;
+  left: 0;
+  transform-origin: top;
+}
+
+/* Focus animation */
+.selectInput:focus + .animatedBorder::before {
+  width: 100%;
+  transition-delay: 0s;
+}
+
+.selectInput:focus + .animatedBorder::after {
+  height: 100%;
+  transition-delay: 0.2s;
+}
