@@ -10,24 +10,26 @@ import {
 import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
 
-import CalendarEditor from "./CalendarEditor"
+import { CategoryEditor } from "./CategoryEditor"
 
-export interface CalendarOption {
+export interface Option {
   label: string
   value: string
+  color?: string
 }
 
-interface CalendarSelectorProperties {
-  data: CalendarOption[]
+interface CategorySelectorProperties {
+  data: Option[]
   value: string | null
   onChange: (val: string | null) => void
-  setData: (data: CalendarOption[]) => void
+  setData: (data: Option[]) => void
 }
 
-const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorProperties) => {
+const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorProperties) => {
   const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add")
   const [currentValue, setCurrentValue] = useState("")
   const [labelInput, setLabelInput] = useState("")
+  const [colorInput, setColorInput] = useState("#3b5bdb")
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const isPopoverOpen = Boolean(anchorEl)
@@ -35,7 +37,7 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
   const handleAdd = () => {
     if (!labelInput.trim()) return
     const newValue = labelInput.toLowerCase().replace(/\s+/g, "-")
-    setData([...data, { label: labelInput, value: newValue }])
+    setData([...data, { label: labelInput, value: newValue, color: colorInput }])
     setAnchorEl(null)
   }
 
@@ -60,10 +62,12 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
     e: React.MouseEvent,
     val = "",
     label = "",
+    color = "#3b5bdb"
   ) => {
     setEditMode(mode)
     setCurrentValue(val)
     setLabelInput(label)
+    setColorInput(color)
     setAnchorEl(e.currentTarget as HTMLElement)
   }
 
@@ -72,7 +76,7 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
       <Box display="flex" alignItems="center" gap={1} width="100%">
         <TextField
           select
-          label="Kalendarz"
+          label="Kategoria"
           value={value || ""}
           onChange={(e) => onChange(e.target.value || null)}
           fullWidth
@@ -81,6 +85,9 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
             <MenuItem key={option.value} value={option.value}>
               <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
                 <Box display="flex" alignItems="center" gap={1}>
+                  {option.color && (
+                    <Box width={10} height={10} borderRadius="50%" bgcolor={option.color} />
+                  )}
                   <Typography variant="body2">{option.label}</Typography>
                 </Box>
                 {option.value !== "all" && (
@@ -89,7 +96,7 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation()
-                        openPopover("edit", e, option.value, option.label)
+                        openPopover("edit", e, option.value, option.label, option.color)
                       }}
                     >
                       <IconPencil size={16} />
@@ -98,7 +105,7 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation()
-                        openPopover("delete", e, option.value, option.label)
+                        openPopover("delete", e, option.value, option.label, option.color)
                       }}
                     >
                       <IconTrash size={16} />
@@ -119,13 +126,15 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
         open={isPopoverOpen}
         anchorEl={anchorEl}
         placement="bottom-end"
-        sx={{ zIndex: 1500 }}
+        sx={{ zIndex: 1300 }}
         disablePortal
       >
-        <CalendarEditor
+        <CategoryEditor
           editMode={editMode}
           labelInput={labelInput}
           setLabelInput={setLabelInput}
+          colorInput={colorInput}
+          setColorInput={setColorInput}
           onClose={() => setAnchorEl(null)}
           onAdd={handleAdd}
           onEdit={handleEdit}
@@ -136,4 +145,4 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
   )
 }
 
-export default CalendarSelector
+export default CategorySelector

@@ -4,9 +4,7 @@ import tsconfigPaths from "vite-tsconfig-paths";
 
 export default defineConfig({
   plugins: [react(), tsconfigPaths()],
-  test: {
-    globals: true,
-    environment: "jsdom",
-    setupFiles: "./vitest.setup.mjs",
-  },
+  optimizeDeps: {
+    exclude: ["@tabler/icons-react"]
+  }
 });

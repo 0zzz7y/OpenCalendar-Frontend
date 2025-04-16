@@ -12,10 +12,19 @@
   },
   "dependencies": {
     "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@hello-pangea/dnd": "^18.0.1",
     "@mantine/core": "^7.17.4",
     "@mantine/hooks": "^7.17.4",
     "@mantine/styles": "^6.0.22",
+    "@mui/icons-material": "^7.0.2",
+    "@mui/material": "^7.0.2",
+    "@mui/x-date-pickers": "^7.28.3",
     "@tabler/icons-react": "^3.31.0",
+    "@uiw/react-color": "^2.4.5",
+    "axios": "^1.8.4",
+    "clsx": "^2.1.1",
+    "date-fns": "^2.29.3",
     "prettier": "^3.5.3",
     "re-resizable": "^6.11.2",
     "react": "^19.1.0",
@@ -27,8 +36,9 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",
-    "@types/react": "^19.0.10",
-    "@types/react-dom": "^19.0.4",
+    "@types/react": "^19.1.2",
+    "@types/react-color": "^3.0.13",
+    "@types/react-dom": "^19.1.2",
     "@vitejs/plugin-react": "^4.4.0",
     "eslint": "^9.21.0",
     "eslint-plugin-react-hooks": "^5.1.0",
@@ -39,6 +49,6 @@
     "postcss-simple-vars": "^7.0.1",
     "typescript": "~5.7.2",
     "typescript-eslint": "^8.24.1",
-    "vite": "^6.2.6"
+    "vite": "^6.3.0"
   }
 }

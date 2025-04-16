@@ -1,16 +1,14 @@
-import "@mantine/core/styles.css";
+import { CssBaseline, ThemeProvider } from "@mui/material"
+import { theme } from "./theme"
+import Dashboard from "./pages/Dashboard"
 
-import { MantineProvider } from "@mantine/core";
-import { theme } from "./components/theme/theme";
-import Router from "./components/router/Router";
-import Dashboard from "./pages/dashboard/Dashboard";
-
-export default function App() {
+const App = () => {
   return (
-    <>
-      <MantineProvider theme={theme}>
-        <Dashboard />
-      </MantineProvider>
-    </>
-  );
+    <ThemeProvider theme={theme}>
+      <CssBaseline />
+      <Dashboard />
+    </ThemeProvider>
+  )
 }
+
+export default App
