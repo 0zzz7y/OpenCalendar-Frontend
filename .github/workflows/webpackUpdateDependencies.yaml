@@ -7,7 +7,6 @@ on:
   workflow_dispatch:
 
 jobs:
-
   checkout:
     name: Checkout Repository
     runs-on: ubuntu-latest

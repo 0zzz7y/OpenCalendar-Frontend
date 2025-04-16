@@ -1,4 +1,4 @@
-import { ResizableLayout } from "@/layouts/resizablelayout/ResizableLayout";
+import { ResizableLayout } from "@/layouts/dashboard/DashboardLayout";
 
 export function Dashboard() {
   return (

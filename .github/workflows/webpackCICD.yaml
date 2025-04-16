@@ -2,13 +2,12 @@ name: Continous Integration / Continous Deployment
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
 
 jobs:
-
   checkout:
     name: Checkout Repository
     runs-on: ubuntu-latest
