@@ -15,6 +15,7 @@
     "@mantine/core": "^7.17.4",
     "@mantine/hooks": "^7.17.4",
     "@mantine/styles": "^6.0.22",
+    "@tabler/icons-react": "^3.31.0",
     "prettier": "^3.5.3",
     "re-resizable": "^6.11.2",
     "react": "^19.1.0",

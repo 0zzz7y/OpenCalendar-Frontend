@@ -9,15 +9,13 @@ const Dashboard = () => {
   return (
     <>
       <ResizableLayout
-        leftPanel={
-        <LeftPanel/>}
-                centerPanel={<div style={{ height: "100%", background: "#ffffff" }} />}
-                rightPanel={<div style={{ height: "100%", background: "#f1f3f5" }} />}
-                initialLeftWidth={300}
-                initialRightWidth={400}
-                centerMinWidth={250}
-              />
-
+        leftPanel={<LeftPanel />}
+        centerPanel={<div style={{ height: "100%", background: "#ffffff" }} />}
+        rightPanel={<div style={{ height: "100%", background: "#f1f3f5" }} />}
+        initialLeftWidth={300}
+        initialRightWidth={400}
+        centerMinWidth={250}
+      />
     </>
   );
 };

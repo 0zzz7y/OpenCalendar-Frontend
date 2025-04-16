@@ -1,69 +1,51 @@
-.wrapper {
-  position: relative;
-  display: inline-block;
+.option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   width: 100%;
+  gap: 8px;
 }
 
-/* Select component base style override */
+.actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.actionIcon {
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 6px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  font-size: 16px;
+  user-select: none;
+  line-height: 1;
+}
+
+/* Hover effects for edit and delete */
+.editIcon:hover {
+  background-color: rgba(255, 223, 0, 0.3);
+  color: #ffdf00;
+}
+
+.deleteIcon:hover {
+  background-color: rgba(255, 72, 72, 0.3);
+  color: #ff4747;
+}
+
+/* Style the InputBase (Combobox Target) */
 .selectInput {
-  position: relative;
-  z-index: 2;
-  background-color: white;
-  border: none;
-  box-shadow: none;
-  transition: box-shadow 0.5s ease;
+  transition: box-shadow 0.2s ease, outline 0.2s ease;
 }
 
-/* Hover/focus shadows */
+/* Hover state (light border glow) */
 .selectInput:hover {
-  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.1);
 }
 
-.selectInput:focus-within {
-  box-shadow: 0 0 0 2px var(--mantine-primary-color-filled);
-}
-
-/* Animated border lines */
-.animatedBorder {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-}
-
-.animatedBorder::before,
-.animatedBorder::after {
-  content: "";
-  position: absolute;
-  background-color: var(--mantine-primary-color-filled);
-  transition: transform 0.4s ease;
-}
-
-/* Top line */
-.animatedBorder::before {
-  height: 2px;
-  width: 0%;
-  top: 0;
-  left: 0;
-  transform-origin: left;
-}
-
-/* Left line */
-.animatedBorder::after {
-  width: 2px;
-  height: 0%;
-  top: 0;
-  left: 0;
-  transform-origin: top;
-}
-
-/* Focus animation */
-.selectInput:focus + .animatedBorder::before {
-  width: 100%;
-  transition-delay: 0s;
-}
-
-.selectInput:focus + .animatedBorder::after {
-  height: 100%;
-  transition-delay: 0.2s;
+/* Focus/clicked state (outline) */
+.selectInput:focus,
+.selectInput:focus-visible {
+  outline: 2px solid #228be6;
+  outline-offset: 2px;
 }

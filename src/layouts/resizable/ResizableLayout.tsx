@@ -1,8 +1,8 @@
-import React, { ReactNode, useState } from "react";
+import React, { ReactNode, useState, useEffect, useRef } from "react";
 import { Box, Paper } from "@mantine/core";
 import styles from "./ResizableLayout.module.css";
 
-interface ResizableLayoutProps {
+interface ResizableLayoutProperties {
   leftPanel?: ReactNode;
   centerPanel: ReactNode;
   rightPanel?: ReactNode;
@@ -18,9 +18,24 @@ const ResizableLayout = ({
   initialLeftWidth = 250,
   initialRightWidth = 350,
   centerMinWidth = 200,
-}: ResizableLayoutProps) => {
+}: ResizableLayoutProperties) => {
   const [leftPanelWidth, setLeftPanelWidth] = useState(initialLeftWidth);
   const [rightPanelWidth, setRightPanelWidth] = useState(initialRightWidth);
+  const [showLeftPanelContent, setShowLeftPanelContent] = useState(true);
+
+  const leftPanelRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleResize = () => {
+      const width = leftPanelRef.current?.offsetWidth || 0;
+      setShowLeftPanelContent(width > 50);
+    };
+
+    const observer = new ResizeObserver(handleResize);
+    if (leftPanelRef.current) observer.observe(leftPanelRef.current);
+
+    return () => observer.disconnect();
+  }, []);
 
   const handleResize = (
     e: React.MouseEvent,
@@ -72,9 +87,9 @@ const ResizableLayout = ({
 
   return (
     <Box className={styles.container}>
-      <Box className={styles.sidePanel} style={{ width: leftPanelWidth }}>
+      <Box className={styles.sidePanel} style={{ width: leftPanelWidth }} ref={leftPanelRef}>
         <Paper withBorder p="md" className={styles.paper}>
-          {leftPanel}
+          {showLeftPanelContent && leftPanel}
         </Paper>
       </Box>
 
