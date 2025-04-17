@@ -1,1 +1,3 @@
-export type RecurringPattern = "DAILY" | "WEEKLY" | "MONTHLY"
+type RecurringPattern = "NONE" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY"
+
+export default RecurringPattern

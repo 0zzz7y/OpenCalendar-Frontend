@@ -1,35 +1,39 @@
-import { Droppable } from "@hello-pangea/dnd"
-import { Box, Paper, Typography } from "@mui/material"
-import TaskCard from "./TaskCard"
-import { Task } from "@/types/task"
-import { TaskStatus } from "@/types/taskStatus"
+import { ReactNode } from "react"
+
+import { Paper, Typography, Box } from "@mui/material"
 
 interface Properties {
-  status: TaskStatus
-  tasks: Task[]
+  title: string
+  icon: ReactNode
+  children: ReactNode
 }
 
-const TaskColumn = ({ status, tasks }: Properties) => {
+const TaskColumn = ({ title, icon, children }: Properties) => {
   return (
-    <Droppable droppableId={status}>
-      {(provided) => (
-        <Paper
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-          sx={{ width: 240, padding: 2, backgroundColor: "#f9f9f9" }}
-        >
-          <Typography variant="subtitle1" fontWeight={600} mb={1}>
-            {status.replace("_", " ")}
+    <>
+      <Paper
+        sx={{
+          width: 300,
+          minHeight: 400,
+          p: 2,
+          mx: 1,
+          border: "2px dashed #2196f3",
+          backgroundColor: "#f9f9f9",
+          display: "flex",
+          flexDirection: "column",
+          gap: 2
+        }}
+      >
+        <Box display="flex" alignItems="center" gap={1}>
+          {icon}
+          <Typography variant="subtitle1" fontWeight="bold">
+            {title}
           </Typography>
+        </Box>
 
-          {tasks.map((task, index) => (
-            <TaskCard key={task.id} task={task} index={index} />
-          ))}
-
-          {provided.placeholder}
-        </Paper>
-      )}
-    </Droppable>
+        {children}
+      </Paper>
+    </>
   )
 }
 

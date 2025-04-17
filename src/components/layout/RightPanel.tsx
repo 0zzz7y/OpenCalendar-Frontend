@@ -3,7 +3,8 @@ import NotesPanel from "../note/NotesPanel"
 const RightPanel = () => {
   return (
     <>
-      <NotesPanel />
+      {/* <NotesPanel /> */}
+      <TasksPanel />
     </>
   )
 }

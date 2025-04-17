@@ -1,1 +1,3 @@
-export type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE"
+type TaskStatus = "TODO" | "IN_PROGRESS" | "DONE"
+
+export default TaskStatus

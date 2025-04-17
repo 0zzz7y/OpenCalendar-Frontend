@@ -1,9 +1,9 @@
-import { TaskStatus } from "./taskStatus"
-import { RecurringPattern } from "./recurringPattern"
+import TaskStatus from "./taskStatus"
+import RecurringPattern from "./recurringPattern"
 
 export default interface Task {
   id: string
-  title: string
+  name: string
   description?: string
   startDate?: string
   endDate?: string

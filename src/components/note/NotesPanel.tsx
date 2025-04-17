@@ -4,6 +4,7 @@ import AddIcon from "@mui/icons-material/Add"
 import { useState } from "react"
 import NoteCard from "./NoteCard"
 import Note from "../../types/note"
+import { v4 as uuidv4 } from "uuid"
 
 const initialNotes: Note[] = [
   {
@@ -50,7 +51,7 @@ const NotesPanel = () => {
   const handleAddNote = () => {
     const maxZ = Math.max(0, ...notes.map((n) => n.zIndex))
     const newNote: Note = {
-      id: "",
+      id: uuidv4(),
       description: "",
       drawing: "",
       categoryId: undefined,
@@ -66,11 +67,15 @@ const NotesPanel = () => {
   }
 
   return (
-    <Box position="relative" width="100%" height="100%">
+    <Box position="absolute" top={0} left={0} width="100vw" height="100vh" zIndex={500}>
       {notes.map((note) => (
         <NoteCard
           key={note.id}
-          note={note}
+          id={note.id}
+          content={note.description || ""}
+          initialX={note.x}
+          initialY={note.y}
+          color={note.color}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
         />
@@ -79,10 +84,10 @@ const NotesPanel = () => {
       <IconButton
         onClick={handleAddNote}
         sx={{
-          position: "absolute",
+          position: "fixed",
           bottom: 16,
           right: 16,
-          zIndex: 1000,
+          zIndex: 1200,
           backgroundColor: "primary.main",
           color: "white",
           "&:hover": {
