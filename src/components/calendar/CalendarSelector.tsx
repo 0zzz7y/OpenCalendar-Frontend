@@ -4,7 +4,7 @@ import {
   IconButton,
   Popper,
   Box,
-  Typography,
+  Typography
 } from "@mui/material"
 
 import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react"
@@ -15,6 +15,7 @@ import CalendarEditor from "./CalendarEditor"
 export interface CalendarOption {
   label: string
   value: string
+  emoji?: string
 }
 
 interface CalendarSelectorProperties {
@@ -28,6 +29,7 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
   const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add")
   const [currentValue, setCurrentValue] = useState("")
   const [labelInput, setLabelInput] = useState("")
+  const [emojiInput, setEmojiInput] = useState("📅")
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
   const isPopoverOpen = Boolean(anchorEl)
@@ -35,24 +37,30 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
   const handleAdd = () => {
     if (!labelInput.trim()) return
     const newValue = labelInput.toLowerCase().replace(/\s+/g, "-")
-    setData([...data, { label: labelInput, value: newValue }])
+    setData([...data, { label: labelInput, value: newValue, emoji: emojiInput }])
     setAnchorEl(null)
+    setLabelInput("")
+    setEmojiInput("📅")
   }
 
   const handleEdit = () => {
     if (!labelInput.trim()) return
     setData(
       data.map((item) =>
-        item.value === currentValue ? { ...item, label: labelInput } : item
+        item.value === currentValue ? { ...item, label: labelInput, emoji: emojiInput } : item
       )
     )
     setAnchorEl(null)
+    setLabelInput("")
+    setEmojiInput("📅")
   }
 
   const handleDelete = () => {
     setData(data.filter((item) => item.value !== currentValue))
     if (value === currentValue) onChange(null)
     setAnchorEl(null)
+    setLabelInput("")
+    setEmojiInput("📅")
   }
 
   const openPopover = (
@@ -60,45 +68,63 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
     e: React.MouseEvent,
     val = "",
     label = "",
+    emoji = "📅"
   ) => {
+    if (mode === "delete" && val === value) return // prevent delete of currently selected
     setEditMode(mode)
     setCurrentValue(val)
     setLabelInput(label)
+    setEmojiInput(emoji)
     setAnchorEl(e.currentTarget as HTMLElement)
   }
 
   return (
     <>
-      <Box display="flex" alignItems="center" gap={1} width="100%">
+      <Box display="flex" alignItems="center" gap={1} width="100%" zIndex={1}>
         <TextField
           select
-          label="Kalendarz"
+          label="Calendar"
           value={value || ""}
           onChange={(e) => onChange(e.target.value || null)}
           fullWidth
+          size="small"
+          SelectProps={{
+            renderValue: (selected) => {
+              const item = data.find((d) => d.value === selected)
+              return (
+                <Box display="flex" alignItems="center" gap={1}>
+                  <span>{item?.emoji || "📅"}</span>
+                  <Typography variant="body2">{item?.label}</Typography>
+                </Box>
+              )
+            }
+          }}
         >
           {data.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+            <MenuItem key={option.value} value={option.value} sx={{ pl: 1, zIndex: 1 }}>
               <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
                 <Box display="flex" alignItems="center" gap={1}>
+                  <span>{option.emoji || "📅"}</span>
                   <Typography variant="body2">{option.label}</Typography>
                 </Box>
+
                 {option.value !== "all" && (
                   <Box display="flex" gap={1}>
                     <IconButton
                       size="small"
                       onClick={(e) => {
                         e.stopPropagation()
-                        openPopover("edit", e, option.value, option.label)
+                        openPopover("edit", e, option.value, option.label, option.emoji)
                       }}
                     >
                       <IconPencil size={16} />
                     </IconButton>
                     <IconButton
                       size="small"
+                      disabled={option.value === value}
                       onClick={(e) => {
                         e.stopPropagation()
-                        openPopover("delete", e, option.value, option.label)
+                        openPopover("delete", e, option.value, option.label, option.emoji)
                       }}
                     >
                       <IconTrash size={16} />
@@ -111,7 +137,7 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
         </TextField>
 
         <IconButton onClick={(e) => openPopover("add", e)}>
-          <IconCirclePlus size={24} />
+          <IconCirclePlus size={20} />
         </IconButton>
       </Box>
 
@@ -119,18 +145,25 @@ const CalendarSelector = ({ data, value, onChange, setData }: CalendarSelectorPr
         open={isPopoverOpen}
         anchorEl={anchorEl}
         placement="bottom-end"
-        sx={{ zIndex: 1500 }}
-        disablePortal
+        sx={{ zIndex: 2000 }}
+        modifiers={[{
+          name: "preventOverflow",
+          options: { boundary: "viewport" }
+        }]}
       >
-        <CalendarEditor
-          editMode={editMode}
-          labelInput={labelInput}
-          setLabelInput={setLabelInput}
-          onClose={() => setAnchorEl(null)}
-          onAdd={handleAdd}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <Box zIndex={2000}>
+          <CalendarEditor
+            editMode={editMode}
+            labelInput={labelInput}
+            setLabelInput={setLabelInput}
+            onClose={() => setAnchorEl(null)}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            emojiInput={emojiInput}
+            setEmojiInput={setEmojiInput}
+          />
+        </Box>
       </Popper>
     </>
   )

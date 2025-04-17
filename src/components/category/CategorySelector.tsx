@@ -4,25 +4,25 @@ import {
   IconButton,
   Popper,
   Box,
-  Typography,
+  Typography
 } from "@mui/material"
 
 import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react"
 import { useState } from "react"
 
-import { CategoryEditor } from "./CategoryEditor"
+import CategoryEditor from "./CategoryEditor"
 
-export interface Option {
+export interface CategoryOption {
   label: string
   value: string
   color?: string
 }
 
 interface CategorySelectorProperties {
-  data: Option[]
+  data: CategoryOption[]
   value: string | null
   onChange: (val: string | null) => void
-  setData: (data: Option[]) => void
+  setData: (data: CategoryOption[]) => void
 }
 
 const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorProperties) => {
@@ -39,22 +39,28 @@ const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorPr
     const newValue = labelInput.toLowerCase().replace(/\s+/g, "-")
     setData([...data, { label: labelInput, value: newValue, color: colorInput }])
     setAnchorEl(null)
+    setLabelInput("")
+    setColorInput("#3b5bdb")
   }
 
   const handleEdit = () => {
     if (!labelInput.trim()) return
     setData(
       data.map((item) =>
-        item.value === currentValue ? { ...item, label: labelInput } : item
+        item.value === currentValue ? { ...item, label: labelInput, color: colorInput } : item
       )
     )
     setAnchorEl(null)
+    setLabelInput("")
+    setColorInput("#3b5bdb")
   }
 
   const handleDelete = () => {
     setData(data.filter((item) => item.value !== currentValue))
     if (value === currentValue) onChange(null)
     setAnchorEl(null)
+    setLabelInput("")
+    setColorInput("#3b5bdb")
   }
 
   const openPopover = (
@@ -64,6 +70,7 @@ const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorPr
     label = "",
     color = "#3b5bdb"
   ) => {
+    if (mode === "delete" && val === value) return
     setEditMode(mode)
     setCurrentValue(val)
     setLabelInput(label)
@@ -73,16 +80,30 @@ const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorPr
 
   return (
     <>
-      <Box display="flex" alignItems="center" gap={1} width="100%">
+      <Box display="flex" alignItems="center" gap={1} width="100%" zIndex={1}>
         <TextField
           select
-          label="Kategoria"
+          label="Category"
           value={value || ""}
           onChange={(e) => onChange(e.target.value || null)}
           fullWidth
+          size="small"
+          SelectProps={{
+            renderValue: (selected) => {
+              const item = data.find((d) => d.value === selected)
+              return (
+                <Box display="flex" alignItems="center" gap={1}>
+                  {item?.color && (
+                    <Box width={10} height={10} borderRadius="50%" bgcolor={item.color} />
+                  )}
+                  <Typography variant="body2">{item?.label}</Typography>
+                </Box>
+              )
+            }
+          }}
         >
           {data.map((option) => (
-            <MenuItem key={option.value} value={option.value}>
+            <MenuItem key={option.value} value={option.value} sx={{ pl: 1, zIndex: 1 }}>
               <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
                 <Box display="flex" alignItems="center" gap={1}>
                   {option.color && (
@@ -90,6 +111,7 @@ const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorPr
                   )}
                   <Typography variant="body2">{option.label}</Typography>
                 </Box>
+
                 {option.value !== "all" && (
                   <Box display="flex" gap={1}>
                     <IconButton
@@ -103,6 +125,7 @@ const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorPr
                     </IconButton>
                     <IconButton
                       size="small"
+                      disabled={option.value === value}
                       onClick={(e) => {
                         e.stopPropagation()
                         openPopover("delete", e, option.value, option.label, option.color)
@@ -118,7 +141,7 @@ const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorPr
         </TextField>
 
         <IconButton onClick={(e) => openPopover("add", e)}>
-          <IconCirclePlus size={24} />
+          <IconCirclePlus size={20} />
         </IconButton>
       </Box>
 
@@ -126,20 +149,25 @@ const CategorySelector = ({ data, value, onChange, setData }: CategorySelectorPr
         open={isPopoverOpen}
         anchorEl={anchorEl}
         placement="bottom-end"
-        sx={{ zIndex: 1300 }}
-        disablePortal
+        sx={{ zIndex: 2000 }}
+        modifiers={[{
+          name: "preventOverflow",
+          options: { boundary: "viewport" }
+        }]}
       >
-        <CategoryEditor
-          editMode={editMode}
-          labelInput={labelInput}
-          setLabelInput={setLabelInput}
-          colorInput={colorInput}
-          setColorInput={setColorInput}
-          onClose={() => setAnchorEl(null)}
-          onAdd={handleAdd}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-        />
+        <Box zIndex={2000}>
+          <CategoryEditor
+            editMode={editMode}
+            labelInput={labelInput}
+            setLabelInput={setLabelInput}
+            onClose={() => setAnchorEl(null)}
+            onAdd={handleAdd}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            colorInput={colorInput}
+            setColorInput={setColorInput}
+          />
+        </Box>
       </Popper>
     </>
   )

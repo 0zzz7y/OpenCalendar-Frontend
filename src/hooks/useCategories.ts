@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from "../api/axios"
-import { Category } from "../models/category"
+import { Category } from "../types/category"
 
 export const useCategories = () => {
   const [categories, setCategories] = useState<Category[]>([])

@@ -1,18 +1,18 @@
-import { Box, Grid } from "@mui/material"
-
 import LeftPanel from "../components/layout/LeftPanel"
-import MiddlePanel from "../components/layout/MiddlePanel"
+import CenterPanel from "../components/layout/CenterPanel"
 import RightPanel from "../components/layout/RightPanel"
 import ResizableLayout from "../components/layout/ResizableLayout"
 
-export default function Dashboard() {
+const Dashboard = () => {
   return (
     <>
       <ResizableLayout
         leftPanel={<LeftPanel />}
-        centerPanel={<MiddlePanel />}
+        centerPanel={<CenterPanel />}
         rightPanel={<RightPanel />}
       />
     </>
   )
 }
+
+export default Dashboard

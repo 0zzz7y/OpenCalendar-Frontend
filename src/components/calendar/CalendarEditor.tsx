@@ -4,8 +4,13 @@ import {
   Typography,
   Button,
   Box,
-  ClickAwayListener,
+  ClickAwayListener
 } from "@mui/material"
+
+import EmojiPicker from "emoji-picker-react"
+
+import { useEffect, useRef } from "react"
+import { EmojiClickData, EmojiStyle, SkinTones, Theme } from "emoji-picker-react"
 
 interface CalendarEditorProperties {
   editMode: "add" | "edit" | "delete"
@@ -15,6 +20,8 @@ interface CalendarEditorProperties {
   onAdd: () => void
   onEdit: () => void
   onDelete: () => void
+  emojiInput: string
+  setEmojiInput: (emoji: string) => void
 }
 
 const CalendarEditor = ({
@@ -25,7 +32,18 @@ const CalendarEditor = ({
   onAdd,
   onEdit,
   onDelete,
+  emojiInput,
+  setEmojiInput
 }: CalendarEditorProperties) => {
+  const inputRef = useRef<HTMLInputElement | null>(null)
+
+  useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus()
+      inputRef.current.setSelectionRange(labelInput.length, labelInput.length)
+    }
+  }, [editMode])
+
   return (
     <>
       <ClickAwayListener onClickAway={onClose}>
@@ -38,11 +56,12 @@ const CalendarEditor = ({
                 fontWeight={500}
                 gutterBottom
               >
-                {editMode === "add" ? "Nowy kalendarz" : "Zmień nazwę"}
+                {editMode === "add" ? "New calendar" : "Edit name"}
               </Typography>
 
               <TextField
-                placeholder="Nazwa"
+                inputRef={inputRef}
+                placeholder="Name"
                 value={labelInput}
                 onChange={(e) => setLabelInput(e.target.value)}
                 fullWidth
@@ -50,13 +69,32 @@ const CalendarEditor = ({
                 margin="dense"
               />
 
+              <Box mt={2}>
+                <EmojiPicker
+                  width="100%"
+                  height={300}
+                  searchDisabled
+                  previewConfig={{ showPreview: false }}
+                  onEmojiClick={(emojiData: EmojiClickData) =>
+                    setEmojiInput(emojiData.emoji)
+                  }
+                  emojiStyle={EmojiStyle.NATIVE}
+                  skinTonesDisabled
+                  lazyLoadEmojis={true}
+                  defaultSkinTone={SkinTones.NEUTRAL}
+                  theme={Theme.LIGHT}
+                  autoFocusSearch={false}
+                  customEmojis={[]}
+                />
+              </Box>
+
               <Button
                 variant="contained"
                 fullWidth
                 sx={{ mt: 2 }}
                 onClick={editMode === "add" ? onAdd : onEdit}
               >
-                {editMode === "add" ? "DODAJ" : "ZAPISZ"}
+                {editMode === "add" ? "ADD" : "SAVE"}
               </Button>
             </>
           )}
@@ -64,12 +102,12 @@ const CalendarEditor = ({
           {editMode === "delete" && (
             <>
               <Typography variant="body2">
-                Czy na pewno chcesz usunąć ten kalendarz?
+                Are you sure you want to delete this calendar?
               </Typography>
 
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
                 <Button variant="text" size="small" onClick={onClose}>
-                  Anuluj
+                  Cancel
                 </Button>
                 <Button
                   variant="contained"
@@ -77,7 +115,7 @@ const CalendarEditor = ({
                   size="small"
                   onClick={onDelete}
                 >
-                  Usuń
+                  Delete
                 </Button>
               </Box>
             </>

@@ -1,13 +1,15 @@
-import { CssBaseline, ThemeProvider } from "@mui/material"
-import { theme } from "./theme"
+import { CssBaseline } from "@mui/material"
+
+import ThemeProvider from "./components/theme/ThemeProvider"
 import Dashboard from "./pages/Dashboard"
 
 const App = () => {
   return (
-    <ThemeProvider theme={theme}>
-      <CssBaseline />
-      <Dashboard />
-    </ThemeProvider>
+    <>
+      <ThemeProvider>
+        <Dashboard />
+      </ThemeProvider>
+    </>
   )
 }
 

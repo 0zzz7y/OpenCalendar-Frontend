@@ -1,54 +1,61 @@
+import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
 import { useState } from "react"
 
+import ThemeToggleButton from "../theme/ThemeToggleButton"
+import CategorySelector, { CategoryOption } from "../category/CategorySelector"
 import CalendarSelector, { CalendarOption } from "../calendar/CalendarSelector"
-import CategorySelector, { Option } from "../category/CategorySelector"
 import MonthlyCalendar from "../calendar/MonthlyCalendar"
 
-export default function LeftPanel() {
-  const [selectedCalendar, setSelectedCalendar] = useState<string | null>(null)
-  const [calendarData, setCalendarData] = useState<CalendarOption[]>([
-    { label: "Osobisty", value: "personal", emoji: "🏠" },
-    { label: "Praca", value: "work", emoji: "💼" },
+const LeftPanel = () => {
+  const [calendarOptions, setCalendarOptions] = useState<CalendarOption[]>([
+    { label: "Osobisty", value: "personal" },
+    { label: "Praca", value: "work" }
   ])
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [categoryData, setCategoryData] = useState<Option[]>([
-    { label: "Siłownia", value: "gym", color: "#f59f00" },
-    { label: "Ogród", value: "garden", color: "#40c057" },
+  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([
+    { label: "Osobisty", value: "personal", color: "#3b5bdb" },
+    { label: "Praca", value: "work", color: "#fa5252" }
   ])
+
+  const [selectedCalendar, setSelectedCalendar] = useState<string | null>("personal")
+  const [selectedCategory, setSelectedCategory] = useState<string | null>("personal")
 
   return (
     <>
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          gap: "12px",
-          padding: "12px",
-          height: "100%",
-          boxSizing: "border-box",
-        }}
-      >
-        <div style={{ marginBottom: "8px" }}>
-          {<CalendarSelector
-            data={calendarData}
+      <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+        <Stack spacing={2}>
+          <CalendarSelector
+            data={calendarOptions}
             value={selectedCalendar}
-            onChange={setSelectedCalendar}
-            setData={setCalendarData}
-          />}
+            onChange={(val) => setSelectedCalendar(val)}
+            setData={setCalendarOptions}
+          />
 
           <CategorySelector
-            data={categoryData}
+            data={categoryOptions}
             value={selectedCategory}
-            onChange={setSelectedCategory}
-            setData={setCategoryData}
+            onChange={(val) => setSelectedCategory(val)}
+            setData={setCategoryOptions}
           />
-        </div>
 
-        <div style={{ flexGrow: 1 }}>
-          <MonthlyCalendar />
-        </div>
-      </div>
+          <Box
+            sx={{
+              alignSelf: "flex-start",
+              mt: "-16px",
+              ml: "-24px",
+            }}
+          >
+            <MonthlyCalendar />
+          </Box>
+        </Stack>
+
+        <Box>
+          <ThemeToggleButton />
+        </Box>
+      </Box>
     </>
   )
 }
+
+export default LeftPanel

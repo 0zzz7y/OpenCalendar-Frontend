@@ -4,7 +4,7 @@ import {
   Typography,
   Button,
   Box,
-  ClickAwayListener,
+  ClickAwayListener
 } from "@mui/material"
 
 import { Sketch } from "@uiw/react-color"
@@ -21,7 +21,7 @@ interface CategoryEditorProperties {
   onDelete: () => void
 }
 
-export const CategoryEditor = ({
+const CategoryEditor = ({
   editMode,
   labelInput,
   setLabelInput,
@@ -30,7 +30,7 @@ export const CategoryEditor = ({
   onClose,
   onAdd,
   onEdit,
-  onDelete,
+  onDelete
 }: CategoryEditorProperties) => {
   return (
     <>
@@ -44,11 +44,11 @@ export const CategoryEditor = ({
                 fontWeight={500}
                 gutterBottom
               >
-                {editMode === "add" ? "Nowa kategoria" : "Zmień nazwę"}
+                {editMode === "add" ? "New category" : "Edit name"}
               </Typography>
 
               <TextField
-                placeholder="Nazwa"
+                placeholder="Name"
                 value={labelInput}
                 onChange={(e) => setLabelInput(e.target.value)}
                 fullWidth
@@ -56,14 +56,12 @@ export const CategoryEditor = ({
                 margin="dense"
               />
 
-              {editMode === "add" && (
-                <Box mt={2}>
-                  <Sketch
-                    color={colorInput}
-                    onChange={(color) => setColorInput(color.hex)}
-                  />
-                </Box>
-              )}
+              <Box mt={2}>
+                <Sketch
+                  color={colorInput}
+                  onChange={(color) => setColorInput(color.hex)}
+                />
+              </Box>
 
               <Button
                 variant="contained"
@@ -71,7 +69,7 @@ export const CategoryEditor = ({
                 sx={{ mt: 2 }}
                 onClick={editMode === "add" ? onAdd : onEdit}
               >
-                {editMode === "add" ? "DODAJ" : "ZAPISZ"}
+                {editMode === "add" ? "ADD" : "SAVE"}
               </Button>
             </>
           )}
@@ -79,12 +77,12 @@ export const CategoryEditor = ({
           {editMode === "delete" && (
             <>
               <Typography variant="body2">
-                Czy na pewno chcesz usunąć tę kategorię?
+                Are you sure you want to delete this category?
               </Typography>
 
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
                 <Button variant="text" size="small" onClick={onClose}>
-                  Anuluj
+                  Cancel
                 </Button>
                 <Button
                   variant="contained"
@@ -92,7 +90,7 @@ export const CategoryEditor = ({
                   size="small"
                   onClick={onDelete}
                 >
-                  Usuń
+                  Delete
                 </Button>
               </Box>
             </>
@@ -102,3 +100,5 @@ export const CategoryEditor = ({
     </>
   )
 }
+
+export default CategoryEditor

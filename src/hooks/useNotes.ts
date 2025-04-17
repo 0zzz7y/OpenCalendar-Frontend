@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from "../api/axios"
-import { Note } from "../models/note"
+import { Note } from "../types/note"
 
 export const useNotes = () => {
   const [notes, setNotes] = useState<Note[]>([])

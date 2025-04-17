@@ -1,8 +1,8 @@
 import { useEffect, useState } from "react"
 import axios from "../api/axios"
-import { Event } from "../models/event"
+import { Event } from "../types/event"
 
-export const useEvents = () => {
+const useEvents = () => {
   const [events, setEvents] = useState<Event[]>([])
 
   const fetchEvents = async () => {
@@ -16,3 +16,5 @@ export const useEvents = () => {
 
   return { events, setEvents, fetchEvents }
 }
+
+export default useEvents

@@ -3,7 +3,7 @@ import { DragDropContext, DropResult } from "@hello-pangea/dnd"
 import { Box } from "@mui/material"
 import TaskColumn from "./TaskColumn"
 import { useTasks } from "@/hooks/useTasks"
-import { TaskStatus } from "@/models/taskStatus"
+import { TaskStatus } from "@/types/taskStatus"
 
 const statuses: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"]
 

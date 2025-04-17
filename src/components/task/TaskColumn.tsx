@@ -1,8 +1,8 @@
 import { Droppable } from "@hello-pangea/dnd"
 import { Box, Paper, Typography } from "@mui/material"
 import TaskCard from "./TaskCard"
-import { Task } from "@/models/task"
-import { TaskStatus } from "@/models/taskStatus"
+import { Task } from "@/types/task"
+import { TaskStatus } from "@/types/taskStatus"
 
 interface Properties {
   status: TaskStatus

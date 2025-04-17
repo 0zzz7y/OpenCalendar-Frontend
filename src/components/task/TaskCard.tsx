@@ -1,7 +1,7 @@
 // src/components/task/TaskCard.tsx
 import { Draggable } from "@hello-pangea/dnd"
 import { Paper, Typography } from "@mui/material"
-import { Task } from "@/models/task"
+import { Task } from "@/types/task"
 import { useCategories } from "@/hooks/useCategories"
 
 interface Properties {

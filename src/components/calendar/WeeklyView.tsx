@@ -1,99 +1,68 @@
-import {
-  Box,
-  CircularProgress,
-  Typography,
-  Paper,
-} from "@mui/material"
-import {
-  eachDayOfInterval,
-  format,
-  startOfWeek,
-  addDays,
-  differenceInMinutes,
-  isSameDay,
-  parseISO,
-} from "date-fns"
-import { useState, useEffect } from "react"
+import { useState } from "react"
+import { Box, Typography } from "@mui/material"
 
-import { useEvents } from "@/hooks/useEvents"
-// import EventCard from "../event/EventCard"
-import EventCreationDialog from "../event/EventCreationDialog"
+import DayColumn from "./DayColumn"
+import { Event } from "../../types/event"
 
-const hourHeight = 50
-const slotHeight = hourHeight / 2
+const getStartOfWeek = (date = new Date()) => {
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1) // poniedziałek
+  d.setDate(diff)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
 
 const WeeklyView = () => {
-  const start = startOfWeek(new Date(), { weekStartsOn: 1 })
-  const days = eachDayOfInterval({ start, end: addDays(start, 6) })
+  const [events, setEvents] = useState<Event[]>([])
 
-  const { events, fetchEvents } = useEvents()
-
-  const [openDialog, setOpenDialog] = useState(false)
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null)
-
-  useEffect(() => {
-    fetchEvents()
-  }, [])
-
-  const handleSlotClick = (day: Date, hour: number, minute: number) => {
-    const date = new Date(day)
-    date.setHours(hour)
-    date.setMinutes(minute)
-    setSelectedDate(date)
-    setOpenDialog(true)
+  const handleSave = (data: Partial<Event> & { start: string }) => {
+    setEvents((prev) => {
+      const exists = prev.find((e) => e.start === data.start)
+      const id = exists?.id || crypto.randomUUID()
+  
+      const newEvent: Event = {
+        id,
+        title: data.title ?? "Nowe wydarzenie",
+        startDate: data.start,
+        endDate: data.end ?? data.start,
+        color: data.color ?? "#1976d2",
+        start: "",
+        calendarId: ""
+      }
+  
+      return exists
+        ? prev.map((e) => (e.id === id ? newEvent : e))
+        : [...prev, newEvent]
+    })
   }
 
+  const weekStart = getStartOfWeek()
+  const days = Array.from({ length: 7 }, (_, i) => {
+    const d = new Date(weekStart)
+    d.setDate(d.getDate() + i)
+    return d
+  })
+
   return (
-    <Box display="flex" height="100%" overflow="auto">
-      {days.map((day, dayIndex) => (
-        <Box key={dayIndex} flex={1} borderRight="1px solid #eee">
-          <Box p={1} textAlign="center" borderBottom="1px solid #ccc" bgcolor="#f9f9f9">
-            <Typography variant="subtitle2">{format(day, "EEEE")}</Typography>
-            <Typography variant="caption">{format(day, "dd/MM")}</Typography>
+    <Box display="flex" height="100%">
+      {days.map((day, index) => (
+        <Box key={index} width="100%" display="flex" flexDirection="column" borderRight="1px solid #ccc">
+          <Box px={1} py={1} textAlign="center" bgcolor="#f0f0f0" borderBottom="1px solid #ddd">
+            <Typography variant="subtitle2">
+              {day.toLocaleDateString("pl-PL", { weekday: "short", day: "numeric", month: "short" })}
+            </Typography>
           </Box>
 
-          <Box position="relative" height={`calc(24 * ${hourHeight}px)`}>
-            {[...Array(24)].map((_, hour) => (
-              <Box
-                key={hour}
-                position="absolute"
-                top={hour * hourHeight}
-                left={0}
-                right={0}
-                height={hourHeight}
-                borderTop="1px dashed #ccc"
-                onClick={() => handleSlotClick(day, hour, 0)}
-              />
-            ))}
-
-            {events
-              .filter((event) => isSameDay(parseISO(event.startDate), day))
-              .map((event) => {
-                const start = parseISO(event.startDate)
-                const end = parseISO(event.endDate)
-                const top = start.getHours() * hourHeight + (start.getMinutes() / 60) * hourHeight
-                const height = (differenceInMinutes(end, start) / 60) * hourHeight
-
-                return (
-                  <></>
-                  // <EventCard
-                  //   key={event.id}
-                  //   event={event}
-                  //   style={{ top, height }}
-                  // />
-                )
-              })}
-          </Box>
+          <DayColumn
+            date={day}
+            events={events.filter((e) =>
+              new Date(e.start).toDateString() === day.toDateString()
+            )}
+            onSave={handleSave}
+          />
         </Box>
       ))}
-
-      {openDialog && selectedDate && (
-        <EventCreationDialog
-          open={openDialog}
-          onClose={() => setOpenDialog(false)}
-          initialDate={selectedDate}
-        />
-      )}
     </Box>
   )
 }

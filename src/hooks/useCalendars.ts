@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import axios from "../api/axios"
-import { Calendar } from "../models/calendar"
+import { Calendar } from "../types/calendar"
 
 export const useCalendars = () => {
   const [calendars, setCalendars] = useState<Calendar[]>([])
