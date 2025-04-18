@@ -1,62 +1,81 @@
-import { Box, Typography } from "@mui/material"
-import { useEffect, useRef, useState } from "react"
-import { useDrag } from "react-dnd"
+import { Box, Typography } from "@mui/material";
+import { useEffect, useRef, useState } from "react";
+import { useDrag } from "react-dnd";
 
-import Event from "../../types/event"
+import Event from "../../types/event";
 
 interface EventBoxProperties {
-  event: Event
-  dragTargetId?: string | null
-  showPopoverLine?: boolean
-  customStyle?: React.CSSProperties
-  onClick?: () => void
+  event: Event;
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
+  dragTargetId?: string | null;
+  showPopoverLine?: boolean;
+  customStyle?: React.CSSProperties;
+  onClick?: () => void;
 }
 
-const EventBox = ({ event, dragTargetId, showPopoverLine, customStyle, onClick }: EventBoxProperties) => {
-  const eventRef = useRef<HTMLDivElement>(null)
-  const [enableDrag, setEnableDrag] = useState(false)
+const EventBox = ({
+  event,
+  calendars,
+  categories,
+  dragTargetId,
+  showPopoverLine,
+  customStyle,
+  onClick
+}: EventBoxProperties) => {
+  const eventRef = useRef<HTMLDivElement>(null);
+  const [enableDrag, setEnableDrag] = useState(false);
 
-  const [{ isDragging }, drag] = useDrag(() => ({
-    type: "event",
-    item: { id: event.id },
-    canDrag: () => enableDrag,
-    collect: (monitor) => ({
-      isDragging: monitor.isDragging()
-    })
-  }), [enableDrag])
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: "event",
+      item: { id: event.id },
+      canDrag: () => enableDrag,
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging()
+      })
+    }),
+    [enableDrag]
+  );
 
   useEffect(() => {
     if (eventRef.current) {
-      drag(eventRef.current)
+      drag(eventRef.current);
     }
-  }, [drag])
+  }, [drag]);
 
-  const timeoutRef = useRef<number | null>(null)
+  const timeoutRef = useRef<number | null>(null);
 
   const handleMouseDown = () => {
-    timeoutRef.current = window.setTimeout(() => setEnableDrag(true), 200)
-  }
+    timeoutRef.current = window.setTimeout(() => setEnableDrag(true), 200);
+  };
 
   const handleMouseUp = () => {
     if (timeoutRef.current !== null) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = null;
     }
     if (!enableDrag) {
-      onClick?.()
+      onClick?.();
     }
-    setEnableDrag(false)
-  }
+    setEnableDrag(false);
+  };
 
-  const start = new Date(event.startDate)
-  const end = new Date(event.endDate)
+  const start = new Date(event.startDate);
+  const end = new Date(event.endDate);
 
-  const minutesFromStart = start.getHours() * 60 + start.getMinutes()
-  const minutesToEnd = end.getHours() * 60 + end.getMinutes()
-  const duration = Math.max(15, minutesToEnd - minutesFromStart)
+  const minutesFromStart = start.getHours() * 60 + start.getMinutes();
+  const minutesToEnd = end.getHours() * 60 + end.getMinutes();
+  const duration = Math.max(15, minutesToEnd - minutesFromStart);
 
-  const top = (minutesFromStart / 15) * 32
-  const height = (duration / 15) * 32
+  const top = (minutesFromStart / 15) * 32;
+  const height = (duration / 15) * 32;
+
+  const calendar = calendars.find((c) => c.id === event.calendarId);
+  const category = categories.find((c) => c.id === event.categoryId);
+
+  const emoji = calendar?.emoji || "";
+  const backgroundColor = category?.color || event.color || "#1976d2";
 
   return (
     <Box
@@ -68,27 +87,33 @@ const EventBox = ({ event, dragTargetId, showPopoverLine, customStyle, onClick }
         position: "absolute",
         top,
         height,
-        backgroundColor: event.color,
+        backgroundColor,
         color: "#fff",
         borderRadius: 1,
         padding: "2px 4px",
         fontSize: "0.75rem",
         opacity: dragTargetId && dragTargetId !== event.id ? 0.5 : 1,
-        pointerEvents: dragTargetId && dragTargetId !== event.id ? "none" : "auto",
+        pointerEvents:
+          dragTargetId && dragTargetId !== event.id ? "none" : "auto",
         cursor: enableDrag ? "move" : "pointer",
         overflow: "hidden",
         zIndex: dragTargetId === event.id ? 1500 : 10,
         display: "flex",
+        justifyContent: "space-between",
         alignItems: "flex-start",
-        justifyContent: "flex-start",
         ...customStyle
       }}
     >
-      <Typography variant="caption" fontWeight={500} noWrap>
+      <Typography variant="caption" fontWeight={500} noWrap flexGrow={1}>
         {event.name}
       </Typography>
+      {emoji && (
+        <Typography variant="caption" ml={1}>
+          {emoji}
+        </Typography>
+      )}
     </Box>
-  )
-}
+  );
+};
 
-export default EventBox
+export default EventBox;

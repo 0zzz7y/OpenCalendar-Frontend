@@ -1,33 +1,44 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material";
 
-import DayColumn from "./DayColumn"
-import TimeColumn from "./TimeColumn"
+import DayColumn from "./DayColumn";
+import TimeColumn from "./TimeColumn";
 
-import Event from "../../types/event"
+import Event from "@/types/event";
 
-interface WeeklyViewProperties {
-  events: Event[]
-  onSlotClick?: (element: HTMLElement, datetime: Date) => void
-  onSave: (event: Partial<Event>) => void
-  onEventClick?: (event: Event) => void
+interface WeekViewProperties {
+  date: Date;
+  events: Event[];
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
+  onSlotClick?: (element: HTMLElement, datetime: Date) => void;
+  onSave: (event: Partial<Event>) => void;
+  onEventClick?: (event: Event) => void;
 }
 
-const getStartOfWeek = (date = new Date()) => {
-  const d = new Date(date)
-  const day = d.getDay()
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
-  d.setDate(diff)
-  d.setHours(0, 0, 0, 0)
-  return d
-}
+const getStartOfWeek = (date: Date) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
 
-const WeeklyView = ({ events, onSlotClick, onSave, onEventClick }: WeeklyViewProperties) => {
-  const weekStart = getStartOfWeek()
+const WeekView = ({
+  date,
+  events,
+  calendars,
+  categories,
+  onSlotClick,
+  onSave,
+  onEventClick
+}: WeekViewProperties) => {
+  const weekStart = getStartOfWeek(date);
   const days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart)
-    d.setDate(d.getDate() + i)
-    return d
-  })
+    const d = new Date(weekStart);
+    d.setDate(d.getDate() + i);
+    return d;
+  });
 
   return (
     <Box
@@ -38,7 +49,7 @@ const WeeklyView = ({ events, onSlotClick, onSave, onEventClick }: WeeklyViewPro
       <TimeColumn />
 
       {days.map((day, index) => {
-        const isToday = day.toDateString() === new Date().toDateString()
+        const isToday = day.toDateString() === new Date().toDateString();
 
         return (
           <Box
@@ -82,19 +93,21 @@ const WeeklyView = ({ events, onSlotClick, onSave, onEventClick }: WeeklyViewPro
 
             <DayColumn
               date={day}
-              events={events.filter(
+              events={(events ?? []).filter(
                 (e) => new Date(e.startDate).toDateString() === day.toDateString()
               )}
               allEvents={events}
+              calendars={calendars}
+              categories={categories}
               onSave={onSave}
               onSlotClick={onSlotClick}
               onEventClick={onEventClick}
             />
           </Box>
-        )
+        );
       })}
     </Box>
-  )
-}
+  );
+};
 
-export default WeeklyView
+export default WeekView;

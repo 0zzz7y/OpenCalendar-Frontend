@@ -5,7 +5,6 @@ import {
   Button,
   Stack,
   Divider,
-  ClickAwayListener,
   Typography,
   Box
 } from "@mui/material";
@@ -26,7 +25,7 @@ interface Properties {
   initialEvent?: Event;
 }
 
-function EventPopover({
+function EventCreationPopover({
   anchorEl,
   onClose,
   onSave,
@@ -116,95 +115,89 @@ function EventPopover({
           }
         }}
       >
-        <ClickAwayListener onClickAway={onClose}>
-          <Stack spacing={2}>
-            <Typography variant="h6">
-              {initialEvent ? "Edit Event" : "New Event"}
-            </Typography>
+        <Stack spacing={2}>
+          <Typography variant="h6">
+            {initialEvent ? "Edit Event" : "New Event"}
+          </Typography>
 
-            <TextField
-              label="Title"
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              fullWidth
-            />
+          <TextField
+            label="Title"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            fullWidth
+          />
 
-            <TextField
-              label="Calendar"
-              value={calendarId}
-              onChange={(e) => setCalendarId(e.target.value)}
-              select
-              fullWidth
-            >
-              <MenuItem value="">Brak</MenuItem>
-              {calendars.map((cal) => (
-                <MenuItem key={cal.id} value={cal.id}>
-                  {cal.emoji} {cal.name}
-                </MenuItem>
-              ))}
-            </TextField>
+          <TextField
+            label="Calendar"
+            value={calendarId}
+            onChange={(e) => setCalendarId(e.target.value)}
+            select
+            fullWidth
+          >
+            <MenuItem value="">Brak</MenuItem>
+            {calendars.map((cal) => (
+              <MenuItem key={cal.id} value={cal.id}>
+                {cal.emoji} {cal.name}
+              </MenuItem>
+            ))}
+          </TextField>
 
-            <TextField
-              label="Category"
-              value={categoryId}
-              onChange={(e) => setCategoryId(e.target.value)}
-              select
-              fullWidth
-            >
-              <MenuItem value="">Brak</MenuItem>
-              {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>
-                  <Box
-                    display="inline-block"
-                    width={12}
-                    height={12}
-                    borderRadius={6}
-                    bgcolor={cat.color}
-                    mr={1}
-                  />
-                  {cat.name}
-                </MenuItem>
-              ))}
-            </TextField>
+          <TextField
+            label="Category"
+            value={categoryId}
+            onChange={(e) => setCategoryId(e.target.value)}
+            select
+            fullWidth
+          >
+            <MenuItem value="">Brak</MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>
+                <Box
+                  display="inline-block"
+                  width={12}
+                  height={12}
+                  borderRadius={6}
+                  bgcolor={cat.color}
+                  mr={1}
+                />
+                {cat.name}
+              </MenuItem>
+            ))}
+          </TextField>
 
-            <Divider />
+          <Divider />
 
-            <Typography variant="body2">Start date</Typography>
-            <DateCalendar value={startDate} onChange={setStartDate} />
-            <TimePicker
-              label="Start time"
-              value={startTime}
-              onChange={setStartTime}
-            />
+          <Typography variant="body2">Start date</Typography>
+          <DateCalendar value={startDate} onChange={setStartDate} />
+          <TimePicker
+            label="Start time"
+            value={startTime}
+            onChange={setStartTime}
+          />
 
-            <TimePicker
-              label="End time"
-              value={endTime}
-              onChange={setEndTime}
-            />
+          <TimePicker label="End time" value={endTime} onChange={setEndTime} />
 
-            <TextField
-              label="Description"
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              fullWidth
-              multiline
-              minRows={2}
-            />
+          <TextField
+            label="Description"
+            value={description}
+            onChange={(e) => setDescription(e.target.value)}
+            fullWidth
+            multiline
+            minRows={2}
+          />
 
-            <Stack direction="row" spacing={1} justifyContent="flex-end">
-              <Button onClick={onClose} color="inherit">
-                Cancel
-              </Button>
-              <Button onClick={handleSave} variant="contained">
-                {initialEvent ? "Save" : "Add"}
-              </Button>
-            </Stack>
+          <Stack direction="row" spacing={1} justifyContent="flex-end">
+            <Button onClick={onClose} color="inherit">
+              Cancel
+            </Button>
+            <Button onClick={handleSave} variant="contained">
+              {initialEvent ? "Save" : "Add"}
+            </Button>
           </Stack>
-        </ClickAwayListener>
+        </Stack>
       </Popover>
     </>
   );
 }
 
-export default EventPopover;
+export default EventCreationPopover;

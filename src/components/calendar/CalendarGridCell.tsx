@@ -1,15 +1,14 @@
-import { Box, Typography } from "@mui/material"
+import { Box } from "@mui/material";
+import { useDrop } from "react-dnd";
+import { useRef, useEffect } from "react";
 
-import { useDrop } from "react-dnd"
-import { useRef, useEffect } from "react"
-
-import Event from "../../types/event"
+import Event from "../../types/event";
 
 interface CalendarGridCellProperties {
-  datetime: Date
-  allEvents: Event[]
-  onSave: (event: Partial<Event> & { startDate: string }) => void
-  onClick?: (element: HTMLElement) => void
+  datetime: Date;
+  allEvents: Event[];
+  onSave: (event: Partial<Event> & { startDate: string }) => void;
+  onClick?: (element: HTMLElement) => void;
 }
 
 const CalendarGridCell = ({
@@ -18,36 +17,34 @@ const CalendarGridCell = ({
   onSave,
   onClick
 }: CalendarGridCellProperties) => {
-  const ref = useRef<HTMLDivElement>(null)
+  const ref = useRef<HTMLDivElement>(null);
 
   const [{ isOver, canDrop, item }, drop] = useDrop(() => ({
     accept: "event",
     drop: (item: { id: string }) => {
-      const moved = allEvents.find(e => e.id === item.id)
-      if (!moved) return
+      const moved = allEvents.find((e) => e.id === item.id);
+      if (!moved) return;
 
-      const newStart = new Date(datetime)
-      const originalStart = new Date(moved.startDate)
-
-      if (newStart.getTime() === originalStart.getTime()) return
+      const newStart = new Date(datetime);
+      const originalStart = new Date(moved.startDate);
+      if (newStart.getTime() === originalStart.getTime()) return;
 
       const duration =
-        new Date(moved.endDate).getTime() - new Date(moved.startDate).getTime()
+        new Date(moved.endDate).getTime() - originalStart.getTime();
+      const newEnd = new Date(newStart.getTime() + duration);
 
-      const newEnd = new Date(newStart.getTime() + duration)
-
-      const overlappingEvents = allEvents.filter(e => {
-        const start = new Date(e.startDate).getTime()
-        const end = new Date(e.endDate).getTime()
+      const overlappingEvents = allEvents.filter((e) => {
+        const start = new Date(e.startDate).getTime();
+        const end = new Date(e.endDate).getTime();
         return (
           e.id !== moved.id &&
           start < newEnd.getTime() &&
           end > newStart.getTime()
-        )
-      })
+        );
+      });
 
-      const totalSlots = overlappingEvents.length + 1
-      const widthPercent = 100 / totalSlots
+      const totalSlots = overlappingEvents.length + 1;
+      const widthPercent = 100 / totalSlots;
 
       onSave({
         id: moved.id,
@@ -58,32 +55,35 @@ const CalendarGridCell = ({
         color: moved.color,
         startDate: newStart.toISOString(),
         endDate: newEnd.toISOString()
-      })
+      });
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
       item: monitor.getItem()
     })
-  }))
+  }));
 
   useEffect(() => {
     if (ref.current) {
-      drop(ref.current)
+      drop(ref.current);
     }
-  }, [drop])
+  }, [drop]);
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => {
-    onClick?.(e.currentTarget)
-  }
+    onClick?.(e.currentTarget);
+  };
 
-  const previewEvent = allEvents.find((e) => e.id === item?.id)
+  const previewEvent = allEvents.find((e) => e.id === item?.id);
   const previewHeight = previewEvent
     ? Math.max(
         32,
-        ((new Date(previewEvent.endDate).getTime() - new Date(previewEvent.startDate).getTime()) / (1000 * 60)) * (32 / 15)
+        ((new Date(previewEvent.endDate).getTime() -
+          new Date(previewEvent.startDate).getTime()) /
+          (1000 * 60)) *
+          (32 / 15)
       )
-    : 32
+    : 32;
 
   return (
     <Box
@@ -120,7 +120,7 @@ const CalendarGridCell = ({
         />
       )}
     </Box>
-  )
-}
+  );
+};
 
-export default CalendarGridCell
+export default CalendarGridCell;

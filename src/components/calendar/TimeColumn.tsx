@@ -8,7 +8,7 @@ interface TimeColumnProperties {
 
 const TimeColumn = ({
   startHour = 0,
-  endHour = 24,
+  endHour = 23.5,
   interval = 30
 }: TimeColumnProperties) => {
   const theme = useTheme();
@@ -30,7 +30,7 @@ const TimeColumn = ({
         alignItems: "flex-end",
         pr: 1,
         pt: 6,
-        borderRight: `1px solid ${theme.palette.divider}`,
+        borderRight: `1px solid ${theme.palette.divider}`
       }}
     >
       {times.map((time, i) => (
@@ -41,7 +41,7 @@ const TimeColumn = ({
             height: 32,
             lineHeight: "32px",
             pr: 1,
-            fontSize: 12,
+            fontSize: 12
           }}
         >
           {time}

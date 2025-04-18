@@ -1,7 +1,9 @@
-import LeftPanel from "../components/layout/LeftPanel";
-import CenterPanel from "../components/layout/CenterPanel";
-import RightPanel from "../components/layout/RightPanel";
-import ResizableLayout from "../components/layout/ResizableLayout";
+import { Box, Button, CircularProgress, Typography } from "@mui/material"
+
+import LeftPanel from "../components/layout/LeftPanel"
+import CenterPanel from "../components/layout/CenterPanel"
+import RightPanel from "../components/layout/RightPanel"
+import ResizableLayout from "../components/layout/ResizableLayout"
 
 const Dashboard = () => {
   return (
@@ -15,7 +17,7 @@ const Dashboard = () => {
         centerMinWidth={200}
       />
     </>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

@@ -5,18 +5,18 @@ import {
   Stack,
   Popover,
   Button
-} from "@mui/material"
-import { Edit, Delete } from "@mui/icons-material"
-import { useState } from "react"
+} from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import { useState } from "react";
 
-import Event from "../../types/event"
+import Event from "../../types/event";
 
 interface EventInformationPopoverProperties {
-  anchorEl: HTMLElement | null
-  event: Event | null
-  onClose: () => void
-  onEdit: () => void
-  onDelete: (eventId: string) => void
+  anchorEl: HTMLElement | null;
+  event: Event | null;
+  onClose: () => void;
+  onEdit: () => void;
+  onDelete: (eventId: string) => void;
 }
 
 const EventInformationPopover = ({
@@ -26,24 +26,24 @@ const EventInformationPopover = ({
   onEdit,
   onDelete
 }: EventInformationPopoverProperties) => {
-  const open = Boolean(anchorEl && event)
-  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const open = Boolean(anchorEl && event);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   const handleDeleteClick = () => {
-    setConfirmingDelete(true)
-  }
+    setConfirmingDelete(true);
+  };
 
   const handleConfirmDelete = () => {
     if (event) {
-      onDelete(event.id)
+      onDelete(event.id);
     }
-    setConfirmingDelete(false)
-    onClose()
-  }
+    setConfirmingDelete(false);
+    onClose();
+  };
 
   const handleCancelDelete = () => {
-    setConfirmingDelete(false)
-  }
+    setConfirmingDelete(false);
+  };
 
   return (
     <Popover
@@ -75,18 +75,31 @@ const EventInformationPopover = ({
           {!confirmingDelete ? (
             <>
               <Typography variant="body2" color="text.secondary">
-                {new Date(event.startDate).toLocaleString()} - {new Date(event.endDate).toLocaleString()}
+                {new Date(event.startDate).toLocaleString()} -{" "}
+                {new Date(event.endDate).toLocaleString()}
               </Typography>
-              {event.description && <Typography>{event.description}</Typography>}
+              {event.description && (
+                <Typography>{event.description}</Typography>
+              )}
             </>
           ) : (
             <Stack spacing={1}>
-              <Typography variant="body2">Czy na pewno chcesz usunąć to wydarzenie?</Typography>
+              <Typography variant="body2">
+                Czy na pewno chcesz usunąć to wydarzenie?
+              </Typography>
               <Stack direction="row" spacing={1} justifyContent="flex-end">
-                <Button onClick={handleCancelDelete} size="small" color="inherit">
+                <Button
+                  onClick={handleCancelDelete}
+                  size="small"
+                  color="inherit"
+                >
                   Anuluj
                 </Button>
-                <Button onClick={handleConfirmDelete} size="small" color="error">
+                <Button
+                  onClick={handleConfirmDelete}
+                  size="small"
+                  color="error"
+                >
                   Usuń
                 </Button>
               </Stack>
@@ -95,7 +108,7 @@ const EventInformationPopover = ({
         </Stack>
       )}
     </Popover>
-  )
-}
+  );
+};
 
-export default EventInformationPopover
+export default EventInformationPopover;
