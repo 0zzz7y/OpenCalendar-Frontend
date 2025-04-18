@@ -43,7 +43,12 @@ const CalendarEditor = ({
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const { addCalendar, updateCalendar, deleteCalendar } = useCalendars();
+  const {
+    addCalendar,
+    updateCalendar,
+    deleteCalendar,
+    reloadCalendars
+  } = useCalendars();
 
   useEffect(() => {
     if (inputRef.current) {
@@ -60,7 +65,7 @@ const CalendarEditor = ({
         name: labelInput.trim(),
         emoji: emojiInput
       });
-
+      await reloadCalendars();
       onSubmit();
       onClose();
     } catch (e) {
@@ -78,7 +83,7 @@ const CalendarEditor = ({
         name: labelInput.trim(),
         emoji: emojiInput
       });
-
+      await reloadCalendars();
       onSubmit();
       onClose();
     } catch (e) {
@@ -93,7 +98,7 @@ const CalendarEditor = ({
     setLoading(true);
     try {
       await deleteCalendar(calendarId);
-
+      await reloadCalendars();
       onSubmit();
       onClose();
     } catch (e) {

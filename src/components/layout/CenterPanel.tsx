@@ -13,21 +13,20 @@ import MonthView from "../calendar/MonthView";
 import EventPopover from "../event/EventCreationPopover";
 import EventInformationPopover from "../event/EventInformationPopover";
 
-import useDashboard from "../../hooks/useDashboard";
 import useFilters from "../../hooks/useFilters";
 
 import Event from "../../types/event";
+import { useDashboardContext } from "@/context/DashboardContext";
 
 const CenterPanel = () => {
   const {
     events,
     calendars,
     categories,
-    loading,
     addEvent,
     updateEvent,
     deleteEvent
-  } = useDashboard();
+  } = useDashboardContext();
 
   const { selectedCalendar, selectedCategory } = useFilters();
 

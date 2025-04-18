@@ -36,7 +36,12 @@ const CategoryEditor = ({
   const [loading, setLoading] = useState(false);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
-  const { addCategory, updateCategory, deleteCategory } = useCategories();
+  const {
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    reloadCategories
+  } = useCategories();
 
   useEffect(() => {
     if (inputRef.current) {
@@ -53,6 +58,7 @@ const CategoryEditor = ({
         name: labelInput.trim(),
         color: colorInput
       });
+      await reloadCategories();
       onSubmit();
       onClose();
     } catch (e) {
@@ -70,6 +76,7 @@ const CategoryEditor = ({
         name: labelInput.trim(),
         color: colorInput
       });
+      await reloadCategories();
       onSubmit();
       onClose();
     } catch (e) {
@@ -84,6 +91,7 @@ const CategoryEditor = ({
     setLoading(true);
     try {
       await deleteCategory(categoryId);
+      await reloadCategories();
       onSubmit();
       onClose();
     } catch (e) {

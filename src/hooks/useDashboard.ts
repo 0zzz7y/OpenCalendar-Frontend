@@ -1,6 +1,3 @@
-import { useEffect, useState } from "react";
-import { toast } from "react-toastify";
-
 import useEvents from "./useEvents";
 import useTasks from "./useTasks";
 import useNotes from "./useNotes";
@@ -8,66 +5,116 @@ import useCalendars from "./useCalendars";
 import useCategories from "./useCategories";
 
 const useDashboard = () => {
-  const { events, setEvents, fetchEvents, addEvent, updateEvent, deleteEvent } =
-    useEvents();
-
-  const { tasks, setTasks, fetchTasks, addTask, updateTask, deleteTask } =
-    useTasks();
-
-  const { notes, setNotes, fetchNotes, addNote, updateNote, deleteNote } =
-    useNotes();
-
-  const { calendars, setCalendars, fetchCalendars } = useCalendars();
-  const { categories, setCategories, fetchCategories } = useCategories();
-
-  const [loading, setLoading] = useState(true);
-
-  const fetchAll = async () => {
-    try {
-      setLoading(true);
-      await Promise.all([
-        fetchEvents().catch(() => toast.error("Failed to load events")),
-        fetchTasks().catch(() => toast.error("Failed to load tasks")),
-        fetchNotes().catch(() => toast.error("Failed to load notes")),
-        fetchCalendars().catch(() => toast.error("Failed to load calendars")),
-        fetchCategories().catch(() => toast.error("Failed to load categories"))
-      ]);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    fetchAll();
-  }, []);
-
-  return {
-    events: Array.isArray(events) ? events : [],
-    setEvents,
+  const {
+    events,
     addEvent,
     updateEvent,
     deleteEvent,
+    reloadEvents,
+    loadNextPage: loadMoreEvents,
+    page: eventsPage,
+    totalPages: eventsTotalPages,
+    isLoadingMore: isLoadingEvents
+  } = useEvents();
 
-    tasks: Array.isArray(tasks) ? tasks : [],
-    setTasks,
+  const {
+    tasks,
     addTask,
     updateTask,
     deleteTask,
+    reloadTasks,
+    loadNextPage: loadMoreTasks,
+    page: tasksPage,
+    totalPages: tasksTotalPages,
+    isLoadingMore: isLoadingTasks
+  } = useTasks();
 
-    notes: Array.isArray(notes) ? notes : [],
-    setNotes,
+  const {
+    notes,
     addNote,
     updateNote,
     deleteNote,
+    reloadNotes,
+    loadNextPage: loadMoreNotes,
+    page: notesPage,
+    totalPages: notesTotalPages,
+    isLoadingMore: isLoadingNotes
+  } = useNotes();
 
-    calendars: Array.isArray(calendars) ? calendars : [],
-    setCalendars,
+  const {
+    calendars,
+    addCalendar,
+    updateCalendar,
+    deleteCalendar,
+    reloadCalendars,
+    loadNextPage: loadMoreCalendars,
+    page: calendarsPage,
+    totalPages: calendarsTotalPages,
+    isLoadingMore: isLoadingCalendars
+  } = useCalendars();
 
-    categories: Array.isArray(categories) ? categories : [],
-    setCategories,
+  const {
+    categories,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    reloadCategories,
+    loadNextPage: loadMoreCategories,
+    page: categoriesPage,
+    totalPages: categoriesTotalPages,
+    isLoadingMore: isLoadingCategories
+  } = useCategories();
 
-    loading,
-    refetch: fetchAll
+  return {
+    events,
+    addEvent,
+    updateEvent,
+    deleteEvent,
+    reloadEvents,
+    loadMoreEvents,
+    eventsPage,
+    eventsTotalPages,
+    isLoadingEvents,
+
+    tasks,
+    addTask,
+    updateTask,
+    deleteTask,
+    reloadTasks,
+    loadMoreTasks,
+    tasksPage,
+    tasksTotalPages,
+    isLoadingTasks,
+
+    notes,
+    addNote,
+    updateNote,
+    deleteNote,
+    reloadNotes,
+    loadMoreNotes,
+    notesPage,
+    notesTotalPages,
+    isLoadingNotes,
+
+    calendars,
+    addCalendar,
+    updateCalendar,
+    deleteCalendar,
+    reloadCalendars,
+    loadMoreCalendars,
+    calendarsPage,
+    calendarsTotalPages,
+    isLoadingCalendars,
+
+    categories,
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    reloadCategories,
+    loadMoreCategories,
+    categoriesPage,
+    categoriesTotalPages,
+    isLoadingCategories
   };
 };
 

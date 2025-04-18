@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 
 import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react";
-import { useState, useEffect } from "react";
+import { useMemo, useState } from "react";
 
 import CategoryEditor from "./CategoryEditor";
 import useCategories from "../../hooks/useCategories";
@@ -28,7 +28,7 @@ const CategorySelector = ({
   value,
   onChange
 }: CategorySelectorProperties) => {
-  const { categories, fetchCategories } = useCategories();
+  const { categories, reloadCategories } = useCategories();
 
   const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add");
   const [currentValue, setCurrentValue] = useState("");
@@ -38,16 +38,17 @@ const CategorySelector = ({
 
   const isPopoverOpen = Boolean(anchorEl);
 
-  const categoryOptions: CategoryOption[] = [
-    { label: "All", value: "all" },
-    ...(Array.isArray(categories)
-      ? categories.map((category) => ({
-          label: category.name,
-          value: category.id,
-          color: category.color
-        }))
-    : [])
-  ];
+  const categoryOptions = useMemo<CategoryOption[]>(() => {
+    if (!Array.isArray(categories)) return [{ label: "All", value: "all" }];
+    return [
+      { label: "All", value: "all" },
+      ...categories.map((category) => ({
+        label: category.name,
+        value: category.id,
+        color: category.color
+      }))
+    ];
+  }, [categories]);
 
   const openPopover = (
     mode: "add" | "edit" | "delete",
@@ -68,6 +69,7 @@ const CategorySelector = ({
     <>
       <Box display="flex" alignItems="center" gap={1} width="100%" zIndex={1}>
         <TextField
+          key={categoryOptions.map((c) => `${c.value}-${c.label}`).join("-")}
           select
           label="Category"
           value={value || "all"}
@@ -181,7 +183,7 @@ const CategorySelector = ({
             setLabelInput={setLabelInput}
             onClose={() => setAnchorEl(null)}
             onSubmit={() => {
-              fetchCategories();
+              reloadCategories();
               setAnchorEl(null);
             }}
             colorInput={colorInput}

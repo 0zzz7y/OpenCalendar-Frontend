@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 
 import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react";
-import { useRef, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 import CalendarEditor from "./CalendarEditor";
 
@@ -31,7 +31,7 @@ const CalendarSelector = ({
 }: CalendarSelectorProperties) => {
   const {
     calendars,
-    fetchCalendars
+    reloadCalendars
   } = useCalendars();
 
   const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add");
@@ -42,16 +42,17 @@ const CalendarSelector = ({
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const isPopoverOpen = Boolean(anchorEl);
 
-  const calendarOptions: CalendarOption[] = [
-    { label: "All", value: "all", emoji: "📅" },
-    ...(Array.isArray(calendars)
-      ? calendars.map((calendar) => ({
-          label: calendar.name,
-          value: calendar.id,
-          emoji: calendar.emoji
-        }))
-      : [])
-  ];
+  const calendarOptions = useMemo<CalendarOption[]>(() => {
+    if (!Array.isArray(calendars)) return [{ label: "All", value: "all", emoji: "📅" }];
+    return [
+      { label: "All", value: "all", emoji: "📅" },
+      ...calendars.map((calendar) => ({
+        label: calendar.name,
+        value: calendar.id,
+        emoji: calendar.emoji
+      }))
+    ];
+  }, [calendars]);
 
   const openPopover = (
     mode: "add" | "edit" | "delete",
@@ -72,6 +73,7 @@ const CalendarSelector = ({
     <>
       <Box display="flex" alignItems="center" gap={1} width="100%" zIndex={1}>
         <TextField
+          key={calendarOptions.map((c) => `${c.value}-${c.label}`).join("-")}
           select
           label="Calendar"
           value={value || "all"}
@@ -171,7 +173,7 @@ const CalendarSelector = ({
             setLabelInput={setLabelInput}
             onClose={() => setAnchorEl(null)}
             onSubmit={() => {
-              fetchCalendars();
+              reloadCalendars();
               setAnchorEl(null);
             }}
             emojiInput={emojiInput}
