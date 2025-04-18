@@ -21,7 +21,7 @@ export const useCategories = () => {
     try {
       const response = await axios.post<Category>(`${import.meta.env.VITE_BACKEND_URL}/categories`, category);
       console.log("Category added:", response.data);
-      setCategories((prev) => [...prev, response.data]);
+      setCategories([response.data])
     } catch (error) {
       toast.error("Failed to add category");
     }

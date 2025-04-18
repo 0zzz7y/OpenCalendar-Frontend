@@ -19,7 +19,7 @@ const useCalendars = () => {
     try {
       const response = await axios.post<Calendar>(`${import.meta.env.VITE_BACKEND_URL}/calendars`, calendar);
       console.log("Calendar added:", response.data);
-      setCalendars((prev) => [...prev, response.data]);
+      setCalendars([response.data]);
     } catch (error) {
       console.error("Error adding calendar:", error);
     }

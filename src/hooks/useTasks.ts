@@ -21,7 +21,7 @@ const useTasks = () => {
     try {
       const response = await axios.post<Task>(`${import.meta.env.VITE_BACKEND_URL}/tasks`, task);
       console.log("Task added:", response.data);
-      setTasks((prev) => [...prev, response.data]);
+      setTasks([response.data]);
     } catch (error) {
       toast.error("Failed to add task");
     }

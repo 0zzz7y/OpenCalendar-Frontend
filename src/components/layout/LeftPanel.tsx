@@ -4,15 +4,13 @@ import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 
 import ThemeToggleButton from "../theme/ThemeToggleButton";
-import CategorySelector, { CategoryOption } from "../category/CategorySelector";
+import CategorySelector from "../category/CategorySelector";
 import CalendarSelector from "../calendar/CalendarSelector";
 import MonthlyCalendar from "../calendar/MonthlyCalendar";
 
-import useDashboard from "../../hooks/useDashboard";
 import useFilters from "../../hooks/useFilters";
 
 const LeftPanel = () => {
-  const { categories } = useDashboard();
   const {
     selectedCalendar,
     setSelectedCalendar,

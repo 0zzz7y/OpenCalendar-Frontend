@@ -21,7 +21,7 @@ const useNotes = () => {
     try {
       const response = await axios.post<Note>(`${import.meta.env.VITE_BACKEND_URL}/notes`, note);
       console.log("Note added:", response.data);      
-      setNotes((prev) => [...prev, response.data]);
+      setNotes([response.data]);
     } catch (error) {
       toast.error("Failed to add note");
     }

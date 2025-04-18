@@ -21,7 +21,7 @@ const useEvents = () => {
     try {
       const response = await axios.post<Event>(`${import.meta.env.VITE_BACKEND_URL}/events`, event);
       console
-      setEvents((prev) => [...prev, response.data]);
+      setEvents([response.data]);
     } catch (error) {
       toast.error("Failed to add event");
     }
