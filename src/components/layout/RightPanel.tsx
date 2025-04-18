@@ -1,17 +1,12 @@
-import { Box } from "@mui/material"
+import { Box } from "@mui/material";
 
-import NotesPanel from "../note/NotesPanel"
-import TasksPanel from "../task/TasksPanel"
+import NotesPanel from "../note/NotesPanel";
+import TasksPanel from "../task/TasksPanel";
 
 const RightPanel = () => {
   return (
     <>
-      <Box
-        display="flex"
-        flexDirection="column"
-        height="100%"
-        width="100%"
-      >
+      <Box display="flex" flexDirection="column" height="100%" width="100%">
         <Box height="0%">
           <NotesPanel />
         </Box>
@@ -21,7 +16,7 @@ const RightPanel = () => {
         </Box>
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default RightPanel
+export default RightPanel;

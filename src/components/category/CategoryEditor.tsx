@@ -5,25 +5,22 @@ import {
   Button,
   Box,
   ClickAwayListener
-} from "@mui/material"
+} from "@mui/material";
 
-import { Sketch } from "@uiw/react-color"
-import { useEffect, useRef, useState } from "react"
-import axios from "axios"
+import { Sketch } from "@uiw/react-color";
+import { useEffect, useRef, useState } from "react";
+
+import useCategories from "../../hooks/useCategories";
 
 interface CategoryEditorProperties {
-  editMode: "add" | "edit" | "delete"
-  labelInput: string
-  setLabelInput: (val: string) => void
-  colorInput: string
-  setColorInput: (val: string) => void
-  onClose: () => void
-
-  onAddLocal: (id: string) => void
-  onEditLocal: () => void
-  onDeleteLocal: () => void
-
-  categoryId?: string
+  editMode: "add" | "edit" | "delete";
+  labelInput: string;
+  setLabelInput: (val: string) => void;
+  colorInput: string;
+  setColorInput: (val: string) => void;
+  onClose: () => void;
+  onSubmit: () => void;
+  categoryId?: string;
 }
 
 const CategoryEditor = ({
@@ -33,69 +30,68 @@ const CategoryEditor = ({
   colorInput,
   setColorInput,
   onClose,
-  onAddLocal,
-  onEditLocal,
-  onDeleteLocal,
+  onSubmit,
   categoryId
 }: CategoryEditorProperties) => {
-  const [loading, setLoading] = useState(false)
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null);
+
+  const { addCategory, updateCategory, deleteCategory } = useCategories();
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.focus()
-      inputRef.current.setSelectionRange(labelInput.length, labelInput.length)
+      inputRef.current.focus();
+      inputRef.current.setSelectionRange(labelInput.length, labelInput.length);
     }
-  }, [editMode])
+  }, [editMode]);
 
   const handleAdd = async () => {
-    if (!labelInput.trim()) return
+    if (!labelInput.trim()) return;
+    setLoading(true);
     try {
-      setLoading(true)
-      const response = await axios.post("/categories", {
-        name: labelInput,
+      await addCategory({
+        name: labelInput.trim(),
         color: colorInput
-      })
-      const newId = response.data.id
-      onAddLocal(newId)
+      });
+      onSubmit();
+      onClose();
     } catch (e) {
-      console.error("Error creating category", e)
+      console.error("Error creating category", e);
     } finally {
-      setLoading(false)
-      onClose()
+      setLoading(false);
     }
-  }
+  };
 
   const handleEdit = async () => {
-    if (!labelInput.trim() || !categoryId) return
+    if (!labelInput.trim() || !categoryId) return;
+    setLoading(true);
     try {
-      setLoading(true)
-      await axios.put(`/categories/${categoryId}`, {
-        name: labelInput,
+      await updateCategory(categoryId, {
+        name: labelInput.trim(),
         color: colorInput
-      })
-      onEditLocal()
+      });
+      onSubmit();
+      onClose();
     } catch (e) {
-      console.error("Error editing category", e)
+      console.error("Error editing category", e);
     } finally {
-      setLoading(false)
-      onClose()
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!categoryId) return
+    if (!categoryId) return;
+    setLoading(true);
     try {
-      setLoading(true)
-      await axios.delete(`/categories/${categoryId}`)
-      onDeleteLocal()
+      await deleteCategory(categoryId);
+      onSubmit();
+      onClose();
     } catch (e) {
-      console.error("Error deleting category", e)
+      console.error("Error deleting category", e);
     } finally {
-      setLoading(false)
-      onClose()
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <>
@@ -109,7 +105,7 @@ const CategoryEditor = ({
                 fontWeight={500}
                 gutterBottom
               >
-                {editMode === "add" ? "New category" : "Edit name"}
+                {editMode === "add" ? "New category" : "Edit category"}
               </Typography>
 
               <TextField
@@ -166,7 +162,7 @@ const CategoryEditor = ({
         </Paper>
       </ClickAwayListener>
     </>
-  )
-}
+  );
+};
 
-export default CategoryEditor
+export default CategoryEditor;

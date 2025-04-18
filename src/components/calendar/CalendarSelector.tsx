@@ -5,78 +5,53 @@ import {
   Popper,
   Box,
   Typography
-} from "@mui/material"
+} from "@mui/material";
 
-import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react"
-import { useState, useEffect } from "react"
+import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react";
+import { useRef, useEffect, useState } from "react";
 
-import CalendarEditor from "./CalendarEditor"
+import CalendarEditor from "./CalendarEditor";
+
+import useCalendars from "../../hooks/useCalendars";
 
 export interface CalendarOption {
-  label: string
-  value: string
-  emoji?: string
+  label: string;
+  value: string;
+  emoji?: string;
 }
 
 interface CalendarSelectorProperties {
-  data: CalendarOption[]
-  value: string | null
-  onChange: (val: string | null) => void
-  setData: (data: CalendarOption[]) => void
+  value: string | null;
+  onChange: (val: string | null) => void;
 }
 
 const CalendarSelector = ({
-  data,
   value,
-  onChange,
-  setData
+  onChange
 }: CalendarSelectorProperties) => {
-  const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add")
-  const [currentValue, setCurrentValue] = useState("")
-  const [labelInput, setLabelInput] = useState("")
-  const [emojiInput, setEmojiInput] = useState("📅")
+  const {
+    calendars,
+    fetchCalendars
+  } = useCalendars();
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
-  const isPopoverOpen = Boolean(anchorEl)
+  const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add");
+  const [currentValue, setCurrentValue] = useState("");
+  const [labelInput, setLabelInput] = useState("");
+  const [emojiInput, setEmojiInput] = useState("📅");
 
-  useEffect(() => {
-    const hasAll = data.some((item) => item.value === "all")
-    if (!hasAll) {
-      setData([{ label: "All", value: "all", emoji: "📅" }, ...data])
-    }
-  }, [data, setData])
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const isPopoverOpen = Boolean(anchorEl);
 
-  useEffect(() => {
-    if (value === null || value === "") {
-      onChange("all")
-    }
-  }, [value, onChange])
-
-  const handleAddLocal = (id: string) => {
-    const newCalendar = {
-      label: labelInput,
-      value: id,
-      emoji: emojiInput
-    }
-    setData([...data, newCalendar])
-    onChange(id)
-  }
-
-  const handleEditLocal = () => {
-    setData(
-      data.map((item) =>
-        item.value === currentValue
-          ? { ...item, label: labelInput, emoji: emojiInput }
-          : item
-      )
-    )
-    onChange(currentValue)
-  }
-
-  const handleDeleteLocal = () => {
-    setData(data.filter((item) => item.value !== currentValue))
-    if (value === currentValue) onChange("all")
-  }
+  const calendarOptions: CalendarOption[] = [
+    { label: "All", value: "all", emoji: "📅" },
+    ...(Array.isArray(calendars)
+      ? calendars.map((calendar) => ({
+          label: calendar.name,
+          value: calendar.id,
+          emoji: calendar.emoji
+        }))
+      : [])
+  ];
 
   const openPopover = (
     mode: "add" | "edit" | "delete",
@@ -85,13 +60,13 @@ const CalendarSelector = ({
     label = "",
     emoji = "📅"
   ) => {
-    if (mode === "delete" && val === value) return
-    setEditMode(mode)
-    setCurrentValue(val)
-    setLabelInput(label)
-    setEmojiInput(emoji)
-    setAnchorEl(e.currentTarget as HTMLElement)
-  }
+    if (mode === "delete" && val === value) return;
+    setEditMode(mode);
+    setCurrentValue(val);
+    setLabelInput(label);
+    setEmojiInput(emoji);
+    setAnchorEl(e.currentTarget as HTMLElement);
+  };
 
   return (
     <>
@@ -105,17 +80,17 @@ const CalendarSelector = ({
           size="small"
           SelectProps={{
             renderValue: (selected) => {
-              const item = data.find((d) => d.value === selected)
+              const item = calendarOptions.find((d) => d.value === selected);
               return (
                 <Box display="flex" alignItems="center" gap={1}>
                   <span>{item?.emoji || "📅"}</span>
                   <Typography variant="body2">{item?.label}</Typography>
                 </Box>
-              )
+              );
             }
           }}
         >
-          {data.map((option) => (
+          {calendarOptions.map((option) => (
             <MenuItem
               key={option.value}
               value={option.value}
@@ -137,14 +112,14 @@ const CalendarSelector = ({
                     <IconButton
                       size="small"
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         openPopover(
                           "edit",
                           e,
                           option.value,
                           option.label,
                           option.emoji
-                        )
+                        );
                       }}
                     >
                       <IconPencil size={16} />
@@ -153,14 +128,14 @@ const CalendarSelector = ({
                       size="small"
                       disabled={option.value === value}
                       onClick={(e) => {
-                        e.stopPropagation()
+                        e.stopPropagation();
                         openPopover(
                           "delete",
                           e,
                           option.value,
                           option.label,
                           option.emoji
-                        )
+                        );
                       }}
                     >
                       <IconTrash size={16} />
@@ -195,9 +170,10 @@ const CalendarSelector = ({
             labelInput={labelInput}
             setLabelInput={setLabelInput}
             onClose={() => setAnchorEl(null)}
-            onAddLocal={() => handleAddLocal(crypto.randomUUID())}
-            onEditLocal={handleEditLocal}
-            onDeleteLocal={handleDeleteLocal}
+            onSubmit={() => {
+              fetchCalendars();
+              setAnchorEl(null);
+            }}
             emojiInput={emojiInput}
             setEmojiInput={setEmojiInput}
             calendarId={currentValue}
@@ -205,7 +181,7 @@ const CalendarSelector = ({
         </Box>
       </Popper>
     </>
-  )
-}
+  );
+};
 
-export default CalendarSelector
+export default CalendarSelector;

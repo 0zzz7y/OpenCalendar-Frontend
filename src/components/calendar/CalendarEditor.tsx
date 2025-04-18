@@ -17,14 +17,14 @@ import {
   Theme
 } from "emoji-picker-react";
 
+import useCalendars from "../../hooks/useCalendars";
+
 interface CalendarEditorProperties {
   editMode: "add" | "edit" | "delete";
   labelInput: string;
   setLabelInput: (val: string) => void;
   onClose: () => void;
-  onAddLocal: () => void;
-  onEditLocal: () => void;
-  onDeleteLocal: () => void;
+  onSubmit: () => void;
   emojiInput: string;
   setEmojiInput: (val: string) => void;
   calendarId?: string;
@@ -35,15 +35,15 @@ const CalendarEditor = ({
   labelInput,
   setLabelInput,
   onClose,
-  onAddLocal,
-  onEditLocal,
-  onDeleteLocal,
+  onSubmit,
   emojiInput,
   setEmojiInput,
   calendarId
 }: CalendarEditorProperties) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
   const [loading, setLoading] = useState(false);
+
+  const { addCalendar, updateCalendar, deleteCalendar } = useCalendars();
 
   useEffect(() => {
     if (inputRef.current) {
@@ -56,16 +56,12 @@ const CalendarEditor = ({
     if (!labelInput.trim()) return;
     setLoading(true);
     try {
-      await fetch("/calendars", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: labelInput.trim(),
-          emoji: emojiInput
-        })
+      await addCalendar({
+        name: labelInput.trim(),
+        emoji: emojiInput
       });
 
-      onAddLocal();
+      onSubmit();
       onClose();
     } catch (e) {
       console.error("Failed to add calendar", e);
@@ -78,16 +74,12 @@ const CalendarEditor = ({
     if (!labelInput.trim() || !calendarId) return;
     setLoading(true);
     try {
-      await fetch(`/calendars/${calendarId}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: labelInput.trim(),
-          emoji: emojiInput
-        })
+      await updateCalendar(calendarId, {
+        name: labelInput.trim(),
+        emoji: emojiInput
       });
 
-      onEditLocal();
+      onSubmit();
       onClose();
     } catch (e) {
       console.error("Failed to update calendar", e);
@@ -100,11 +92,9 @@ const CalendarEditor = ({
     if (!calendarId) return;
     setLoading(true);
     try {
-      await fetch(`/calendars/${calendarId}`, {
-        method: "DELETE"
-      });
+      await deleteCalendar(calendarId);
 
-      onDeleteLocal();
+      onSubmit();
       onClose();
     } catch (e) {
       console.error("Failed to delete calendar", e);

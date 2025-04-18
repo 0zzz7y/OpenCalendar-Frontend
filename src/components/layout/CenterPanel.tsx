@@ -1,6 +1,7 @@
 import { useState } from "react";
 
 import { Box, Typography, Button, CircularProgress } from "@mui/material";
+
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
@@ -18,7 +19,16 @@ import useFilters from "../../hooks/useFilters";
 import Event from "../../types/event";
 
 const CenterPanel = () => {
-  const { events, setEvents, calendars, categories, loading } = useDashboard();
+  const {
+    events,
+    calendars,
+    categories,
+    loading,
+    addEvent,
+    updateEvent,
+    deleteEvent
+  } = useDashboard();
+
   const { selectedCalendar, selectedCategory } = useFilters();
 
   const [view, setView] = useState<"day" | "week" | "month">("week");
@@ -30,14 +40,14 @@ const CenterPanel = () => {
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
 
   const filteredEvents = Array.isArray(events)
-  ? events.filter((event) => {
-      const calendarMatch =
-        selectedCalendar === "all" || event.calendarId === selectedCalendar;
-      const categoryMatch =
-        selectedCategory === "all" || event.categoryId === selectedCategory;
-      return calendarMatch && categoryMatch;
-    })
-  : [];
+    ? events.filter((event) => {
+        const calendarMatch =
+          selectedCalendar === "all" || event.calendarId === selectedCalendar;
+        const categoryMatch =
+          selectedCategory === "all" || event.categoryId === selectedCategory;
+        return calendarMatch && categoryMatch;
+      })
+    : [];
 
   const handleSlotClick = (element: HTMLElement, datetime: Date) => {
     setSelectedSlot(element);
@@ -60,26 +70,28 @@ const CenterPanel = () => {
     setEditingEvent(null);
   };
 
-  const handleSave = (data: Partial<Event>) => {
+  const handleSave = async (data: Partial<Event>) => {
     if (!data.startDate) return;
 
     const exists = events.find((e) => e.id === data.id);
-    const id = exists?.id || crypto.randomUUID();
 
-    const newEvent: Event = {
-      id,
-      name: data.name ?? "Nowe wydarzenie",
-      description: data.description ?? "",
-      startDate: data.startDate,
-      endDate: data.endDate ?? data.startDate,
-      color: data.color ?? "#1976d2",
-      calendarId: data.calendarId ?? "",
-      categoryId: data.categoryId
-    };
+    if (exists && data.id) {
+      await updateEvent(data.id, data);
+    } else {
+      const newEvent: Omit<Event, "id"> = {
+        name: data.name ?? "Nowe wydarzenie",
+        description: data.description ?? "",
+        startDate: data.startDate,
+        endDate: data.endDate ?? data.startDate,
+        color: data.color ?? "#1976d2",
+        calendarId: data.calendarId ?? "",
+        categoryId: data.categoryId
+      };
 
-    setEvents((prev) =>
-      exists ? prev.map((e) => (e.id === id ? newEvent : e)) : [...prev, newEvent]
-    );
+      await addEvent(newEvent);
+    }
+
+    handleClosePopover();
   };
 
   const handleEditEvent = () => {
@@ -89,8 +101,9 @@ const CenterPanel = () => {
     setInfoEvent(null);
   };
 
-  const handleDeleteEvent = (id: string) => {
-    setEvents((prev) => prev.filter((e) => e.id !== id));
+  const handleDeleteEvent = async (id: string) => {
+    await deleteEvent(id);
+    setInfoEvent(null);
   };
 
   const navigate = (direction: "prev" | "next") => {
@@ -99,25 +112,23 @@ const CenterPanel = () => {
     setSelectedDate(dayjs(selectedDate).add(delta, unit).toDate());
   };
 
-  if (loading) {
-    return (
-      <>
-        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
-          <CircularProgress />
-        </Box>
-      </>
-    );
-  }
-
   return (
     <>
-      <Box display="flex" justifyContent="space-between" alignItems="center" px={2} py={1}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={2}
+        py={1}
+      >
         <Box display="flex" alignItems="center" gap={1}>
           <Button onClick={() => navigate("prev")} size="large">
             <ChevronLeftIcon fontSize="medium" />
           </Button>
           <Typography variant="h6">
-            {dayjs(selectedDate).format(view === "month" ? "MMMM YYYY" : "DD MMM YYYY")}
+            {dayjs(selectedDate).format(
+              view === "month" ? "MMMM YYYY" : "DD MMM YYYY"
+            )}
           </Typography>
           <Button onClick={() => navigate("next")} size="large">
             <ChevronRightIcon fontSize="medium" />
@@ -125,14 +136,23 @@ const CenterPanel = () => {
         </Box>
 
         <Box display="flex" gap={2}>
-          <Button onClick={() => setView("day")} variant={view === "day" ? "outlined" : "text"}>
-            Dzień
+          <Button
+            onClick={() => setView("day")}
+            variant={view === "day" ? "outlined" : "text"}
+          >
+            Day
           </Button>
-          <Button onClick={() => setView("week")} variant={view === "week" ? "outlined" : "text"}>
-            Tydzień
+          <Button
+            onClick={() => setView("week")}
+            variant={view === "week" ? "outlined" : "text"}
+          >
+            Week
           </Button>
-          <Button onClick={() => setView("month")} variant={view === "month" ? "outlined" : "text"}>
-            Miesiąc
+          <Button
+            onClick={() => setView("month")}
+            variant={view === "month" ? "outlined" : "text"}
+          >
+            Month
           </Button>
         </Box>
       </Box>
@@ -186,7 +206,9 @@ const CenterPanel = () => {
               name: "",
               description: "",
               startDate: selectedDatetime.toISOString(),
-              endDate: new Date(selectedDatetime.getTime() + 60 * 60 * 1000).toISOString(),
+              endDate: new Date(
+                selectedDatetime.getTime() + 60 * 60 * 1000
+              ).toISOString(),
               calendarId: "",
               categoryId: undefined,
               color: "#1976d2"
@@ -200,7 +222,7 @@ const CenterPanel = () => {
         event={infoEvent}
         onClose={() => setInfoEvent(null)}
         onEdit={handleEditEvent}
-        onDelete={handleDeleteEvent}
+        onDelete={() => infoEvent && handleDeleteEvent(infoEvent.id)}
       />
     </>
   );

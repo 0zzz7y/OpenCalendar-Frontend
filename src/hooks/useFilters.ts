@@ -1,17 +1,27 @@
-import { create } from "zustand";
+import { useState, useEffect } from "react";
 
-interface FiltersState {
-  selectedCalendar: string | null;
-  selectedCategory: string | null;
-  setSelectedCalendar: (id: string | null) => void;
-  setSelectedCategory: (id: string | null) => void;
-}
+const useFilters = () => {
+  const [selectedCalendar, setSelectedCalendar] = useState<string | null>("all");
+  const [selectedCategory, setSelectedCategory] = useState<string | null>("all");
 
-const useFilters = create<FiltersState>((set) => ({
-  selectedCalendar: "all",
-  selectedCategory: "all",
-  setSelectedCalendar: (id) => set({ selectedCalendar: id }),
-  setSelectedCategory: (id) => set({ selectedCategory: id })
-}));
+  useEffect(() => {
+    if (selectedCalendar === null) {
+      setSelectedCalendar("all");
+    }
+  }, [selectedCalendar]);
+
+  useEffect(() => {
+    if (selectedCategory === null) {
+      setSelectedCategory("all");
+    }
+  }, [selectedCategory]);
+
+  return {
+    selectedCalendar,
+    setSelectedCalendar,
+    selectedCategory,
+    setSelectedCategory
+  };
+};
 
 export default useFilters;

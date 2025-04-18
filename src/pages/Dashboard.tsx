@@ -1,22 +1,14 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Typography
-} from "@mui/material"
+import { Box, Button, CircularProgress, Typography } from "@mui/material";
 
-import LeftPanel from "../components/layout/LeftPanel"
-import CenterPanel from "../components/layout/CenterPanel"
-import RightPanel from "../components/layout/RightPanel"
-import ResizableLayout from "../components/layout/ResizableLayout"
+import LeftPanel from "../components/layout/LeftPanel";
+import CenterPanel from "../components/layout/CenterPanel";
+import RightPanel from "../components/layout/RightPanel";
+import ResizableLayout from "../components/layout/ResizableLayout";
 
-import useDashboard from "../hooks/useDashboard"
+import useDashboard from "../hooks/useDashboard";
 
 const Dashboard = () => {
-  const {
-    loading,
-    refetch
-  } = useDashboard()
+  const { loading, refetch } = useDashboard();
 
   if (loading) {
     return (
@@ -34,7 +26,7 @@ const Dashboard = () => {
           Retry
         </Button>
       </Box>
-    )
+    );
   }
 
   return (
@@ -48,7 +40,7 @@ const Dashboard = () => {
         centerMinWidth={200}
       />
     </>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;
