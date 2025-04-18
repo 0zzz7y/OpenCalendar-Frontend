@@ -59,6 +59,53 @@ const TaskCard = ({
 
   const borderColor = currentCategory?.color || "#FFF176";
 
+  const textFieldProps = {
+    InputProps: {
+      sx: {
+        backgroundColor: "#fff",
+        color: "#000",
+        "& .MuiOutlinedInput-notchedOutline": {
+          borderColor: "#000"
+        },
+        "&:hover .MuiOutlinedInput-notchedOutline": {
+          borderColor: "#000"
+        },
+        "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+          borderColor: "#000"
+        },
+        "& svg": {
+          color: "#000"
+        }
+      }
+    },
+    InputLabelProps: {
+      sx: {
+        color: "#000",
+        "&.Mui-focused": {
+          color: "#000"
+        }
+      }
+    },
+    sx: {
+      backgroundColor: "#fff",
+      color: "#000",
+      "& .MuiOutlinedInput-root .MuiSelect-icon": {
+        color: "#000"
+      },
+      "& .MuiOutlinedInput-root:hover .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#000"
+      },
+      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
+        borderColor: "#000"
+      },
+      "& fieldset": {
+        borderColor: "#000"
+      }
+    }
+  };
+
+  const iconStyle = { color: "#000" };
+
   return (
     <Card
       sx={{
@@ -71,8 +118,8 @@ const TaskCard = ({
       }}
     >
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <IconButton onClick={handleToggleExpand}>
-          {expanded ? <ExpandLess /> : <ExpandMore />}
+        <IconButton onClick={handleToggleExpand} sx={iconStyle}>
+          {expanded ? <ExpandLess sx={iconStyle} /> : <ExpandMore sx={iconStyle} />}
         </IconButton>
 
         <TextField
@@ -80,24 +127,28 @@ const TaskCard = ({
           value={task.name}
           onChange={(e) => handleChange("name", e.target.value)}
           placeholder="Title"
+          label="Title"
           fullWidth
           size="small"
+          {...textFieldProps}
         />
 
-        <IconButton onClick={() => onDelete(task.id)}>
-          <Delete />
+        <IconButton onClick={() => onDelete(task.id)} sx={iconStyle}>
+          <Delete sx={iconStyle} />
         </IconButton>
       </Box>
 
       <Collapse in={expanded}>
         <Box display="flex" flexDirection="column" gap={2} mt={2}>
           <TextField
+          label="Description"
             variant="outlined"
             value={task.description || ""}
             onChange={(e) => handleChange("description", e.target.value)}
             placeholder="Description"
             fullWidth
             size="small"
+            {...textFieldProps}
           />
 
           <DateTimePicker
@@ -109,7 +160,8 @@ const TaskCard = ({
             slotProps={{
               textField: {
                 variant: "outlined",
-                size: "small"
+                size: "small",
+                ...textFieldProps
               }
             }}
           />
@@ -123,7 +175,8 @@ const TaskCard = ({
             slotProps={{
               textField: {
                 variant: "outlined",
-                size: "small"
+                size: "small",
+                ...textFieldProps
               }
             }}
           />
@@ -136,6 +189,7 @@ const TaskCard = ({
               onChange={(e) => handleChange("recurringPattern", e.target.value)}
               label="Repetition"
               size="small"
+              {...textFieldProps}
             >
               <MenuItem value="NONE">None</MenuItem>
               <MenuItem value="DAILY">Daily</MenuItem>
@@ -152,10 +206,11 @@ const TaskCard = ({
             onChange={(e) => handleChange("calendarId", e.target.value)}
             variant="outlined"
             size="small"
+            {...textFieldProps}
           >
-          {calendars.map((cal) => (
+            {calendars.map((cal) => (
               <MenuItem key={cal.id} value={cal.id}>
-                {cal.emoji} {cal.name}
+                {cal.name}
               </MenuItem>
             ))}
           </TextField>
@@ -170,13 +225,21 @@ const TaskCard = ({
             InputProps={{
               startAdornment: currentCategory && (
                 <InputAdornment position="start">
-                  <Typography sx={{ pr: 1, fontSize: 20 }}>
+                  <Typography sx={{ pr: 1, fontSize: 20, color: "#000" }}>
                     {currentCategory.name}
                   </Typography>
                 </InputAdornment>
-              )
+              ),
+              sx: { color: "#000" }
             }}
+            InputLabelProps={{ sx: { color: "#000" } }}
+            sx={textFieldProps.sx}
           >
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>
+                {cat.name}
+              </MenuItem>
+            ))}
           </TextField>
         </Box>
       </Collapse>

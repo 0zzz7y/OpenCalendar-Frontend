@@ -75,7 +75,6 @@ const TaskBoard = ({
                   width: "100%",
                   minHeight: 300,
                   p: 1,
-                  bgcolor: "#f5f5f5",
                   borderRadius: 2
                 }}
               >

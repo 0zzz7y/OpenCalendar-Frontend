@@ -106,7 +106,15 @@ const TasksPanel = () => {
 
   return (
     <>
-      <Box sx={{ p: 2 }}>
+      <Box
+        sx={{
+          p: 2,
+          maxHeight: "100vh",
+          overflowY: "auto",
+          boxSizing: "border-box",
+          height: "100vh"
+        }}
+      >
         <TextField
           label="Nowe zadanie"
           value={newTitle}

@@ -13,7 +13,7 @@ const TaskColumn = ({ title, icon, children }: Properties) => {
     <>
       <Paper
         sx={{
-          width: 300,
+          width: 200,
           minHeight: 400,
           p: 2,
           mx: 1,

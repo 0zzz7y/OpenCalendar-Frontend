@@ -1,32 +1,33 @@
-import { useState } from "react";
-import { Box, Typography } from "@mui/material";
+import { useState } from "react"
+import { Box, Typography } from "@mui/material"
 
-import DayColumn from "./DayColumn";
-import Event from "../../types/event";
+import DayColumn from "./DayColumn"
+import TimeColumn from "./TimeColumn"
+import Event from "../../types/event"
 
 export interface Properties {
   onSlotClick: (slot: {
-    anchorEl: HTMLElement;
-    dateTime: { dayIndex: number; hour: string };
-  }) => void;
+    anchorEl: HTMLElement
+    dateTime: { dayIndex: number; hour: string }
+  }) => void
 }
 
 const getStartOfWeek = (date = new Date()) => {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1); // poniedziałek
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  d.setDate(diff)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
 
 const WeeklyView = () => {
-  const [events, setEvents] = useState<Event[]>([]);
+  const [events, setEvents] = useState<Event[]>([])
 
   const handleSave = (data: Partial<Event> & { start: string }) => {
     setEvents((prev) => {
-      const exists = prev.find((e) => e.startDate === data.start);
-      const id = exists?.id || crypto.randomUUID();
+      const exists = prev.find((e) => e.startDate === data.start)
+      const id = exists?.id || crypto.randomUUID()
 
       const newEvent: Event = {
         id,
@@ -36,23 +37,25 @@ const WeeklyView = () => {
         color: data.color ?? "#1976d2",
         calendarId: "",
         description: ""
-      };
+      }
 
       return exists
         ? prev.map((e) => (e.id === id ? newEvent : e))
-        : [...prev, newEvent];
-    });
-  };
+        : [...prev, newEvent]
+    })
+  }
 
-  const weekStart = getStartOfWeek();
+  const weekStart = getStartOfWeek()
   const days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
+    const d = new Date(weekStart)
+    d.setDate(d.getDate() + i)
+    return d
+  })
 
   return (
     <Box display="flex" height="100%" sx={{ p: 2, height: "100vh", overflow: "auto" }}>
+      <TimeColumn />
+
       {days.map((day, index) => (
         <Box
           key={index}
@@ -87,7 +90,7 @@ const WeeklyView = () => {
         </Box>
       ))}
     </Box>
-  );
-};
+  )
+}
 
-export default WeeklyView;
+export default WeeklyView

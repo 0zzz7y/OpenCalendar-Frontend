@@ -87,6 +87,7 @@ const NotesPanel = () => {
 
       <IconButton
         onClick={handleAddNote}
+        z-index={1000}
         sx={{
           position: "fixed",
           bottom: 16,
@@ -95,7 +96,7 @@ const NotesPanel = () => {
           color: "white",
           "&:hover": {
             backgroundColor: "primary.dark"
-          }
+          },
         }}
       >
         <AddIcon />

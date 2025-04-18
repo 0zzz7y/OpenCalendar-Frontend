@@ -8,7 +8,7 @@ import {
 } from "@mui/material";
 
 import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 import CalendarEditor from "./CalendarEditor";
 
@@ -38,6 +38,19 @@ const CalendarSelector = ({
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const isPopoverOpen = Boolean(anchorEl);
+
+  useEffect(() => {
+    const hasAll = data.some((item) => item.value === "all");
+    if (!hasAll) {
+      setData([{ label: "All", value: "all", emoji: "📅" }, ...data]);
+    }
+  }, [data, setData]);
+
+  useEffect(() => {
+    if (value === null || value === "") {
+      onChange("all");
+    }
+  }, [value, onChange]);
 
   const handleAdd = () => {
     if (!labelInput.trim()) return;
@@ -94,7 +107,7 @@ const CalendarSelector = ({
         <TextField
           select
           label="Calendar"
-          value={value || ""}
+          value={value || "all"}
           onChange={(e) => onChange(e.target.value || null)}
           fullWidth
           size="small"
@@ -177,12 +190,10 @@ const CalendarSelector = ({
         anchorEl={anchorEl}
         placement="bottom-end"
         sx={{ zIndex: 2000 }}
-        modifiers={[
-          {
-            name: "preventOverflow",
-            options: { boundary: "viewport" }
-          }
-        ]}
+        modifiers={[{
+          name: "preventOverflow",
+          options: { boundary: "viewport" }
+        }]}
       >
         <Box zIndex={2000}>
           <CalendarEditor

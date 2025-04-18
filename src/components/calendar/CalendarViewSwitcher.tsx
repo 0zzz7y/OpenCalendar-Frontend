@@ -14,13 +14,13 @@ const CalendarViewSwitcher = ({
       <ToggleButtonGroup
         value={view}
         exclusive
-        onChange={(e, nextView) => nextView && onChange(nextView)}
+        onChange={(_e, nextView) => nextView && onChange(nextView)}
         size="small"
         sx={{ mb: 2 }}
       >
-        <ToggleButton value="day">Dzień</ToggleButton>
-        <ToggleButton value="week">Tydzień</ToggleButton>
-        <ToggleButton value="month">Miesiąc</ToggleButton>
+        <ToggleButton value="day">Day</ToggleButton>
+        <ToggleButton value="week">Week</ToggleButton>
+        <ToggleButton value="month">Month</ToggleButton>
       </ToggleButtonGroup>
     </>
   );

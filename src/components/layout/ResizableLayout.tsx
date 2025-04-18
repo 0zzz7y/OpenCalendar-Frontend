@@ -14,8 +14,8 @@ const ResizableLayout = ({
   leftPanel,
   centerPanel,
   rightPanel,
-  initialLeftWidth = 250,
-  initialRightWidth = 350,
+  initialLeftWidth = 300,
+  initialRightWidth = 800,
   centerMinWidth = 200
 }: ResizableLayoutProperties) => {
   const [leftPanelWidth, setLeftPanelWidth] = useState(initialLeftWidth);
@@ -23,12 +23,12 @@ const ResizableLayout = ({
   const [showLeftPanelContent, setShowLeftPanelContent] = useState(true);
   const [isDragging, setIsDragging] = useState<"left" | "right" | null>(null);
 
+  const containerRef = useRef<HTMLDivElement>(null);
   const leftPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleResize = () => {
       const width = leftPanelRef.current?.offsetWidth || 0;
-      console.log("Left panel resized to:", width);
       setShowLeftPanelContent(width > 50);
     };
 
@@ -42,54 +42,31 @@ const ResizableLayout = ({
     e.preventDefault();
     setIsDragging(panel);
     const startX = e.clientX;
-    const startWidth = panel === "left" ? leftPanelWidth : rightPanelWidth;
+    const startLeftWidth = leftPanelWidth;
+    const startRightWidth = rightPanelWidth;
+    const containerWidth = containerRef.current?.offsetWidth || window.innerWidth;
 
     document.body.style.userSelect = "none";
-
-    console.log(
-      "Start resizing",
-      panel,
-      "at",
-      startX,
-      "with width",
-      startWidth
-    );
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       const delta = moveEvent.clientX - startX;
 
       if (panel === "left") {
-        const newWidth = Math.max(startWidth + delta, 24);
-        const maxWidth = window.innerWidth - rightPanelWidth - centerMinWidth;
-        console.log("Dragging left panel to:", newWidth);
-        setLeftPanelWidth(Math.min(newWidth, maxWidth));
+        const newLeftWidth = Math.max(startLeftWidth + delta, 50);
+        const maxLeftWidth = containerWidth - rightPanelWidth - centerMinWidth;
+        setLeftPanelWidth(Math.min(newLeftWidth, maxLeftWidth));
       }
 
       if (panel === "right") {
-        const newWidth = Math.max(startWidth - delta, 24);
-        const maxWidth = startWidth - delta;
-        console.log("Dragging right panel to:", newWidth);
-        setRightPanelWidth(Math.min(newWidth, maxWidth));
+        const newRightWidth = Math.max(startRightWidth - delta, 50);
+        const maxRightWidth = containerWidth - leftPanelWidth - centerMinWidth;
+        setRightPanelWidth(Math.min(newRightWidth, maxRightWidth));
       }
     };
 
     const onMouseUp = () => {
       setIsDragging(null);
       document.body.style.userSelect = "";
-
-      const totalWidth = leftPanelWidth + rightPanelWidth + centerMinWidth;
-      const overflow = totalWidth - window.innerWidth;
-
-      if (overflow > 0) {
-        if (panel === "right") {
-          console.log("Adjusting right panel for overflow:", overflow);
-          setRightPanelWidth((prev) => Math.max(100, prev - overflow));
-        } else {
-          console.log("Adjusting left panel for overflow:", overflow);
-          setLeftPanelWidth((prev) => Math.max(100, prev - overflow));
-        }
-      }
-
       window.removeEventListener("mousemove", onMouseMove);
       window.removeEventListener("mouseup", onMouseUp);
     };
@@ -99,10 +76,11 @@ const ResizableLayout = ({
   };
 
   const themeTransition = "all 0.5s ease";
-  const dragTransition = isDragging ? "all 0.2s ease" : "all 0.5s ease";
+  const dragTransition = isDragging ? "none" : "all 0.5s ease";
 
   return (
     <Box
+      ref={containerRef}
       sx={{
         display: "flex",
         width: "100%",
@@ -139,22 +117,31 @@ const ResizableLayout = ({
         </Paper>
       </Box>
 
+      {/* Left Handle and Indicator */}
       <Box
         onMouseDown={(e) => handleResize(e, "left")}
         sx={{
           position: "absolute",
           top: 0,
-          left: leftPanelWidth - 24,
+          left: leftPanelWidth,
           bottom: 0,
           width: 12,
+          transform: "translateX(-50%)",
           cursor: "col-resize",
-          zIndex: 10,
+          zIndex: 20,
           backgroundColor: "transparent",
-          "&:hover": {
-            backgroundColor: "transparent"
-          }
+          transition: dragTransition
         }}
-      />
+      >
+        <Box
+          sx={{
+            width: 8,
+            height: "100%",
+            backgroundColor: "#bbb",
+            margin: "0 auto"
+          }}
+        />
+      </Box>
 
       <Box
         sx={{
@@ -181,22 +168,31 @@ const ResizableLayout = ({
         </Paper>
       </Box>
 
+      {/* Right Handle and Indicator */}
       <Box
         onMouseDown={(e) => handleResize(e, "right")}
         sx={{
           position: "absolute",
           top: 0,
-          right: rightPanelWidth - 24,
+          right: rightPanelWidth,
           bottom: 0,
           width: 12,
+          transform: "translateX(50%)",
           cursor: "col-resize",
-          zIndex: 10,
+          zIndex: 20,
           backgroundColor: "transparent",
-          "&:hover": {
-            backgroundColor: "transparent"
-          }
+          transition: dragTransition
         }}
-      />
+      >
+        <Box
+          sx={{
+            width: 8,
+            height: "100%",
+            backgroundColor: "#bbb",
+            margin: "0 auto"
+          }}
+        />
+      </Box>
 
       <Box
         sx={{

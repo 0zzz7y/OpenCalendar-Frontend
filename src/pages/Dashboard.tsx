@@ -10,6 +10,9 @@ const Dashboard = () => {
         leftPanel={<LeftPanel />}
         centerPanel={<CenterPanel />}
         rightPanel={<RightPanel />}
+        initialLeftWidth={300}
+        initialRightWidth={800}
+        centerMinWidth={200}
       />
     </>
   );
