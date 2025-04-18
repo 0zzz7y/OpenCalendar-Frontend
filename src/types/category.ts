@@ -1,6 +1,5 @@
 export default interface Category {
-  id: string
-  name: string
-  emoji: string
-  color: string
+  id: string;
+  name: string;
+  color: string;
 }

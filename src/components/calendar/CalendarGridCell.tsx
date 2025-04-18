@@ -1,33 +1,45 @@
-import { Box, Typography, Dialog, DialogTitle, DialogContent, TextField, Button } from "@mui/material"
+import {
+  Box,
+  Typography,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  TextField,
+  Button
+} from "@mui/material";
 
-import { useState } from "react"
+import { useState } from "react";
 
-import Event from "../../types/event"
+import Event from "../../types/event";
 
 interface CalendarGridCellProperties {
-  datetime: Date
-  event?: Event
-  onSave: (event: Partial<Event> & { startDate: string }) => void
+  datetime: Date;
+  event?: Event;
+  onSave: (event: Partial<Event> & { startDate: string }) => void;
 }
 
-const CalendarGridCell = ({ datetime, event, onSave }: CalendarGridCellProperties) => {
-  const [open, setOpen] = useState(false)
-  const [name, setName] = useState(event?.name || "")
+const CalendarGridCell = ({
+  datetime,
+  event,
+  onSave
+}: CalendarGridCellProperties) => {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState(event?.name || "");
 
   const handleOpen = () => {
-    setOpen(true)
-    setName(event?.name || "")
-  }
+    setOpen(true);
+    setName(event?.name || "");
+  };
 
   const handleSave = () => {
     onSave({
       ...event,
       name,
       startDate: datetime.toISOString(),
-      endDate: new Date(datetime.getTime() + 60 * 60 * 1000).toISOString(),
-    })
-    setOpen(false)
-  }
+      endDate: new Date(datetime.getTime() + 60 * 60 * 1000).toISOString()
+    });
+    setOpen(false);
+  };
 
   return (
     <>
@@ -59,9 +71,16 @@ const CalendarGridCell = ({ datetime, event, onSave }: CalendarGridCellPropertie
         )}
       </Box>
 
-      <Dialog open={open} onClose={() => setOpen(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={open}
+        onClose={() => setOpen(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>{event ? "Edit event" : "Add event"}</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+        >
           <Typography variant="body2">
             Time:{" "}
             <strong>
@@ -75,13 +94,17 @@ const CalendarGridCell = ({ datetime, event, onSave }: CalendarGridCellPropertie
             onChange={(e) => setName(e.target.value)}
             fullWidth
           />
-          <Button variant="contained" onClick={handleSave} disabled={!name.trim()}>
+          <Button
+            variant="contained"
+            onClick={handleSave}
+            disabled={!name.trim()}
+          >
             {event ? "Save" : "Add"}
           </Button>
         </DialogContent>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
-export default CalendarGridCell
+export default CalendarGridCell;

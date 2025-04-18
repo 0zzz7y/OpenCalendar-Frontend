@@ -1,19 +1,24 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Typography } from "@mui/material";
 
 interface DayGridProperties {
-  onSlotClick: (hour: number, minute: number) => void
+  onSlotClick: (hour: number, minute: number) => void;
 }
 
 const DayGrid = ({ onSlotClick }: DayGridProperties) => {
   const slots = Array.from({ length: 24 * 2 }, (_, i) => {
-    const hour = Math.floor(i / 2)
-    const minute = i % 2 === 0 ? 0 : 30
-    return { hour, minute }
-  })
+    const hour = Math.floor(i / 2);
+    const minute = i % 2 === 0 ? 0 : 30;
+    return { hour, minute };
+  });
 
   return (
     <>
-      <Box display="flex" flexDirection="column" height="100%" border="1px solid #ddd">
+      <Box
+        display="flex"
+        flexDirection="column"
+        height="100%"
+        border="1px solid #ddd"
+      >
         {slots.map(({ hour, minute }, i) => (
           <Box
             key={i}
@@ -24,8 +29,8 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
               minHeight: 32,
               cursor: "pointer",
               "&:hover": {
-                backgroundColor: "#f5f5f5",
-              },
+                backgroundColor: "#f5f5f5"
+              }
             }}
           >
             <Typography variant="caption">
@@ -35,7 +40,7 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
         ))}
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default DayGrid
+export default DayGrid;

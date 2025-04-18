@@ -1,11 +1,14 @@
-import { ToggleButton, ToggleButtonGroup } from "@mui/material"
+import { ToggleButton, ToggleButtonGroup } from "@mui/material";
 
 interface CalendarViewSwitcherProperties {
-  view: "day" | "week" | "month"
-  onChange: (view: "day" | "week" | "month") => void
+  view: "day" | "week" | "month";
+  onChange: (view: "day" | "week" | "month") => void;
 }
 
-const CalendarViewSwitcher = ({ view, onChange }: CalendarViewSwitcherProperties) => {
+const CalendarViewSwitcher = ({
+  view,
+  onChange
+}: CalendarViewSwitcherProperties) => {
   return (
     <>
       <ToggleButtonGroup
@@ -20,7 +23,7 @@ const CalendarViewSwitcher = ({ view, onChange }: CalendarViewSwitcherProperties
         <ToggleButton value="month">Miesiąc</ToggleButton>
       </ToggleButtonGroup>
     </>
-  )
-}
+  );
+};
 
-export default CalendarViewSwitcher
+export default CalendarViewSwitcher;

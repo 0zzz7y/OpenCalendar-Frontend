@@ -1,10 +1,14 @@
-import Box from "@mui/material/Box"
-import IconButton from "@mui/material/IconButton"
-import AddIcon from "@mui/icons-material/Add"
-import { useState } from "react"
-import NoteCard from "./NoteCard"
-import Note from "../../types/note"
-import { v4 as uuidv4 } from "uuid"
+import { useState } from "react";
+
+import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton";
+import AddIcon from "@mui/icons-material/Add";
+
+import NoteCard from "./NoteCard";
+
+import { v4 as uuidv4 } from "uuid";
+
+import Note from "../../types/note";
 
 const initialNotes: Note[] = [
   {
@@ -33,23 +37,23 @@ const initialNotes: Note[] = [
     zIndex: 2,
     color: "#ffff88"
   }
-]
+];
 
 const NotesPanel = () => {
-  const [notes, setNotes] = useState<Note[]>(initialNotes)
+  const [notes, setNotes] = useState<Note[]>(initialNotes);
 
   const handleUpdate = (updatedNote: Note) => {
     setNotes((prev) =>
       prev.map((note) => (note.id === updatedNote.id ? updatedNote : note))
-    )
-  }
+    );
+  };
 
   const handleDelete = (id: string) => {
-    setNotes((prev) => prev.filter((note) => note.id !== id))
-  }
+    setNotes((prev) => prev.filter((note) => note.id !== id));
+  };
 
   const handleAddNote = () => {
-    const maxZ = Math.max(0, ...notes.map((n) => n.zIndex))
+    const maxZ = Math.max(0, ...notes.map((n) => n.zIndex));
     const newNote: Note = {
       id: uuidv4(),
       description: "",
@@ -62,12 +66,12 @@ const NotesPanel = () => {
       height: 150,
       zIndex: maxZ + 1,
       color: "#ffff88"
-    }
-    setNotes((prev) => [...prev, newNote])
-  }
+    };
+    setNotes((prev) => [...prev, newNote]);
+  };
 
   return (
-    <Box position="absolute" top={0} left={0} width="100vw" height="100vh" zIndex={500}>
+    <Box position="absolute" top={0} left={0} width="0vh" height="0vh">
       {notes.map((note) => (
         <NoteCard
           key={note.id}
@@ -87,7 +91,6 @@ const NotesPanel = () => {
           position: "fixed",
           bottom: 16,
           right: 16,
-          zIndex: 1200,
           backgroundColor: "primary.main",
           color: "white",
           "&:hover": {
@@ -98,7 +101,7 @@ const NotesPanel = () => {
         <AddIcon />
       </IconButton>
     </Box>
-  )
-}
+  );
+};
 
-export default NotesPanel
+export default NotesPanel;

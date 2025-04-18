@@ -1,6 +1,6 @@
-import { DateCalendar } from "@mui/x-date-pickers/DateCalendar"
-import { LocalizationProvider } from "@mui/x-date-pickers"
-import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns";
 
 function MonthlyCalendar() {
   return (
@@ -9,7 +9,7 @@ function MonthlyCalendar() {
         <DateCalendar />
       </LocalizationProvider>
     </>
-  )
+  );
 }
 
-export default MonthlyCalendar
+export default MonthlyCalendar;

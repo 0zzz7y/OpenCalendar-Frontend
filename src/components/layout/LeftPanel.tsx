@@ -1,29 +1,38 @@
-import Box from "@mui/material/Box"
-import Stack from "@mui/material/Stack"
-import { useState } from "react"
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
+import { useState } from "react";
 
-import ThemeToggleButton from "../theme/ThemeToggleButton"
-import CategorySelector, { CategoryOption } from "../category/CategorySelector"
-import CalendarSelector, { CalendarOption } from "../calendar/CalendarSelector"
-import MonthlyCalendar from "../calendar/MonthlyCalendar"
+import ThemeToggleButton from "../theme/ThemeToggleButton";
+import CategorySelector, { CategoryOption } from "../category/CategorySelector";
+import CalendarSelector, { CalendarOption } from "../calendar/CalendarSelector";
+import MonthlyCalendar from "../calendar/MonthlyCalendar";
 
 const LeftPanel = () => {
   const [calendarOptions, setCalendarOptions] = useState<CalendarOption[]>([
     { label: "Osobisty", value: "personal" },
     { label: "Praca", value: "work" }
-  ])
+  ]);
 
   const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([
     { label: "Osobisty", value: "personal", color: "#3b5bdb" },
     { label: "Praca", value: "work", color: "#fa5252" }
-  ])
+  ]);
 
-  const [selectedCalendar, setSelectedCalendar] = useState<string | null>("personal")
-  const [selectedCategory, setSelectedCategory] = useState<string | null>("personal")
+  const [selectedCalendar, setSelectedCalendar] = useState<string | null>(
+    "personal"
+  );
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(
+    "personal"
+  );
 
   return (
     <>
-      <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+      <Box
+        display="flex"
+        flexDirection="column"
+        justifyContent="space-between"
+        height="100%"
+      >
         <Stack spacing={2}>
           <CalendarSelector
             data={calendarOptions}
@@ -43,7 +52,7 @@ const LeftPanel = () => {
             sx={{
               alignSelf: "flex-start",
               mt: "-16px",
-              ml: "-24px",
+              ml: "-24px"
             }}
           >
             <MonthlyCalendar />
@@ -55,7 +64,7 @@ const LeftPanel = () => {
         </Box>
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default LeftPanel
+export default LeftPanel;

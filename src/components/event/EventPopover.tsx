@@ -7,22 +7,22 @@ import {
   Divider,
   ClickAwayListener,
   Typography
-} from "@mui/material"
+} from "@mui/material";
 
-import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
-import { useEffect, useState } from "react"
+import { DateCalendar, TimePicker } from "@mui/x-date-pickers";
+import { useEffect, useState } from "react";
 
-import dayjs, { Dayjs } from "dayjs"
+import dayjs, { Dayjs } from "dayjs";
 
-import { Event } from "@/types"
+import Event from "../../types/event";
 
 interface Properties {
-  anchorEl: HTMLElement | null
-  onClose: () => void
-  onSave: (event: Partial<Event>) => void
-  calendars: { id: string; name: string }[]
-  categories: { id: string; name: string; emoji: string }[]
-  initialEvent?: Event
+  anchorEl: HTMLElement | null;
+  onClose: () => void;
+  onSave: (event: Partial<Event>) => void;
+  calendars: { id: string; name: string }[];
+  categories: { id: string; name: string; emoji: string }[];
+  initialEvent?: Event;
 }
 
 function EventPopover({
@@ -33,56 +33,56 @@ function EventPopover({
   categories,
   initialEvent
 }: Properties) {
-  const open = Boolean(anchorEl)
+  const open = Boolean(anchorEl);
 
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [date, setDate] = useState<Dayjs | null>(dayjs())
-  const [time, setTime] = useState<Dayjs | null>(dayjs())
-  const [calendarId, setCalendarId] = useState("")
-  const [categoryId, setCategoryId] = useState("")
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [date, setDate] = useState<Dayjs | null>(dayjs());
+  const [time, setTime] = useState<Dayjs | null>(dayjs());
+  const [calendarId, setCalendarId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
 
   useEffect(() => {
     if (initialEvent) {
-      setTitle(initialEvent.title)
-      setDescription(initialEvent.description || "")
-      const dateTime = dayjs(initialEvent.startDate)
-      setDate(dateTime)
-      setTime(dateTime)
-      setCalendarId(initialEvent.calendarId)
-      setCategoryId(initialEvent.categoryId || "")
+      setTitle(initialEvent.name);
+      setDescription(initialEvent.description || "");
+      const dateTime = dayjs(initialEvent.startDate);
+      setDate(dateTime);
+      setTime(dateTime);
+      setCalendarId(initialEvent.calendarId);
+      setCategoryId(initialEvent.categoryId || "");
     } else {
-      setTitle("")
-      setDescription("")
-      setDate(dayjs())
-      setTime(dayjs())
-      setCalendarId("")
-      setCategoryId("")
+      setTitle("");
+      setDescription("");
+      setDate(dayjs());
+      setTime(dayjs());
+      setCalendarId("");
+      setCategoryId("");
     }
-  }, [initialEvent, open])
+  }, [initialEvent, open]);
 
   const handleSave = () => {
-    if (!title || !date || !time) return
+    if (!title || !date || !time) return;
 
     const eventDateTime = date
       ?.hour(time?.hour() || 0)
       .minute(time?.minute() || 0)
       .second(0)
       .millisecond(0)
-      .toISOString()
+      .toISOString();
 
     onSave({
       id: initialEvent?.id,
-      title,
+      name: title,
       description,
       calendarId,
       categoryId,
       startDate: eventDateTime,
       endDate: eventDateTime
-    })
+    });
 
-    onClose()
-  }
+    onClose();
+  };
 
   return (
     <>
@@ -116,18 +116,18 @@ function EventPopover({
             <TextField
               label="Title"
               value={title}
-              onChange={e => setTitle(e.target.value)}
+              onChange={(e) => setTitle(e.target.value)}
               fullWidth
             />
 
             <TextField
               label="Calendar"
               value={calendarId}
-              onChange={e => setCalendarId(e.target.value)}
+              onChange={(e) => setCalendarId(e.target.value)}
               select
               fullWidth
             >
-              {calendars.map(cal => (
+              {calendars.map((cal) => (
                 <MenuItem key={cal.id} value={cal.id}>
                   {cal.name}
                 </MenuItem>
@@ -137,11 +137,11 @@ function EventPopover({
             <TextField
               label="Category"
               value={categoryId}
-              onChange={e => setCategoryId(e.target.value)}
+              onChange={(e) => setCategoryId(e.target.value)}
               select
               fullWidth
             >
-              {categories.map(cat => (
+              {categories.map((cat) => (
                 <MenuItem key={cat.id} value={cat.id}>
                   {cat.emoji} {cat.name}
                 </MenuItem>
@@ -152,19 +152,19 @@ function EventPopover({
 
             <DateCalendar
               value={date}
-              onChange={newDate => setDate(newDate)}
+              onChange={(newDate) => setDate(newDate)}
             />
 
             <TimePicker
               label="Time"
               value={time}
-              onChange={newTime => setTime(newTime)}
+              onChange={(newTime) => setTime(newTime)}
             />
 
             <TextField
               label="Description"
               value={description}
-              onChange={e => setDescription(e.target.value)}
+              onChange={(e) => setDescription(e.target.value)}
               fullWidth
               multiline
               minRows={2}
@@ -182,7 +182,7 @@ function EventPopover({
         </ClickAwayListener>
       </Popover>
     </>
-  )
+  );
 }
 
-export default EventPopover
+export default EventPopover;

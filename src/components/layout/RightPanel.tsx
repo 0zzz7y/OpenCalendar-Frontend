@@ -1,12 +1,13 @@
-import NotesPanel from "../note/NotesPanel"
+import NotesPanel from "../note/NotesPanel";
+import TasksPanel from "../task/TasksPanel";
 
 const RightPanel = () => {
   return (
     <>
-      {/* <NotesPanel /> */}
+      <NotesPanel />
       <TasksPanel />
     </>
-  )
-}
+  );
+};
 
-export default RightPanel
+export default RightPanel;

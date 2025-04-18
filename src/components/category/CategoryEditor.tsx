@@ -5,20 +5,20 @@ import {
   Button,
   Box,
   ClickAwayListener
-} from "@mui/material"
+} from "@mui/material";
 
-import { Sketch } from "@uiw/react-color"
+import { Sketch } from "@uiw/react-color";
 
 interface CategoryEditorProperties {
-  editMode: "add" | "edit" | "delete"
-  labelInput: string
-  setLabelInput: (val: string) => void
-  colorInput: string
-  setColorInput: (val: string) => void
-  onClose: () => void
-  onAdd: () => void
-  onEdit: () => void
-  onDelete: () => void
+  editMode: "add" | "edit" | "delete";
+  labelInput: string;
+  setLabelInput: (val: string) => void;
+  colorInput: string;
+  setColorInput: (val: string) => void;
+  onClose: () => void;
+  onAdd: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
 }
 
 const CategoryEditor = ({
@@ -98,7 +98,7 @@ const CategoryEditor = ({
         </Paper>
       </ClickAwayListener>
     </>
-  )
-}
+  );
+};
 
-export default CategoryEditor
+export default CategoryEditor;

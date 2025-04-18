@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect, ReactNode } from "react"
-import { Box, Paper } from "@mui/material"
+import React, { useState, useRef, useEffect, ReactNode } from "react";
+import { Box, Paper } from "@mui/material";
 
 interface ResizableLayoutProperties {
-  leftPanel?: ReactNode
-  centerPanel: ReactNode
-  rightPanel?: ReactNode
-  initialLeftWidth?: number
-  initialRightWidth?: number
-  centerMinWidth?: number
+  leftPanel?: ReactNode;
+  centerPanel: ReactNode;
+  rightPanel?: ReactNode;
+  initialLeftWidth?: number;
+  initialRightWidth?: number;
+  centerMinWidth?: number;
 }
 
 const ResizableLayout = ({
@@ -18,81 +18,88 @@ const ResizableLayout = ({
   initialRightWidth = 350,
   centerMinWidth = 200
 }: ResizableLayoutProperties) => {
-  const [leftPanelWidth, setLeftPanelWidth] = useState(initialLeftWidth)
-  const [rightPanelWidth, setRightPanelWidth] = useState(initialRightWidth)
-  const [showLeftPanelContent, setShowLeftPanelContent] = useState(true)
-  const [isDragging, setIsDragging] = useState<"left" | "right" | null>(null)
+  const [leftPanelWidth, setLeftPanelWidth] = useState(initialLeftWidth);
+  const [rightPanelWidth, setRightPanelWidth] = useState(initialRightWidth);
+  const [showLeftPanelContent, setShowLeftPanelContent] = useState(true);
+  const [isDragging, setIsDragging] = useState<"left" | "right" | null>(null);
 
-  const leftPanelRef = useRef<HTMLDivElement>(null)
+  const leftPanelRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleResize = () => {
-      const width = leftPanelRef.current?.offsetWidth || 0
-      console.log("Left panel resized to:", width)
-      setShowLeftPanelContent(width > 50)
-    }
+      const width = leftPanelRef.current?.offsetWidth || 0;
+      console.log("Left panel resized to:", width);
+      setShowLeftPanelContent(width > 50);
+    };
 
-    const observer = new ResizeObserver(handleResize)
-    if (leftPanelRef.current) observer.observe(leftPanelRef.current)
+    const observer = new ResizeObserver(handleResize);
+    if (leftPanelRef.current) observer.observe(leftPanelRef.current);
 
-    return () => observer.disconnect()
-  }, [])
+    return () => observer.disconnect();
+  }, []);
 
   const handleResize = (e: React.MouseEvent, panel: "left" | "right") => {
-    e.preventDefault()
-    setIsDragging(panel)
-    const startX = e.clientX
-    const startWidth = panel === "left" ? leftPanelWidth : rightPanelWidth
+    e.preventDefault();
+    setIsDragging(panel);
+    const startX = e.clientX;
+    const startWidth = panel === "left" ? leftPanelWidth : rightPanelWidth;
 
-    document.body.style.userSelect = "none"
+    document.body.style.userSelect = "none";
 
-    console.log("Start resizing", panel, "at", startX, "with width", startWidth)
+    console.log(
+      "Start resizing",
+      panel,
+      "at",
+      startX,
+      "with width",
+      startWidth
+    );
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const delta = moveEvent.clientX - startX
+      const delta = moveEvent.clientX - startX;
 
       if (panel === "left") {
-        const newWidth = Math.max(startWidth + delta, 24)
-        const maxWidth = window.innerWidth - rightPanelWidth - centerMinWidth
-        console.log("Dragging left panel to:", newWidth)
-        setLeftPanelWidth(Math.min(newWidth, maxWidth))
+        const newWidth = Math.max(startWidth + delta, 24);
+        const maxWidth = window.innerWidth - rightPanelWidth - centerMinWidth;
+        console.log("Dragging left panel to:", newWidth);
+        setLeftPanelWidth(Math.min(newWidth, maxWidth));
       }
 
       if (panel === "right") {
-        const newWidth = Math.max(startWidth - delta, 24)
-        const maxWidth = startWidth - delta
-        console.log("Dragging right panel to:", newWidth)
-        setRightPanelWidth(Math.min(newWidth, maxWidth))
+        const newWidth = Math.max(startWidth - delta, 24);
+        const maxWidth = startWidth - delta;
+        console.log("Dragging right panel to:", newWidth);
+        setRightPanelWidth(Math.min(newWidth, maxWidth));
       }
-    }
+    };
 
     const onMouseUp = () => {
-      setIsDragging(null)
-      document.body.style.userSelect = ""
+      setIsDragging(null);
+      document.body.style.userSelect = "";
 
-      const totalWidth = leftPanelWidth + rightPanelWidth + centerMinWidth
-      const overflow = totalWidth - window.innerWidth
+      const totalWidth = leftPanelWidth + rightPanelWidth + centerMinWidth;
+      const overflow = totalWidth - window.innerWidth;
 
       if (overflow > 0) {
         if (panel === "right") {
-          console.log("Adjusting right panel for overflow:", overflow)
-          setRightPanelWidth((prev) => Math.max(100, prev - overflow))
+          console.log("Adjusting right panel for overflow:", overflow);
+          setRightPanelWidth((prev) => Math.max(100, prev - overflow));
         } else {
-          console.log("Adjusting left panel for overflow:", overflow)
-          setLeftPanelWidth((prev) => Math.max(100, prev - overflow))
+          console.log("Adjusting left panel for overflow:", overflow);
+          setLeftPanelWidth((prev) => Math.max(100, prev - overflow));
         }
       }
 
-      window.removeEventListener("mousemove", onMouseMove)
-      window.removeEventListener("mouseup", onMouseUp)
-    }
+      window.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mouseup", onMouseUp);
+    };
 
-    window.addEventListener("mousemove", onMouseMove)
-    window.addEventListener("mouseup", onMouseUp)
-  }
+    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mouseup", onMouseUp);
+  };
 
-  const themeTransition = "all 0.5s ease"
-  const dragTransition = isDragging ? "all 0.2s ease" : "all 0.5s ease"
+  const themeTransition = "all 0.5s ease";
+  const dragTransition = isDragging ? "all 0.2s ease" : "all 0.5s ease";
 
   return (
     <Box
@@ -118,7 +125,16 @@ const ResizableLayout = ({
           transition: dragTransition
         }}
       >
-        <Paper elevation={1} sx={{ height: "100%", overflow: "hidden", p: 2, backgroundColor: "inherit", transition: themeTransition }}>
+        <Paper
+          elevation={1}
+          sx={{
+            height: "100%",
+            overflow: "hidden",
+            p: 2,
+            backgroundColor: "inherit",
+            transition: themeTransition
+          }}
+        >
           {showLeftPanelContent && leftPanel}
         </Paper>
       </Box>
@@ -151,7 +167,16 @@ const ResizableLayout = ({
           transition: dragTransition
         }}
       >
-        <Paper elevation={1} sx={{ height: "100%", overflow: "hidden", p: 2, backgroundColor: "inherit", transition: themeTransition }}>
+        <Paper
+          elevation={1}
+          sx={{
+            height: "100%",
+            overflow: "hidden",
+            p: 2,
+            backgroundColor: "inherit",
+            transition: themeTransition
+          }}
+        >
           {centerPanel}
         </Paper>
       </Box>
@@ -184,12 +209,21 @@ const ResizableLayout = ({
           transition: dragTransition
         }}
       >
-        <Paper elevation={1} sx={{ height: "100%", overflow: "hidden", p: 2, backgroundColor: "inherit", transition: themeTransition }}>
+        <Paper
+          elevation={1}
+          sx={{
+            height: "100%",
+            overflow: "hidden",
+            p: 2,
+            backgroundColor: "inherit",
+            transition: themeTransition
+          }}
+        >
           {rightPanel}
         </Paper>
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default ResizableLayout
+export default ResizableLayout;

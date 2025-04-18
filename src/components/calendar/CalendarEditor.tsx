@@ -5,23 +5,28 @@ import {
   Button,
   Box,
   ClickAwayListener
-} from "@mui/material"
+} from "@mui/material";
 
-import EmojiPicker from "emoji-picker-react"
+import EmojiPicker from "emoji-picker-react";
 
-import { useEffect, useRef } from "react"
-import { EmojiClickData, EmojiStyle, SkinTones, Theme } from "emoji-picker-react"
+import { useEffect, useRef } from "react";
+import {
+  EmojiClickData,
+  EmojiStyle,
+  SkinTones,
+  Theme
+} from "emoji-picker-react";
 
 interface CalendarEditorProperties {
-  editMode: "add" | "edit" | "delete"
-  labelInput: string
-  setLabelInput: (val: string) => void
-  onClose: () => void
-  onAdd: () => void
-  onEdit: () => void
-  onDelete: () => void
-  emojiInput: string
-  setEmojiInput: (emoji: string) => void
+  editMode: "add" | "edit" | "delete";
+  labelInput: string;
+  setLabelInput: (val: string) => void;
+  onClose: () => void;
+  onAdd: () => void;
+  onEdit: () => void;
+  onDelete: () => void;
+  emojiInput: string;
+  setEmojiInput: (emoji: string) => void;
 }
 
 const CalendarEditor = ({
@@ -35,14 +40,14 @@ const CalendarEditor = ({
   emojiInput,
   setEmojiInput
 }: CalendarEditorProperties) => {
-  const inputRef = useRef<HTMLInputElement | null>(null)
+  const inputRef = useRef<HTMLInputElement | null>(null);
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.focus()
-      inputRef.current.setSelectionRange(labelInput.length, labelInput.length)
+      inputRef.current.focus();
+      inputRef.current.setSelectionRange(labelInput.length, labelInput.length);
     }
-  }, [editMode])
+  }, [editMode]);
 
   return (
     <>
@@ -123,7 +128,7 @@ const CalendarEditor = ({
         </Paper>
       </ClickAwayListener>
     </>
-  )
-}
+  );
+};
 
-export default CalendarEditor
+export default CalendarEditor;

@@ -1,18 +1,18 @@
-import { useEffect, useState } from "react"
-import axios from "../api/axios"
-import { Note } from "../types/note"
+import { useEffect, useState } from "react";
+import axios from "../api/axios";
+import { Note } from "../types/note";
 
 export const useNotes = () => {
-  const [notes, setNotes] = useState<Note[]>([])
+  const [notes, setNotes] = useState<Note[]>([]);
 
   const fetchNotes = async () => {
-    const response = await axios.get<Note[]>("/notes")
-    setNotes(response.data)
-  }
+    const response = await axios.get<Note[]>("/notes");
+    setNotes(response.data);
+  };
 
   useEffect(() => {
-    fetchNotes()
-  }, [])
+    fetchNotes();
+  }, []);
 
-  return { notes, setNotes, fetchNotes }
-}
+  return { notes, setNotes, fetchNotes };
+};

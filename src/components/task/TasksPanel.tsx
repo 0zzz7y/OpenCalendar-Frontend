@@ -1,27 +1,26 @@
-import { useState } from "react"
+import { useState } from "react";
 
-import { Box, TextField } from "@mui/material"
-import { AddCircleOutline } from "@mui/icons-material"
+import { Box, TextField } from "@mui/material";
+import { AddCircleOutline } from "@mui/icons-material";
 
-import TaskBoard from "./TasksBoard"
+import TaskBoard from "./TasksBoard";
 
-import Task from "../../types/task"
-import Calendar from "../../types/calendar"
-import Category from "../../types/category"
-import TaskStatus from "../../types/taskStatus"
+import Task from "../../types/task";
+import Calendar from "../../types/calendar";
+import Category from "../../types/category";
+import TaskStatus from "../../types/taskStatus";
 
 const mockCalendar: Calendar = {
   id: "1",
   name: "Osobisty",
-  color: "#fff176"
-}
+  emoji: "🟡",
+};
 
 const mockCategory: Category = {
   id: "1",
   name: "Osobisty",
-  emoji: "🟡",
   color: "#fff176"
-}
+};
 
 const initialTasks: Task[] = [
   {
@@ -60,14 +59,14 @@ const initialTasks: Task[] = [
     startDate: "",
     endDate: ""
   }
-]
+];
 
 const TasksPanel = () => {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks)
-  const [newTitle, setNewTitle] = useState("")
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [newTitle, setNewTitle] = useState("");
 
   const handleCreate = () => {
-    if (!newTitle.trim()) return
+    if (!newTitle.trim()) return;
 
     const newTask: Task = {
       id: Date.now().toString(),
@@ -77,33 +76,33 @@ const TasksPanel = () => {
       categoryId: mockCategory.id,
       startDate: "",
       endDate: ""
-    }
+    };
 
-    setTasks([...tasks, newTask])
-    setNewTitle("")
-  }
+    setTasks([...tasks, newTask]);
+    setNewTitle("");
+  };
 
   const handleUpdate = (updated: Task) => {
-    setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)))
-  }
+    setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+  };
 
   const handleDelete = (id: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id))
-  }
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+  };
 
   const handleToggleStatus = (id: string) => {
     setTasks((prev) =>
       prev.map((t) => {
-        if (t.id !== id) return t
+        if (t.id !== id) return t;
 
-        const order: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"]
-        const current = order.indexOf(t.status)
-        const next = (current + 1) % order.length
+        const order: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
+        const current = order.indexOf(t.status);
+        const next = (current + 1) % order.length;
 
-        return { ...t, status: order[next] }
+        return { ...t, status: order[next] };
       })
-    )
-  }
+    );
+  };
 
   return (
     <>
@@ -126,15 +125,15 @@ const TasksPanel = () => {
 
         <TaskBoard
           tasks={tasks}
-          calendar={mockCalendar}
-          category={mockCategory}
+          calendars={[mockCalendar]}
+          categories={[mockCategory]}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
           onToggleStatus={handleToggleStatus}
         />
       </Box>
     </>
-  )
-}
+  );
+};
 
-export default TasksPanel
+export default TasksPanel;

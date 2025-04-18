@@ -1,7 +1,7 @@
-import LeftPanel from "../components/layout/LeftPanel"
-import CenterPanel from "../components/layout/CenterPanel"
-import RightPanel from "../components/layout/RightPanel"
-import ResizableLayout from "../components/layout/ResizableLayout"
+import LeftPanel from "../components/layout/LeftPanel";
+import CenterPanel from "../components/layout/CenterPanel";
+import RightPanel from "../components/layout/RightPanel";
+import ResizableLayout from "../components/layout/ResizableLayout";
 
 const Dashboard = () => {
   return (
@@ -12,7 +12,7 @@ const Dashboard = () => {
         rightPanel={<RightPanel />}
       />
     </>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

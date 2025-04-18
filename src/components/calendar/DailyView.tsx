@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState } from "react";
 import {
   Box,
   Typography,
@@ -6,40 +6,47 @@ import {
   DialogTitle,
   DialogContent,
   TextField,
-  Button,
-} from "@mui/material"
+  Button
+} from "@mui/material";
 
-import DayGrid from "./DayGrid"
+import DayGrid from "./DayGrid";
 
 const DailyView = () => {
-  const [openModal, setOpenModal] = useState(false)
-  const [selectedHour, setSelectedHour] = useState<number | null>(null)
-  const [selectedMinute, setSelectedMinute] = useState<number | null>(null)
-  const [eventTitle, setEventTitle] = useState("")
+  const [openModal, setOpenModal] = useState(false);
+  const [selectedHour, setSelectedHour] = useState<number | null>(null);
+  const [selectedMinute, setSelectedMinute] = useState<number | null>(null);
+  const [eventTitle, setEventTitle] = useState("");
 
   const handleSlotClick = (hour: number, minute: number) => {
-    setSelectedHour(hour)
-    setSelectedMinute(minute)
-    setOpenModal(true)
-  }
+    setSelectedHour(hour);
+    setSelectedMinute(minute);
+    setOpenModal(true);
+  };
 
   const handleAddEvent = () => {
     console.log("Dodano wydarzenie:", {
       hour: selectedHour,
       minute: selectedMinute,
-      title: eventTitle,
-    })
-    setOpenModal(false)
-    setEventTitle("")
-  }
+      title: eventTitle
+    });
+    setOpenModal(false);
+    setEventTitle("");
+  };
 
   return (
     <>
       <DayGrid onSlotClick={handleSlotClick} />
 
-      <Dialog open={openModal} onClose={() => setOpenModal(false)} maxWidth="xs" fullWidth>
+      <Dialog
+        open={openModal}
+        onClose={() => setOpenModal(false)}
+        maxWidth="xs"
+        fullWidth
+      >
         <DialogTitle>Dodaj wydarzenie</DialogTitle>
-        <DialogContent sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}>
+        <DialogContent
+          sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
+        >
           <Typography variant="body2">
             Godzina:{" "}
             <strong>
@@ -53,13 +60,17 @@ const DailyView = () => {
             onChange={(e) => setEventTitle(e.target.value)}
             fullWidth
           />
-          <Button variant="contained" onClick={handleAddEvent} disabled={!eventTitle.trim()}>
+          <Button
+            variant="contained"
+            onClick={handleAddEvent}
+            disabled={!eventTitle.trim()}
+          >
             Dodaj
           </Button>
         </DialogContent>
       </Dialog>
     </>
-  )
-}
+  );
+};
 
-export default DailyView
+export default DailyView;
