@@ -96,7 +96,7 @@ const NotesPanel = () => {
           color: "white",
           "&:hover": {
             backgroundColor: "primary.dark"
-          },
+          }
         }}
       >
         <AddIcon />

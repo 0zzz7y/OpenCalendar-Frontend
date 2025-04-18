@@ -204,10 +204,12 @@ const CategorySelector = ({
         anchorEl={anchorEl}
         placement="bottom-end"
         sx={{ zIndex: 2000 }}
-        modifiers={[{
-          name: "preventOverflow",
-          options: { boundary: "viewport" }
-        }]}
+        modifiers={[
+          {
+            name: "preventOverflow",
+            options: { boundary: "viewport" }
+          }
+        ]}
       >
         <Box zIndex={2000}>
           <CategoryEditor

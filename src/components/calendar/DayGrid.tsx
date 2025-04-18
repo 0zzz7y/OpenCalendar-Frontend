@@ -1,7 +1,7 @@
 import { Box, Typography } from "@mui/material";
 
 interface DayGridProperties {
-  onSlotClick: (hour: number, minute: number) => void;
+  onSlotClick: (hour: number, minute: number, element: HTMLElement) => void;
 }
 
 const DayGrid = ({ onSlotClick }: DayGridProperties) => {
@@ -22,7 +22,7 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
         {slots.map(({ hour, minute }, i) => (
           <Box
             key={i}
-            onClick={() => onSlotClick(hour, minute)}
+            onClick={(e) => onSlotClick(hour, minute, e.currentTarget)}
             sx={{
               borderBottom: "1px solid #eee",
               padding: "6px 12px",

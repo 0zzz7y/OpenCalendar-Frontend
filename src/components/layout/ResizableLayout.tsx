@@ -44,7 +44,8 @@ const ResizableLayout = ({
     const startX = e.clientX;
     const startLeftWidth = leftPanelWidth;
     const startRightWidth = rightPanelWidth;
-    const containerWidth = containerRef.current?.offsetWidth || window.innerWidth;
+    const containerWidth =
+      containerRef.current?.offsetWidth || window.innerWidth;
 
     document.body.style.userSelect = "none";
 

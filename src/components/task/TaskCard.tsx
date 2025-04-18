@@ -119,7 +119,11 @@ const TaskCard = ({
     >
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <IconButton onClick={handleToggleExpand} sx={iconStyle}>
-          {expanded ? <ExpandLess sx={iconStyle} /> : <ExpandMore sx={iconStyle} />}
+          {expanded ? (
+            <ExpandLess sx={iconStyle} />
+          ) : (
+            <ExpandMore sx={iconStyle} />
+          )}
         </IconButton>
 
         <TextField
@@ -141,7 +145,7 @@ const TaskCard = ({
       <Collapse in={expanded}>
         <Box display="flex" flexDirection="column" gap={2} mt={2}>
           <TextField
-          label="Description"
+            label="Description"
             variant="outlined"
             value={task.description || ""}
             onChange={(e) => handleChange("description", e.target.value)}

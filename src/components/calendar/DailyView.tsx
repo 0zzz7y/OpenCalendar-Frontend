@@ -1,76 +1,116 @@
-import { useState } from "react";
-import {
-  Box,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  Button
-} from "@mui/material";
+import { useState } from "react"
+import { Box } from "@mui/material"
+import dayjs from "dayjs"
 
-import DayGrid from "./DayGrid";
+import DayColumn from "./DayColumn"
+import TimeColumn from "./TimeColumn"
+import EventPopover from "../event/EventPopover"
+import EventInformationPopover from "../event/EventInformationPopover"
 
-const DailyView = () => {
-  const [openModal, setOpenModal] = useState(false);
-  const [selectedHour, setSelectedHour] = useState<number | null>(null);
-  const [selectedMinute, setSelectedMinute] = useState<number | null>(null);
-  const [eventTitle, setEventTitle] = useState("");
+import Event from "@/types/event"
 
-  const handleSlotClick = (hour: number, minute: number) => {
-    setSelectedHour(hour);
-    setSelectedMinute(minute);
-    setOpenModal(true);
-  };
+interface DailyViewProperties {
+  events: Event[];
+  onSave: (event: Partial<Event>) => void;
+  onSlotClick: (element: HTMLElement, datetime: Date) => void;
+  onEventClick?: (event: Event) => void;
+}
 
-  const handleAddEvent = () => {
-    console.log("Dodano wydarzenie:", {
-      hour: selectedHour,
-      minute: selectedMinute,
-      title: eventTitle
-    });
-    setOpenModal(false);
-    setEventTitle("");
-  };
+const DailyView = ({ events, onSave, onSlotClick, onEventClick }: DailyViewProperties) => {
+  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
+  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null)
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
+
+  const handleSlotClick = (element: HTMLElement, datetime: Date) => {
+    setSelectedSlot(element)
+    setSelectedDatetime(datetime)
+    setEditingEvent(null)
+    setInfoEvent(null)
+  }
+
+  const handleEventClick = (event: Event) => {
+    const element = document.querySelector(`#event-${event.id}`) as HTMLElement
+    if (element) {
+      setInfoAnchor(element)
+      setInfoEvent(event)
+    }
+  }
+
+  const handleClosePopover = () => {
+    setSelectedSlot(null)
+    setSelectedDatetime(null)
+    setEditingEvent(null)
+  }
+
+  const handleSave = (data: Partial<Event>) => {
+    onSave(data)
+    handleClosePopover()
+  }
+
+  const handleEditEvent = () => {
+    setEditingEvent(infoEvent)
+    setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null)
+    setSelectedSlot(infoAnchor)
+    setInfoEvent(null)
+  }
+
+  const handleDeleteEvent = (id: string) => {
+    onSave({ id })
+  }
+
+  const today = new Date()
 
   return (
     <>
-      <DayGrid onSlotClick={handleSlotClick} />
+      <Box display="flex" height="100%" sx={{ p: 2, height: "100vh", overflow: "auto" }}>
+        <TimeColumn />
+        <DayColumn
+          date={today}
+          events={events}
+          allEvents={events}
+          onSave={onSave}
+          onSlotClick={handleSlotClick}
+          onEventClick={handleEventClick}
+        />
+      </Box>
 
-      <Dialog
-        open={openModal}
-        onClose={() => setOpenModal(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>Dodaj wydarzenie</DialogTitle>
-        <DialogContent
-          sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
-        >
-          <Typography variant="body2">
-            Godzina:{" "}
-            <strong>
-              {selectedHour?.toString().padStart(2, "0")}:
-              {selectedMinute?.toString().padStart(2, "0")}
-            </strong>
-          </Typography>
-          <TextField
-            label="Nazwa wydarzenia"
-            value={eventTitle}
-            onChange={(e) => setEventTitle(e.target.value)}
-            fullWidth
-          />
-          <Button
-            variant="contained"
-            onClick={handleAddEvent}
-            disabled={!eventTitle.trim()}
-          >
-            Dodaj
-          </Button>
-        </DialogContent>
-      </Dialog>
+      {selectedSlot && selectedDatetime && (
+        <EventPopover
+          anchorEl={selectedSlot}
+          onClose={handleClosePopover}
+          onSave={handleSave}
+          calendars={[
+            { id: "personal", name: "Osobisty", emoji: "🗓" },
+            { id: "work", name: "Praca", emoji: "💼" }
+          ]}
+          categories={[
+            { id: "study", name: "Uczelnia", color: "#F44336" },
+            { id: "dog", name: "Spacer", color: "#FFEB3B" }
+          ]}
+          initialEvent={editingEvent ?? {
+            id: "",
+            name: "",
+            description: "",
+            startDate: dayjs(selectedDatetime).toISOString(),
+            endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
+            calendarId: "",
+            categoryId: undefined,
+            color: "#1976d2"
+          }}
+        />
+      )}
+
+      <EventInformationPopover
+        anchorEl={infoAnchor}
+        event={infoEvent}
+        onClose={() => setInfoEvent(null)}
+        onEdit={handleEditEvent}
+        onDelete={handleDeleteEvent}
+      />
     </>
-  );
-};
+  )
+}
 
-export default DailyView;
+export default DailyView

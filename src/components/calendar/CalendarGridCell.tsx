@@ -1,110 +1,126 @@
-import {
-  Box,
-  Typography,
-  Dialog,
-  DialogTitle,
-  DialogContent,
-  TextField,
-  Button
-} from "@mui/material";
+import { Box, Typography } from "@mui/material"
 
-import { useState } from "react";
+import { useDrop } from "react-dnd"
+import { useRef, useEffect } from "react"
 
-import Event from "../../types/event";
+import Event from "../../types/event"
 
 interface CalendarGridCellProperties {
-  datetime: Date;
-  event?: Event;
-  onSave: (event: Partial<Event> & { startDate: string }) => void;
+  datetime: Date
+  allEvents: Event[]
+  onSave: (event: Partial<Event> & { startDate: string }) => void
+  onClick?: (element: HTMLElement) => void
 }
 
 const CalendarGridCell = ({
   datetime,
-  event,
-  onSave
+  allEvents,
+  onSave,
+  onClick
 }: CalendarGridCellProperties) => {
-  const [open, setOpen] = useState(false);
-  const [name, setName] = useState(event?.name || "");
+  const ref = useRef<HTMLDivElement>(null)
 
-  const handleOpen = () => {
-    setOpen(true);
-    setName(event?.name || "");
-  };
+  const [{ isOver, canDrop, item }, drop] = useDrop(() => ({
+    accept: "event",
+    drop: (item: { id: string }) => {
+      const moved = allEvents.find(e => e.id === item.id)
+      if (!moved) return
 
-  const handleSave = () => {
-    onSave({
-      ...event,
-      name,
-      startDate: datetime.toISOString(),
-      endDate: new Date(datetime.getTime() + 60 * 60 * 1000).toISOString()
-    });
-    setOpen(false);
-  };
+      const newStart = new Date(datetime)
+      const originalStart = new Date(moved.startDate)
+
+      if (newStart.getTime() === originalStart.getTime()) return
+
+      const duration =
+        new Date(moved.endDate).getTime() - new Date(moved.startDate).getTime()
+
+      const newEnd = new Date(newStart.getTime() + duration)
+
+      const overlappingEvents = allEvents.filter(e => {
+        const start = new Date(e.startDate).getTime()
+        const end = new Date(e.endDate).getTime()
+        return (
+          e.id !== moved.id &&
+          start < newEnd.getTime() &&
+          end > newStart.getTime()
+        )
+      })
+
+      const totalSlots = overlappingEvents.length + 1
+      const widthPercent = 100 / totalSlots
+
+      onSave({
+        id: moved.id,
+        name: moved.name,
+        description: moved.description,
+        calendarId: moved.calendarId,
+        categoryId: moved.categoryId,
+        color: moved.color,
+        startDate: newStart.toISOString(),
+        endDate: newEnd.toISOString()
+      })
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+      item: monitor.getItem()
+    })
+  }))
+
+  useEffect(() => {
+    if (ref.current) {
+      drop(ref.current)
+    }
+  }, [drop])
+
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    onClick?.(e.currentTarget)
+  }
+
+  const previewEvent = allEvents.find((e) => e.id === item?.id)
+  const previewHeight = previewEvent
+    ? Math.max(
+        32,
+        ((new Date(previewEvent.endDate).getTime() - new Date(previewEvent.startDate).getTime()) / (1000 * 60)) * (32 / 15)
+      )
+    : 32
 
   return (
-    <>
-      <Box
-        onClick={handleOpen}
-        sx={{
-          borderBottom: "1px solid #eee",
-          padding: "6px",
-          minHeight: 32,
-          position: "relative",
-          cursor: "pointer",
-          bgcolor: event ? "#2196f3" : "transparent",
-          color: event ? "#fff" : "inherit",
-          fontSize: "0.75rem",
-          "&:hover": {
-            backgroundColor: event ? "#1976d2" : "#f5f5f5"
-          }
-        }}
-      >
-        <Typography variant="caption">
-          {datetime.getHours().toString().padStart(2, "0")}:
-          {datetime.getMinutes().toString().padStart(2, "0")}
-        </Typography>
+    <Box
+      ref={ref}
+      onClick={handleClick}
+      sx={{
+        borderBottom: "1px solid #eee",
+        padding: "6px",
+        minHeight: 32,
+        position: "relative",
+        cursor: "pointer",
+        zIndex: 10,
+        bgcolor: isOver && canDrop ? "#e3f2fd" : "transparent",
+        fontSize: "0.75rem",
+        border: isOver && canDrop ? "2px dashed #1976d2" : undefined,
+        "&:hover": {
+          backgroundColor: "#f5f5f5"
+        }
+      }}
+    >
+      {isOver && canDrop && (
+        <Box
+          sx={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            right: 0,
+            height: previewHeight,
+            border: "2px dashed #1976d2",
+            borderRadius: 1,
+            backgroundColor: "rgba(25, 118, 210, 0.1)",
+            zIndex: 1
+          }}
+        />
+      )}
+    </Box>
+  )
+}
 
-        {event && (
-          <Box mt={0.5} fontWeight={500}>
-            {event.name}
-          </Box>
-        )}
-      </Box>
-
-      <Dialog
-        open={open}
-        onClose={() => setOpen(false)}
-        maxWidth="xs"
-        fullWidth
-      >
-        <DialogTitle>{event ? "Edit event" : "Add event"}</DialogTitle>
-        <DialogContent
-          sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 1 }}
-        >
-          <Typography variant="body2">
-            Time:{" "}
-            <strong>
-              {datetime.getHours().toString().padStart(2, "0")}:
-              {datetime.getMinutes().toString().padStart(2, "0")}
-            </strong>
-          </Typography>
-          <TextField
-            label="Event name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            fullWidth
-          />
-          <Button
-            variant="contained"
-            onClick={handleSave}
-            disabled={!name.trim()}
-          >
-            {event ? "Save" : "Add"}
-          </Button>
-        </DialogContent>
-      </Dialog>
-    </>
-  );
-};
-
-export default CalendarGridCell;
+export default CalendarGridCell

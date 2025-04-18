@@ -6,7 +6,8 @@ import {
   Stack,
   Divider,
   ClickAwayListener,
-  Typography
+  Typography,
+  Box
 } from "@mui/material";
 
 import { DateCalendar, TimePicker } from "@mui/x-date-pickers";
@@ -20,8 +21,8 @@ interface Properties {
   anchorEl: HTMLElement | null;
   onClose: () => void;
   onSave: (event: Partial<Event>) => void;
-  calendars: { id: string; name: string }[];
-  categories: { id: string; name: string; emoji: string }[];
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
   initialEvent?: Event;
 }
 
@@ -37,39 +38,52 @@ function EventPopover({
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState<Dayjs | null>(dayjs());
-  const [time, setTime] = useState<Dayjs | null>(dayjs());
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
+  const [startTime, setStartTime] = useState<Dayjs | null>(dayjs());
+  const [endTime, setEndTime] = useState<Dayjs | null>(dayjs().add(1, "hour"));
   const [calendarId, setCalendarId] = useState("");
   const [categoryId, setCategoryId] = useState("");
 
   useEffect(() => {
     if (initialEvent) {
+      const start = dayjs(initialEvent.startDate);
+      const end = dayjs(initialEvent.endDate);
+
       setTitle(initialEvent.name);
       setDescription(initialEvent.description || "");
-      const dateTime = dayjs(initialEvent.startDate);
-      setDate(dateTime);
-      setTime(dateTime);
-      setCalendarId(initialEvent.calendarId);
+      setStartDate(start);
+      setStartTime(start);
+      setEndTime(end);
+      setCalendarId(initialEvent.calendarId || "");
       setCategoryId(initialEvent.categoryId || "");
     } else {
+      const now = dayjs();
       setTitle("");
       setDescription("");
-      setDate(dayjs());
-      setTime(dayjs());
+      setStartDate(now);
+      setStartTime(now);
+      setEndTime(now.add(1, "hour"));
       setCalendarId("");
       setCategoryId("");
     }
   }, [initialEvent, open]);
 
   const handleSave = () => {
-    if (!title || !date || !time) return;
+    if (!title || !startDate || !startTime || !endTime) return;
 
-    const eventDateTime = date
-      ?.hour(time?.hour() || 0)
-      .minute(time?.minute() || 0)
+    const start = startDate
+      .hour(startTime.hour())
+      .minute(startTime.minute())
       .second(0)
-      .millisecond(0)
-      .toISOString();
+      .millisecond(0);
+
+    const end = startDate
+      .hour(endTime.hour())
+      .minute(endTime.minute())
+      .second(0)
+      .millisecond(0);
+
+    const categoryColor = categories.find((c) => c.id === categoryId)?.color;
 
     onSave({
       id: initialEvent?.id,
@@ -77,8 +91,9 @@ function EventPopover({
       description,
       calendarId,
       categoryId,
-      startDate: eventDateTime,
-      endDate: eventDateTime
+      color: categoryColor,
+      startDate: start.toISOString(),
+      endDate: end.toISOString()
     });
 
     onClose();
@@ -90,14 +105,8 @@ function EventPopover({
         open={open}
         anchorEl={anchorEl}
         onClose={onClose}
-        anchorOrigin={{
-          vertical: "top",
-          horizontal: "right"
-        }}
-        transformOrigin={{
-          vertical: "top",
-          horizontal: "left"
-        }}
+        anchorOrigin={{ vertical: "top", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "left" }}
         PaperProps={{
           sx: {
             p: 2,
@@ -127,9 +136,10 @@ function EventPopover({
               select
               fullWidth
             >
+              <MenuItem value="">Brak</MenuItem>
               {calendars.map((cal) => (
                 <MenuItem key={cal.id} value={cal.id}>
-                  {cal.name}
+                  {cal.emoji} {cal.name}
                 </MenuItem>
               ))}
             </TextField>
@@ -141,24 +151,36 @@ function EventPopover({
               select
               fullWidth
             >
+              <MenuItem value="">Brak</MenuItem>
               {categories.map((cat) => (
                 <MenuItem key={cat.id} value={cat.id}>
-                  {cat.emoji} {cat.name}
+                  <Box
+                    display="inline-block"
+                    width={12}
+                    height={12}
+                    borderRadius={6}
+                    bgcolor={cat.color}
+                    mr={1}
+                  />
+                  {cat.name}
                 </MenuItem>
               ))}
             </TextField>
 
             <Divider />
 
-            <DateCalendar
-              value={date}
-              onChange={(newDate) => setDate(newDate)}
+            <Typography variant="body2">Start date</Typography>
+            <DateCalendar value={startDate} onChange={setStartDate} />
+            <TimePicker
+              label="Start time"
+              value={startTime}
+              onChange={setStartTime}
             />
 
             <TimePicker
-              label="Time"
-              value={time}
-              onChange={(newTime) => setTime(newTime)}
+              label="End time"
+              value={endTime}
+              onChange={setEndTime}
             />
 
             <TextField

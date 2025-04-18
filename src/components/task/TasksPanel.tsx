@@ -13,7 +13,7 @@ import TaskStatus from "../../types/taskStatus";
 const mockCalendar: Calendar = {
   id: "1",
   name: "Osobisty",
-  emoji: "🟡",
+  emoji: "🟡"
 };
 
 const mockCategory: Category = {
