@@ -40,7 +40,8 @@
     "testing-library": "^0.0.2",
     "uuidv4": "^6.2.13",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.1"
+    "vitest": "^3.1.1",
+    "zustand": "^5.0.3"
   },
   "devDependencies": {
     "@eslint/js": "^9.21.0",

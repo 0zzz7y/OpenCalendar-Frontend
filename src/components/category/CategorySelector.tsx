@@ -5,24 +5,25 @@ import {
   Popper,
   Box,
   Typography
-} from "@mui/material";
+} from "@mui/material"
 
-import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react";
-import { useState, useEffect } from "react";
+import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react"
+import { useState, useEffect } from "react"
+import axios from "axios"
 
-import CategoryEditor from "./CategoryEditor";
+import CategoryEditor from "./CategoryEditor"
 
 export interface CategoryOption {
-  label: string;
-  value: string;
-  color?: string;
+  label: string
+  value: string
+  color?: string
 }
 
 interface CategorySelectorProperties {
-  data: CategoryOption[];
-  value: string | null;
-  onChange: (val: string | null) => void;
-  setData: (data: CategoryOption[]) => void;
+  data: CategoryOption[]
+  value: string | null
+  onChange: (val: string | null) => void
+  setData: (data: CategoryOption[]) => void
 }
 
 const CategorySelector = ({
@@ -31,60 +32,50 @@ const CategorySelector = ({
   onChange,
   setData
 }: CategorySelectorProperties) => {
-  const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add");
-  const [currentValue, setCurrentValue] = useState("");
-  const [labelInput, setLabelInput] = useState("");
-  const [colorInput, setColorInput] = useState("#3b5bdb");
+  const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add")
+  const [currentValue, setCurrentValue] = useState("")
+  const [labelInput, setLabelInput] = useState("")
+  const [colorInput, setColorInput] = useState("#3b5bdb")
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const isPopoverOpen = Boolean(anchorEl);
+  const isPopoverOpen = Boolean(anchorEl)
 
   useEffect(() => {
-    const hasAll = data.some((item) => item.value === "all");
+    const hasAll = data.some((item) => item.value === "all")
     if (!hasAll) {
-      setData([{ label: "All", value: "all" }, ...data]);
+      setData([{ label: "All", value: "all" }, ...data])
     }
-  }, [data, setData]);
+  }, [data, setData])
 
   useEffect(() => {
     if (value === null) {
-      onChange("all");
+      onChange("all")
     }
-  }, [value, onChange]);
+  }, [value, onChange])
 
-  const handleAdd = () => {
-    if (!labelInput.trim()) return;
-    const newValue = labelInput.toLowerCase().replace(/\s+/g, "-");
+  const handleAddLocal = (id: string) => {
     setData([
       ...data,
-      { label: labelInput, value: newValue, color: colorInput }
-    ]);
-    setAnchorEl(null);
-    setLabelInput("");
-    setColorInput("#3b5bdb");
-  };
+      { label: labelInput, value: id, color: colorInput }
+    ])
+    onChange(id)
+  }
 
-  const handleEdit = () => {
-    if (!labelInput.trim()) return;
+  const handleEditLocal = () => {
     setData(
       data.map((item) =>
         item.value === currentValue
           ? { ...item, label: labelInput, color: colorInput }
           : item
       )
-    );
-    setAnchorEl(null);
-    setLabelInput("");
-    setColorInput("#3b5bdb");
-  };
+    )
+    onChange(currentValue)
+  }
 
-  const handleDelete = () => {
-    setData(data.filter((item) => item.value !== currentValue));
-    if (value === currentValue) onChange(null);
-    setAnchorEl(null);
-    setLabelInput("");
-    setColorInput("#3b5bdb");
-  };
+  const handleDeleteLocal = () => {
+    setData(data.filter((item) => item.value !== currentValue))
+    if (value === currentValue) onChange("all")
+  }
 
   const openPopover = (
     mode: "add" | "edit" | "delete",
@@ -93,13 +84,13 @@ const CategorySelector = ({
     label = "",
     color = "#3b5bdb"
   ) => {
-    if (mode === "delete" && val === value) return;
-    setEditMode(mode);
-    setCurrentValue(val);
-    setLabelInput(label);
-    setColorInput(color);
-    setAnchorEl(e.currentTarget as HTMLElement);
-  };
+    if (mode === "delete" && val === value) return
+    setEditMode(mode)
+    setCurrentValue(val)
+    setLabelInput(label)
+    setColorInput(color)
+    setAnchorEl(e.currentTarget as HTMLElement)
+  }
 
   return (
     <>
@@ -113,7 +104,7 @@ const CategorySelector = ({
           size="small"
           SelectProps={{
             renderValue: (selected) => {
-              const item = data.find((d) => d.value === selected);
+              const item = data.find((d) => d.value === selected)
               return (
                 <Box display="flex" alignItems="center" gap={1}>
                   {item?.color && (
@@ -126,7 +117,7 @@ const CategorySelector = ({
                   )}
                   <Typography variant="body2">{item?.label}</Typography>
                 </Box>
-              );
+              )
             }
           }}
         >
@@ -159,14 +150,14 @@ const CategorySelector = ({
                     <IconButton
                       size="small"
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation()
                         openPopover(
                           "edit",
                           e,
                           option.value,
                           option.label,
                           option.color
-                        );
+                        )
                       }}
                     >
                       <IconPencil size={16} />
@@ -175,14 +166,14 @@ const CategorySelector = ({
                       size="small"
                       disabled={option.value === value}
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation()
                         openPopover(
                           "delete",
                           e,
                           option.value,
                           option.label,
                           option.color
-                        );
+                        )
                       }}
                     >
                       <IconTrash size={16} />
@@ -217,16 +208,21 @@ const CategorySelector = ({
             labelInput={labelInput}
             setLabelInput={setLabelInput}
             onClose={() => setAnchorEl(null)}
-            onAdd={handleAdd}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
+            onAddLocal={handleAddLocal}
+            onEditLocal={handleEditLocal}
+            onDeleteLocal={handleDeleteLocal}
             colorInput={colorInput}
             setColorInput={setColorInput}
+            categoryId={
+              editMode !== "add" && currentValue !== "all"
+                ? currentValue
+                : undefined
+            }
           />
         </Box>
       </Popper>
     </>
-  );
-};
+  )
+}
 
-export default CategorySelector;
+export default CategorySelector

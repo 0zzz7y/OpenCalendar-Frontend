@@ -1,60 +1,67 @@
+import { useEffect, useState } from "react";
+
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import { useState } from "react";
 
 import ThemeToggleButton from "../theme/ThemeToggleButton";
 import CategorySelector, { CategoryOption } from "../category/CategorySelector";
 import CalendarSelector, { CalendarOption } from "../calendar/CalendarSelector";
 import MonthlyCalendar from "../calendar/MonthlyCalendar";
 
+import useDashboard from "../../hooks/useDashboard";
+import useFilters from "../../hooks/useFilters";
+
 const LeftPanel = () => {
-  const [calendarOptions, setCalendarOptions] = useState<CalendarOption[]>([
-    { label: "Osobisty", value: "personal" },
-    { label: "Praca", value: "work" }
-  ]);
+  const { calendars, categories } = useDashboard();
+  const {
+    selectedCalendar,
+    setSelectedCalendar,
+    selectedCategory,
+    setSelectedCategory
+  } = useFilters();
 
-  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([
-    { label: "Osobisty", value: "personal", color: "#3b5bdb" },
-    { label: "Praca", value: "work", color: "#fa5252" }
-  ]);
+  const [calendarOptions, setCalendarOptions] = useState<CalendarOption[]>([]);
+  const [categoryOptions, setCategoryOptions] = useState<CategoryOption[]>([]);
 
-  const [selectedCalendar, setSelectedCalendar] = useState<string | null>(
-    "personal"
-  );
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(
-    "personal"
-  );
+  useEffect(() => {
+    setCalendarOptions(
+      calendars.map((cal) => ({
+        label: cal.name,
+        value: cal.id,
+        emoji: cal.emoji
+      }))
+    );
+  }, [calendars]);
+
+  useEffect(() => {
+    setCategoryOptions(
+      categories.map((cat) => ({
+        label: cat.name,
+        value: cat.id,
+        color: cat.color
+      }))
+    );
+  }, [categories]);
 
   return (
     <>
-      <Box
-        display="flex"
-        flexDirection="column"
-        justifyContent="space-between"
-        height="100%"
-      >
+      <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
         <Stack spacing={2}>
           <CalendarSelector
             data={calendarOptions}
             value={selectedCalendar}
-            onChange={(val) => setSelectedCalendar(val)}
+            onChange={setSelectedCalendar}
             setData={setCalendarOptions}
           />
 
           <CategorySelector
             data={categoryOptions}
             value={selectedCategory}
-            onChange={(val) => setSelectedCategory(val)}
+            onChange={setSelectedCategory}
             setData={setCategoryOptions}
           />
 
-          <Box
-            sx={{
-              alignSelf: "flex-start",
-              mt: "-16px",
-              ml: "-24px"
-            }}
-          >
+          <Box sx={{ alignSelf: "flex-start", mt: "-16px", ml: "-24px" }}>
             <MonthlyCalendar />
           </Box>
         </Stack>

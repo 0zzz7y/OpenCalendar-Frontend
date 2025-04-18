@@ -9,7 +9,7 @@ import {
 
 import EmojiPicker from "emoji-picker-react";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   EmojiClickData,
   EmojiStyle,
@@ -22,11 +22,12 @@ interface CalendarEditorProperties {
   labelInput: string;
   setLabelInput: (val: string) => void;
   onClose: () => void;
-  onAdd: () => void;
-  onEdit: () => void;
-  onDelete: () => void;
+  onAddLocal: () => void;
+  onEditLocal: () => void;
+  onDeleteLocal: () => void;
   emojiInput: string;
-  setEmojiInput: (emoji: string) => void;
+  setEmojiInput: (val: string) => void;
+  calendarId?: string;
 }
 
 const CalendarEditor = ({
@@ -34,13 +35,15 @@ const CalendarEditor = ({
   labelInput,
   setLabelInput,
   onClose,
-  onAdd,
-  onEdit,
-  onDelete,
+  onAddLocal,
+  onEditLocal,
+  onDeleteLocal,
   emojiInput,
-  setEmojiInput
+  setEmojiInput,
+  calendarId
 }: CalendarEditorProperties) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (inputRef.current) {
@@ -48,6 +51,67 @@ const CalendarEditor = ({
       inputRef.current.setSelectionRange(labelInput.length, labelInput.length);
     }
   }, [editMode]);
+
+  const handleAdd = async () => {
+    if (!labelInput.trim()) return;
+    setLoading(true);
+    try {
+      await fetch("/calendars", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: labelInput.trim(),
+          emoji: emojiInput
+        })
+      });
+
+      onAddLocal();
+      onClose();
+    } catch (e) {
+      console.error("Failed to add calendar", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleEdit = async () => {
+    if (!labelInput.trim() || !calendarId) return;
+    setLoading(true);
+    try {
+      await fetch(`/calendars/${calendarId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: labelInput.trim(),
+          emoji: emojiInput
+        })
+      });
+
+      onEditLocal();
+      onClose();
+    } catch (e) {
+      console.error("Failed to update calendar", e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDelete = async () => {
+    if (!calendarId) return;
+    setLoading(true);
+    try {
+      await fetch(`/calendars/${calendarId}`, {
+        method: "DELETE"
+      });
+
+      onDeleteLocal();
+      onClose();
+    } catch (e) {
+      console.error("Failed to delete calendar", e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <>
@@ -61,7 +125,7 @@ const CalendarEditor = ({
                 fontWeight={500}
                 gutterBottom
               >
-                {editMode === "add" ? "New calendar" : "Edit name"}
+                {editMode === "add" ? "New calendar" : "Edit calendar"}
               </Typography>
 
               <TextField
@@ -85,7 +149,7 @@ const CalendarEditor = ({
                   }
                   emojiStyle={EmojiStyle.NATIVE}
                   skinTonesDisabled
-                  lazyLoadEmojis={true}
+                  lazyLoadEmojis
                   defaultSkinTone={SkinTones.NEUTRAL}
                   theme={Theme.LIGHT}
                   autoFocusSearch={false}
@@ -97,7 +161,8 @@ const CalendarEditor = ({
                 variant="contained"
                 fullWidth
                 sx={{ mt: 2 }}
-                onClick={editMode === "add" ? onAdd : onEdit}
+                onClick={editMode === "add" ? handleAdd : handleEdit}
+                disabled={loading}
               >
                 {editMode === "add" ? "ADD" : "SAVE"}
               </Button>
@@ -118,7 +183,8 @@ const CalendarEditor = ({
                   variant="contained"
                   color="error"
                   size="small"
-                  onClick={onDelete}
+                  onClick={handleDelete}
+                  disabled={loading}
                 >
                   Delete
                 </Button>

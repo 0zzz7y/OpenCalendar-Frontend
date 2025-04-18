@@ -1,22 +1,31 @@
-import { useEffect, useState } from "react"
-import axios from "../api/axios"
-import Calendar from "../types/calendar"
+import { useState, useCallback, useEffect } from "react";
+import axios from "axios";
+
+import Calendar from "../types/calendar";
 
 export const useCalendars = () => {
-  const [calendars, setCalendars] = useState<Calendar[]>([])
+  const [calendars, setCalendars] = useState<Calendar[]>([]);
 
-  const fetchCalendars = async () => {
+  const fetchCalendars = useCallback(async () => {
     try {
-      const response = await axios.get<Calendar[]>("/calendars")
-      setCalendars(Array.isArray(response.data) ? response.data : [])
+      const response = await axios.get<Calendar[]>("/calendars");
+      setCalendars(response.data ?? []);
     } catch (error) {
-      console.error("Failed to fetch calendars:", error)
+      console.error("Error fetching calendars:", error);
+      setCalendars([]);
+      throw error;
     }
-  }
+  }, []);
 
   useEffect(() => {
-    fetchCalendars()
-  }, [])
+    fetchCalendars();
+  }, [fetchCalendars]);
 
-  return { calendars, setCalendars, fetchCalendars }
-}
+  return {
+    calendars,
+    setCalendars,
+    fetchCalendars
+  };
+};
+
+export default useCalendars;

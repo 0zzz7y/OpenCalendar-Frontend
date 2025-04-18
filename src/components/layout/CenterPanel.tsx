@@ -1,7 +1,9 @@
 import { useState } from "react";
+
 import { Box, Typography, Button, CircularProgress } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
 import dayjs from "dayjs";
 
 import DayView from "../calendar/DayView";
@@ -11,11 +13,13 @@ import EventPopover from "../event/EventCreationPopover";
 import EventInformationPopover from "../event/EventInformationPopover";
 
 import useDashboard from "../../hooks/useDashboard";
+import useFilters from "../../hooks/useFilters";
 
-import Event from "@/types/event";
+import Event from "../../types/event";
 
 const CenterPanel = () => {
   const { events, setEvents, calendars, categories, loading } = useDashboard();
+  const { selectedCalendar, selectedCategory } = useFilters();
 
   const [view, setView] = useState<"day" | "week" | "month">("week");
   const [selectedDate, setSelectedDate] = useState(new Date());
@@ -24,6 +28,16 @@ const CenterPanel = () => {
   const [editingEvent, setEditingEvent] = useState<Event | null>(null);
   const [infoEvent, setInfoEvent] = useState<Event | null>(null);
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
+
+  const filteredEvents = Array.isArray(events)
+  ? events.filter((event) => {
+      const calendarMatch =
+        selectedCalendar === "all" || event.calendarId === selectedCalendar;
+      const categoryMatch =
+        selectedCategory === "all" || event.categoryId === selectedCategory;
+      return calendarMatch && categoryMatch;
+    })
+  : [];
 
   const handleSlotClick = (element: HTMLElement, datetime: Date) => {
     setSelectedSlot(element);
@@ -49,9 +63,7 @@ const CenterPanel = () => {
   const handleSave = (data: Partial<Event>) => {
     if (!data.startDate) return;
 
-    const exists = events.find(
-      (e: { id: string | undefined }) => e.id === data.id
-    );
+    const exists = events.find((e) => e.id === data.id);
     const id = exists?.id || crypto.randomUUID();
 
     const newEvent: Event = {
@@ -66,9 +78,7 @@ const CenterPanel = () => {
     };
 
     setEvents((prev) =>
-      exists
-        ? prev.map((e) => (e.id === id ? newEvent : e))
-        : [...prev, newEvent]
+      exists ? prev.map((e) => (e.id === id ? newEvent : e)) : [...prev, newEvent]
     );
   };
 
@@ -91,34 +101,23 @@ const CenterPanel = () => {
 
   if (loading) {
     return (
-      <Box
-        display="flex"
-        justifyContent="center"
-        alignItems="center"
-        height="100%"
-      >
-        <CircularProgress />
-      </Box>
+      <>
+        <Box display="flex" justifyContent="center" alignItems="center" height="100%">
+          <CircularProgress />
+        </Box>
+      </>
     );
   }
 
   return (
     <>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        px={2}
-        py={1}
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" px={2} py={1}>
         <Box display="flex" alignItems="center" gap={1}>
           <Button onClick={() => navigate("prev")} size="large">
             <ChevronLeftIcon fontSize="medium" />
           </Button>
           <Typography variant="h6">
-            {dayjs(selectedDate).format(
-              view === "month" ? "MMMM YYYY" : "DD MMM YYYY"
-            )}
+            {dayjs(selectedDate).format(view === "month" ? "MMMM YYYY" : "DD MMM YYYY")}
           </Typography>
           <Button onClick={() => navigate("next")} size="large">
             <ChevronRightIcon fontSize="medium" />
@@ -126,22 +125,13 @@ const CenterPanel = () => {
         </Box>
 
         <Box display="flex" gap={2}>
-          <Button
-            onClick={() => setView("day")}
-            variant={view === "day" ? "outlined" : "text"}
-          >
+          <Button onClick={() => setView("day")} variant={view === "day" ? "outlined" : "text"}>
             Dzień
           </Button>
-          <Button
-            onClick={() => setView("week")}
-            variant={view === "week" ? "outlined" : "text"}
-          >
+          <Button onClick={() => setView("week")} variant={view === "week" ? "outlined" : "text"}>
             Tydzień
           </Button>
-          <Button
-            onClick={() => setView("month")}
-            variant={view === "month" ? "outlined" : "text"}
-          >
+          <Button onClick={() => setView("month")} variant={view === "month" ? "outlined" : "text"}>
             Miesiąc
           </Button>
         </Box>
@@ -150,7 +140,7 @@ const CenterPanel = () => {
       {view === "day" && (
         <DayView
           date={selectedDate}
-          events={events}
+          events={filteredEvents}
           onSlotClick={handleSlotClick}
           onSave={handleSave}
           onEventClick={handleEventClick}
@@ -162,7 +152,7 @@ const CenterPanel = () => {
       {view === "week" && (
         <WeekView
           date={selectedDate}
-          events={events}
+          events={filteredEvents}
           onSlotClick={handleSlotClick}
           onSave={handleSave}
           onEventClick={handleEventClick}
@@ -174,7 +164,7 @@ const CenterPanel = () => {
       {view === "month" && (
         <MonthView
           date={selectedDate}
-          events={events}
+          events={filteredEvents}
           onSlotClick={handleSlotClick}
           onSave={handleSave}
           onEventClick={handleEventClick}
@@ -196,9 +186,7 @@ const CenterPanel = () => {
               name: "",
               description: "",
               startDate: selectedDatetime.toISOString(),
-              endDate: new Date(
-                selectedDatetime.getTime() + 60 * 60 * 1000
-              ).toISOString(),
+              endDate: new Date(selectedDatetime.getTime() + 60 * 60 * 1000).toISOString(),
               calendarId: "",
               categoryId: undefined,
               color: "#1976d2"

@@ -36,17 +36,17 @@ const useDashboard = () => {
   }, [])
 
   return {
-    events: events ?? [],
-    setEvents: setEvents ?? [],
-    tasks: tasks ?? [],
-    setTasks: setTasks ?? [],
-    notes: notes ?? [],
-    setNotes: setNotes ?? [],
-    calendars: calendars ?? [],
-    setCalendars: setCalendars ?? [],
-    categories: categories ?? [],
-    setCategories: setCategories ?? [],
-    loading: loading ?? false,
+    events: Array.isArray(events) ? events : [],
+    setEvents,
+    tasks: Array.isArray(tasks) ? tasks : [],
+    setTasks,
+    notes: Array.isArray(notes) ? notes : [],
+    setNotes,
+    calendars: Array.isArray(calendars) ? calendars : [],
+    setCalendars,
+    categories: Array.isArray(categories) ? categories : [],
+    setCategories,
+    loading,
     refetch: fetchAll
   }
 }

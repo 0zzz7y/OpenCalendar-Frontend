@@ -1,22 +1,31 @@
-import { useEffect, useState } from "react"
-import axios from "../api/axios"
-import Task from "../types/task"
+import { useState, useCallback, useEffect } from "react";
+import axios from "axios";
+
+import Task from "../types/task";
 
 export const useTasks = () => {
-  const [tasks, setTasks] = useState<Task[]>([])
+  const [tasks, setTasks] = useState<Task[]>([]);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
-      const response = await axios.get<Task[]>("/tasks")
-      setTasks(Array.isArray(response.data) ? response.data : [])
+      const response = await axios.get<Task[]>("/tasks");
+      setTasks(response.data ?? []);
     } catch (error) {
-      console.error("Failed to fetch tasks:", error)
+      console.error("Error fetching tasks:", error);
+      setTasks([]);
+      throw error;
     }
-  }
+  }, []);
 
   useEffect(() => {
-    fetchTasks()
-  }, [])
+    fetchTasks();
+  }, [fetchTasks]);
 
-  return { tasks, setTasks, fetchTasks }
-}
+  return {
+    tasks,
+    setTasks,
+    fetchTasks
+  };
+};
+
+export default useTasks;

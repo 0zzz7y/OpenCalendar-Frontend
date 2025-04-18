@@ -1,22 +1,31 @@
-import { useEffect, useState } from "react"
-import axios from "../api/axios"
-import Note from "../types/note"
+import { useState, useCallback, useEffect } from "react";
+import axios from "axios";
+
+import Note from "../types/note";
 
 export const useNotes = () => {
-  const [notes, setNotes] = useState<Note[]>([])
+  const [notes, setNotes] = useState<Note[]>([]);
 
-  const fetchNotes = async () => {
+  const fetchNotes = useCallback(async () => {
     try {
-      const response = await axios.get<Note[]>("/notes")
-      setNotes(Array.isArray(response.data) ? response.data : [])
+      const response = await axios.get<Note[]>("/notes");
+      setNotes(response.data ?? []);
     } catch (error) {
-      console.error("Failed to fetch notes:", error)
+      console.error("Error fetching notes:", error);
+      setNotes([]);
+      throw error;
     }
-  }
+  }, []);
 
   useEffect(() => {
-    fetchNotes()
-  }, [])
+    fetchNotes();
+  }, [fetchNotes]);
 
-  return { notes, setNotes, fetchNotes }
-}
+  return {
+    notes,
+    setNotes,
+    fetchNotes
+  };
+};
+
+export default useNotes;
