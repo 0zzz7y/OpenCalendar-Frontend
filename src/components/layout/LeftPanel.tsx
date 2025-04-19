@@ -1,12 +1,12 @@
-import Box from "@mui/material/Box";
-import Stack from "@mui/material/Stack";
+import Box from "@mui/material/Box"
+import Stack from "@mui/material/Stack"
 
-import ThemeToggleButton from "../theme/ThemeToggleButton";
-import CategorySelector from "../category/CategorySelector";
-import CalendarSelector from "../calendar/CalendarSelector";
-import MonthlyCalendar from "../calendar/MonthlyCalendar";
+import ThemeToggleButton from "../theme/ThemeToggleButton"
+import CategorySelector from "../category/CategorySelector"
+import CalendarSelector from "../calendar/CalendarSelector"
+import MonthlyCalendar from "../calendar/MonthlyCalendar"
 
-import useFilters from "../../hooks/useFilters";
+import useFilters from "../../hooks/useFilters"
 
 const LeftPanel = () => {
   const {
@@ -14,7 +14,7 @@ const LeftPanel = () => {
     setSelectedCalendar,
     selectedCategory,
     setSelectedCategory
-  } = useFilters();
+  } = useFilters()
 
   return (
     <>
@@ -45,7 +45,7 @@ const LeftPanel = () => {
         </Box>
       </Box>
     </>
-  );
-};
+  )
+}
 
-export default LeftPanel;
+export default LeftPanel

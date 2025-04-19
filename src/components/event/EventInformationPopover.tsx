@@ -5,18 +5,18 @@ import {
   Stack,
   Popover,
   Button
-} from "@mui/material";
-import { Edit, Delete } from "@mui/icons-material";
-import { useState } from "react";
+} from "@mui/material"
+import { Edit, Delete } from "@mui/icons-material"
+import { useState } from "react"
 
-import Event from "../../types/event";
+import Event from "../../types/event"
 
 interface EventInformationPopoverProperties {
-  anchorEl: HTMLElement | null;
-  event: Event | null;
-  onClose: () => void;
-  onEdit: () => void;
-  onDelete: (eventId: string) => void;
+  anchorEl: HTMLElement | null
+  event: Event | null
+  onClose: () => void
+  onEdit: () => void
+  onDelete: (eventId: string) => void
 }
 
 const EventInformationPopover = ({
@@ -26,24 +26,24 @@ const EventInformationPopover = ({
   onEdit,
   onDelete
 }: EventInformationPopoverProperties) => {
-  const open = Boolean(anchorEl && event);
-  const [confirmingDelete, setConfirmingDelete] = useState(false);
+  const open = Boolean(anchorEl && event)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   const handleDeleteClick = () => {
-    setConfirmingDelete(true);
-  };
+    setConfirmingDelete(true)
+  }
 
   const handleConfirmDelete = () => {
     if (event) {
-      onDelete(event.id);
+      onDelete(event.id)
     }
-    setConfirmingDelete(false);
-    onClose();
-  };
+    setConfirmingDelete(false)
+    onClose()
+  }
 
   const handleCancelDelete = () => {
-    setConfirmingDelete(false);
-  };
+    setConfirmingDelete(false)
+  }
 
   return (
     <Popover
@@ -108,7 +108,7 @@ const EventInformationPopover = ({
         </Stack>
       )}
     </Popover>
-  );
-};
+  )
+}
 
-export default EventInformationPopover;
+export default EventInformationPopover

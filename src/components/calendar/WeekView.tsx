@@ -1,28 +1,28 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material"
 
-import DayColumn from "./DayColumn";
-import TimeColumn from "./TimeColumn";
+import DayColumn from "./DayColumn"
+import TimeColumn from "./TimeColumn"
 
-import Event from "@/types/event";
+import Event from "@/types/event"
 
 interface WeekViewProperties {
-  date: Date;
-  events: Event[];
-  calendars: { id: string; name: string; emoji: string }[];
-  categories: { id: string; name: string; color: string }[];
-  onSlotClick?: (element: HTMLElement, datetime: Date) => void;
-  onSave: (event: Partial<Event>) => void;
-  onEventClick?: (event: Event) => void;
+  date: Date
+  events: Event[]
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  onSlotClick?: (element: HTMLElement, datetime: Date) => void
+  onSave: (event: Partial<Event>) => void
+  onEventClick?: (event: Event) => void
 }
 
 const getStartOfWeek = (date: Date) => {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  d.setDate(diff)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
 
 const WeekView = ({
   date,
@@ -33,12 +33,12 @@ const WeekView = ({
   onSave,
   onEventClick
 }: WeekViewProperties) => {
-  const weekStart = getStartOfWeek(date);
+  const weekStart = getStartOfWeek(date)
   const days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart);
-    d.setDate(d.getDate() + i);
-    return d;
-  });
+    const d = new Date(weekStart)
+    d.setDate(d.getDate() + i)
+    return d
+  })
 
   return (
     <Box
@@ -49,7 +49,7 @@ const WeekView = ({
       <TimeColumn />
 
       {days.map((day, index) => {
-        const isToday = day.toDateString() === new Date().toDateString();
+        const isToday = day.toDateString() === new Date().toDateString()
 
         return (
           <Box
@@ -105,10 +105,10 @@ const WeekView = ({
               onEventClick={onEventClick}
             />
           </Box>
-        );
+        )
       })}
     </Box>
-  );
-};
+  )
+}
 
-export default WeekView;
+export default WeekView

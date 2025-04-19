@@ -1,8 +1,8 @@
-import useEvents from "./useEvents";
-import useTasks from "./useTasks";
-import useNotes from "./useNotes";
-import useCalendars from "./useCalendars";
-import useCategories from "./useCategories";
+import useEvents from "./useEvents"
+import useTasks from "./useTasks"
+import useNotes from "./useNotes"
+import useCalendars from "./useCalendars"
+import useCategories from "./useCategories"
 
 const useDashboard = () => {
   const {
@@ -15,7 +15,7 @@ const useDashboard = () => {
     page: eventsPage,
     totalPages: eventsTotalPages,
     isLoadingMore: isLoadingEvents
-  } = useEvents();
+  } = useEvents()
 
   const {
     tasks,
@@ -27,7 +27,7 @@ const useDashboard = () => {
     page: tasksPage,
     totalPages: tasksTotalPages,
     isLoadingMore: isLoadingTasks
-  } = useTasks();
+  } = useTasks()
 
   const {
     notes,
@@ -39,7 +39,7 @@ const useDashboard = () => {
     page: notesPage,
     totalPages: notesTotalPages,
     isLoadingMore: isLoadingNotes
-  } = useNotes();
+  } = useNotes()
 
   const {
     calendars,
@@ -51,7 +51,7 @@ const useDashboard = () => {
     page: calendarsPage,
     totalPages: calendarsTotalPages,
     isLoadingMore: isLoadingCalendars
-  } = useCalendars();
+  } = useCalendars()
 
   const {
     categories,
@@ -63,7 +63,7 @@ const useDashboard = () => {
     page: categoriesPage,
     totalPages: categoriesTotalPages,
     isLoadingMore: isLoadingCategories
-  } = useCategories();
+  } = useCategories()
 
   return {
     events,
@@ -115,7 +115,7 @@ const useDashboard = () => {
     categoriesPage,
     categoriesTotalPages,
     isLoadingCategories
-  };
-};
+  }
+}
 
-export default useDashboard;
+export default useDashboard

@@ -1,9 +1,9 @@
-import { DashboardProvider } from "../context/DashboardContext";
+import { DashboardProvider } from "../context/DashboardContext"
 
-import LeftPanel from "../components/layout/LeftPanel";
-import CenterPanel from "../components/layout/CenterPanel";
-import RightPanel from "../components/layout/RightPanel";
-import ResizableLayout from "../components/layout/ResizableLayout";
+import LeftPanel from "../components/layout/LeftPanel"
+import CenterPanel from "../components/layout/CenterPanel"
+import RightPanel from "../components/layout/RightPanel"
+import ResizableLayout from "../components/layout/ResizableLayout"
 
 const Dashboard = () => {
   return (
@@ -19,7 +19,7 @@ const Dashboard = () => {
         />
       </DashboardProvider>
     </>
-  );
-};
+  )
+}
 
-export default Dashboard;
+export default Dashboard

@@ -1,17 +1,17 @@
-import { Box, Typography } from "@mui/material";
-import { useEffect, useRef, useState } from "react";
-import { useDrag } from "react-dnd";
+import { Box, Typography } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
+import { useDrag } from "react-dnd"
 
-import Event from "../../types/event";
+import Event from "../../types/event"
 
 interface EventBoxProperties {
-  event: Event;
-  calendars: { id: string; name: string; emoji: string }[];
-  categories: { id: string; name: string; color: string }[];
-  dragTargetId?: string | null;
-  showPopoverLine?: boolean;
-  customStyle?: React.CSSProperties;
-  onClick?: () => void;
+  event: Event
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  dragTargetId?: string | null
+  showPopoverLine?: boolean
+  customStyle?: React.CSSProperties
+  onClick?: () => void
 }
 
 const EventBox = ({
@@ -23,8 +23,8 @@ const EventBox = ({
   customStyle,
   onClick
 }: EventBoxProperties) => {
-  const eventRef = useRef<HTMLDivElement>(null);
-  const [enableDrag, setEnableDrag] = useState(false);
+  const eventRef = useRef<HTMLDivElement>(null)
+  const [enableDrag, setEnableDrag] = useState(false)
 
   const [{ isDragging }, drag] = useDrag(
     () => ({
@@ -36,46 +36,46 @@ const EventBox = ({
       })
     }),
     [enableDrag]
-  );
+  )
 
   useEffect(() => {
     if (eventRef.current) {
-      drag(eventRef.current);
+      drag(eventRef.current)
     }
-  }, [drag]);
+  }, [drag])
 
-  const timeoutRef = useRef<number | null>(null);
+  const timeoutRef = useRef<number | null>(null)
 
   const handleMouseDown = () => {
-    timeoutRef.current = window.setTimeout(() => setEnableDrag(true), 200);
-  };
+    timeoutRef.current = window.setTimeout(() => setEnableDrag(true), 200)
+  }
 
   const handleMouseUp = () => {
     if (timeoutRef.current !== null) {
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = null;
+      clearTimeout(timeoutRef.current)
+      timeoutRef.current = null
     }
     if (!enableDrag) {
-      onClick?.();
+      onClick?.()
     }
-    setEnableDrag(false);
-  };
+    setEnableDrag(false)
+  }
 
-  const start = new Date(event.startDate);
-  const end = new Date(event.endDate);
+  const start = new Date(event.startDate)
+  const end = new Date(event.endDate)
 
-  const minutesFromStart = start.getHours() * 60 + start.getMinutes();
-  const minutesToEnd = end.getHours() * 60 + end.getMinutes();
-  const duration = Math.max(15, minutesToEnd - minutesFromStart);
+  const minutesFromStart = start.getHours() * 60 + start.getMinutes()
+  const minutesToEnd = end.getHours() * 60 + end.getMinutes()
+  const duration = Math.max(15, minutesToEnd - minutesFromStart)
 
-  const top = (minutesFromStart / 15) * 32;
-  const height = (duration / 15) * 32;
+  const top = (minutesFromStart / 15) * 32
+  const height = (duration / 15) * 32
 
-  const calendar = calendars.find((c) => c.id === event.calendarId);
-  const category = categories.find((c) => c.id === event.categoryId);
+  const calendar = calendars.find((c) => c.id === event.calendarId)
+  const category = categories.find((c) => c.id === event.categoryId)
 
-  const emoji = calendar?.emoji || "";
-  const backgroundColor = category?.color || event.color || "#1976d2";
+  const emoji = calendar?.emoji || ""
+  const backgroundColor = category?.color || event.color || "#1976d2"
 
   return (
     <Box
@@ -113,7 +113,7 @@ const EventBox = ({
         </Typography>
       )}
     </Box>
-  );
-};
+  )
+}
 
-export default EventBox;
+export default EventBox

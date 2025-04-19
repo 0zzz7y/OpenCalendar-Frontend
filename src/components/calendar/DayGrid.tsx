@@ -1,15 +1,15 @@
-import { Box, Typography } from "@mui/material";
+import { Box, Typography } from "@mui/material"
 
 interface DayGridProperties {
-  onSlotClick: (hour: number, minute: number, element: HTMLElement) => void;
+  onSlotClick: (hour: number, minute: number, element: HTMLElement) => void
 }
 
 const DayGrid = ({ onSlotClick }: DayGridProperties) => {
   const slots = Array.from({ length: 24 * 2 }, (_, i) => {
-    const hour = Math.floor(i / 2);
-    const minute = i % 2 === 0 ? 0 : 30;
-    return { hour, minute };
-  });
+    const hour = Math.floor(i / 2)
+    const minute = i % 2 === 0 ? 0 : 30
+    return { hour, minute }
+  })
 
   return (
     <>
@@ -40,7 +40,7 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
         ))}
       </Box>
     </>
-  );
-};
+  )
+}
 
-export default DayGrid;
+export default DayGrid

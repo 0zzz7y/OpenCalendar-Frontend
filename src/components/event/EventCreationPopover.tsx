@@ -7,22 +7,22 @@ import {
   Divider,
   Typography,
   Box
-} from "@mui/material";
+} from "@mui/material"
 
-import { DateCalendar, TimePicker } from "@mui/x-date-pickers";
-import { useEffect, useState } from "react";
+import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
+import { useEffect, useState } from "react"
 
-import dayjs, { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs"
 
-import Event from "../../types/event";
+import Event from "../../types/event"
 
 interface Properties {
-  anchorEl: HTMLElement | null;
-  onClose: () => void;
-  onSave: (event: Partial<Event>) => void;
-  calendars: { id: string; name: string; emoji: string }[];
-  categories: { id: string; name: string; color: string }[];
-  initialEvent?: Event;
+  anchorEl: HTMLElement | null
+  onClose: () => void
+  onSave: (event: Partial<Event>) => void
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  initialEvent?: Event
 }
 
 function EventCreationPopover({
@@ -33,56 +33,56 @@ function EventCreationPopover({
   categories,
   initialEvent
 }: Properties) {
-  const open = Boolean(anchorEl);
+  const open = Boolean(anchorEl)
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs());
-  const [startTime, setStartTime] = useState<Dayjs | null>(dayjs());
-  const [endTime, setEndTime] = useState<Dayjs | null>(dayjs().add(1, "hour"));
-  const [calendarId, setCalendarId] = useState("");
-  const [categoryId, setCategoryId] = useState("");
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [startDate, setStartDate] = useState<Dayjs | null>(dayjs())
+  const [startTime, setStartTime] = useState<Dayjs | null>(dayjs())
+  const [endTime, setEndTime] = useState<Dayjs | null>(dayjs().add(1, "hour"))
+  const [calendarId, setCalendarId] = useState("")
+  const [categoryId, setCategoryId] = useState("")
 
   useEffect(() => {
     if (initialEvent) {
-      const start = dayjs(initialEvent.startDate);
-      const end = dayjs(initialEvent.endDate);
+      const start = dayjs(initialEvent.startDate)
+      const end = dayjs(initialEvent.endDate)
 
-      setTitle(initialEvent.name);
-      setDescription(initialEvent.description || "");
-      setStartDate(start);
-      setStartTime(start);
-      setEndTime(end);
-      setCalendarId(initialEvent.calendarId || "");
-      setCategoryId(initialEvent.categoryId || "");
+      setTitle(initialEvent.name)
+      setDescription(initialEvent.description || "")
+      setStartDate(start)
+      setStartTime(start)
+      setEndTime(end)
+      setCalendarId(initialEvent.calendarId || "")
+      setCategoryId(initialEvent.categoryId || "")
     } else {
-      const now = dayjs();
-      setTitle("");
-      setDescription("");
-      setStartDate(now);
-      setStartTime(now);
-      setEndTime(now.add(1, "hour"));
-      setCalendarId("");
-      setCategoryId("");
+      const now = dayjs()
+      setTitle("")
+      setDescription("")
+      setStartDate(now)
+      setStartTime(now)
+      setEndTime(now.add(1, "hour"))
+      setCalendarId("")
+      setCategoryId("")
     }
-  }, [initialEvent, open]);
+  }, [initialEvent, open])
 
   const handleSave = () => {
-    if (!title || !startDate || !startTime || !endTime) return;
+    if (!title || !startDate || !startTime || !endTime) return
 
     const start = startDate
       .hour(startTime.hour())
       .minute(startTime.minute())
       .second(0)
-      .millisecond(0);
+      .millisecond(0)
 
     const end = startDate
       .hour(endTime.hour())
       .minute(endTime.minute())
       .second(0)
-      .millisecond(0);
+      .millisecond(0)
 
-    const categoryColor = categories.find((c) => c.id === categoryId)?.color;
+    const categoryColor = categories.find((c) => c.id === categoryId)?.color
 
     onSave({
       id: initialEvent?.id,
@@ -93,10 +93,10 @@ function EventCreationPopover({
       color: categoryColor,
       startDate: start.toISOString(),
       endDate: end.toISOString()
-    });
+    })
 
-    onClose();
-  };
+    onClose()
+  }
 
   return (
     <>
@@ -197,7 +197,7 @@ function EventCreationPopover({
         </Stack>
       </Popover>
     </>
-  );
+  )
 }
 
-export default EventCreationPopover;
+export default EventCreationPopover

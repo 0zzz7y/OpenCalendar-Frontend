@@ -7,25 +7,25 @@ import {
   IconButton,
   Collapse,
   TextField
-} from "@mui/material";
+} from "@mui/material"
 
-import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material";
+import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material"
 
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import dayjs from "dayjs";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import dayjs from "dayjs"
 
-import type Task from "../../types/task";
-import type Calendar from "../../types/calendar";
-import type Category from "../../types/category";
+import type Task from "../../types/task"
+import type Calendar from "../../types/calendar"
+import type Category from "../../types/category"
 
-import { useState, useEffect } from "react";
+import { useState, useEffect } from "react"
 
 interface Properties {
-  task: Task;
-  calendars: Calendar[];
-  categories: Category[];
-  onUpdate: (task: Task) => void;
-  onDelete: (id: string) => void;
+  task: Task
+  calendars: Calendar[]
+  categories: Category[]
+  onUpdate: (task: Task) => void
+  onDelete: (id: string) => void
 }
 
 const TaskCard = ({
@@ -35,26 +35,26 @@ const TaskCard = ({
   onUpdate,
   onDelete
 }: Properties) => {
-  const [expanded, setExpanded] = useState(true);
-  const [localTask, setLocalTask] = useState<Task>(task);
+  const [expanded, setExpanded] = useState(true)
+  const [localTask, setLocalTask] = useState<Task>(task)
 
   useEffect(() => {
-    setLocalTask(task);
-  }, [task]);
+    setLocalTask(task)
+  }, [task])
 
-  const currentCalendar = calendars.find((c) => c.id === localTask.calendarId);
-  const currentCategory = categories.find((c) => c.id === localTask.categoryId);
-  const cardColor = currentCategory?.color;
+  const currentCalendar = calendars.find((c) => c.id === localTask.calendarId)
+  const currentCategory = categories.find((c) => c.id === localTask.categoryId)
+  const cardColor = currentCategory?.color
 
   const handleFieldChange = (field: keyof Task, value: any) => {
-    const updatedTask = { ...localTask, [field]: value };
-    setLocalTask(updatedTask);
-    onUpdate(updatedTask);
-  };
+    const updatedTask = { ...localTask, [field]: value }
+    setLocalTask(updatedTask)
+    onUpdate(updatedTask)
+  }
 
   const handleToggleExpand = () => {
-    setExpanded((prev) => !prev);
-  };
+    setExpanded((prev) => !prev)
+  }
 
   const fieldStyle = {
     "& .MuiOutlinedInput-root": {
@@ -71,7 +71,7 @@ const TaskCard = ({
     "& .MuiSelect-icon": {
       color: "#000"
     }
-  };
+  }
 
   return (
     <Card
@@ -84,7 +84,12 @@ const TaskCard = ({
         minWidth: 220
       }}
     >
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={1}
+      >
         <IconButton onClick={handleToggleExpand} size="small">
           {expanded ? <ExpandLess /> : <ExpandMore />}
         </IconButton>
@@ -119,7 +124,10 @@ const TaskCard = ({
           <DateTimePicker
             value={localTask.startDate ? dayjs(localTask.startDate) : null}
             onChange={(newValue) =>
-              handleFieldChange("startDate", newValue ? newValue.toISOString() : "")
+              handleFieldChange(
+                "startDate",
+                newValue ? newValue.toISOString() : ""
+              )
             }
             slotProps={{
               textField: {
@@ -137,7 +145,10 @@ const TaskCard = ({
           <DateTimePicker
             value={localTask.endDate ? dayjs(localTask.endDate) : null}
             onChange={(newValue) =>
-              handleFieldChange("endDate", newValue ? newValue.toISOString() : "")
+              handleFieldChange(
+                "endDate",
+                newValue ? newValue.toISOString() : ""
+              )
             }
             slotProps={{
               textField: {
@@ -157,7 +168,9 @@ const TaskCard = ({
               placeholder="Recurring"
               select
               value={localTask.recurringPattern || "NONE"}
-              onChange={(e) => handleFieldChange("recurringPattern", e.target.value)}
+              onChange={(e) =>
+                handleFieldChange("recurringPattern", e.target.value)
+              }
               size="small"
               variant="outlined"
               fullWidth
@@ -184,8 +197,12 @@ const TaskCard = ({
             {calendars.map((cal) => (
               <MenuItem key={cal.id} value={cal.id}>
                 <Box display="flex" alignItems="center" gap={1}>
-                <Typography sx={{ textAlign: "center", minWidth: 24, mt: -0.5}}>{cal.emoji}</Typography>
-                <Typography>{cal.name}</Typography>
+                  <Typography
+                    sx={{ textAlign: "center", minWidth: 24, mt: -0.5 }}
+                  >
+                    {cal.emoji}
+                  </Typography>
+                  <Typography>{cal.name}</Typography>
                 </Box>
               </MenuItem>
             ))}
@@ -221,7 +238,7 @@ const TaskCard = ({
         </Box>
       </Collapse>
     </Card>
-  );
-};
+  )
+}
 
-export default TaskCard;
+export default TaskCard

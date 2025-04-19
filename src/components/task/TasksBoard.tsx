@@ -1,30 +1,30 @@
-import { Box } from "@mui/material";
+import { Box } from "@mui/material"
 
-import TaskCard from "./TaskCard";
-import TaskColumn from "./TaskColumn";
+import TaskCard from "./TaskCard"
+import TaskColumn from "./TaskColumn"
 
-import Task from "../../types/task";
-import Calendar from "../../types/calendar";
-import Category from "../../types/category";
-import TaskStatus from "../../types/taskStatus";
+import Task from "../../types/task"
+import Calendar from "../../types/calendar"
+import Category from "../../types/category"
+import TaskStatus from "../../types/taskStatus"
 
-import { HourglassEmpty, Done, Pending } from "@mui/icons-material";
+import { HourglassEmpty, Done, Pending } from "@mui/icons-material"
 
 import {
   DragDropContext,
   Droppable,
   Draggable,
   DropResult
-} from "@hello-pangea/dnd";
-import { JSX } from "react";
-import MESSAGES from "@/constants/messages";
+} from "@hello-pangea/dnd"
+import { JSX } from "react"
+import MESSAGES from "@/constants/messages"
 
 interface Properties {
-  tasks: Task[];
-  calendars: Calendar[];
-  categories: Category[];
-  onUpdate: (task: Task) => void;
-  onDelete: (id: string) => void;
+  tasks: Task[]
+  calendars: Calendar[]
+  categories: Category[]
+  onUpdate: (task: Task) => void
+  onDelete: (id: string) => void
 }
 
 const TaskBoard = ({
@@ -34,28 +34,32 @@ const TaskBoard = ({
   onUpdate,
   onDelete
 }: Properties) => {
-  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } = {
-    TODO: { title: MESSAGES.PLACEHOLDERS.TODO, icon: <HourglassEmpty /> },
-    IN_PROGRESS: { title: MESSAGES.PLACEHOLDERS.IN_PROGRESS, icon: <Pending /> },
-    DONE: { title: MESSAGES.PLACEHOLDERS.DONE, icon: <Done /> }
-  };
+  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } =
+    {
+      TODO: { title: MESSAGES.PLACEHOLDERS.TODO, icon: <HourglassEmpty /> },
+      IN_PROGRESS: {
+        title: MESSAGES.PLACEHOLDERS.IN_PROGRESS,
+        icon: <Pending />
+      },
+      DONE: { title: MESSAGES.PLACEHOLDERS.DONE, icon: <Done /> }
+    }
 
   const onDragEnd = (result: DropResult) => {
-    if (!result.destination) return;
+    if (!result.destination) return
 
-    const { draggableId, destination, source } = result;
-    if (destination.droppableId === source.droppableId) return;
+    const { draggableId, destination, source } = result
+    if (destination.droppableId === source.droppableId) return
 
-    const task = tasks.find((t) => t.id === draggableId);
-    if (!task) return;
+    const task = tasks.find((t) => t.id === draggableId)
+    if (!task) return
 
     const updatedTask: Task = {
       ...task,
       status: destination.droppableId as TaskStatus
-    };
+    }
 
-    onUpdate(updatedTask);
-  };
+    onUpdate(updatedTask)
+  }
 
   return (
     <>
@@ -69,7 +73,7 @@ const TaskBoard = ({
                   {...provided.droppableProps}
                   sx={{ flex: 1 }}
                 >
-                  <TaskColumn title={title} icon={icon} >
+                  <TaskColumn title={title} icon={icon}>
                     {tasks
                       .filter((t) => t.status === status)
                       .map((task, index) => (
@@ -105,7 +109,7 @@ const TaskBoard = ({
         </Box>
       </DragDropContext>
     </>
-  );
-};
+  )
+}
 
-export default TaskBoard;
+export default TaskBoard

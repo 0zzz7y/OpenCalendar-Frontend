@@ -1,22 +1,22 @@
-import { useState } from "react";
-import { Box } from "@mui/material";
-import dayjs from "dayjs";
+import { useState } from "react"
+import { Box } from "@mui/material"
+import dayjs from "dayjs"
 
-import TimeColumn from "./TimeColumn";
-import DayColumn from "./DayColumn";
-import EventPopover from "../event/EventCreationPopover";
-import EventInformationPopover from "../event/EventInformationPopover";
+import TimeColumn from "./TimeColumn"
+import DayColumn from "./DayColumn"
+import EventPopover from "../event/EventCreationPopover"
+import EventInformationPopover from "../event/EventInformationPopover"
 
-import Event from "@/types/event";
+import Event from "@/types/event"
 
 interface DayViewProperties {
-  date: Date;
-  events: Event[];
-  calendars: { id: string; name: string; emoji: string }[];
-  categories: { id: string; name: string; color: string }[];
-  onSave: (event: Partial<Event>) => void;
-  onSlotClick: (element: HTMLElement, datetime: Date) => void;
-  onEventClick?: (event: Event) => void;
+  date: Date
+  events: Event[]
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  onSave: (event: Partial<Event>) => void
+  onSlotClick: (element: HTMLElement, datetime: Date) => void
+  onEventClick?: (event: Event) => void
 }
 
 const DayView = ({
@@ -28,54 +28,52 @@ const DayView = ({
   onSlotClick,
   onEventClick
 }: DayViewProperties) => {
-  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null);
-  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null);
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
-  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
-  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
+  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
+  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null)
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
-  const dayEvents = events.filter((e) =>
-    dayjs(e.startDate).isSame(date, "day")
-  );
+  const dayEvents = events.filter((e) => dayjs(e.startDate).isSame(date, "day"))
 
   const handleSlotClick = (element: HTMLElement, datetime: Date) => {
-    setSelectedSlot(element);
-    setSelectedDatetime(datetime);
-    setEditingEvent(null);
-    setInfoEvent(null);
-    onSlotClick(element, datetime);
-  };
+    setSelectedSlot(element)
+    setSelectedDatetime(datetime)
+    setEditingEvent(null)
+    setInfoEvent(null)
+    onSlotClick(element, datetime)
+  }
 
   const handleEventClick = (event: Event) => {
-    const element = document.querySelector(`#event-${event.id}`) as HTMLElement;
+    const element = document.querySelector(`#event-${event.id}`) as HTMLElement
     if (element) {
-      setInfoAnchor(element);
-      setInfoEvent(event);
-      onEventClick?.(event);
+      setInfoAnchor(element)
+      setInfoEvent(event)
+      onEventClick?.(event)
     }
-  };
+  }
 
   const handleClosePopover = () => {
-    setSelectedSlot(null);
-    setSelectedDatetime(null);
-    setEditingEvent(null);
-  };
+    setSelectedSlot(null)
+    setSelectedDatetime(null)
+    setEditingEvent(null)
+  }
 
   const handleSave = (data: Partial<Event>) => {
-    onSave(data);
-    handleClosePopover();
-  };
+    onSave(data)
+    handleClosePopover()
+  }
 
   const handleEditEvent = () => {
-    setEditingEvent(infoEvent);
-    setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null);
-    setSelectedSlot(infoAnchor);
-    setInfoEvent(null);
-  };
+    setEditingEvent(infoEvent)
+    setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null)
+    setSelectedSlot(infoAnchor)
+    setInfoEvent(null)
+  }
 
   const handleDeleteEvent = (id: string) => {
-    onSave({ id });
-  };
+    onSave({ id })
+  }
 
   return (
     <>
@@ -129,7 +127,7 @@ const DayView = ({
         />
       )}
     </>
-  );
-};
+  )
+}
 
-export default DayView;
+export default DayView

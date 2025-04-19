@@ -1,9 +1,9 @@
-import { Box, Typography, useTheme } from "@mui/material";
+import { Box, Typography, useTheme } from "@mui/material"
 
 interface TimeColumnProperties {
-  startHour?: number;
-  endHour?: number;
-  interval?: number;
+  startHour?: number
+  endHour?: number
+  interval?: number
 }
 
 const TimeColumn = ({
@@ -11,14 +11,14 @@ const TimeColumn = ({
   endHour = 23.5,
   interval = 30
 }: TimeColumnProperties) => {
-  const theme = useTheme();
-  const times: string[] = [];
+  const theme = useTheme()
+  const times: string[] = []
 
   for (let h = startHour; h <= endHour; h++) {
     for (let m = 0; m < 60; m += interval) {
-      const hh = h.toString().padStart(2, "0");
-      const mm = m.toString().padStart(2, "0");
-      times.push(`${hh}:${mm}`);
+      const hh = h.toString().padStart(2, "0")
+      const mm = m.toString().padStart(2, "0")
+      times.push(`${hh}:${mm}`)
     }
   }
 
@@ -48,7 +48,7 @@ const TimeColumn = ({
         </Typography>
       ))}
     </Box>
-  );
-};
+  )
+}
 
-export default TimeColumn;
+export default TimeColumn

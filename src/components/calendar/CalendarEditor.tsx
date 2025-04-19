@@ -5,29 +5,29 @@ import {
   Button,
   Box,
   ClickAwayListener
-} from "@mui/material";
+} from "@mui/material"
 
-import EmojiPicker from "emoji-picker-react";
+import EmojiPicker from "emoji-picker-react"
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react"
 import {
   EmojiClickData,
   EmojiStyle,
   SkinTones,
   Theme
-} from "emoji-picker-react";
+} from "emoji-picker-react"
 
-import useCalendars from "../../hooks/useCalendars";
+import useCalendars from "../../hooks/useCalendars"
 
 interface CalendarEditorProperties {
-  editMode: "add" | "edit" | "delete";
-  labelInput: string;
-  setLabelInput: (val: string) => void;
-  onClose: () => void;
-  onSubmit: () => void;
-  emojiInput: string;
-  setEmojiInput: (val: string) => void;
-  calendarId?: string;
+  editMode: "add" | "edit" | "delete"
+  labelInput: string
+  setLabelInput: (val: string) => void
+  onClose: () => void
+  onSubmit: () => void
+  emojiInput: string
+  setEmojiInput: (val: string) => void
+  calendarId?: string
 }
 
 const CalendarEditor = ({
@@ -40,73 +40,69 @@ const CalendarEditor = ({
   setEmojiInput,
   calendarId
 }: CalendarEditorProperties) => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const [loading, setLoading] = useState(false);
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const [loading, setLoading] = useState(false)
 
-  const {
-    addCalendar,
-    updateCalendar,
-    deleteCalendar,
-    reloadCalendars
-  } = useCalendars();
+  const { addCalendar, updateCalendar, deleteCalendar, reloadCalendars } =
+    useCalendars()
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.setSelectionRange(labelInput.length, labelInput.length);
+      inputRef.current.focus()
+      inputRef.current.setSelectionRange(labelInput.length, labelInput.length)
     }
-  }, [editMode]);
+  }, [editMode])
 
   const handleAdd = async () => {
-    if (!labelInput.trim()) return;
-    setLoading(true);
+    if (!labelInput.trim()) return
+    setLoading(true)
     try {
       await addCalendar({
         name: labelInput.trim(),
         emoji: emojiInput
-      });
-      await reloadCalendars();
-      onSubmit();
-      onClose();
+      })
+      await reloadCalendars()
+      onSubmit()
+      onClose()
     } catch (e) {
-      console.error("Failed to add calendar", e);
+      console.error("Failed to add calendar", e)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleEdit = async () => {
-    if (!labelInput.trim() || !calendarId) return;
-    setLoading(true);
+    if (!labelInput.trim() || !calendarId) return
+    setLoading(true)
     try {
       await updateCalendar(calendarId, {
         name: labelInput.trim(),
         emoji: emojiInput
-      });
-      await reloadCalendars();
-      onSubmit();
-      onClose();
+      })
+      await reloadCalendars()
+      onSubmit()
+      onClose()
     } catch (e) {
-      console.error("Failed to update calendar", e);
+      console.error("Failed to update calendar", e)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleDelete = async () => {
-    if (!calendarId) return;
-    setLoading(true);
+    if (!calendarId) return
+    setLoading(true)
     try {
-      await deleteCalendar(calendarId);
-      await reloadCalendars();
-      onSubmit();
-      onClose();
+      await deleteCalendar(calendarId)
+      await reloadCalendars()
+      onSubmit()
+      onClose()
     } catch (e) {
-      console.error("Failed to delete calendar", e);
+      console.error("Failed to delete calendar", e)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <>
@@ -189,7 +185,7 @@ const CalendarEditor = ({
         </Paper>
       </ClickAwayListener>
     </>
-  );
-};
+  )
+}
 
-export default CalendarEditor;
+export default CalendarEditor

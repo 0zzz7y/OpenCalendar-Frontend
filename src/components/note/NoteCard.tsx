@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react"
 import {
   Box,
   Paper,
@@ -7,26 +7,27 @@ import {
   MenuItem,
   Popover,
   Typography,
-  Button
-} from "@mui/material";
+  Button,
+  TextField
+} from "@mui/material"
 
-import NoteToolbar, { FormatCommand } from "./NoteToolbar";
-import Note from "../../types/note";
-import Category from "../../types/category";
+import NoteToolbar, { FormatCommand } from "./NoteToolbar"
+import Note from "../../types/note"
+import Category from "../../types/category"
 
-import MESSAGES from "@/constants/messages";
+import MESSAGES from "@/constants/messages"
 
 export interface NoteCardProperties {
-  id: string;
-  content: string;
-  initialX?: number;
-  initialY?: number;
-  color?: string;
-  categories: Category[];
-  onDelete?: (id: string) => void;
-  onUpdate?: (note: Note) => void;
-  calendarId?: string;
-  name?: string;
+  id: string
+  content: string
+  initialX?: number
+  initialY?: number
+  color?: string
+  categories: Category[]
+  onDelete?: (id: string) => void
+  onUpdate?: (note: Note) => void
+  calendarId?: string
+  name?: string
 }
 
 const NoteCard = ({
@@ -39,183 +40,187 @@ const NoteCard = ({
   onDelete,
   onUpdate,
   calendarId,
-  name = ""
+  name = MESSAGES.PLACEHOLDERS.NEW_NOTE
 }: NoteCardProperties) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const toolbarRef = useRef<HTMLDivElement | null>(null);
-  const positionRef = useRef({ x: initialX, y: initialY });
-  const lastMousePos = useRef<{ x: number; y: number } | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const dragReady = useRef(false);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null)
+  const contentRef = useRef<HTMLDivElement | null>(null)
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const toolbarRef = useRef<HTMLDivElement | null>(null)
+  const positionRef = useRef({ x: initialX, y: initialY })
+  const lastMousePos = useRef<{ x: number; y: number } | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const dragReady = useRef(false)
 
-  const [position, setPosition] = useState(positionRef.current);
-  const [dragging, setDragging] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const [isDrawing, setIsDrawing] = useState(false);
-  const [drawingDataURL, setDrawingDataURL] = useState<string | null>(null);
-  const [brushColor, setBrushColor] = useState("#000000");
-  const [brushSize, setBrushSize] = useState(2);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(null);
-  const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
-  const [confirmOpen, setConfirmOpen] = useState(false);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
+  const [position, setPosition] = useState(positionRef.current)
+  const [dragging, setDragging] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+  const [isDrawing, setIsDrawing] = useState(false)
+  const [drawingDataURL, setDrawingDataURL] = useState<string | null>(null)
+  const [brushColor, setBrushColor] = useState("#000000")
+  const [brushSize, setBrushSize] = useState(2)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
+  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(
+    null
+  )
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => {})
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
+  const [activeFormats, setActiveFormats] = useState<
+    Record<FormatCommand, boolean>
+  >({
     bold: false,
     italic: false,
     underline: false
-  });
+  })
+  const [noteName, setNoteName] = useState(name)
 
   const getCategoryColor = (categoryId: string | null) =>
-    categories.find((c) => c.id === categoryId)?.color || color;
+    categories.find((c) => c.id === categoryId)?.color || color
 
   const clearCanvas = () => {
-    const canvas = canvasRef.current;
-    const ctx = canvas?.getContext("2d");
+    const canvas = canvasRef.current
+    const ctx = canvas?.getContext("2d")
     if (canvas && ctx) {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-      setDrawingDataURL(null);
+      ctx.clearRect(0, 0, canvas.width, canvas.height)
+      setDrawingDataURL(null)
     }
-  };
+  }
 
   const clearText = () => {
-    if (contentRef.current) contentRef.current.innerText = "";
-  };
+    if (contentRef.current) contentRef.current.innerText = ""
+  }
 
   const toggleMode = () => {
-    setIsDrawing((prev) => !prev);
-  };
+    setIsDrawing((prev) => !prev)
+  }
 
   const formatText = (command: FormatCommand) => {
-    contentRef.current?.focus();
-    document.execCommand(command);
-  
+    contentRef.current?.focus()
+    document.execCommand(command)
+
     setActiveFormats((prev) => ({
       ...prev,
       [command]: !prev[command]
-    }));
-  };
-  
+    }))
+  }
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (toolbarRef.current && toolbarRef.current.contains(e.target as Node)) {
-      dragReady.current = true;
-      lastMousePos.current = { x: e.clientX, y: e.clientY };
-      setDragging(true);
+      dragReady.current = true
+      lastMousePos.current = { x: e.clientX, y: e.clientY }
+      setDragging(true)
     }
-  };
+  }
 
   const handleMouseUp = () => {
-    setDragging(false);
-    dragReady.current = false;
-    lastMousePos.current = null;
-  };
+    setDragging(false)
+    dragReady.current = false
+    lastMousePos.current = null
+  }
 
   const handleDrag = (e: MouseEvent) => {
-    if (!dragging || !lastMousePos.current) return;
-    const dx = e.clientX - lastMousePos.current.x;
-    const dy = e.clientY - lastMousePos.current.y;
-    lastMousePos.current = { x: e.clientX, y: e.clientY };
+    if (!dragging || !lastMousePos.current) return
+    const dx = e.clientX - lastMousePos.current.x
+    const dy = e.clientY - lastMousePos.current.y
+    lastMousePos.current = { x: e.clientX, y: e.clientY }
     positionRef.current = {
       x: Math.max(0, positionRef.current.x + dx),
       y: Math.max(0, positionRef.current.y + dy)
-    };
+    }
     if (animationFrameRef.current === null) {
       animationFrameRef.current = requestAnimationFrame(() => {
-        setPosition({ ...positionRef.current });
-        animationFrameRef.current = null;
-      });
+        setPosition({ ...positionRef.current })
+        animationFrameRef.current = null
+      })
     }
-  };
+  }
 
   const handleConfirm = (message: string, action: () => void) => {
-    setConfirmAction(() => action);
-    setConfirmOpen(true);
-    setConfirmAnchorEl(wrapperRef.current);
-  };
+    setConfirmAction(() => action)
+    setConfirmOpen(true)
+    setConfirmAnchorEl(wrapperRef.current)
+  }
 
   const handleConfirmClose = () => {
-    setConfirmOpen(false);
-    setConfirmAnchorEl(null);
-  };
+    setConfirmOpen(false)
+    setConfirmAnchorEl(null)
+  }
 
   const handleBlur = () => {
     if (onUpdate) {
       onUpdate({
         id,
-        name,
+        name: noteName,
         description: contentRef.current?.innerText || "",
         categoryId: selectedCategory || "",
         calendarId: calendarId || ""
-      });
+      })
     }
-  };
+  }
 
   useEffect(() => {
     if (dragging) {
-      window.addEventListener("mousemove", handleDrag);
-      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener("mousemove", handleDrag)
+      window.addEventListener("mouseup", handleMouseUp)
       return () => {
-        window.removeEventListener("mousemove", handleDrag);
-        window.removeEventListener("mouseup", handleMouseUp);
-      };
+        window.removeEventListener("mousemove", handleDrag)
+        window.removeEventListener("mouseup", handleMouseUp)
+      }
     }
-  }, [dragging]);
+  }, [dragging])
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
+    const canvas = canvasRef.current
+    if (!canvas) return
+    const ctx = canvas.getContext("2d")
+    if (!ctx) return
 
-    let drawing = false;
+    let drawing = false
 
     const handleMouseDown = (e: MouseEvent) => {
-      drawing = true;
-      const rect = canvas.getBoundingClientRect();
-      ctx.beginPath();
-      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
-    };
+      drawing = true
+      const rect = canvas.getBoundingClientRect()
+      ctx.beginPath()
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top)
+    }
 
     const handleMouseMove = (e: MouseEvent) => {
-      if (!drawing) return;
-      const rect = canvas.getBoundingClientRect();
-      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
-      ctx.strokeStyle = brushColor;
-      ctx.lineWidth = brushSize;
-      ctx.lineCap = "round";
-      ctx.stroke();
-    };
+      if (!drawing) return
+      const rect = canvas.getBoundingClientRect()
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top)
+      ctx.strokeStyle = brushColor
+      ctx.lineWidth = brushSize
+      ctx.lineCap = "round"
+      ctx.stroke()
+    }
 
     const handleMouseUp = () => {
-      drawing = false;
-      ctx.closePath();
-    };
+      drawing = false
+      ctx.closePath()
+    }
 
-    canvas.addEventListener("mousedown", handleMouseDown);
-    canvas.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("mouseup", handleMouseUp);
+    canvas.addEventListener("mousedown", handleMouseDown)
+    canvas.addEventListener("mousemove", handleMouseMove)
+    window.addEventListener("mouseup", handleMouseUp)
 
     return () => {
-      canvas.removeEventListener("mousedown", handleMouseDown);
-      canvas.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("mouseup", handleMouseUp);
-    };
-  }, [brushColor, brushSize]);
+      canvas.removeEventListener("mousedown", handleMouseDown)
+      canvas.removeEventListener("mousemove", handleMouseMove)
+      window.removeEventListener("mouseup", handleMouseUp)
+    }
+  }, [brushColor, brushSize])
 
   useEffect(() => {
     if (onUpdate) {
       onUpdate({
         id,
-        name,
+        name: noteName,
         description: contentRef.current?.innerText || "",
         categoryId: selectedCategory || "",
         calendarId: calendarId || ""
-      });
+      })
     }
-  }, [selectedCategory]);
+  }, [selectedCategory])
 
   return (
     <Box
@@ -249,11 +254,17 @@ const NoteCard = ({
             isDrawing={isDrawing}
             onToggleCollapse={() => setCollapsed((c) => !c)}
             onToggleMode={toggleMode}
-            onClearCanvas={() => handleConfirm("Clear drawing?", clearCanvas)}
-            onClearText={() => handleConfirm("Clear text?", clearText)}
+            onClearCanvas={() =>
+              handleConfirm(MESSAGES.POPOVER.CONFIRM_CLEAR_CANVAS, clearCanvas)
+            }
+            onClearText={() =>
+              handleConfirm(MESSAGES.POPOVER.CONFIRM_CLEAR_TEXT, clearText)
+            }
             onDelete={() =>
-              (contentRef.current?.innerText.trim() || drawingDataURL)
-                ? handleConfirm("Delete note?", () => onDelete?.(id))
+              contentRef.current?.innerText.trim() || drawingDataURL
+                ? handleConfirm(MESSAGES.POPOVER.CONFIRM_DELETE_NOTE, () =>
+                    onDelete?.(id)
+                  )
                 : onDelete?.(id)
             }
             onFormatText={formatText}
@@ -264,6 +275,8 @@ const NoteCard = ({
             activeFormats={activeFormats}
             selectedCategory={selectedCategory}
             onCategoryMenuOpen={(e: any) => setMenuAnchorEl(e)}
+            noteName={noteName}
+            onNameChange={setNoteName}
           />
         </Box>
 
@@ -317,8 +330,8 @@ const NoteCard = ({
             color="error"
             variant="contained"
             onClick={() => {
-              confirmAction();
-              handleConfirmClose();
+              confirmAction()
+              handleConfirmClose()
             }}
           >
             Delete
@@ -339,8 +352,8 @@ const NoteCard = ({
             key={id}
             selected={selectedCategory === id}
             onClick={() => {
-              setSelectedCategory(id);
-              setMenuAnchorEl(null);
+              setSelectedCategory(id)
+              setMenuAnchorEl(null)
             }}
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
           >
@@ -359,7 +372,7 @@ const NoteCard = ({
         ))}
       </Menu>
     </Box>
-  );
-};
+  )
+}
 
-export default NoteCard;
+export default NoteCard

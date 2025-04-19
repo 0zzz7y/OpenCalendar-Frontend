@@ -1,19 +1,19 @@
-import { useState } from "react";
-import { Box, Typography, Paper, useTheme } from "@mui/material";
-import dayjs from "dayjs";
+import { useState } from "react"
+import { Box, Typography, Paper, useTheme } from "@mui/material"
+import dayjs from "dayjs"
 
-import EventInformationPopover from "../event/EventInformationPopover";
-import EventCreationPopover from "../event/EventCreationPopover";
-import Event from "@/types/event";
+import EventInformationPopover from "../event/EventInformationPopover"
+import EventCreationPopover from "../event/EventCreationPopover"
+import Event from "@/types/event"
 
 interface MonthViewProperties {
-  date: Date;
-  events: Event[];
-  calendars: { id: string; name: string; emoji: string }[];
-  categories: { id: string; name: string; color: string }[];
-  onSave: (data: Partial<Event>) => void;
-  onSlotClick?: (element: HTMLElement, datetime: Date) => void;
-  onEventClick?: (event: Event) => void;
+  date: Date
+  events: Event[]
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  onSave: (data: Partial<Event>) => void
+  onSlotClick?: (element: HTMLElement, datetime: Date) => void
+  onEventClick?: (event: Event) => void
 }
 
 const MonthView = ({
@@ -25,62 +25,62 @@ const MonthView = ({
   onSlotClick,
   onEventClick
 }: MonthViewProperties) => {
-  const theme = useTheme();
+  const theme = useTheme()
 
-  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
-  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
-  const [createAnchor, setCreateAnchor] = useState<HTMLElement | null>(null);
-  const [createDate, setCreateDate] = useState<Date | null>(null);
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null)
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
+  const [createAnchor, setCreateAnchor] = useState<HTMLElement | null>(null)
+  const [createDate, setCreateDate] = useState<Date | null>(null)
 
-  const startOfMonth = dayjs(date).startOf("month");
-  const startDay = startOfMonth.startOf("week");
-  const today = dayjs();
+  const startOfMonth = dayjs(date).startOf("month")
+  const startDay = startOfMonth.startOf("week")
+  const today = dayjs()
 
   const openInfoPopover = (event: Event, anchor: HTMLElement) => {
-    setInfoEvent(event);
-    setInfoAnchor(anchor);
-    onEventClick?.(event);
-  };
+    setInfoEvent(event)
+    setInfoAnchor(anchor)
+    onEventClick?.(event)
+  }
 
   const closeInfoPopover = () => {
-    setInfoEvent(null);
-    setInfoAnchor(null);
-  };
+    setInfoEvent(null)
+    setInfoAnchor(null)
+  }
 
   const deleteEvent = (id: string) => {
-    onSave({ id });
-    closeInfoPopover();
-  };
+    onSave({ id })
+    closeInfoPopover()
+  }
 
   const editEvent = () => {
-    if (!infoEvent || !infoAnchor) return;
-    closeInfoPopover();
-    setCreateDate(new Date(infoEvent.startDate));
-    setCreateAnchor(infoAnchor);
-  };
+    if (!infoEvent || !infoAnchor) return
+    closeInfoPopover()
+    setCreateDate(new Date(infoEvent.startDate))
+    setCreateAnchor(infoAnchor)
+  }
 
   const openCreatePopover = (anchor: HTMLElement, date: Date) => {
-    setCreateAnchor(anchor);
-    setCreateDate(date);
-    onSlotClick?.(anchor, date);
-  };
+    setCreateAnchor(anchor)
+    setCreateDate(date)
+    onSlotClick?.(anchor, date)
+  }
 
   const closeCreatePopover = () => {
-    setCreateAnchor(null);
-    setCreateDate(null);
-  };
+    setCreateAnchor(null)
+    setCreateDate(null)
+  }
 
   const handleSave = (data: Partial<Event>) => {
-    onSave(data);
-    closeCreatePopover();
-  };
+    onSave(data)
+    closeCreatePopover()
+  }
 
-  const cells: React.ReactNode[] = [];
+  const cells: React.ReactNode[] = []
   for (let i = 0; i < 42; i++) {
-    const day = startDay.add(i, "day");
+    const day = startDay.add(i, "day")
     const dayEvents = events.filter((e) =>
       dayjs(e.startDate).isSame(day, "day")
-    );
+    )
 
     cells.push(
       <Paper
@@ -110,8 +110,8 @@ const MonthView = ({
 
         <Box sx={{ mt: 0.5 }}>
           {dayEvents.slice(0, 3).map((ev) => {
-            const category = categories.find((c) => c.id === ev.categoryId);
-            const calendar = calendars.find((c) => c.id === ev.calendarId);
+            const category = categories.find((c) => c.id === ev.categoryId)
+            const calendar = calendars.find((c) => c.id === ev.calendarId)
 
             return (
               <Box
@@ -125,8 +125,8 @@ const MonthView = ({
                   "&:hover": { bgcolor: theme.palette.action.hover }
                 }}
                 onClick={(e) => {
-                  e.stopPropagation();
-                  openInfoPopover(ev, e.currentTarget as HTMLElement);
+                  e.stopPropagation()
+                  openInfoPopover(ev, e.currentTarget as HTMLElement)
                 }}
               >
                 <Box
@@ -142,7 +142,7 @@ const MonthView = ({
                   {calendar?.emoji}
                 </Typography>
               </Box>
-            );
+            )
           })}
 
           {dayEvents.length > 3 && (
@@ -152,7 +152,7 @@ const MonthView = ({
           )}
         </Box>
       </Paper>
-    );
+    )
   }
 
   return (
@@ -197,7 +197,7 @@ const MonthView = ({
         />
       )}
     </Box>
-  );
-};
+  )
+}
 
-export default MonthView;
+export default MonthView

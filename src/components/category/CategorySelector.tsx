@@ -5,41 +5,38 @@ import {
   Popper,
   Box,
   Typography
-} from "@mui/material";
+} from "@mui/material"
 
-import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react";
-import { useMemo, useState } from "react";
+import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react"
+import { useMemo, useState } from "react"
 
-import CategoryEditor from "./CategoryEditor";
-import useCategories from "../../hooks/useCategories";
+import CategoryEditor from "./CategoryEditor"
+import useCategories from "../../hooks/useCategories"
 
 export interface CategoryOption {
-  label: string;
-  value: string;
-  color?: string;
+  label: string
+  value: string
+  color?: string
 }
 
 interface CategorySelectorProperties {
-  value: string | null;
-  onChange: (val: string | null) => void;
+  value: string | null
+  onChange: (val: string | null) => void
 }
 
-const CategorySelector = ({
-  value,
-  onChange
-}: CategorySelectorProperties) => {
-  const { categories, reloadCategories } = useCategories();
+const CategorySelector = ({ value, onChange }: CategorySelectorProperties) => {
+  const { categories, reloadCategories } = useCategories()
 
-  const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add");
-  const [currentValue, setCurrentValue] = useState("");
-  const [labelInput, setLabelInput] = useState("");
-  const [colorInput, setColorInput] = useState("#3b5bdb");
-  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [editMode, setEditMode] = useState<"add" | "edit" | "delete">("add")
+  const [currentValue, setCurrentValue] = useState("")
+  const [labelInput, setLabelInput] = useState("")
+  const [colorInput, setColorInput] = useState("#3b5bdb")
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null)
 
-  const isPopoverOpen = Boolean(anchorEl);
+  const isPopoverOpen = Boolean(anchorEl)
 
   const categoryOptions = useMemo<CategoryOption[]>(() => {
-    if (!Array.isArray(categories)) return [{ label: "All", value: "all" }];
+    if (!Array.isArray(categories)) return [{ label: "All", value: "all" }]
     return [
       { label: "All", value: "all" },
       ...categories.map((category) => ({
@@ -47,8 +44,8 @@ const CategorySelector = ({
         value: category.id,
         color: category.color
       }))
-    ];
-  }, [categories]);
+    ]
+  }, [categories])
 
   const openPopover = (
     mode: "add" | "edit" | "delete",
@@ -57,13 +54,13 @@ const CategorySelector = ({
     label = "",
     color = "#3b5bdb"
   ) => {
-    if (mode === "delete" && val === value) return;
-    setEditMode(mode);
-    setCurrentValue(val);
-    setLabelInput(label);
-    setColorInput(color);
-    setAnchorEl(e.currentTarget as HTMLElement);
-  };
+    if (mode === "delete" && val === value) return
+    setEditMode(mode)
+    setCurrentValue(val)
+    setLabelInput(label)
+    setColorInput(color)
+    setAnchorEl(e.currentTarget as HTMLElement)
+  }
 
   return (
     <>
@@ -78,7 +75,7 @@ const CategorySelector = ({
           size="small"
           SelectProps={{
             renderValue: (selected) => {
-              const item = categoryOptions.find((d) => d.value === selected);
+              const item = categoryOptions.find((d) => d.value === selected)
               return (
                 <Box display="flex" alignItems="center" gap={1}>
                   {item?.color && (
@@ -91,7 +88,7 @@ const CategorySelector = ({
                   )}
                   <Typography variant="body2">{item?.label}</Typography>
                 </Box>
-              );
+              )
             }
           }}
         >
@@ -124,14 +121,14 @@ const CategorySelector = ({
                     <IconButton
                       size="small"
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation()
                         openPopover(
                           "edit",
                           e,
                           option.value,
                           option.label,
                           option.color
-                        );
+                        )
                       }}
                     >
                       <IconPencil size={16} />
@@ -140,14 +137,14 @@ const CategorySelector = ({
                       size="small"
                       disabled={option.value === value}
                       onClick={(e) => {
-                        e.stopPropagation();
+                        e.stopPropagation()
                         openPopover(
                           "delete",
                           e,
                           option.value,
                           option.label,
                           option.color
-                        );
+                        )
                       }}
                     >
                       <IconTrash size={16} />
@@ -183,8 +180,8 @@ const CategorySelector = ({
             setLabelInput={setLabelInput}
             onClose={() => setAnchorEl(null)}
             onSubmit={() => {
-              reloadCategories();
-              setAnchorEl(null);
+              reloadCategories()
+              setAnchorEl(null)
             }}
             colorInput={colorInput}
             setColorInput={setColorInput}
@@ -197,7 +194,7 @@ const CategorySelector = ({
         </Box>
       </Popper>
     </>
-  );
-};
+  )
+}
 
-export default CategorySelector;
+export default CategorySelector

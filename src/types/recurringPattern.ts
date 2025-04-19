@@ -1,3 +1,3 @@
-type RecurringPattern = "NONE" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY";
+type RecurringPattern = "NONE" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY"
 
-export default RecurringPattern;
+export default RecurringPattern

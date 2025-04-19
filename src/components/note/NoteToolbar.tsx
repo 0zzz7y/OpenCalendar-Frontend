@@ -6,44 +6,46 @@ import {
   Popover,
   Typography,
   Button
-} from "@mui/material";
+} from "@mui/material"
 
-import BrushIcon from "@mui/icons-material/Brush";
-import EditIcon from "@mui/icons-material/Edit";
-import ClearIcon from "@mui/icons-material/Clear";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FormatBoldIcon from "@mui/icons-material/FormatBold";
-import FormatItalicIcon from "@mui/icons-material/FormatItalic";
-import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
-import { useState } from "react";
-import MESSAGES from "@/constants/messages";
+import BrushIcon from "@mui/icons-material/Brush"
+import EditIcon from "@mui/icons-material/Edit"
+import ClearIcon from "@mui/icons-material/Clear"
+import DeleteIcon from "@mui/icons-material/Delete"
+import ChevronRightIcon from "@mui/icons-material/ChevronRight"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import FormatBoldIcon from "@mui/icons-material/FormatBold"
+import FormatItalicIcon from "@mui/icons-material/FormatItalic"
+import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined"
+import { useState } from "react"
+import MESSAGES from "@/constants/messages"
 
 export type FormatCommand =
   | typeof MESSAGES.TOOLBAR.BOLD
   | typeof MESSAGES.TOOLBAR.ITALIC
-  | typeof MESSAGES.TOOLBAR.UNDERLINE;
+  | typeof MESSAGES.TOOLBAR.UNDERLINE
 
 interface NoteToolbarProperties {
-  isCollapsed: boolean;
-  isDrawing: boolean;
-  onToggleCollapse: () => void;
-  onToggleMode: () => void;
-  onClearCanvas: () => void;
-  onClearText: () => void;
-  onDelete: () => void;
-  onFormatText: (command: FormatCommand) => void;
-  brushColor: string;
-  setBrushColor: (color: string) => void;
-  brushSize: number;
-  setBrushSize: (size: number) => void;
-  activeFormats: Record<FormatCommand, boolean>;
-  selectedCategory: string | null;
-  onCategoryMenuOpen: (anchor: HTMLElement) => void;
+  noteName: string
+  isCollapsed: boolean
+  isDrawing: boolean
+  onToggleCollapse: () => void
+  onToggleMode: () => void
+  onClearCanvas: () => void
+  onClearText: () => void
+  onDelete: () => void
+  onFormatText: (command: FormatCommand) => void
+  brushColor: string
+  setBrushColor: (color: string) => void
+  brushSize: number
+  setBrushSize: (size: number) => void
+  activeFormats: Record<FormatCommand, boolean>
+  selectedCategory: string | null
+  onCategoryMenuOpen: (anchor: HTMLElement) => void
 }
 
 const NoteToolBar = ({
+  noteName,
   isCollapsed,
   isDrawing,
   onToggleCollapse,
@@ -60,20 +62,20 @@ const NoteToolBar = ({
   selectedCategory,
   onCategoryMenuOpen
 }: NoteToolbarProperties) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
   const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget);
-  };
+    setAnchorEl(event.currentTarget)
+  }
 
   const handleConfirm = () => {
-    onDelete();
-    setAnchorEl(null);
-  };
+    onDelete()
+    setAnchorEl(null)
+  }
 
   const handleCancel = () => {
-    setAnchorEl(null);
-  };
+    setAnchorEl(null)
+  }
 
   return (
     <Box
@@ -131,8 +133,8 @@ const NoteToolBar = ({
                 cmd === "bold"
                   ? FormatBoldIcon
                   : cmd === "italic"
-                  ? FormatItalicIcon
-                  : FormatUnderlinedIcon;
+                    ? FormatItalicIcon
+                    : FormatUnderlinedIcon
               return (
                 <IconButton
                   key={cmd}
@@ -146,7 +148,7 @@ const NoteToolBar = ({
                 >
                   <Icon fontSize="small" sx={{ color: "#000" }} />
                 </IconButton>
-              );
+              )
             })}
             <IconButton size="small" onClick={onClearText}>
               <ClearIcon fontSize="small" sx={{ color: "#000" }} />
@@ -197,14 +199,19 @@ const NoteToolBar = ({
             <Button size="small" onClick={handleCancel}>
               Cancel
             </Button>
-            <Button size="small" color="error" variant="contained" onClick={handleConfirm}>
+            <Button
+              size="small"
+              color="error"
+              variant="contained"
+              onClick={handleConfirm}
+            >
               Delete
             </Button>
           </Box>
         </Popover>
       </Box>
     </Box>
-  );
-};
+  )
+}
 
-export default NoteToolBar;
+export default NoteToolBar

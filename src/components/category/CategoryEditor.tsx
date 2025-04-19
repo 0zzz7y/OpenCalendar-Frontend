@@ -5,22 +5,22 @@ import {
   Button,
   Box,
   ClickAwayListener
-} from "@mui/material";
+} from "@mui/material"
 
-import { Sketch } from "@uiw/react-color";
-import { useEffect, useRef, useState } from "react";
+import { Sketch } from "@uiw/react-color"
+import { useEffect, useRef, useState } from "react"
 
-import useCategories from "../../hooks/useCategories";
+import useCategories from "../../hooks/useCategories"
 
 interface CategoryEditorProperties {
-  editMode: "add" | "edit" | "delete";
-  labelInput: string;
-  setLabelInput: (val: string) => void;
-  colorInput: string;
-  setColorInput: (val: string) => void;
-  onClose: () => void;
-  onSubmit: () => void;
-  categoryId?: string;
+  editMode: "add" | "edit" | "delete"
+  labelInput: string
+  setLabelInput: (val: string) => void
+  colorInput: string
+  setColorInput: (val: string) => void
+  onClose: () => void
+  onSubmit: () => void
+  categoryId?: string
 }
 
 const CategoryEditor = ({
@@ -33,73 +33,69 @@ const CategoryEditor = ({
   onSubmit,
   categoryId
 }: CategoryEditorProperties) => {
-  const [loading, setLoading] = useState(false);
-  const inputRef = useRef<HTMLInputElement | null>(null);
+  const [loading, setLoading] = useState(false)
+  const inputRef = useRef<HTMLInputElement | null>(null)
 
-  const {
-    addCategory,
-    updateCategory,
-    deleteCategory,
-    reloadCategories
-  } = useCategories();
+  const { addCategory, updateCategory, deleteCategory, reloadCategories } =
+    useCategories()
 
   useEffect(() => {
     if (inputRef.current) {
-      inputRef.current.focus();
-      inputRef.current.setSelectionRange(labelInput.length, labelInput.length);
+      inputRef.current.focus()
+      inputRef.current.setSelectionRange(labelInput.length, labelInput.length)
     }
-  }, [editMode]);
+  }, [editMode])
 
   const handleAdd = async () => {
-    if (!labelInput.trim()) return;
-    setLoading(true);
+    if (!labelInput.trim()) return
+    setLoading(true)
     try {
       await addCategory({
         name: labelInput.trim(),
         color: colorInput
-      });
-      await reloadCategories();
-      onSubmit();
-      onClose();
+      })
+      await reloadCategories()
+      onSubmit()
+      onClose()
     } catch (e) {
-      console.error("Error creating category", e);
+      console.error("Error creating category", e)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleEdit = async () => {
-    if (!labelInput.trim() || !categoryId) return;
-    setLoading(true);
+    if (!labelInput.trim() || !categoryId) return
+    setLoading(true)
     try {
       await updateCategory(categoryId, {
         name: labelInput.trim(),
         color: colorInput
-      });
-      await reloadCategories();
-      onSubmit();
-      onClose();
+      })
+      await reloadCategories()
+      onSubmit()
+      onClose()
     } catch (e) {
-      console.error("Error editing category", e);
+      console.error("Error editing category", e)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   const handleDelete = async () => {
-    if (!categoryId) return;
-    setLoading(true);
+    if (!categoryId) return
+    setLoading(true)
     try {
-      await deleteCategory(categoryId);
-      await reloadCategories();
-      onSubmit();
-      onClose();
+      await deleteCategory(categoryId)
+      await reloadCategories()
+      onSubmit()
+      onClose()
     } catch (e) {
-      console.error("Error deleting category", e);
+      console.error("Error deleting category", e)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  };
+  }
 
   return (
     <>
@@ -170,7 +166,7 @@ const CategoryEditor = ({
         </Paper>
       </ClickAwayListener>
     </>
-  );
-};
+  )
+}
 
-export default CategoryEditor;
+export default CategoryEditor

@@ -1,13 +1,13 @@
-import React, { useState, useRef, useEffect, ReactNode } from "react";
-import { Box, Paper } from "@mui/material";
+import React, { useState, useRef, useEffect, ReactNode } from "react"
+import { Box, Paper } from "@mui/material"
 
 interface ResizableLayoutProperties {
-  leftPanel?: ReactNode;
-  centerPanel: ReactNode;
-  rightPanel?: ReactNode;
-  initialLeftWidth?: number;
-  initialRightWidth?: number;
-  centerMinWidth?: number;
+  leftPanel?: ReactNode
+  centerPanel: ReactNode
+  rightPanel?: ReactNode
+  initialLeftWidth?: number
+  initialRightWidth?: number
+  centerMinWidth?: number
 }
 
 const ResizableLayout = ({
@@ -18,69 +18,69 @@ const ResizableLayout = ({
   initialRightWidth = 800,
   centerMinWidth = 200
 }: ResizableLayoutProperties) => {
-  const [leftPanelWidth, setLeftPanelWidth] = useState(initialLeftWidth);
-  const [rightPanelWidth, setRightPanelWidth] = useState(initialRightWidth);
-  const [showLeftPanelContent, setShowLeftPanelContent] = useState(true);
-  const [isDragging, setIsDragging] = useState<"left" | "right" | null>(null);
+  const [leftPanelWidth, setLeftPanelWidth] = useState(initialLeftWidth)
+  const [rightPanelWidth, setRightPanelWidth] = useState(initialRightWidth)
+  const [showLeftPanelContent, setShowLeftPanelContent] = useState(true)
+  const [isDragging, setIsDragging] = useState<"left" | "right" | null>(null)
 
-  const containerRef = useRef<HTMLDivElement>(null);
-  const leftPanelRef = useRef<HTMLDivElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null)
+  const leftPanelRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleResize = () => {
-      const width = leftPanelRef.current?.offsetWidth || 0;
-      setShowLeftPanelContent(width > 50);
-    };
+      const width = leftPanelRef.current?.offsetWidth || 0
+      setShowLeftPanelContent(width > 50)
+    }
 
-    const observer = new ResizeObserver(handleResize);
-    if (leftPanelRef.current) observer.observe(leftPanelRef.current);
+    const observer = new ResizeObserver(handleResize)
+    if (leftPanelRef.current) observer.observe(leftPanelRef.current)
 
-    return () => observer.disconnect();
-  }, []);
+    return () => observer.disconnect()
+  }, [])
 
   const handleResize = (e: React.MouseEvent, panel: "left" | "right") => {
-    e.preventDefault();
-    setIsDragging(panel);
+    e.preventDefault()
+    setIsDragging(panel)
 
-    const startX = e.clientX;
-    const startLeftWidth = leftPanelWidth;
-    const startRightWidth = rightPanelWidth;
+    const startX = e.clientX
+    const startLeftWidth = leftPanelWidth
+    const startRightWidth = rightPanelWidth
     const containerWidth =
-      containerRef.current?.offsetWidth || window.innerWidth;
+      containerRef.current?.offsetWidth || window.innerWidth
 
-    document.body.style.userSelect = "none";
-    document.body.style.cursor = "col-resize";
+    document.body.style.userSelect = "none"
+    document.body.style.cursor = "col-resize"
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const delta = moveEvent.clientX - startX;
+      const delta = moveEvent.clientX - startX
 
       if (panel === "left") {
-        const newLeftWidth = Math.max(startLeftWidth + delta, 50);
-        const maxLeftWidth = containerWidth - rightPanelWidth - centerMinWidth;
-        setLeftPanelWidth(Math.min(newLeftWidth, maxLeftWidth));
+        const newLeftWidth = Math.max(startLeftWidth + delta, 50)
+        const maxLeftWidth = containerWidth - rightPanelWidth - centerMinWidth
+        setLeftPanelWidth(Math.min(newLeftWidth, maxLeftWidth))
       }
 
       if (panel === "right") {
-        const newRightWidth = Math.max(startRightWidth - delta, 50);
-        const maxRightWidth = containerWidth - leftPanelWidth - centerMinWidth;
-        setRightPanelWidth(Math.min(newRightWidth, maxRightWidth));
+        const newRightWidth = Math.max(startRightWidth - delta, 50)
+        const maxRightWidth = containerWidth - leftPanelWidth - centerMinWidth
+        setRightPanelWidth(Math.min(newRightWidth, maxRightWidth))
       }
-    };
+    }
 
     const onMouseUp = () => {
-      setIsDragging(null);
-      document.body.style.userSelect = "";
-      document.body.style.cursor = "";
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
+      setIsDragging(null)
+      document.body.style.userSelect = ""
+      document.body.style.cursor = ""
+      window.removeEventListener("mousemove", onMouseMove)
+      window.removeEventListener("mouseup", onMouseUp)
+    }
 
-    window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-  };
+    window.addEventListener("mousemove", onMouseMove)
+    window.addEventListener("mouseup", onMouseUp)
+  }
 
-  const themeTransition = "all 0.5s ease";
-  const dragTransition = isDragging ? "none" : themeTransition;
+  const themeTransition = "all 0.5s ease"
+  const dragTransition = isDragging ? "none" : themeTransition
 
   return (
     <Box
@@ -225,7 +225,7 @@ const ResizableLayout = ({
         </Paper>
       </Box>
     </Box>
-  );
-};
+  )
+}
 
-export default ResizableLayout;
+export default ResizableLayout

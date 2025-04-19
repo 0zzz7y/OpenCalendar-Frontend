@@ -1,12 +1,12 @@
-import React from "react";
-import IconButton from "@mui/material/IconButton";
-import LightModeIcon from "@mui/icons-material/LightMode";
-import DarkModeIcon from "@mui/icons-material/DarkMode";
+import React from "react"
+import IconButton from "@mui/material/IconButton"
+import LightModeIcon from "@mui/icons-material/LightMode"
+import DarkModeIcon from "@mui/icons-material/DarkMode"
 
-import { useThemeMode } from "./ThemeProvider";
+import { useThemeMode } from "./ThemeProvider"
 
 const ThemeToggleButton = () => {
-  const { mode, toggle } = useThemeMode();
+  const { mode, toggle } = useThemeMode()
 
   return (
     <>
@@ -14,7 +14,7 @@ const ThemeToggleButton = () => {
         {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
       </IconButton>
     </>
-  );
-};
+  )
+}
 
-export default ThemeToggleButton;
+export default ThemeToggleButton

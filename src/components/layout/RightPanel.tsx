@@ -1,7 +1,7 @@
-import { Box } from "@mui/material";
+import { Box } from "@mui/material"
 
-import NotesPanel from "../note/NotesPanel";
-import TasksPanel from "../task/TasksPanel";
+import NotesPanel from "../note/NotesPanel"
+import TasksPanel from "../task/TasksPanel"
 
 const RightPanel = () => {
   return (
@@ -16,7 +16,7 @@ const RightPanel = () => {
         </Box>
       </Box>
     </>
-  );
-};
+  )
+}
 
-export default RightPanel;
+export default RightPanel

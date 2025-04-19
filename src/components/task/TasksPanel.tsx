@@ -1,30 +1,24 @@
-import { useState } from "react";
+import { useState } from "react"
 
-import { Box, TextField } from "@mui/material";
-import { AddCircleOutline } from "@mui/icons-material";
+import { Box, TextField } from "@mui/material"
+import { AddCircleOutline } from "@mui/icons-material"
 
-import TaskBoard from "./TasksBoard";
+import TaskBoard from "./TasksBoard"
 
-import useDashboard from "../../hooks/useDashboard";
+import useDashboard from "../../hooks/useDashboard"
 
-import TaskStatus from "../../types/taskStatus";
-import Task from "../../types/task";
-import MESSAGES from "@/constants/messages";
+import TaskStatus from "../../types/taskStatus"
+import Task from "../../types/task"
+import MESSAGES from "@/constants/messages"
 
 const TasksPanel = () => {
-  const {
-    tasks,
-    calendars,
-    categories,
-    addTask,
-    updateTask,
-    deleteTask
-  } = useDashboard();
+  const { tasks, calendars, categories, addTask, updateTask, deleteTask } =
+    useDashboard()
 
-  const [newTitle, setNewTitle] = useState("");
+  const [newTitle, setNewTitle] = useState("")
 
   const handleCreate = async () => {
-    if (!newTitle.trim()) return;
+    if (!newTitle.trim()) return
 
     await addTask({
       name: newTitle,
@@ -33,25 +27,25 @@ const TasksPanel = () => {
       categoryId: categories[0]?.id || "",
       startDate: "",
       endDate: ""
-    });
+    })
 
-    setNewTitle("");
-  };
+    setNewTitle("")
+  }
 
   const handleUpdate = async (updated: Task) => {
-    await updateTask(updated.id, updated);
-  };
+    await updateTask(updated.id, updated)
+  }
 
   const handleToggleStatus = async (id: string) => {
-    const task = tasks.find((t) => t.id === id);
-    if (!task) return;
+    const task = tasks.find((t) => t.id === id)
+    if (!task) return
 
-    const statusOrder: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
-    const currentIndex = statusOrder.indexOf(task.status);
-    const nextStatus = statusOrder[(currentIndex + 1) % statusOrder.length];
+    const statusOrder: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"]
+    const currentIndex = statusOrder.indexOf(task.status)
+    const nextStatus = statusOrder[(currentIndex + 1) % statusOrder.length]
 
-    await updateTask(id, { status: nextStatus });
-  };
+    await updateTask(id, { status: nextStatus })
+  }
 
   return (
     <>
@@ -89,7 +83,7 @@ const TasksPanel = () => {
         />
       </Box>
     </>
-  );
-};
+  )
+}
 
-export default TasksPanel;
+export default TasksPanel
