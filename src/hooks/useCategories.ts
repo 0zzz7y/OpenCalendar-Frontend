@@ -65,29 +65,56 @@ const useCategories = () => {
   };
 
   const addCategory = async (category: Omit<Category, "id">) => {
+    const tempId = crypto.randomUUID();
+    const optimisticCategory = { ...category, id: tempId };
+    setCategories((prev) => [...prev, optimisticCategory]);
+
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/categories`, category);
-      await reloadCategories();
+      const response = await axios.post<Category>(
+        `${import.meta.env.VITE_BACKEND_URL}/categories`,
+        category
+      );
+      setCategories((prev) =>
+        prev.map((c) => (c.id === tempId ? response.data : c))
+      );
     } catch (error) {
       toast.error("Failed to add category");
+      setCategories((prev) => prev.filter((c) => c.id !== tempId));
+      throw error;
     }
   };
 
-  const updateCategory = async (id: string, category: Partial<Category>) => {
+  const updateCategory = async (id: string, updated: Partial<Category>) => {
+    const previous = categories.find((c) => c.id === id);
+    if (!previous) return;
+
+    setCategories((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updated } : c))
+    );
+
     try {
-      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/categories/${id}`, category);
-      await reloadCategories();
+      await axios.put(`${import.meta.env.VITE_BACKEND_URL}/categories/${id}`, updated);
     } catch (error) {
       toast.error("Failed to update category");
+      setCategories((prev) =>
+        prev.map((c) => (c.id === id ? previous : c))
+      );
+      throw error;
     }
   };
 
   const deleteCategory = async (id: string) => {
+    const deleted = categories.find((c) => c.id === id);
+    if (!deleted) return;
+
+    setCategories((prev) => prev.filter((c) => c.id !== id));
+
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/categories/${id}`);
-      await reloadCategories();
     } catch (error) {
       toast.error("Failed to delete category");
+      setCategories((prev) => [...prev, deleted]);
+      throw error;
     }
   };
 

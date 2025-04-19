@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import axios from "axios";
+
 import Calendar from "../types/calendar";
 
 const useCalendars = () => {
@@ -63,29 +64,56 @@ const useCalendars = () => {
   };
 
   const addCalendar = async (calendar: Omit<Calendar, "id">) => {
+    const tempId = crypto.randomUUID();
+    const optimisticCalendar = { ...calendar, id: tempId };
+    setCalendars((prev) => [...prev, optimisticCalendar]);
+
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/calendars`, calendar);
-      await reloadCalendars();
+      const response = await axios.post<Calendar>(
+        `${import.meta.env.VITE_BACKEND_URL}/calendars`,
+        calendar
+      );
+      setCalendars((prev) =>
+        prev.map((c) => (c.id === tempId ? response.data : c))
+      );
     } catch (error) {
       console.error("Error adding calendar:", error);
+      setCalendars((prev) => prev.filter((c) => c.id !== tempId));
+      throw error;
     }
   };
 
   const updateCalendar = async (id: string, updated: Partial<Calendar>) => {
+    const previous = calendars.find((c) => c.id === id);
+    if (!previous) return;
+
+    setCalendars((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updated } : c))
+    );
+
     try {
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/calendars/${id}`, updated);
-      await reloadCalendars();
     } catch (error) {
       console.error("Error updating calendar:", error);
+      setCalendars((prev) =>
+        prev.map((c) => (c.id === id ? previous : c))
+      );
+      throw error;
     }
   };
 
   const deleteCalendar = async (id: string) => {
+    const deleted = calendars.find((c) => c.id === id);
+    if (!deleted) return;
+
+    setCalendars((prev) => prev.filter((c) => c.id !== id));
+
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/calendars/${id}`);
-      await reloadCalendars();
     } catch (error) {
       console.error("Error deleting calendar:", error);
+      setCalendars((prev) => [...prev, deleted]);
+      throw error;
     }
   };
 

@@ -65,29 +65,56 @@ const useTasks = () => {
   };
 
   const addTask = async (task: Omit<Task, "id">) => {
+    const tempId = crypto.randomUUID();
+    const optimisticTask = { ...task, id: tempId };
+    setTasks((prev) => [...prev, optimisticTask]);
+
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/tasks`, task);
-      await reloadTasks();
+      const response = await axios.post<Task>(
+        `${import.meta.env.VITE_BACKEND_URL}/tasks`,
+        task
+      );
+      setTasks((prev) =>
+        prev.map((t) => (t.id === tempId ? response.data : t))
+      );
     } catch (error) {
       toast.error("Failed to add task");
+      setTasks((prev) => prev.filter((t) => t.id !== tempId));
+      throw error;
     }
   };
 
   const updateTask = async (id: string, updated: Partial<Task>) => {
+    const previous = tasks.find((t) => t.id === id);
+    if (!previous) return;
+
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updated } : t))
+    );
+
     try {
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/tasks/${id}`, updated);
-      await reloadTasks();
     } catch (error) {
       toast.error("Failed to update task");
+      setTasks((prev) =>
+        prev.map((t) => (t.id === id ? previous : t))
+      );
+      throw error;
     }
   };
 
   const deleteTask = async (id: string) => {
+    const deleted = tasks.find((t) => t.id === id);
+    if (!deleted) return;
+
+    setTasks((prev) => prev.filter((t) => t.id !== id));
+
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/tasks/${id}`);
-      await reloadTasks();
     } catch (error) {
       toast.error("Failed to delete task");
+      setTasks((prev) => [...prev, deleted]);
+      throw error;
     }
   };
 

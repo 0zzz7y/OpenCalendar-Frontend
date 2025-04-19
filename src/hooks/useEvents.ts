@@ -65,29 +65,56 @@ const useEvents = () => {
   };
 
   const addEvent = async (event: Omit<Event, "id">) => {
+    const tempId = crypto.randomUUID();
+    const optimisticEvent = { ...event, id: tempId };
+    setEvents((prev) => [...prev, optimisticEvent]);
+
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/events`, event);
-      await reloadEvents();
+      const response = await axios.post<Event>(
+        `${import.meta.env.VITE_BACKEND_URL}/events`,
+        event
+      );
+      setEvents((prev) =>
+        prev.map((e) => (e.id === tempId ? response.data : e))
+      );
     } catch (error) {
       toast.error("Failed to add event");
+      setEvents((prev) => prev.filter((e) => e.id !== tempId));
+      throw error;
     }
   };
 
   const updateEvent = async (id: string, updated: Partial<Event>) => {
+    const previous = events.find((e) => e.id === id);
+    if (!previous) return;
+
+    setEvents((prev) =>
+      prev.map((e) => (e.id === id ? { ...e, ...updated } : e))
+    );
+
     try {
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/events/${id}`, updated);
-      await reloadEvents();
     } catch (error) {
       toast.error("Failed to update event");
+      setEvents((prev) =>
+        prev.map((e) => (e.id === id ? previous : e))
+      );
+      throw error;
     }
   };
 
   const deleteEvent = async (id: string) => {
+    const deleted = events.find((e) => e.id === id);
+    if (!deleted) return;
+
+    setEvents((prev) => prev.filter((e) => e.id !== id));
+
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/events/${id}`);
-      await reloadEvents();
     } catch (error) {
       toast.error("Failed to delete event");
+      setEvents((prev) => [...prev, deleted]);
+      throw error;
     }
   };
 

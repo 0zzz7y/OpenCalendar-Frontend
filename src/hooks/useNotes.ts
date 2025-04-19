@@ -65,29 +65,56 @@ const useNotes = () => {
   };
 
   const addNote = async (note: Omit<Note, "id">) => {
+    const tempId = crypto.randomUUID();
+    const optimisticNote = { ...note, id: tempId };
+    setNotes((prev) => [...prev, optimisticNote]);
+
     try {
-      await axios.post(`${import.meta.env.VITE_BACKEND_URL}/notes`, note);
-      await reloadNotes();
+      const response = await axios.post<Note>(
+        `${import.meta.env.VITE_BACKEND_URL}/notes`,
+        note
+      );
+      setNotes((prev) =>
+        prev.map((n) => (n.id === tempId ? response.data : n))
+      );
     } catch (error) {
       toast.error("Failed to add note");
+      setNotes((prev) => prev.filter((n) => n.id !== tempId));
+      throw error;
     }
   };
 
   const updateNote = async (id: string, updated: Partial<Note>) => {
+    const previous = notes.find((n) => n.id === id);
+    if (!previous) return;
+
+    setNotes((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, ...updated } : n))
+    );
+
     try {
       await axios.put(`${import.meta.env.VITE_BACKEND_URL}/notes/${id}`, updated);
-      await reloadNotes();
     } catch (error) {
       toast.error("Failed to update note");
+      setNotes((prev) =>
+        prev.map((n) => (n.id === id ? previous : n))
+      );
+      throw error;
     }
   };
 
   const deleteNote = async (id: string) => {
+    const deleted = notes.find((n) => n.id === id);
+    if (!deleted) return;
+
+    setNotes((prev) => prev.filter((n) => n.id !== id));
+
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/notes/${id}`);
-      await reloadNotes();
     } catch (error) {
       toast.error("Failed to delete note");
+      setNotes((prev) => [...prev, deleted]);
+      throw error;
     }
   };
 
