@@ -19,7 +19,6 @@
     "@mui/material": "^7.0.2",
     "@mui/x-date-pickers": "^7.29.0",
     "@tabler/icons-react": "^3.31.0",
-    "@uiw/react-color": "^2.4.5",
     "axios": "^1.8.4",
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.13",
@@ -29,12 +28,10 @@
     "react-dnd": "^16.0.1",
     "react-dnd-html5-backend": "^16.0.1",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.5.0",
     "react-toastify": "^11.0.5",
     "testing-library": "^0.0.2",
     "vite-tsconfig-paths": "^5.1.4",
-    "vitest": "^3.1.1",
-    "zustand": "^5.0.3"
+    "vitest": "^3.1.1"
   },
   "devDependencies": {
     "@types/node": "^22.14.1",
