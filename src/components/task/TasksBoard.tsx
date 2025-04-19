@@ -1,6 +1,7 @@
 import { Box } from "@mui/material";
 
 import TaskCard from "./TaskCard";
+import TaskColumn from "./TaskColumn";
 
 import Task from "../../types/task";
 import Calendar from "../../types/calendar";
@@ -8,7 +9,6 @@ import Category from "../../types/category";
 import TaskStatus from "../../types/taskStatus";
 
 import { HourglassEmpty, Done, Pending } from "@mui/icons-material";
-import { JSX } from "react";
 
 import {
   DragDropContext,
@@ -16,6 +16,7 @@ import {
   Draggable,
   DropResult
 } from "@hello-pangea/dnd";
+import { JSX } from "react";
 
 interface Properties {
   tasks: Task[];
@@ -33,12 +34,11 @@ const TaskBoard = ({
   onUpdate,
   onDelete
 }: Properties) => {
-  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } =
-    {
-      TODO: { title: "Do zrobienia", icon: <HourglassEmpty /> },
-      IN_PROGRESS: { title: "W trakcie", icon: <Pending /> },
-      DONE: { title: "Zrobione", icon: <Done /> }
-    };
+  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } = {
+    TODO: { title: "Do zrobienia", icon: <HourglassEmpty /> },
+    IN_PROGRESS: { title: "W trakcie", icon: <Pending /> },
+    DONE: { title: "Zrobione", icon: <Done /> }
+  };
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -58,64 +58,53 @@ const TaskBoard = ({
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <Box
-        display="flex"
-        flexDirection="row"
-        justifyContent="space-between"
-        gap={2}
-      >
-        {Object.entries(columns).map(([status, { title, icon }]) => (
-          <Droppable droppableId={status} key={status}>
-            {(provided) => (
-              <Box
-                ref={provided.innerRef}
-                {...provided.droppableProps}
-                sx={{
-                  width: "100%",
-                  minHeight: 300,
-                  p: 1,
-                  borderRadius: 2
-                }}
-              >
-                <Box display="flex" alignItems="center" gap={1} mb={1}>
-                  {icon}
-                  <strong>{title}</strong>
-                </Box>
-
-                {tasks
-                  .filter((t) => t.status === status)
-                  .map((task, index) => (
-                    <Draggable
-                      draggableId={task.id}
-                      index={index}
-                      key={task.id}
-                    >
-                      {(provided) => (
-                        <Box
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
+    <>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Box display="flex" gap={2} alignItems="flex-start" width="100%">
+          {Object.entries(columns).map(([status, { title, icon }]) => (
+            <Droppable droppableId={status} key={status}>
+              {(provided) => (
+                <Box
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  sx={{ flexGrow: 1, flexBasis: 0, minWidth: 0 }}
+                >
+                  <TaskColumn title={title} icon={icon}>
+                    {tasks
+                      .filter((t) => t.status === status)
+                      .map((task, index) => (
+                        <Draggable
+                          draggableId={task.id}
+                          index={index}
+                          key={task.id}
                         >
-                          <TaskCard
-                            task={task}
-                            calendars={calendars}
-                            categories={categories}
-                            onUpdate={onUpdate}
-                            onDelete={onDelete}
-                          />
-                        </Box>
-                      )}
-                    </Draggable>
-                  ))}
+                          {(provided) => (
+                            <Box
+                              ref={provided.innerRef}
+                              {...provided.draggableProps}
+                              {...provided.dragHandleProps}
+                            >
+                              <TaskCard
+                                task={task}
+                                calendars={calendars}
+                                categories={categories}
+                                onUpdate={onUpdate}
+                                onDelete={onDelete}
+                              />
+                            </Box>
+                          )}
+                        </Draggable>
+                      ))}
 
-                {provided.placeholder}
-              </Box>
-            )}
-          </Droppable>
-        ))}
-      </Box>
-    </DragDropContext>
+                    {provided.placeholder}
+                  </TaskColumn>
+                </Box>
+              )}
+            </Droppable>
+          ))}
+        </Box>
+      </DragDropContext>
+    </>
   );
 };
 

@@ -5,103 +5,51 @@ import { AddCircleOutline } from "@mui/icons-material";
 
 import TaskBoard from "./TasksBoard";
 
-import Task from "../../types/task";
-import Calendar from "../../types/calendar";
-import Category from "../../types/category";
+import useDashboard from "../../hooks/useDashboard";
+
 import TaskStatus from "../../types/taskStatus";
-
-const mockCalendar: Calendar = {
-  id: "1",
-  name: "Osobisty",
-  emoji: "🟡"
-};
-
-const mockCategory: Category = {
-  id: "1",
-  name: "Osobisty",
-  color: "#fff176"
-};
-
-const initialTasks: Task[] = [
-  {
-    id: "1",
-    name: "Zrobić zakupy",
-    status: "TODO",
-    calendarId: "1",
-    categoryId: "1",
-    startDate: "",
-    endDate: ""
-  },
-  {
-    id: "2",
-    name: "Wyjść z psem na spacer",
-    status: "IN_PROGRESS",
-    calendarId: "1",
-    categoryId: "1",
-    startDate: "2025-06-25T14:00",
-    endDate: ""
-  },
-  {
-    id: "3",
-    name: "Nauczyć się na kolokwium",
-    status: "DONE",
-    calendarId: "1",
-    categoryId: "1",
-    startDate: "",
-    endDate: ""
-  },
-  {
-    id: "4",
-    name: "Spotkanie zespołu",
-    status: "DONE",
-    calendarId: "1",
-    categoryId: "1",
-    startDate: "",
-    endDate: ""
-  }
-];
+import Task from "../../types/task";
 
 const TasksPanel = () => {
-  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const {
+    tasks,
+    calendars,
+    categories,
+    addTask,
+    updateTask,
+    deleteTask
+  } = useDashboard();
+
   const [newTitle, setNewTitle] = useState("");
 
-  const handleCreate = () => {
+  const handleCreate = async () => {
     if (!newTitle.trim()) return;
 
-    const newTask: Task = {
-      id: Date.now().toString(),
+    await addTask({
       name: newTitle,
       status: "TODO",
-      calendarId: mockCalendar.id,
-      categoryId: mockCategory.id,
+      calendarId: calendars[0]?.id || "",
+      categoryId: categories[0]?.id || "",
       startDate: "",
       endDate: ""
-    };
+    });
 
-    setTasks([...tasks, newTask]);
     setNewTitle("");
   };
 
-  const handleUpdate = (updated: Task) => {
-    setTasks((prev) => prev.map((t) => (t.id === updated.id ? updated : t)));
+  const handleUpdate = async (updated: Task) => {
+    await updateTask(updated.id, updated);
   };
 
-  const handleDelete = (id: string) => {
-    setTasks((prev) => prev.filter((t) => t.id !== id));
-  };
+  const handleToggleStatus = async (id: string) => {
+    const task = tasks.find((t) => t.id === id);
+    if (!task) return;
 
-  const handleToggleStatus = (id: string) => {
-    setTasks((prev) =>
-      prev.map((t) => {
-        if (t.id !== id) return t;
+    const statusOrder: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
+    const currentIndex = statusOrder.indexOf(task.status);
+    const nextStatus = statusOrder[(currentIndex + 1) % statusOrder.length];
 
-        const order: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"];
-        const current = order.indexOf(t.status);
-        const next = (current + 1) % order.length;
-
-        return { ...t, status: order[next] };
-      })
-    );
+    await updateTask(id, { status: nextStatus });
   };
 
   return (
@@ -133,10 +81,10 @@ const TasksPanel = () => {
 
         <TaskBoard
           tasks={tasks}
-          calendars={[mockCalendar]}
-          categories={[mockCategory]}
+          calendars={calendars}
+          categories={categories}
           onUpdate={handleUpdate}
-          onDelete={handleDelete}
+          onDelete={deleteTask}
           onToggleStatus={handleToggleStatus}
         />
       </Box>

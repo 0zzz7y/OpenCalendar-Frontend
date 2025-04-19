@@ -13,20 +13,27 @@ const TaskColumn = ({ title, icon, children }: Properties) => {
     <>
       <Paper
         sx={{
-          width: 200,
-          minHeight: 400,
+          minHeight: 500,
+          width: 300,
+          backgroundColor: "#fefefe",
+          borderRadius: 2,
           p: 2,
-          mx: 1,
-          border: "2px dashed #2196f3",
-          backgroundColor: "#f9f9f9",
+          boxShadow: 3,
           display: "flex",
           flexDirection: "column",
           gap: 2
         }}
       >
-        <Box display="flex" alignItems="center" gap={1}>
-          {icon}
-          <Typography variant="subtitle1" fontWeight="bold">
+        <Box
+          display="flex"
+          alignItems="center"
+          justifyContent="center"
+          gap={1}
+        >
+          <Box display="flex" alignItems="center" sx={{ mt: "-8px", color: "#000" }}>
+            {icon}
+          </Box>
+          <Typography variant="h6" fontWeight="bold" sx={{ color: "#000" }}>
             {title}
           </Typography>
         </Box>

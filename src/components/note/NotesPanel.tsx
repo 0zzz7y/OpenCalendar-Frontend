@@ -6,8 +6,6 @@ import AddIcon from "@mui/icons-material/Add";
 
 import NoteCard from "./NoteCard";
 
-import { v4 as uuidv4 } from "uuid";
-
 import Note from "../../types/note";
 
 const initialNotes: Note[] = [
@@ -55,7 +53,7 @@ const NotesPanel = () => {
   const handleAddNote = () => {
     const maxZ = Math.max(0, ...notes.map((n) => n.zIndex));
     const newNote: Note = {
-      id: uuidv4(),
+      id: Math.random().toString(36).substring(2, 9),
       description: "",
       drawing: "",
       categoryId: undefined,
