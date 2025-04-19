@@ -12,6 +12,7 @@ import {
 import useCategoryContext from "../../hook/context/useCategoryContext"
 import useCategories from "../../hook/api/useCategory"
 import MESSAGES from "../../constant/message"
+import { createPortal } from "react-dom"
 
 const CategoryEditor = () => {
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -101,12 +102,21 @@ const CategoryEditor = () => {
 
   if (!editorOpen) return null
 
-  return (
+  return createPortal(
     <>
       <ClickAwayListener onClickAway={handleClickAway}>
         <Paper
           ref={containerRef}
-          sx={{ p: 2, width: 280, boxShadow: 3, borderRadius: 2 }}
+          sx={{
+            p: 2,
+            width: 280,
+            boxShadow: 3,
+            borderRadius: 2,
+            position: "fixed",
+            top: 140,
+            left: 120,
+            zIndex: 2000
+          }}
         >
           {(editorMode === "add" || editorMode === "edit") && (
             <>
@@ -116,14 +126,12 @@ const CategoryEditor = () => {
                 fontWeight={500}
                 gutterBottom
               >
-                {editorMode === "add"
-                  ? MESSAGES.PLACEHOLDERS.NEW_NOTE
-                  : "Edit category"}
+                {editorMode === "add" ? "New category" : "Edit category"}
               </Typography>
 
               <TextField
                 inputRef={inputRef}
-                placeholder={MESSAGES.PLACEHOLDERS.NAME}
+                placeholder="Category name"
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 fullWidth
@@ -131,16 +139,27 @@ const CategoryEditor = () => {
                 margin="dense"
               />
 
-              <TextField
-                label="Color"
-                type="color"
-                value={color}
-                onChange={(e) => setColor(e.target.value)}
-                fullWidth
-                size="small"
-                margin="dense"
-                sx={{ mt: 1 }}
-              />
+              <Box
+                mt={2}
+                mb={1}
+                display="flex"
+                alignItems="center"
+                justifyContent="space-between"
+              >
+                <Typography variant="body2" fontWeight={500}>
+                  Selected color:
+                </Typography>
+                <Box
+                  sx={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: "50%",
+                    backgroundColor: color
+                  }}
+                />
+              </Box>
+
+              {/* Możesz tu dodać swój komponent do wyboru koloru */}
 
               <Button
                 variant="contained"
@@ -149,9 +168,7 @@ const CategoryEditor = () => {
                 onClick={editorMode === "add" ? handleAdd : handleEdit}
                 disabled={loading}
               >
-                {editorMode === "add"
-                  ? MESSAGES.BUTTONS.ADD
-                  : MESSAGES.BUTTONS.SAVE}
+                {editorMode === "add" ? "Add" : "Save"}
               </Button>
             </>
           )}
@@ -159,12 +176,12 @@ const CategoryEditor = () => {
           {editorMode === "delete" && (
             <>
               <Typography variant="body2">
-                {MESSAGES.POPOVER.CONFIRM_DELETE_NOTE}
+                Are you sure you want to delete this category?
               </Typography>
 
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
                 <Button variant="text" size="small" onClick={closeEditor}>
-                  {MESSAGES.BUTTONS.CANCEL}
+                  Cancel
                 </Button>
                 <Button
                   variant="contained"
@@ -173,14 +190,15 @@ const CategoryEditor = () => {
                   onClick={handleDelete}
                   disabled={loading}
                 >
-                  {MESSAGES.BUTTONS.DELETE}
+                  Delete
                 </Button>
               </Box>
             </>
           )}
         </Paper>
       </ClickAwayListener>
-    </>
+    </>,
+    document.body
   )
 }
 

@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react"
 
-import Event from "../type/event"
 import EventContextState, { EventEditorData } from "./state/EventContextState"
 
 import useEvent from "../hook/api/useEvent"

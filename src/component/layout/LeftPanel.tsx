@@ -7,6 +7,8 @@ import CalendarSelector from "../calendar/CalendarSelector"
 import MonthlyCalendar from "../calendar/MonthlyCalendar"
 
 import useFilters from "../../hook/api/useFilter"
+import CalendarEditor from "../calendar/CalendarEditor"
+import CategoryEditor from "../category/CategoryEditor"
 
 const LeftPanel = () => {
   const {
@@ -25,15 +27,13 @@ const LeftPanel = () => {
         height="100%"
       >
         <Stack spacing={2}>
-          <CalendarSelector
-            value={selectedCalendar}
-            onChange={setSelectedCalendar}
-          />
+          <CalendarSelector />
 
-          <CategorySelector
-            value={selectedCategory}
-            onChange={setSelectedCategory}
-          />
+          <CalendarEditor />
+
+          <CategorySelector />
+
+          <CategoryEditor />
 
           <Box sx={{ alignSelf: "flex-start", mt: "-16px", ml: "-24px" }}>
             <MonthlyCalendar />

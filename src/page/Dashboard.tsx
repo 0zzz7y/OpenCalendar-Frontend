@@ -1,5 +1,3 @@
-import { DashboardProvider } from "../context/DashboardContext"
-
 import LeftPanel from "../component/layout/LeftPanel"
 import CenterPanel from "../component/layout/CenterPanel"
 import RightPanel from "../component/layout/RightPanel"

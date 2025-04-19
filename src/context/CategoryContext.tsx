@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  ReactNode
-} from "react"
+import { createContext, useState, ReactNode } from "react"
 
 import useCategories from "../hook/api/useCategory"
 import CategoryContextState, {

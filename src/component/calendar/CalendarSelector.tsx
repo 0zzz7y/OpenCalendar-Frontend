@@ -1,4 +1,4 @@
-import { MenuItem, TextField, IconButton, Box, Typography } from "@mui/material"
+import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
 
 import { IconCirclePlus, IconPencil, IconTrash } from "@tabler/icons-react"
 import { useMemo } from "react"
@@ -22,7 +22,7 @@ const CalendarSelector = () => {
 
   return (
     <>
-      <Box display="flex" alignItems="center" gap={1} width="100%" zIndex={1}>
+      <Box display="flex" alignItems="center" gap={1} width="100%">
         <TextField
           key={calendarOptions.map((c) => `${c.value}-${c.label}`).join("-")}
           select

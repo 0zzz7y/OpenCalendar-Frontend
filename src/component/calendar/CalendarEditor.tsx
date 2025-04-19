@@ -18,6 +18,7 @@ import EmojiPicker, {
 import useCalendarContext from "../../hook/context/useCalendarContext"
 import useCalendars from "../../hook/api/useCalendar"
 import MESSAGES from "../../constant/message"
+import { createPortal } from "react-dom"
 
 const CalendarEditor = () => {
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -108,12 +109,21 @@ const CalendarEditor = () => {
 
   if (!editorOpen) return null
 
-  return (
+  return createPortal(
     <>
       <ClickAwayListener onClickAway={handleClickAway}>
         <Paper
           ref={containerRef}
-          sx={{ p: 2, width: 280, boxShadow: 3, borderRadius: 2 }}
+          sx={{
+            p: 2,
+            width: 280,
+            boxShadow: 3,
+            borderRadius: 2,
+            position: "fixed",
+            top: 100,
+            left: 100,
+            zIndex: 2000
+          }}
         >
           {(editorMode === "add" || editorMode === "edit") && (
             <>
@@ -205,7 +215,8 @@ const CalendarEditor = () => {
           )}
         </Paper>
       </ClickAwayListener>
-    </>
+    </>,
+    document.body
   )
 }
 

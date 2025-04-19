@@ -1,4 +1,4 @@
-import { createContext, useContext, ReactNode } from "react"
+import { createContext, ReactNode } from "react"
 
 import Calendar from "../type/calendar"
 import Category from "../type/category"
