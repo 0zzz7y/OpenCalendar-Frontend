@@ -1,6 +1,8 @@
 import { createContext, useState, ReactNode } from "react"
-import Calendar from "../type/calendar"
-import useCalendars from "../hook/api/useCalendar"
+import Calendar from "@/type/domain/calendar"
+import useCalendars from "@/hook/api/useCalendar"
+
+import EditorMode from "@/type/utility/editorMode"
 
 interface EditorData {
   id?: string
@@ -14,23 +16,20 @@ interface CalendarContextState {
   setSelectedCalendar: (val: string | null) => void
 
   editorOpen: boolean
-  editorMode: "add" | "edit" | "delete"
+  editorMode: EditorMode
   editorData: EditorData
-  openEditor: (mode: "add" | "edit" | "delete", data?: EditorData) => void
+  openEditor: (mode: EditorMode, data?: EditorData) => void
   closeEditor: () => void
 
   reloadCalendars: () => Promise<void>
 }
 
-const CalendarContext = createContext<CalendarContextState | undefined>(
-  undefined
-)
+const CalendarContext = createContext<CalendarContextState | undefined>(undefined)
 
 export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   const [selectedCalendar, setSelectedCalendar] = useState<string | null>("all")
-
   const [editorOpen, setEditorOpen] = useState(false)
-  const [editorMode, setEditorMode] = useState<"add" | "edit" | "delete">("add")
+  const [editorMode, setEditorMode] = useState<EditorMode>("add")
   const [editorData, setEditorData] = useState<EditorData>({
     label: "",
     emoji: "📅"
@@ -39,7 +38,7 @@ export const CalendarProvider = ({ children }: { children: ReactNode }) => {
   const { calendars, reloadCalendars } = useCalendars()
 
   const openEditor = (
-    mode: "add" | "edit" | "delete",
+    mode: EditorMode,
     data: EditorData = { label: "", emoji: "📅" }
   ) => {
     setEditorMode(mode)

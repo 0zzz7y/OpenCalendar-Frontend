@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 
-import NotesPanel from "../note/NotesPanel"
-import TasksPanel from "../task/TasksPanel"
+import NotesPanel from "@/component/note/NotesPanel"
+import TasksPanel from "@/component/task/TasksPanel"
 
 const RightPanel = () => {
   return (

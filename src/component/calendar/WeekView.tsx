@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material"
 import DayColumn from "./DayColumn"
 import TimeColumn from "./TimeColumn"
 
-import Event from "@/type/event"
+import Event from "@/type/domain/event"
 
 interface WeekViewProperties {
   date: Date

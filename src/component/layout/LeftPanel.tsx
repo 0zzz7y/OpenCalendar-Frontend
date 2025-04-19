@@ -1,14 +1,13 @@
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 
-import ThemeToggleButton from "../theme/ThemeToggleButton"
-import CategorySelector from "../category/CategorySelector"
-import CalendarSelector from "../calendar/CalendarSelector"
-import MonthlyCalendar from "../calendar/MonthlyCalendar"
+import ThemeToggleButton from "@/component/theme/ThemeToggleButton"
+import CategorySelector from "@/component/category/CategorySelector"
+import CalendarSelector from "@/component/calendar/CalendarSelector"
+import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
 
-import useFilters from "../../hook/api/useFilter"
-import CalendarEditor from "../calendar/CalendarEditor"
-import CategoryEditor from "../category/CategoryEditor"
+import CalendarEditor from "@/component/calendar/CalendarEditor"
+import CategoryEditor from "@/component/category/CategoryEditor"
 
 const LeftPanel = () => {
   return (

@@ -1,4 +1,7 @@
-import Task from "@/type/task"
+import RecurringPattern from "@/type/domain/recurringPattern"
+import Task from "@/type/domain/task"
+import TaskStatus from "@/type/domain/taskStatus"
+import EditorMode from "@/type/utility/editorMode"
 
 export interface TaskEditorData {
   id?: string
@@ -6,7 +9,8 @@ export interface TaskEditorData {
   description?: string
   startDate?: string
   endDate?: string
-  status: "TODO" | "IN_PROGRESS" | "DONE"
+  recurringPattern: RecurringPattern
+  status: TaskStatus
   calendarId: string
   categoryId?: string
 }
@@ -16,8 +20,8 @@ export default interface TaskContextState {
   reloadTasks: () => Promise<void>
 
   editorOpen: boolean
-  editorMode: "add" | "edit" | "delete"
+  editorMode: EditorMode
   editorData: TaskEditorData
-  openEditor: (mode: "add" | "edit" | "delete", data?: TaskEditorData) => void
+  openEditor: (mode: EditorMode, data?: TaskEditorData) => void
   closeEditor: () => void
 }

@@ -2,30 +2,34 @@ import { createContext, useContext, useState, ReactNode } from "react"
 
 import EventContextState, { EventEditorData } from "./state/EventContextState"
 
-import useEvent from "../hook/api/useEvent"
+import useEvent from "@/hook/api/useEvent"
+
+import EditorMode from "@/type/utility/editorMode"
 
 const EventContext = createContext<EventContextState | undefined>(undefined)
 
 export const EventProvider = ({ children }: { children: ReactNode }) => {
   const [editorOpen, setEditorOpen] = useState(false)
-  const [editorMode, setEditorMode] = useState<"add" | "edit" | "delete">("add")
+  const [editorMode, setEditorMode] = useState<EditorMode>("add")
   const [editorData, setEditorData] = useState<EventEditorData>({
     name: "",
     description: "",
     startDate: "",
     endDate: "",
+    recurringPattern: "NONE",
     calendarId: ""
   })
 
   const { events, reloadEvents } = useEvent()
 
   const openEditor = (
-    mode: "add" | "edit" | "delete",
+    mode: EditorMode,
     data: EventEditorData = {
       name: "",
       description: "",
       startDate: "",
       endDate: "",
+      recurringPattern: "NONE",
       calendarId: ""
     }
   ) => {

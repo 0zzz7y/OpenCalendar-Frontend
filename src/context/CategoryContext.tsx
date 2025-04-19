@@ -1,18 +1,18 @@
 import { createContext, useState, ReactNode } from "react"
 
-import useCategories from "../hook/api/useCategory"
+import useCategories from "@/hook/api/useCategory"
 import CategoryContextState, {
   CategoryEditorData
 } from "./state/CategoryContextState"
 
-const CategoryContext = createContext<CategoryContextState | undefined>(
-  undefined
-)
+import EditorMode from "@/type/utility/editorMode"
+
+const CategoryContext = createContext<CategoryContextState | undefined>(undefined)
 
 export const CategoryProvider = ({ children }: { children: ReactNode }) => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>("all")
   const [editorOpen, setEditorOpen] = useState(false)
-  const [editorMode, setEditorMode] = useState<"add" | "edit" | "delete">("add")
+  const [editorMode, setEditorMode] = useState<EditorMode>("add")
   const [editorData, setEditorData] = useState<CategoryEditorData>({
     label: "",
     color: "#3b5bdb"
@@ -21,7 +21,7 @@ export const CategoryProvider = ({ children }: { children: ReactNode }) => {
   const { categories, reloadCategories } = useCategories()
 
   const openEditor = (
-    mode: "add" | "edit" | "delete",
+    mode: EditorMode,
     data: CategoryEditorData = { label: "", color: "#3b5bdb" }
   ) => {
     setEditorMode(mode)

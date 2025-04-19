@@ -4,7 +4,7 @@ import dayjs from "dayjs"
 
 import EventInformationPopover from "../event/EventInformationPopover"
 import EventCreationPopover from "../event/EventCreationPopover"
-import Event from "@/type/event"
+import Event from "@/type/domain/event"
 
 interface MonthViewProperties {
   date: Date

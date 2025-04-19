@@ -16,7 +16,7 @@ const MESSAGES = {
     NEW_EVENT: "New event",
     NEW_TASK: "New task",
     NEW_NOTE: "New note",
-  
+
     ADD_EVENT: "Add event",
     ADD_TASK: "Add task",
     ADD_NOTE: "Add note",

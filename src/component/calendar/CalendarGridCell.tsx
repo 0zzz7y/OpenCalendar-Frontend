@@ -2,7 +2,7 @@ import { Box } from "@mui/material"
 import { useDrop } from "react-dnd"
 import { useRef, useEffect } from "react"
 
-import Event from "../../type/event"
+import Event from "../../type/domain/event"
 
 interface CalendarGridCellProperties {
   datetime: Date

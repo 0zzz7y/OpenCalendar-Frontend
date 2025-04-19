@@ -1,16 +1,16 @@
 import { createContext, ReactNode } from "react"
 
-import Calendar from "../type/calendar"
-import Category from "../type/category"
-import Note from "../type/note"
-import Event from "../type/event"
-import Task from "../type/task"
+import Calendar from "@/type/domain/calendar"
+import Category from "@/type/domain/category"
+import Note from "@/type/domain/note"
+import Event from "@/type/domain/event"
+import Task from "@/type/domain/task"
 
-import useCalendars from "../hook/api/useCalendar"
-import useCategories from "../hook/api/useCategory"
-import useNotes from "../hook/api/useNote"
-import useEvents from "../hook/api/useEvent"
-import useTasks from "../hook/api/useTask"
+import useCalendars from "@/hook/api/useCalendar"
+import useCategories from "@/hook/api/useCategory"
+import useNotes from "@/hook/api/useNote"
+import useEvents from "@/hook/api/useEvent"
+import useTasks from "@/hook/api/useTask"
 
 export interface DashboardContextState {
   calendars: Calendar[]
@@ -44,9 +44,7 @@ export interface DashboardContextState {
   reloadTasks: () => Promise<void>
 }
 
-const DashboardContext = createContext<DashboardContextState | undefined>(
-  undefined
-)
+const DashboardContext = createContext<DashboardContextState | undefined>(undefined)
 
 export const DashboardProvider = ({ children }: { children: ReactNode }) => {
   const {
@@ -65,12 +63,11 @@ export const DashboardProvider = ({ children }: { children: ReactNode }) => {
     reloadCategories
   } = useCategories()
 
-  const { notes, addNote, updateNote, deleteNote, reloadNotes } = useNotes()
-
-  const { events, addEvent, updateEvent, deleteEvent, reloadEvents } =
-    useEvents()
+  const { events, addEvent, updateEvent, deleteEvent, reloadEvents } = useEvents()
 
   const { tasks, addTask, updateTask, deleteTask, reloadTasks } = useTasks()
+
+  const { notes, addNote, updateNote, deleteNote, reloadNotes } = useNotes()
 
   return (
     <DashboardContext.Provider

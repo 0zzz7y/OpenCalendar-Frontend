@@ -1,4 +1,4 @@
-import Calendar from "@/type/calendar"
+import Calendar from "@/type/domain/calendar"
 
 interface CalendarContextState {
   calendars: Calendar[]

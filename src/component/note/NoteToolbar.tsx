@@ -7,7 +7,6 @@ import {
   TextField
 } from "@mui/material"
 
-import EditIcon from "@mui/icons-material/Edit"
 import ClearIcon from "@mui/icons-material/Clear"
 import DeleteIcon from "@mui/icons-material/Delete"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
@@ -17,7 +16,7 @@ import FormatItalicIcon from "@mui/icons-material/FormatItalic"
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined"
 import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted"
 
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import MESSAGES from "@/constant/message"
 
 export type FormatCommand =

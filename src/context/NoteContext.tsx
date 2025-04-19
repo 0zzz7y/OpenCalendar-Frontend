@@ -2,13 +2,15 @@ import { createContext, useState, ReactNode } from "react"
 
 import NoteContextState, { NoteEditorData } from "./state/NoteContextState"
 
-import useNote from "../hook/api/useNote"
+import useNote from "@/hook/api/useNote"
+
+import EditorMode from "@/type/utility/editorMode"
 
 const NoteContext = createContext<NoteContextState | undefined>(undefined)
 
 export const NoteProvider = ({ children }: { children: ReactNode }) => {
   const [editorOpen, setEditorOpen] = useState(false)
-  const [editorMode, setEditorMode] = useState<"add" | "edit" | "delete">("add")
+  const [editorMode, setEditorMode] = useState<EditorMode>("add")
   const [editorData, setEditorData] = useState<NoteEditorData>({
     name: "",
     description: "",
@@ -19,7 +21,7 @@ export const NoteProvider = ({ children }: { children: ReactNode }) => {
   const { notes, reloadNotes } = useNote()
 
   const openEditor = (
-    mode: "add" | "edit" | "delete",
+    mode: EditorMode,
     data: NoteEditorData = {
       name: "",
       description: "",

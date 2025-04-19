@@ -1,4 +1,5 @@
-import Note from "@/type/note"
+import Note from "@/type/domain/note"
+import EditorMode from "@/type/utility/editorMode"
 
 export interface NoteEditorData {
   id?: string
@@ -13,8 +14,8 @@ export default interface NoteContextState {
   reloadNotes: () => Promise<void>
 
   editorOpen: boolean
-  editorMode: "add" | "edit" | "delete"
+  editorMode: EditorMode
   editorData: NoteEditorData
-  openEditor: (mode: "add" | "edit" | "delete", data?: NoteEditorData) => void
+  openEditor: (mode: EditorMode, data?: NoteEditorData) => void
   closeEditor: () => void
 }

@@ -1,7 +1,7 @@
-import LeftPanel from "../component/layout/LeftPanel"
-import CenterPanel from "../component/layout/CenterPanel"
-import RightPanel from "../component/layout/RightPanel"
-import ResizableLayout from "../component/layout/ResizableLayout"
+import LeftPanel from "@/component/layout/LeftPanel"
+import CenterPanel from "@/component/layout/CenterPanel"
+import RightPanel from "@/component/layout/RightPanel"
+import ResizableLayout from "@/component/layout/ResizableLayout"
 
 const Dashboard = () => {
   return (

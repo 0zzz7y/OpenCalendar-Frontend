@@ -1,4 +1,5 @@
-import Category from "@/type/category"
+import Category from "@/type/domain/category"
+import EditorMode from "@/type/utility/editorMode"
 
 export interface CategoryEditorData {
   id?: string
@@ -12,10 +13,10 @@ export default interface CategoryContextState {
   setSelectedCategory: (val: string | null) => void
 
   editorOpen: boolean
-  editorMode: "add" | "edit" | "delete"
+  editorMode: EditorMode
   editorData: CategoryEditorData
   openEditor: (
-    mode: "add" | "edit" | "delete",
+    mode: EditorMode,
     data?: CategoryEditorData
   ) => void
   closeEditor: () => void

@@ -7,7 +7,7 @@ import DayColumn from "./DayColumn"
 import EventPopover from "../event/EventCreationPopover"
 import EventInformationPopover from "../event/EventInformationPopover"
 
-import Event from "@/type/event"
+import Event from "@/type/domain/event"
 
 interface DayViewProperties {
   date: Date

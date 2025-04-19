@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 
-import Note from "../../type/note"
+import Note from "@/type/domain/note"
 
 const useNote = () => {
   const [notes, setNotes] = useState<Note[]>([])
@@ -16,9 +16,13 @@ const useNote = () => {
     try {
       const response = await axios.get<PaginatedResponse<Note>>(
         `${import.meta.env.VITE_BACKEND_URL}/notes`,
-        { params: { page: pageNumber, size } }
+        {
+          params: {
+            page:pageNumber,
+            size 
+          }
+        }
       )
-
       const data = response.data
 
       setNotes((prev) => (reset ? data.content : [...prev, ...data.content]))
@@ -39,7 +43,12 @@ const useNote = () => {
       do {
         const response = await axios.get<PaginatedResponse<Note>>(
           `${import.meta.env.VITE_BACKEND_URL}/notes`,
-          { params: { page: currentPage, size } }
+          {
+            params: {
+              page: currentPage,
+              size
+            }
+          }
         )
 
         const data = response.data
@@ -65,9 +74,7 @@ const useNote = () => {
   }
 
   const addNote = async (note: Omit<Note, "id">): Promise<Note> => {
-    if (!note.name.trim() || !note.description.trim()) {
-      throw new Error("Note name and description cannot be empty.")
-    }
+    if (!note.name.trim() || !note.description.trim()) throw new Error("Note name and description cannot be empty.")
 
     const temporaryId = crypto.randomUUID()
     const optimisticNote: Note = { ...note, id: temporaryId }
@@ -80,9 +87,8 @@ const useNote = () => {
         note
       )
       const savedNote = response.data
-      setNotes((prev) =>
-        prev.map((n) => (n.id === temporaryId ? { ...savedNote } : n))
-      )
+
+      setNotes((prev) =>prev.map((n) => (n.id === temporaryId ? { ...savedNote } : n)))
       return savedNote
     } catch (error) {
       toast.error("Failed to add note")

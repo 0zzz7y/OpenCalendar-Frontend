@@ -3,7 +3,7 @@ import { Box } from "@mui/material"
 import CalendarGridCell from "./CalendarGridCell"
 import EventBox from "../event/EventBox"
 
-import Event from "../../type/event"
+import Event from "../../type/domain/event"
 
 interface DayColumnProperties {
   date: Date

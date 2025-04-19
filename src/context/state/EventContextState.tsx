@@ -1,4 +1,6 @@
-import Event from "@/type/event"
+import Event from "@/type/domain/event"
+import RecurringPattern from "@/type/domain/recurringPattern"
+import EditorMode from "@/type/utility/editorMode"
 
 export interface EventEditorData {
   id?: string
@@ -6,6 +8,7 @@ export interface EventEditorData {
   description: string
   startDate: string
   endDate: string
+  recurringPattern: RecurringPattern
   calendarId: string
   categoryId?: string
   color?: string
@@ -16,8 +19,8 @@ export default interface EventContextState {
   reloadEvents: () => Promise<void>
 
   editorOpen: boolean
-  editorMode: "add" | "edit" | "delete"
+  editorMode: EditorMode
   editorData: EventEditorData
-  openEditor: (mode: "add" | "edit" | "delete", data?: EventEditorData) => void
+  openEditor: (mode: EditorMode, data?: EventEditorData) => void
   closeEditor: () => void
 }

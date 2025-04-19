@@ -13,9 +13,11 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 
-import Task from "../../type/task"
-import Calendar from "../../type/calendar"
-import Category from "../../type/category"
+import type Task from "../../type/task"
+import type Calendar from "../../type/calendar"
+import type Category from "../../type/category"
+
+import { useState, useEffect } from "react"
 
 interface Properties {
   task: Task
@@ -77,8 +79,13 @@ const TaskCard = ({
         minWidth: 220
       }}
     >
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
-        <IconButton onClick={() => setExpanded((prev) => !prev)} size="small" sx={{ color: "#000" }}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={1}
+      >
+        <IconButton onClick={handleToggleExpand} size="small">
           {expanded ? <ExpandLess /> : <ExpandMore />}
         </IconButton>
 
@@ -92,7 +99,7 @@ const TaskCard = ({
           sx={fieldStyle}
         />
 
-        <IconButton onClick={() => onDelete(task.id)} size="small" sx={{ color: "#000" }}>
+        <IconButton onClick={() => onDelete(task.id)} size="small">
           <Delete />
         </IconButton>
       </Box>
@@ -156,11 +163,11 @@ const TaskCard = ({
               fullWidth
               sx={fieldStyle}
             >
-              <MenuItem value="NONE">Brak</MenuItem>
-              <MenuItem value="DAILY">Codziennie</MenuItem>
-              <MenuItem value="WEEKLY">Co tydzień</MenuItem>
-              <MenuItem value="MONTHLY">Co miesiąc</MenuItem>
-              <MenuItem value="YEARLY">Co rok</MenuItem>
+              <MenuItem value="NONE">{RECURRING_PATTERN.VALUE.NONE}</MenuItem>
+              <MenuItem value="DAILY">{RECURRING_PATTERN.VALUE.DAILY}</MenuItem>
+              <MenuItem value="WEEKLY">{RECURRING_PATTERN.VALUE.WEEKLY}</MenuItem>
+              <MenuItem value="MONTHLY">{RECURRING_PATTERN.VALUE.MONTHLY}</MenuItem>
+              <MenuItem value="YEARLY">{RECURRING_PATTERN.VALUE.YEARLY}</MenuItem>
             </TextField>
           )}
 

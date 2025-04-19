@@ -13,10 +13,10 @@ import MonthView from "../calendar/MonthView"
 import EventPopover from "../event/EventCreationPopover"
 import EventInformationPopover from "../event/EventInformationPopover"
 
-import useFilters from "../../hook/api/useFilter"
-import useDashboardContext from "../../hook/context/useDashboardContext"
+import useFilters from "@/hook/api/useFilter"
+import useDashboardContext from "@/hook/context/useDashboardContext"
 
-import Event from "../../type/event"
+import Event from "@/type/domain/event"
 
 const CenterPanel = () => {
   const { events, calendars, categories, addEvent, updateEvent, deleteEvent } =
@@ -76,7 +76,6 @@ const CenterPanel = () => {
         description: data.description ?? "",
         startDate: data.startDate,
         endDate: data.endDate ?? data.startDate,
-        color: data.color ?? "#1976d2",
         calendarId: data.calendarId ?? "",
         categoryId: data.categoryId
       }
@@ -204,7 +203,6 @@ const CenterPanel = () => {
               ).toISOString(),
               calendarId: "",
               categoryId: undefined,
-              color: "#1976d2"
             }
           }
         />

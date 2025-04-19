@@ -3,10 +3,10 @@ import { Box } from "@mui/material"
 import TaskCard from "./TaskCard"
 import TaskColumn from "./TaskColumn"
 
-import Task from "../../type/task"
-import Calendar from "../../type/calendar"
-import Category from "../../type/category"
-import TaskStatus from "../../type/taskStatus"
+import Task from "../../type/domain/task"
+import Calendar from "../../type/domain/calendar"
+import Category from "../../type/domain/category"
+import TaskStatus from "../../type/domain/taskStatus"
 
 import { HourglassEmpty, Done, Pending } from "@mui/icons-material"
 

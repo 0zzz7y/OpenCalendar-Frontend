@@ -9,7 +9,7 @@ import {
 import { Edit, Delete } from "@mui/icons-material"
 import { useState } from "react"
 
-import Event from "../../type/event"
+import Event from "@/type/domain/event"
 
 interface EventInformationPopoverProperties {
   anchorEl: HTMLElement | null

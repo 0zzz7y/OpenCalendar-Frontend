@@ -2,7 +2,7 @@ import { useState, useEffect } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 
-import Calendar from "../../type/calendar"
+import Calendar from "@/type/domain/calendar"
 
 const useCalendar = () => {
   const [calendars, setCalendars] = useState<Calendar[]>([])
@@ -16,14 +16,16 @@ const useCalendar = () => {
     try {
       const response = await axios.get<PaginatedResponse<Calendar>>(
         `${import.meta.env.VITE_BACKEND_URL}/calendars`,
-        { params: { page: pageNumber, size } }
+        {
+          params: {
+            page: pageNumber,
+            size
+          }
+        }
       )
-
       const data = response.data
 
-      setCalendars((prev) =>
-        reset ? data.content : [...prev, ...data.content]
-      )
+      setCalendars((prev) => reset ? data.content : [...prev, ...data.content])
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
@@ -41,10 +43,15 @@ const useCalendar = () => {
       do {
         const response = await axios.get<PaginatedResponse<Calendar>>(
           `${import.meta.env.VITE_BACKEND_URL}/calendars`,
-          { params: { page: currentPage, size } }
+          {
+            params: {
+              page: currentPage,
+              size
+            }
+          }
         )
-
         const data = response.data
+
         allCalendars = [...allCalendars, ...data.content]
         total = data.totalPages
         currentPage++
@@ -69,12 +76,11 @@ const useCalendar = () => {
   const addCalendar = async (
     calendar: Omit<Calendar, "id">
   ): Promise<Calendar> => {
-    if (!calendar.name.trim()) {
-      throw new Error("Calendar name cannot be empty.")
-    }
+    if (!calendar.name.trim()) throw new Error("Calendar name cannot be empty.")
 
     const tempId = crypto.randomUUID()
     const optimisticCalendar = { ...calendar, id: tempId }
+
     setCalendars((prev) => [...prev, optimisticCalendar])
 
     try {
@@ -83,9 +89,8 @@ const useCalendar = () => {
         calendar
       )
       const savedCalendar = response.data
-      setCalendars((prev) =>
-        prev.map((c) => (c.id === tempId ? { ...savedCalendar } : c))
-      )
+
+      setCalendars((prev) =>prev.map((c) => (c.id === tempId ? { ...savedCalendar } : c)))
       return savedCalendar
     } catch (error) {
       toast.error("Failed to add calendar")
@@ -98,9 +103,7 @@ const useCalendar = () => {
     const previous = calendars.find((c) => c.id === id)
     if (!previous) return
 
-    setCalendars((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...updated } : c))
-    )
+    setCalendars((prev) => prev.map((c) => (c.id === id ? { ...c, ...updated } : c)))
 
     try {
       await axios.put(

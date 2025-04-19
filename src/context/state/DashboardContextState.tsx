@@ -1,8 +1,8 @@
-import Calendar from "../../type/calendar"
-import Category from "../../type/category"
-import Note from "../../type/note"
-import Event from "../../type/event"
-import Task from "../../type/task"
+import Calendar from "@/type/domain/calendar"
+import Category from "@/type/domain/category"
+import Note from "@/type/domain/note"
+import Event from "@/type/domain/event"
+import Task from "@/type/domain/task"
 
 interface DashboardContextState {
   calendars: Calendar[]

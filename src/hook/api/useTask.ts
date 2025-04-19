@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 
-import Task from "../../type/task"
+import Task from "@/type/domain/task"
 
 const useTask = () => {
   const [tasks, setTasks] = useState<Task[]>([])
@@ -18,7 +18,6 @@ const useTask = () => {
         `${import.meta.env.VITE_BACKEND_URL}/tasks`,
         { params: { page: pageNumber, size } }
       )
-
       const data = response.data
 
       setTasks((prev) => (reset ? data.content : [...prev, ...data.content]))
@@ -39,7 +38,12 @@ const useTask = () => {
       do {
         const response = await axios.get<PaginatedResponse<Task>>(
           `${import.meta.env.VITE_BACKEND_URL}/tasks`,
-          { params: { page: currentPage, size } }
+          {
+            params: {
+              page: currentPage,
+              size
+            }
+          }
         )
 
         const data = response.data
@@ -65,9 +69,7 @@ const useTask = () => {
   }
 
   const addTask = async (task: Omit<Task, "id">): Promise<Task> => {
-    if (!task.name.trim()) {
-      throw new Error("Task name cannot be empty.")
-    }
+    if (!task.name.trim()) throw new Error("Task name cannot be empty.")
 
     const temporaryId = crypto.randomUUID()
     const optimisticTask: Task = { ...task, id: temporaryId }
@@ -80,9 +82,8 @@ const useTask = () => {
         task
       )
       const savedTask = response.data
-      setTasks((prev) =>
-        prev.map((t) => (t.id === temporaryId ? { ...savedTask } : t))
-      )
+
+      setTasks((prev) =>prev.map((t) => (t.id === temporaryId ? { ...savedTask } : t)))
       return savedTask
     } catch (error) {
       toast.error("Failed to add task")
@@ -95,9 +96,7 @@ const useTask = () => {
     const previous = tasks.find((t) => t.id === id)
     if (!previous) return
 
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updated } : t))
-    )
+    setTasks((prev) =>prev.map((t) => (t.id === id ? { ...t, ...updated } : t)))
 
     try {
       await axios.put(

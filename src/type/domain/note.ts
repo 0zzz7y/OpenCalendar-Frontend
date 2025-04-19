@@ -1,7 +1,7 @@
 export default interface Note {
   id: string
-  name: string
+  name?: string
   description: string
-  categoryId: string
+  categoryId?: string
   calendarId: string
 }

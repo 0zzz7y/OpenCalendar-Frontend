@@ -2,7 +2,7 @@ import { Box, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
 import { useDrag } from "react-dnd"
 
-import Event from "../../type/event"
+import Event from "../../type/domain/event"
 
 interface EventBoxProperties {
   event: Event

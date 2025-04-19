@@ -2,7 +2,7 @@ import { useEffect, useState } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 
-import Event from "../../type/event"
+import Event from "@/type/domain/event"
 
 const useEvent = () => {
   const [events, setEvents] = useState<Event[]>([])
@@ -16,9 +16,13 @@ const useEvent = () => {
     try {
       const response = await axios.get<PaginatedResponse<Event>>(
         `${import.meta.env.VITE_BACKEND_URL}/events`,
-        { params: { page: pageNumber, size } }
+        {
+          params: {
+            page: pageNumber,
+            size
+          }
+        }
       )
-
       const data = response.data
 
       setEvents((prev) => (reset ? data.content : [...prev, ...data.content]))
@@ -39,10 +43,15 @@ const useEvent = () => {
       do {
         const response = await axios.get<PaginatedResponse<Event>>(
           `${import.meta.env.VITE_BACKEND_URL}/events`,
-          { params: { page: currentPage, size } }
+          {
+            params: {
+              page: currentPage,
+              size
+            }
+          }
         )
-
         const data = response.data
+
         allEvents = [...allEvents, ...data.content]
         total = data.totalPages
         currentPage++
@@ -65,9 +74,7 @@ const useEvent = () => {
   }
 
   const addEvent = async (event: Omit<Event, "id">): Promise<Event> => {
-    if (!event.name.trim()) {
-      throw new Error("Event name cannot be empty.")
-    }
+    if (!event.name.trim()) throw new Error("Event name cannot be empty.")
 
     const tempId = crypto.randomUUID()
     const optimisticEvent: Event = { ...event, id: tempId }
@@ -80,6 +87,7 @@ const useEvent = () => {
         event
       )
       const savedEvent = response.data
+
       setEvents((prev) =>
         prev.map((e) => (e.id === tempId ? { ...savedEvent } : e))
       )

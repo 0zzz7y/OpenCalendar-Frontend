@@ -9,6 +9,6 @@ export default interface Task {
   endDate?: string
   recurringPattern?: RecurringPattern
   status: TaskStatus
-  calendarId: string
+  calendarId?: string
   categoryId?: string
 }

@@ -12,8 +12,8 @@ import {
 
 import NoteToolbar, { FormatCommand } from "./NoteToolbar"
 
-import Note from "../../type/note"
-import Category from "../../type/category"
+import Note from "@/type/domain/note"
+import Category from "@/type/domain/category"
 
 import MESSAGES from "@/constant/message"
 

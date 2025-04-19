@@ -4,7 +4,7 @@ import IconButton from "@mui/material/IconButton"
 import AddIcon from "@mui/icons-material/Add"
 
 import NoteCard from "./NoteCard"
-import Note from "../../type/note"
+import Note from "../../type/domain/note"
 import useNotes from "../../hook/api/useNote"
 import useCategories from "../../hook/api/useCategory"
 import MESSAGES from "@/constant/message"
