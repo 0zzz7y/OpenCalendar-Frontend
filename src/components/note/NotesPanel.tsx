@@ -1,71 +1,51 @@
-import { useState } from "react";
-
+import { useEffect, useRef } from "react";
 import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import AddIcon from "@mui/icons-material/Add";
 
 import NoteCard from "./NoteCard";
-
 import Note from "../../types/note";
-
-const initialNotes: Note[] = [
-  {
-    id: "1",
-    description: "Zakupy: mleko, chleb, jajka",
-    drawing: "",
-    categoryId: undefined,
-    calendarId: undefined,
-    x: 0,
-    y: 0,
-    width: 200,
-    height: 150,
-    zIndex: 1,
-    color: "#ffff88"
-  },
-  {
-    id: "2",
-    description: "Siłownia: biceps, plecy",
-    categoryId: undefined,
-    calendarId: undefined,
-    drawing: "",
-    x: 220,
-    y: 0,
-    width: 200,
-    height: 150,
-    zIndex: 2,
-    color: "#ffff88"
-  }
-];
+import useNotes from "../../hooks/useNotes";
+import useCategories from "../../hooks/useCategories";
 
 const NotesPanel = () => {
-  const [notes, setNotes] = useState<Note[]>(initialNotes);
+  const {
+    notes,
+    addNote,
+    updateNote,
+    deleteNote,
+    reloadNotes
+  } = useNotes();
+
+  const { categories, reloadCategories } = useCategories();
+  const didFetchRef = useRef(false);
+
+  useEffect(() => {
+    if (!didFetchRef.current) {
+      reloadNotes();
+      reloadCategories();
+      didFetchRef.current = true;
+    }
+  }, []);
 
   const handleUpdate = (updatedNote: Note) => {
-    setNotes((prev) =>
-      prev.map((note) => (note.id === updatedNote.id ? updatedNote : note))
-    );
+    updateNote(updatedNote.id, updatedNote);
   };
 
-  const handleDelete = (id: string) => {
-    setNotes((prev) => prev.filter((note) => note.id !== id));
+  const handleDelete = async (id: string) => {
+    await deleteNote(id);
+    reloadNotes();
   };
 
-  const handleAddNote = () => {
-    const maxZ = Math.max(0, ...notes.map((n) => n.zIndex));
-    const newNote: Note = {
-      id: Math.random().toString(36).substring(2, 9),
+  const handleAddNote = async () => {
+    const newNote: Omit<Note, "id"> = {
+      name: "New Note",
       description: "",
-      drawing: "",
-      categoryId: undefined,
-      calendarId: undefined,
-      x: 20,
-      y: 20,
-      width: 200,
-      height: 150,
-      zIndex: maxZ + 1,
-      color: "#ffff88"
+      categoryId: "",
+      calendarId: ""
     };
-    setNotes((prev) => [...prev, newNote]);
+    await addNote(newNote);
+    reloadNotes();
   };
 
   return (
@@ -74,10 +54,10 @@ const NotesPanel = () => {
         <NoteCard
           key={note.id}
           id={note.id}
+          name={note.name}
           content={note.description || ""}
-          initialX={note.x}
-          initialY={note.y}
-          color={note.color}
+          calendarId={note.calendarId}
+          categories={categories}
           onUpdate={handleUpdate}
           onDelete={handleDelete}
         />
@@ -85,13 +65,13 @@ const NotesPanel = () => {
 
       <IconButton
         onClick={handleAddNote}
-        z-index={1000}
         sx={{
           position: "fixed",
           bottom: 16,
           right: 16,
           backgroundColor: "primary.main",
           color: "white",
+          zIndex: 1000,
           "&:hover": {
             backgroundColor: "primary.dark"
           }

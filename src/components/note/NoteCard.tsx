@@ -1,28 +1,18 @@
 import { useEffect, useRef, useState } from "react";
-
 import {
   Box,
   Paper,
   Collapse,
   Menu,
   MenuItem,
-  IconButton,
   Popover,
   Typography,
   Button
 } from "@mui/material";
 
-import BrushIcon from "@mui/icons-material/Brush";
-import EditIcon from "@mui/icons-material/Edit";
-import ClearIcon from "@mui/icons-material/Clear";
-import DeleteIcon from "@mui/icons-material/Delete";
-import ChevronRightIcon from "@mui/icons-material/ChevronRight";
-import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
-import FormatBoldIcon from "@mui/icons-material/FormatBold";
-import FormatItalicIcon from "@mui/icons-material/FormatItalic";
-import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
-
+import NoteToolbar from "./NoteToolbar";
 import Note from "../../types/note";
+import Category from "../../types/category";
 
 export interface NoteCardProperties {
   id: string;
@@ -30,8 +20,11 @@ export interface NoteCardProperties {
   initialX?: number;
   initialY?: number;
   color?: string;
+  categories: Category[];
   onDelete?: (id: string) => void;
   onUpdate?: (note: Note) => void;
+  calendarId?: string;
+  name?: string;
 }
 
 const NoteCard = ({
@@ -40,29 +33,30 @@ const NoteCard = ({
   initialY = 0,
   color = "#fff59d",
   content = "",
-  onDelete
+  categories,
+  onDelete,
+  onUpdate,
+  calendarId,
+  name = ""
 }: NoteCardProperties) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
+  const toolbarRef = useRef<HTMLDivElement | null>(null);
   const positionRef = useRef({ x: initialX, y: initialY });
   const lastMousePos = useRef<{ x: number; y: number } | null>(null);
   const animationFrameRef = useRef<number | null>(null);
-  const holdTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dragReady = useRef(false);
 
   const [position, setPosition] = useState(positionRef.current);
   const [dragging, setDragging] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
   const [isDrawing, setIsDrawing] = useState(false);
-  const [textContent, setTextContent] = useState(content);
   const [drawingDataURL, setDrawingDataURL] = useState<string | null>(null);
   const [brushColor, setBrushColor] = useState("#000000");
   const [brushSize, setBrushSize] = useState(2);
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(
-    null
-  );
+  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(null);
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
@@ -72,15 +66,8 @@ const NoteCard = ({
     underline: false
   });
 
-  const categories = [
-    { label: "Brak", value: "", color: "#fff59d" },
-    { label: "Siłownia", value: "siłownia", color: "#ffcc80" },
-    { label: "Praca", value: "praca", color: "#90caf9" },
-    { label: "Ogród", value: "ogród", color: "#c5e1a5" }
-  ];
-
-  const getCategoryColor = (category: string) =>
-    categories.find((c) => c.value === category)?.color || color;
+  const getCategoryColor = (categoryId: string | null) =>
+    categories.find((c) => c.id === categoryId)?.color || color;
 
   const clearCanvas = () => {
     const canvas = canvasRef.current;
@@ -92,16 +79,10 @@ const NoteCard = ({
   };
 
   const clearText = () => {
-    setTextContent("");
     if (contentRef.current) contentRef.current.innerText = "";
   };
 
   const toggleMode = () => {
-    if (isDrawing && canvasRef.current) {
-      setDrawingDataURL(canvasRef.current.toDataURL());
-    } else if (contentRef.current) {
-      setTextContent(contentRef.current.innerText);
-    }
     setIsDrawing((prev) => !prev);
   };
 
@@ -112,17 +93,14 @@ const NoteCard = ({
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    if (isDrawing) return;
-    dragReady.current = false;
-    holdTimeout.current = setTimeout(() => {
+    if (toolbarRef.current && toolbarRef.current.contains(e.target as Node)) {
       dragReady.current = true;
-      setDragging(true);
       lastMousePos.current = { x: e.clientX, y: e.clientY };
-    }, 100);
+      setDragging(true);
+    }
   };
 
   const handleMouseUp = () => {
-    clearTimeout(holdTimeout.current!);
     setDragging(false);
     dragReady.current = false;
     lastMousePos.current = null;
@@ -156,6 +134,18 @@ const NoteCard = ({
     setConfirmAnchorEl(null);
   };
 
+  const handleBlur = () => {
+    if (onUpdate) {
+      onUpdate({
+        id,
+        name,
+        description: contentRef.current?.innerText || "",
+        categoryId: selectedCategory || "",
+        calendarId: calendarId || ""
+      });
+    }
+  };
+
   useEffect(() => {
     if (dragging) {
       window.addEventListener("mousemove", handleDrag);
@@ -166,6 +156,59 @@ const NoteCard = ({
       };
     }
   }, [dragging]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let drawing = false;
+
+    const handleMouseDown = (e: MouseEvent) => {
+      drawing = true;
+      const rect = canvas.getBoundingClientRect();
+      ctx.beginPath();
+      ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    };
+
+    const handleMouseMove = (e: MouseEvent) => {
+      if (!drawing) return;
+      const rect = canvas.getBoundingClientRect();
+      ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+      ctx.strokeStyle = brushColor;
+      ctx.lineWidth = brushSize;
+      ctx.lineCap = "round";
+      ctx.stroke();
+    };
+
+    const handleMouseUp = () => {
+      drawing = false;
+      ctx.closePath();
+    };
+
+    canvas.addEventListener("mousedown", handleMouseDown);
+    canvas.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
+
+    return () => {
+      canvas.removeEventListener("mousedown", handleMouseDown);
+      canvas.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+    };
+  }, [brushColor, brushSize]);
+
+  useEffect(() => {
+    if (onUpdate) {
+      onUpdate({
+        id,
+        name,
+        description: contentRef.current?.innerText || "",
+        categoryId: selectedCategory || "",
+        calendarId: calendarId || ""
+      });
+    }
+  }, [selectedCategory]);
 
   return (
     <Box
@@ -186,154 +229,35 @@ const NoteCard = ({
         sx={{
           color: "#000",
           width: "100%",
-          backgroundColor: getCategoryColor(selectedCategory ?? color),
+          backgroundColor: getCategoryColor(selectedCategory),
           borderRadius: 2,
           boxShadow: dragging ? "0 0 10px #2196f3" : 3,
           overflow: "hidden",
-          cursor: dragging ? "grabbing" : "grab"
+          cursor: dragging ? "grabbing" : "default"
         }}
       >
-        <Box
-          display="flex"
-          justifyContent="space-between"
-          bgcolor="rgba(255,255,255,0.4)"
-          p={0.5}
-        >
-          <IconButton size="small" onClick={() => setCollapsed((c) => !c)}>
-            {collapsed ? (
-              <ChevronRightIcon
-                fontSize="small"
-                sx={{ color: "#000", transform: "rotate(270deg)" }}
-              />
-            ) : (
-              <ExpandMoreIcon fontSize="small" sx={{ color: "#000" }} />
-            )}
-          </IconButton>
-
-          <Box display="flex" gap={0.5} alignItems="center">
-            {isDrawing ? (
-              <>
-                <input
-                  type="color"
-                  value={brushColor}
-                  onChange={(e) => setBrushColor(e.target.value)}
-                  style={{
-                    width: 24,
-                    height: 24,
-                    border: "none",
-                    background: "none",
-                    cursor: "pointer"
-                  }}
-                />
-                <select
-                  value={brushSize}
-                  onChange={(e) => setBrushSize(parseInt(e.target.value))}
-                  style={{ height: 24, fontSize: "12px", cursor: "pointer" }}
-                >
-                  {[1, 2, 4, 8, 12].map((size) => (
-                    <option key={size} value={size}>
-                      {size}px
-                    </option>
-                  ))}
-                </select>
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleConfirm("Clear drawing?", clearCanvas);
-                  }}
-                >
-                  <ClearIcon fontSize="small" sx={{ color: "#000" }} />
-                </IconButton>
-              </>
-            ) : (
-              <>
-                {["bold", "italic", "underline"].map((cmd) => {
-                  const Icon =
-                    cmd === "bold"
-                      ? FormatBoldIcon
-                      : cmd === "italic"
-                        ? FormatItalicIcon
-                        : FormatUnderlinedIcon;
-                  return (
-                    <IconButton
-                      key={cmd}
-                      size="small"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        formatText(cmd as "bold" | "italic" | "underline");
-                      }}
-                      sx={{
-                        bgcolor: activeFormats[
-                          cmd as keyof typeof activeFormats
-                        ]
-                          ? "#ddd"
-                          : "transparent"
-                      }}
-                    >
-                      <Icon fontSize="small" sx={{ color: "#000" }} />
-                    </IconButton>
-                  );
-                })}
-                <IconButton
-                  size="small"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleConfirm("Clear text?", clearText);
-                  }}
-                >
-                  <ClearIcon fontSize="small" sx={{ color: "#000" }} />
-                </IconButton>
-              </>
-            )}
-
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                toggleMode();
-              }}
-            >
-              {isDrawing ? (
-                <BrushIcon sx={{ color: "#000" }} />
-              ) : (
-                <EditIcon sx={{ color: "#000" }} />
-              )}
-            </IconButton>
-
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                setMenuAnchorEl(e.currentTarget);
-              }}
-            >
-              <Box
-                sx={{
-                  color: "#000",
-                  width: 14,
-                  height: 14,
-                  borderRadius: "50%",
-                  backgroundColor: getCategoryColor(selectedCategory ?? ""),
-                  border: "1px solid #333"
-                }}
-              />
-            </IconButton>
-
-            <IconButton
-              size="small"
-              onClick={(e) => {
-                e.stopPropagation();
-                if (textContent.trim() !== "" || drawingDataURL) {
-                  handleConfirm("Delete note?", () => onDelete?.(id));
-                } else {
-                  onDelete?.(id);
-                }
-              }}
-            >
-              <DeleteIcon fontSize="small" sx={{ color: "#000" }} />
-            </IconButton>
-          </Box>
+        <Box ref={toolbarRef}>
+          <NoteToolbar
+            isCollapsed={collapsed}
+            isDrawing={isDrawing}
+            onToggleCollapse={() => setCollapsed((c) => !c)}
+            onToggleMode={toggleMode}
+            onClearCanvas={() => handleConfirm("Clear drawing?", clearCanvas)}
+            onClearText={() => handleConfirm("Clear text?", clearText)}
+            onDelete={() =>
+              (contentRef.current?.innerText.trim() || drawingDataURL)
+                ? handleConfirm("Delete note?", () => onDelete?.(id))
+                : onDelete?.(id)
+            }
+            onFormatText={formatText}
+            brushColor={brushColor}
+            setBrushColor={setBrushColor}
+            brushSize={brushSize}
+            setBrushSize={setBrushSize}
+            activeFormats={activeFormats}
+            selectedCategory={selectedCategory}
+            onCategoryMenuOpen={(e: any) => setMenuAnchorEl(e)}
+          />
         </Box>
 
         <Collapse in={!collapsed}>
@@ -349,6 +273,7 @@ const NoteCard = ({
               ref={contentRef}
               contentEditable
               suppressContentEditableWarning
+              onBlur={handleBlur}
               sx={{
                 height: 220,
                 p: 1,
@@ -358,11 +283,9 @@ const NoteCard = ({
                 overflowY: "auto",
                 whiteSpace: "pre-wrap",
                 wordBreak: "break-word",
-                color: "#000" // zawsze czarny tekst
+                color: "#000"
               }}
-            >
-              {textContent}
-            </Box>
+            />
           )}
         </Collapse>
       </Paper>
@@ -404,12 +327,12 @@ const NoteCard = ({
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         MenuListProps={{ dense: true }}
       >
-        {categories.map(({ label, value }) => (
+        {categories.map(({ id, name, color }) => (
           <MenuItem
-            key={value}
-            selected={selectedCategory === value}
+            key={id}
+            selected={selectedCategory === id}
             onClick={() => {
-              setSelectedCategory(value);
+              setSelectedCategory(id);
               setMenuAnchorEl(null);
             }}
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
@@ -420,11 +343,11 @@ const NoteCard = ({
                 width: 12,
                 height: 12,
                 borderRadius: "50%",
-                backgroundColor: getCategoryColor(value),
+                backgroundColor: color,
                 mr: 1
               }}
             />
-            {label}
+            {name}
           </MenuItem>
         ))}
       </Menu>
