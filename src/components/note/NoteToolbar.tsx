@@ -5,7 +5,8 @@ import {
   MenuItem,
   Popover,
   Typography,
-  Button
+  Button,
+  TextField
 } from "@mui/material"
 
 import BrushIcon from "@mui/icons-material/Brush"
@@ -17,6 +18,7 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import FormatBoldIcon from "@mui/icons-material/FormatBold"
 import FormatItalicIcon from "@mui/icons-material/FormatItalic"
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined"
+
 import { useState } from "react"
 import MESSAGES from "@/constants/messages"
 
@@ -26,7 +28,6 @@ export type FormatCommand =
   | typeof MESSAGES.TOOLBAR.UNDERLINE
 
 interface NoteToolbarProperties {
-  noteName: string
   isCollapsed: boolean
   isDrawing: boolean
   onToggleCollapse: () => void
@@ -42,10 +43,11 @@ interface NoteToolbarProperties {
   activeFormats: Record<FormatCommand, boolean>
   selectedCategory: string | null
   onCategoryMenuOpen: (anchor: HTMLElement) => void
+  noteName: string
+  onNameChange: (newName: string) => void
 }
 
 const NoteToolBar = ({
-  noteName,
   isCollapsed,
   isDrawing,
   onToggleCollapse,
@@ -60,7 +62,9 @@ const NoteToolBar = ({
   setBrushSize,
   activeFormats,
   selectedCategory,
-  onCategoryMenuOpen
+  onCategoryMenuOpen,
+  noteName,
+  onNameChange
 }: NoteToolbarProperties) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
@@ -81,135 +85,185 @@ const NoteToolBar = ({
     <Box
       display="flex"
       justifyContent="space-between"
+      alignItems="center"
       bgcolor="rgba(255,255,255,0.4)"
       p={0.5}
+      sx={{ cursor: "move", userSelect: "none" }}
     >
-      <IconButton size="small" onClick={onToggleCollapse}>
-        {isCollapsed ? (
-          <ChevronRightIcon
-            fontSize="small"
-            sx={{ color: "#000", transform: "rotate(270deg)" }}
-          />
-        ) : (
-          <ExpandMoreIcon fontSize="small" sx={{ color: "#000" }} />
-        )}
-      </IconButton>
-
-      <Box display="flex" gap={0.5} alignItems="center">
-        {isDrawing ? (
-          <>
-            <input
-              type="color"
-              value={brushColor}
-              onChange={(e) => setBrushColor(e.target.value)}
-              style={{
-                width: 24,
-                height: 24,
-                border: "none",
-                background: "none",
-                cursor: "pointer"
-              }}
+      <Box display="flex" alignItems="center">
+        <IconButton
+          size="small"
+          onClick={onToggleCollapse}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
+          {isCollapsed ? (
+            <ChevronRightIcon
+              fontSize="small"
+              sx={{ color: "#000", transform: "rotate(270deg)" }}
             />
-            <Select
-              value={brushSize}
-              onChange={(e) => setBrushSize(Number(e.target.value))}
-              size="small"
-              sx={{ height: 24, fontSize: 12 }}
-            >
-              {[1, 2, 4, 8, 12].map((size) => (
-                <MenuItem key={size} value={size}>
-                  {size}px
-                </MenuItem>
-              ))}
-            </Select>
-            <IconButton size="small" onClick={onClearCanvas}>
-              <ClearIcon fontSize="small" sx={{ color: "#000" }} />
-            </IconButton>
-          </>
-        ) : (
-          <>
-            {["bold", "italic", "underline"].map((cmd) => {
-              const Icon =
-                cmd === "bold"
-                  ? FormatBoldIcon
-                  : cmd === "italic"
-                    ? FormatItalicIcon
-                    : FormatUnderlinedIcon
-              return (
-                <IconButton
-                  key={cmd}
-                  size="small"
-                  onClick={() => onFormatText(cmd as any)}
-                  sx={{
-                    bgcolor: activeFormats[cmd as keyof typeof activeFormats]
-                      ? "#ddd"
-                      : "transparent"
-                  }}
-                >
-                  <Icon fontSize="small" sx={{ color: "#000" }} />
-                </IconButton>
-              )
-            })}
-            <IconButton size="small" onClick={onClearText}>
-              <ClearIcon fontSize="small" sx={{ color: "#000" }} />
-            </IconButton>
-          </>
-        )}
-
-        <IconButton size="small" onClick={onToggleMode}>
-          {isDrawing ? (
-            <BrushIcon sx={{ color: "#000" }} />
           ) : (
-            <EditIcon sx={{ color: "#000" }} />
+            <ExpandMoreIcon fontSize="small" sx={{ color: "#000" }} />
           )}
         </IconButton>
 
-        <IconButton
+        <TextField
+          placeholder="Name"
+          value={noteName}
+          onChange={(e) => onNameChange(e.target.value)}
+          variant="outlined"
           size="small"
-          onClick={(e) => onCategoryMenuOpen(e.currentTarget)}
-        >
-          <Box
-            sx={{
-              color: "#000",
-              width: 14,
-              height: 14,
-              borderRadius: "50%",
-              backgroundColor: selectedCategory || "#fff59d",
-              border: "1px solid #333"
-            }}
-          />
-        </IconButton>
-
-        <IconButton size="small" onClick={handleDeleteClick}>
-          <DeleteIcon fontSize="small" sx={{ color: "#000" }} />
-        </IconButton>
-
-        <Popover
-          open={Boolean(anchorEl)}
-          anchorEl={anchorEl}
-          onClose={handleCancel}
-          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-          transformOrigin={{ vertical: "top", horizontal: "center" }}
-          PaperProps={{ sx: { p: 2 } }}
-        >
-          <Typography variant="body2" gutterBottom>
-            {MESSAGES.POPOVER.CONFIRM_DELETE_NOTE}
-          </Typography>
-          <Box display="flex" gap={1} justifyContent="flex-end">
-            <Button size="small" onClick={handleCancel}>
-              Cancel
-            </Button>
-            <Button
-              size="small"
-              color="error"
-              variant="contained"
-              onClick={handleConfirm}
-            >
-              Delete
-            </Button>
-          </Box>
-        </Popover>
+          onMouseDown={(e) => e.stopPropagation()}
+          sx={{
+            ml: 1,
+            width: 140,
+            input: {
+              fontSize: 14,
+              fontWeight: 500,
+              color: "#333"
+            }
+          }}
+        />
       </Box>
+
+      {!isCollapsed && (
+        <Box display="flex" gap={0.5} alignItems="center">
+          {isDrawing ? (
+            <>
+              <input
+                type="color"
+                value={brushColor}
+                onChange={(e) => setBrushColor(e.target.value)}
+                onMouseDown={(e) => e.stopPropagation()}
+                style={{
+                  width: 24,
+                  height: 24,
+                  border: "none",
+                  background: "none",
+                  cursor: "pointer"
+                }}
+              />
+              <Select
+                value={brushSize}
+                onChange={(e) => setBrushSize(Number(e.target.value))}
+                size="small"
+                sx={{ height: 24, fontSize: 12 }}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                {[1, 2, 4, 8, 12].map((size) => (
+                  <MenuItem key={size} value={size}>
+                    {size}px
+                  </MenuItem>
+                ))}
+              </Select>
+              <IconButton
+                size="small"
+                onClick={onClearCanvas}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <ClearIcon fontSize="small" sx={{ color: "#000" }} />
+              </IconButton>
+            </>
+          ) : (
+            <>
+              {[
+                MESSAGES.TOOLBAR.BOLD,
+                MESSAGES.TOOLBAR.ITALIC,
+                MESSAGES.TOOLBAR.UNDERLINE
+              ].map((cmd) => {
+                const Icon =
+                  cmd === MESSAGES.TOOLBAR.BOLD
+                    ? FormatBoldIcon
+                    : cmd === MESSAGES.TOOLBAR.ITALIC
+                      ? FormatItalicIcon
+                      : FormatUnderlinedIcon
+                return (
+                  <IconButton
+                    key={cmd}
+                    size="small"
+                    onClick={() => onFormatText(cmd)}
+                    onMouseDown={(e) => e.stopPropagation()}
+                    sx={{
+                      bgcolor: activeFormats[cmd] ? "#ddd" : "transparent"
+                    }}
+                  >
+                    <Icon fontSize="small" sx={{ color: "#000" }} />
+                  </IconButton>
+                )
+              })}
+              <IconButton
+                size="small"
+                onClick={onClearText}
+                onMouseDown={(e) => e.stopPropagation()}
+              >
+                <ClearIcon fontSize="small" sx={{ color: "#000" }} />
+              </IconButton>
+            </>
+          )}
+
+          <IconButton
+            size="small"
+            onClick={onToggleMode}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            {isDrawing ? (
+              <BrushIcon sx={{ color: "#000" }} />
+            ) : (
+              <EditIcon sx={{ color: "#000" }} />
+            )}
+          </IconButton>
+
+          <IconButton
+            size="small"
+            onClick={(e) => onCategoryMenuOpen(e.currentTarget)}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <Box
+              sx={{
+                color: "#000",
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                backgroundColor: selectedCategory || "#fff59d",
+                border: "1px solid #333"
+              }}
+            />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            onClick={handleDeleteClick}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <DeleteIcon fontSize="small" sx={{ color: "#000" }} />
+          </IconButton>
+
+          <Popover
+            open={Boolean(anchorEl)}
+            anchorEl={anchorEl}
+            onClose={handleCancel}
+            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+            transformOrigin={{ vertical: "top", horizontal: "center" }}
+            PaperProps={{ sx: { p: 2 } }}
+          >
+            <Typography variant="body2" gutterBottom>
+              {MESSAGES.POPOVER.CONFIRM_DELETE_NOTE}
+            </Typography>
+            <Box display="flex" gap={1} justifyContent="flex-end">
+              <Button size="small" onClick={handleCancel}>
+                Cancel
+              </Button>
+              <Button
+                size="small"
+                color="error"
+                variant="contained"
+                onClick={handleConfirm}
+              >
+                Delete
+              </Button>
+            </Box>
+          </Popover>
+        </Box>
+      )}
     </Box>
   )
 }

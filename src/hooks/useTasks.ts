@@ -64,9 +64,14 @@ const useTasks = () => {
     setIsLoadingMore(false)
   }
 
-  const addTask = async (task: Omit<Task, "id">) => {
-    const tempId = crypto.randomUUID()
-    const optimisticTask = { ...task, id: tempId }
+  const addTask = async (task: Omit<Task, "id">): Promise<Task> => {
+    if (!task.name.trim()) {
+      throw new Error("Task name cannot be empty.")
+    }
+
+    const temporaryId = crypto.randomUUID()
+    const optimisticTask: Task = { ...task, id: temporaryId }
+
     setTasks((prev) => [...prev, optimisticTask])
 
     try {
@@ -74,10 +79,14 @@ const useTasks = () => {
         `${import.meta.env.VITE_BACKEND_URL}/tasks`,
         task
       )
-      setTasks((prev) => prev.map((t) => (t.id === tempId ? response.data : t)))
+      const savedTask = response.data
+      setTasks((prev) =>
+        prev.map((t) => (t.id === temporaryId ? { ...savedTask } : t))
+      )
+      return savedTask
     } catch (error) {
       toast.error("Failed to add task")
-      setTasks((prev) => prev.filter((t) => t.id !== tempId))
+      setTasks((prev) => prev.filter((t) => t.id !== temporaryId))
       throw error
     }
   }

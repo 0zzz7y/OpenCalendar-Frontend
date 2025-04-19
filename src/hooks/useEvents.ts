@@ -64,9 +64,14 @@ const useEvents = () => {
     setIsLoadingMore(false)
   }
 
-  const addEvent = async (event: Omit<Event, "id">) => {
+  const addEvent = async (event: Omit<Event, "id">): Promise<Event> => {
+    if (!event.name.trim()) {
+      throw new Error("Event name cannot be empty.")
+    }
+
     const tempId = crypto.randomUUID()
-    const optimisticEvent = { ...event, id: tempId }
+    const optimisticEvent: Event = { ...event, id: tempId }
+
     setEvents((prev) => [...prev, optimisticEvent])
 
     try {
@@ -74,9 +79,11 @@ const useEvents = () => {
         `${import.meta.env.VITE_BACKEND_URL}/events`,
         event
       )
+      const savedEvent = response.data
       setEvents((prev) =>
-        prev.map((e) => (e.id === tempId ? response.data : e))
+        prev.map((e) => (e.id === tempId ? { ...savedEvent } : e))
       )
+      return savedEvent
     } catch (error) {
       toast.error("Failed to add event")
       setEvents((prev) => prev.filter((e) => e.id !== tempId))

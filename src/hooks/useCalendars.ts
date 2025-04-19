@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react"
 import axios from "axios"
+import { toast } from "react-toastify"
 
 import Calendar from "../types/calendar"
 
@@ -27,7 +28,7 @@ const useCalendars = () => {
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
     } catch (error) {
-      console.error("Error fetching calendars:", error)
+      toast.error("Failed to fetch calendars")
     }
   }
 
@@ -54,7 +55,7 @@ const useCalendars = () => {
       setTotalPages(1)
       setTotalElements(allCalendars.length)
     } catch (error) {
-      console.error("Error reloading all calendars:", error)
+      toast.error("Failed to reload all calendars")
     }
   }
 
@@ -65,7 +66,11 @@ const useCalendars = () => {
     setIsLoadingMore(false)
   }
 
-  const addCalendar = async (calendar: Omit<Calendar, "id">) => {
+  const addCalendar = async (calendar: Omit<Calendar, "id">): Promise<Calendar> => {
+    if (!calendar.name.trim()) {
+      throw new Error("Calendar name cannot be empty.")
+    }
+
     const tempId = crypto.randomUUID()
     const optimisticCalendar = { ...calendar, id: tempId }
     setCalendars((prev) => [...prev, optimisticCalendar])
@@ -75,11 +80,13 @@ const useCalendars = () => {
         `${import.meta.env.VITE_BACKEND_URL}/calendars`,
         calendar
       )
+      const savedCalendar = response.data
       setCalendars((prev) =>
-        prev.map((c) => (c.id === tempId ? response.data : c))
+        prev.map((c) => (c.id === tempId ? { ...savedCalendar } : c))
       )
+      return savedCalendar
     } catch (error) {
-      console.error("Error adding calendar:", error)
+      toast.error("Failed to add calendar")
       setCalendars((prev) => prev.filter((c) => c.id !== tempId))
       throw error
     }
@@ -99,7 +106,7 @@ const useCalendars = () => {
         updated
       )
     } catch (error) {
-      console.error("Error updating calendar:", error)
+      toast.error("Failed to update calendar")
       setCalendars((prev) => prev.map((c) => (c.id === id ? previous : c)))
       throw error
     }
@@ -114,7 +121,7 @@ const useCalendars = () => {
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/calendars/${id}`)
     } catch (error) {
-      console.error("Error deleting calendar:", error)
+      toast.error("Failed to delete calendar")
       setCalendars((prev) => [...prev, deleted])
       throw error
     }

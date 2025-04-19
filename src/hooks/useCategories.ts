@@ -66,9 +66,13 @@ const useCategories = () => {
     setIsLoadingMore(false)
   }
 
-  const addCategory = async (category: Omit<Category, "id">) => {
-    const tempId = crypto.randomUUID()
-    const optimisticCategory = { ...category, id: tempId }
+  const addCategory = async (category: Omit<Category, "id">): Promise<Category> => {
+    if (!category.name.trim()) {
+      throw new Error("Category name cannot be empty.")
+    }
+
+    const temporaryId = crypto.randomUUID()
+    const optimisticCategory: Category = { ...category, id: temporaryId }
     setCategories((prev) => [...prev, optimisticCategory])
 
     try {
@@ -76,12 +80,14 @@ const useCategories = () => {
         `${import.meta.env.VITE_BACKEND_URL}/categories`,
         category
       )
+      const savedCategory = response.data
       setCategories((prev) =>
-        prev.map((c) => (c.id === tempId ? response.data : c))
+        prev.map((c) => (c.id === temporaryId ? { ...savedCategory } : c))
       )
+      return savedCategory
     } catch (error) {
       toast.error("Failed to add category")
-      setCategories((prev) => prev.filter((c) => c.id !== tempId))
+      setCategories((prev) => prev.filter((c) => c.id !== temporaryId))
       throw error
     }
   }

@@ -64,20 +64,29 @@ const useNotes = () => {
     setIsLoadingMore(false)
   }
 
-  const addNote = async (note: Omit<Note, "id">) => {
-    const tempId = crypto.randomUUID()
-    const optimisticNote = { ...note, id: tempId }
+  const addNote = async (note: Omit<Note, "id">): Promise<Note> => {
+    if (!note.name.trim() || !note.description.trim()) {
+      throw new Error("Note name and description cannot be empty.")
+    }
+  
+    const temporaryId = crypto.randomUUID()
+    const optimisticNote: Note = { ...note, id: temporaryId }
+  
     setNotes((prev) => [...prev, optimisticNote])
-
+  
     try {
       const response = await axios.post<Note>(
         `${import.meta.env.VITE_BACKEND_URL}/notes`,
         note
       )
-      setNotes((prev) => prev.map((n) => (n.id === tempId ? response.data : n)))
+      const savedNote = response.data
+      setNotes((prev) =>
+        prev.map((n) => (n.id === temporaryId ? { ...savedNote } : n))
+      )
+      return savedNote
     } catch (error) {
       toast.error("Failed to add note")
-      setNotes((prev) => prev.filter((n) => n.id !== tempId))
+      setNotes((prev) => prev.filter((n) => n.id !== temporaryId))
       throw error
     }
   }
