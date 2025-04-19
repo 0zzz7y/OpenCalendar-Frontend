@@ -134,8 +134,8 @@ const CalendarEditor = () => {
                 gutterBottom
               >
                 {editorMode === "add"
-                  ? MESSAGES.PLACEHOLDERS.NEW_EVENT
-                  : "Edit calendar"}
+                  ? MESSAGES.PLACEHOLDERS.ADD_EVENT
+                  : MESSAGES.PLACEHOLDERS.EDIT_EVENT}
               </Typography>
 
               <TextField

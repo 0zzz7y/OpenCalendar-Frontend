@@ -11,13 +11,6 @@ import CalendarEditor from "../calendar/CalendarEditor"
 import CategoryEditor from "../category/CategoryEditor"
 
 const LeftPanel = () => {
-  const {
-    selectedCalendar,
-    setSelectedCalendar,
-    selectedCategory,
-    setSelectedCategory
-  } = useFilters()
-
   return (
     <>
       <Box

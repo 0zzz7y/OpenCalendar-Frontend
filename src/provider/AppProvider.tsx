@@ -4,7 +4,6 @@ import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider"
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
-import { CssBaseline } from "@mui/material"
 
 import ThemeProvider from "../component/theme/ThemeProvider"
 
@@ -26,10 +25,7 @@ const AppProvider = ({ children }: { children: ReactNode }) => {
                 <EventProvider>
                   <TaskProvider>
                     <NoteProvider>
-                      <DashboardProvider>
-                        <CssBaseline />
-                        {children}
-                      </DashboardProvider>
+                      <DashboardProvider>{children}</DashboardProvider>
                     </NoteProvider>
                   </TaskProvider>
                 </EventProvider>
