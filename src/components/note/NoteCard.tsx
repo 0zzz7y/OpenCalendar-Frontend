@@ -10,9 +10,11 @@ import {
   Button
 } from "@mui/material";
 
-import NoteToolbar from "./NoteToolbar";
+import NoteToolbar, { FormatCommand } from "./NoteToolbar";
 import Note from "../../types/note";
 import Category from "../../types/category";
+
+import MESSAGES from "@/constants/messages";
 
 export interface NoteCardProperties {
   id: string;
@@ -60,7 +62,7 @@ const NoteCard = ({
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [activeFormats, setActiveFormats] = useState({
+  const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
     bold: false,
     italic: false,
     underline: false
@@ -86,11 +88,16 @@ const NoteCard = ({
     setIsDrawing((prev) => !prev);
   };
 
-  const formatText = (command: "bold" | "italic" | "underline") => {
-    document.execCommand(command);
-    setActiveFormats((prev) => ({ ...prev, [command]: !prev[command] }));
+  const formatText = (command: FormatCommand) => {
     contentRef.current?.focus();
+    document.execCommand(command);
+  
+    setActiveFormats((prev) => ({
+      ...prev,
+      [command]: !prev[command]
+    }));
   };
+  
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (toolbarRef.current && toolbarRef.current.contains(e.target as Node)) {
@@ -299,7 +306,7 @@ const NoteCard = ({
         PaperProps={{ sx: { p: 2 } }}
       >
         <Typography variant="body2" gutterBottom>
-          Are you sure?
+          {MESSAGES.POPOVER.CONFIRM_CLEAR_CONTENTS}
         </Typography>
         <Box display="flex" gap={1} justifyContent="flex-end">
           <Button size="small" onClick={handleConfirmClose}>

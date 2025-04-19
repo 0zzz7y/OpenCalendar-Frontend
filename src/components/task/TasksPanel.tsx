@@ -9,6 +9,7 @@ import useDashboard from "../../hooks/useDashboard";
 
 import TaskStatus from "../../types/taskStatus";
 import Task from "../../types/task";
+import MESSAGES from "@/constants/messages";
 
 const TasksPanel = () => {
   const {
@@ -64,7 +65,7 @@ const TasksPanel = () => {
         }}
       >
         <TextField
-          label="Nowe zadanie"
+          label={MESSAGES.PLACEHOLDERS.NEW_TASK}
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleCreate()}

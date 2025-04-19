@@ -2,8 +2,12 @@ import {
   Box,
   IconButton,
   Select,
-  MenuItem
+  MenuItem,
+  Popover,
+  Typography,
+  Button
 } from "@mui/material";
+
 import BrushIcon from "@mui/icons-material/Brush";
 import EditIcon from "@mui/icons-material/Edit";
 import ClearIcon from "@mui/icons-material/Clear";
@@ -13,8 +17,13 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import FormatBoldIcon from "@mui/icons-material/FormatBold";
 import FormatItalicIcon from "@mui/icons-material/FormatItalic";
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined";
+import { useState } from "react";
+import MESSAGES from "@/constants/messages";
 
-// Dodano obsługę rozmycia do zapisania notatki
+export type FormatCommand =
+  | typeof MESSAGES.TOOLBAR.BOLD
+  | typeof MESSAGES.TOOLBAR.ITALIC
+  | typeof MESSAGES.TOOLBAR.UNDERLINE;
 
 interface NoteToolbarProperties {
   isCollapsed: boolean;
@@ -24,12 +33,12 @@ interface NoteToolbarProperties {
   onClearCanvas: () => void;
   onClearText: () => void;
   onDelete: () => void;
-  onFormatText: (command: "bold" | "italic" | "underline") => void;
+  onFormatText: (command: FormatCommand) => void;
   brushColor: string;
   setBrushColor: (color: string) => void;
   brushSize: number;
   setBrushSize: (size: number) => void;
-  activeFormats: { bold: boolean; italic: boolean; underline: boolean };
+  activeFormats: Record<FormatCommand, boolean>;
   selectedCategory: string | null;
   onCategoryMenuOpen: (anchor: HTMLElement) => void;
 }
@@ -51,6 +60,21 @@ const NoteToolBar = ({
   selectedCategory,
   onCategoryMenuOpen
 }: NoteToolbarProperties) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+
+  const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleConfirm = () => {
+    onDelete();
+    setAnchorEl(null);
+  };
+
+  const handleCancel = () => {
+    setAnchorEl(null);
+  };
+
   return (
     <Box
       display="flex"
@@ -107,8 +131,8 @@ const NoteToolBar = ({
                 cmd === "bold"
                   ? FormatBoldIcon
                   : cmd === "italic"
-                    ? FormatItalicIcon
-                    : FormatUnderlinedIcon;
+                  ? FormatItalicIcon
+                  : FormatUnderlinedIcon;
               return (
                 <IconButton
                   key={cmd}
@@ -154,9 +178,30 @@ const NoteToolBar = ({
           />
         </IconButton>
 
-        <IconButton size="small" onClick={onDelete}>
+        <IconButton size="small" onClick={handleDeleteClick}>
           <DeleteIcon fontSize="small" sx={{ color: "#000" }} />
         </IconButton>
+
+        <Popover
+          open={Boolean(anchorEl)}
+          anchorEl={anchorEl}
+          onClose={handleCancel}
+          anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+          transformOrigin={{ vertical: "top", horizontal: "center" }}
+          PaperProps={{ sx: { p: 2 } }}
+        >
+          <Typography variant="body2" gutterBottom>
+            {MESSAGES.POPOVER.CONFIRM_DELETE_NOTE}
+          </Typography>
+          <Box display="flex" gap={1} justifyContent="flex-end">
+            <Button size="small" onClick={handleCancel}>
+              Cancel
+            </Button>
+            <Button size="small" color="error" variant="contained" onClick={handleConfirm}>
+              Delete
+            </Button>
+          </Box>
+        </Popover>
       </Box>
     </Box>
   );

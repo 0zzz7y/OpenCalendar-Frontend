@@ -17,6 +17,7 @@ import {
   DropResult
 } from "@hello-pangea/dnd";
 import { JSX } from "react";
+import MESSAGES from "@/constants/messages";
 
 interface Properties {
   tasks: Task[];
@@ -34,9 +35,9 @@ const TaskBoard = ({
   onDelete
 }: Properties) => {
   const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } = {
-    TODO: { title: "Do zrobienia", icon: <HourglassEmpty /> },
-    IN_PROGRESS: { title: "W trakcie", icon: <Pending /> },
-    DONE: { title: "Zrobione", icon: <Done /> }
+    TODO: { title: MESSAGES.PLACEHOLDERS.TODO, icon: <HourglassEmpty /> },
+    IN_PROGRESS: { title: MESSAGES.PLACEHOLDERS.IN_PROGRESS, icon: <Pending /> },
+    DONE: { title: MESSAGES.PLACEHOLDERS.DONE, icon: <Done /> }
   };
 
   const onDragEnd = (result: DropResult) => {
