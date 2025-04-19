@@ -2,23 +2,20 @@ import {
   Typography,
   MenuItem,
   Box,
-  InputAdornment,
-  Card,
   IconButton,
   Collapse,
-  TextField
+  TextField,
+  Card
 } from "@mui/material"
 
 import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material"
-
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import dayjs from "dayjs"
+import { useEffect, useState } from "react"
 
-import type Task from "../../type/task"
-import type Calendar from "../../type/calendar"
-import type Category from "../../type/category"
-
-import { useState, useEffect } from "react"
+import Task from "../../type/task"
+import Calendar from "../../type/calendar"
+import Category from "../../type/category"
 
 interface Properties {
   task: Task
@@ -52,10 +49,6 @@ const TaskCard = ({
     onUpdate(updatedTask)
   }
 
-  const handleToggleExpand = () => {
-    setExpanded((prev) => !prev)
-  }
-
   const fieldStyle = {
     "& .MuiOutlinedInput-root": {
       backgroundColor: "#fff",
@@ -84,13 +77,8 @@ const TaskCard = ({
         minWidth: 220
       }}
     >
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-        mb={1}
-      >
-        <IconButton onClick={handleToggleExpand} size="small">
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+        <IconButton onClick={() => setExpanded((prev) => !prev)} size="small" sx={{ color: "#000" }}>
           {expanded ? <ExpandLess /> : <ExpandMore />}
         </IconButton>
 
@@ -104,7 +92,7 @@ const TaskCard = ({
           sx={fieldStyle}
         />
 
-        <IconButton onClick={() => onDelete(task.id)} size="small">
+        <IconButton onClick={() => onDelete(task.id)} size="small" sx={{ color: "#000" }}>
           <Delete />
         </IconButton>
       </Box>
@@ -124,10 +112,7 @@ const TaskCard = ({
           <DateTimePicker
             value={localTask.startDate ? dayjs(localTask.startDate) : null}
             onChange={(newValue) =>
-              handleFieldChange(
-                "startDate",
-                newValue ? newValue.toISOString() : ""
-              )
+              handleFieldChange("startDate", newValue ? newValue.toISOString() : "")
             }
             slotProps={{
               textField: {
@@ -135,7 +120,7 @@ const TaskCard = ({
                 sx: {
                   ...fieldStyle,
                   "& .MuiSvgIcon-root": {
-                    color: "#fff"
+                    color: "#000"
                   }
                 }
               }
@@ -145,10 +130,7 @@ const TaskCard = ({
           <DateTimePicker
             value={localTask.endDate ? dayjs(localTask.endDate) : null}
             onChange={(newValue) =>
-              handleFieldChange(
-                "endDate",
-                newValue ? newValue.toISOString() : ""
-              )
+              handleFieldChange("endDate", newValue ? newValue.toISOString() : "")
             }
             slotProps={{
               textField: {
@@ -156,7 +138,7 @@ const TaskCard = ({
                 sx: {
                   ...fieldStyle,
                   "& .MuiSvgIcon-root": {
-                    color: "#fff"
+                    color: "#000"
                   }
                 }
               }
@@ -168,9 +150,7 @@ const TaskCard = ({
               placeholder="Recurring"
               select
               value={localTask.recurringPattern || "NONE"}
-              onChange={(e) =>
-                handleFieldChange("recurringPattern", e.target.value)
-              }
+              onChange={(e) => handleFieldChange("recurringPattern", e.target.value)}
               size="small"
               variant="outlined"
               fullWidth
@@ -197,9 +177,7 @@ const TaskCard = ({
             {calendars.map((cal) => (
               <MenuItem key={cal.id} value={cal.id}>
                 <Box display="flex" alignItems="center" gap={1}>
-                  <Typography
-                    sx={{ textAlign: "center", minWidth: 24, mt: -0.5 }}
-                  >
+                  <Typography sx={{ textAlign: "center", minWidth: 24, mt: -0.5 }}>
                     {cal.emoji}
                   </Typography>
                   <Typography>{cal.name}</Typography>

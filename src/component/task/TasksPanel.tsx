@@ -5,15 +5,20 @@ import { AddCircleOutline } from "@mui/icons-material"
 
 import TaskBoard from "./TasksBoard"
 
-import useDashboard from "../../hook/api/useDashboard"
+import useDashboardContext from "../../hook/context/useDashboardContext"
 
 import TaskStatus from "../../type/taskStatus"
-import Task from "../../type/task"
 import MESSAGES from "@/constant/message"
 
 const TasksPanel = () => {
-  const { tasks, calendars, categories, addTask, updateTask, deleteTask } =
-    useDashboard()
+  const {
+    tasks,
+    calendars,
+    categories,
+    addTask,
+    updateTask,
+    deleteTask
+  } = useDashboardContext()
 
   const [newTitle, setNewTitle] = useState("")
 
@@ -32,19 +37,8 @@ const TasksPanel = () => {
     setNewTitle("")
   }
 
-  const handleUpdate = async (updated: Task) => {
+  const handleUpdate = async (updated: any) => {
     await updateTask(updated.id, updated)
-  }
-
-  const handleToggleStatus = async (id: string) => {
-    const task = tasks.find((t) => t.id === id)
-    if (!task) return
-
-    const statusOrder: TaskStatus[] = ["TODO", "IN_PROGRESS", "DONE"]
-    const currentIndex = statusOrder.indexOf(task.status)
-    const nextStatus = statusOrder[(currentIndex + 1) % statusOrder.length]
-
-    await updateTask(id, { status: nextStatus })
   }
 
   return (

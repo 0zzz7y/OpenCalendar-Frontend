@@ -34,15 +34,14 @@ const TaskBoard = ({
   onUpdate,
   onDelete
 }: Properties) => {
-  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } =
-    {
-      TODO: { title: MESSAGES.PLACEHOLDERS.TODO, icon: <HourglassEmpty /> },
-      IN_PROGRESS: {
-        title: MESSAGES.PLACEHOLDERS.IN_PROGRESS,
-        icon: <Pending />
-      },
-      DONE: { title: MESSAGES.PLACEHOLDERS.DONE, icon: <Done /> }
-    }
+  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } = {
+    TODO: { title: MESSAGES.PLACEHOLDERS.TODO, icon: <HourglassEmpty /> },
+    IN_PROGRESS: {
+      title: MESSAGES.PLACEHOLDERS.IN_PROGRESS,
+      icon: <Pending />
+    },
+    DONE: { title: MESSAGES.PLACEHOLDERS.DONE, icon: <Done /> }
+  }
 
   const onDragEnd = (result: DropResult) => {
     if (!result.destination) return
