@@ -24,7 +24,6 @@ interface Properties {
   categories: Category[];
   onUpdate: (task: Task) => void;
   onDelete: (id: string) => void;
-  onToggleStatus: (id: string) => void;
 }
 
 const TaskBoard = ({
@@ -60,16 +59,16 @@ const TaskBoard = ({
   return (
     <>
       <DragDropContext onDragEnd={onDragEnd}>
-        <Box display="flex" gap={2} alignItems="flex-start" width="100%">
+        <Box display="flex" gap={2} alignItems="flex-start">
           {Object.entries(columns).map(([status, { title, icon }]) => (
             <Droppable droppableId={status} key={status}>
               {(provided) => (
                 <Box
                   ref={provided.innerRef}
                   {...provided.droppableProps}
-                  sx={{ flexGrow: 1, flexBasis: 0, minWidth: 0 }}
+                  sx={{ flex: 1 }}
                 >
-                  <TaskColumn title={title} icon={icon}>
+                  <TaskColumn title={title} icon={icon} >
                     {tasks
                       .filter((t) => t.status === status)
                       .map((task, index) => (

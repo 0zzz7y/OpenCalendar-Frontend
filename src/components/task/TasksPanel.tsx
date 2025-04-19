@@ -85,7 +85,6 @@ const TasksPanel = () => {
           categories={categories}
           onUpdate={handleUpdate}
           onDelete={deleteTask}
-          onToggleStatus={handleToggleStatus}
         />
       </Box>
     </>
