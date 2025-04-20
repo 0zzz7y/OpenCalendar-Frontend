@@ -18,7 +18,6 @@ import {
 } from "@hello-pangea/dnd"
 import { JSX } from "react"
 import MESSAGES from "@/constant/message"
-
 interface Properties {
   tasks: Task[]
   calendars: Calendar[]

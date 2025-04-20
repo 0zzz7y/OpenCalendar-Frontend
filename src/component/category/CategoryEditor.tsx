@@ -1,15 +1,16 @@
 import { useEffect, useRef, useState } from "react"
-import {
-  Paper,
-  TextField,
-  Typography,
-  Button,
-  Box,
-  ClickAwayListener
-} from "@mui/material"
 
-import useAppContext from "@/hook/context/useAppContext" // Using global AppContext
+import { Box, Button, ClickAwayListener, Paper, TextField, Typography, Input } from "@mui/material"
+
 import { createPortal } from "react-dom"
+
+import useAppContext from "@/hook/context/useAppContext"
+
+import EditorType from "@/type/utility/editorType"
+
+import PLACEHOLDERS from "@/constant/placeholders"
+import BUTTONS from "@/constant/buttons"
+import POPOVER from "@/constant/popover"
 
 const CategoryEditor = () => {
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -20,20 +21,21 @@ const CategoryEditor = () => {
     editorMode,
     editorData,
     closeEditor,
+    editorType,
     selectedCategory,
     setSelectedCategory,
     reloadCategories,
     addCategory,
     updateCategory,
     deleteCategory
-  } = useAppContext() // Accessing state from AppContext
+  } = useAppContext()
 
   const [label, setLabel] = useState("")
   const [color, setColor] = useState("#3b5bdb")
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (editorOpen) {
+    if (editorOpen && editorType === EditorType.CATEGORY) {
       setLabel(editorData.label || "")
       setColor(editorData.color || "#3b5bdb")
 
@@ -41,7 +43,7 @@ const CategoryEditor = () => {
         inputRef.current?.focus()
       }, 50)
     }
-  }, [editorOpen, editorData])
+  }, [editorOpen, editorData, editorType])
 
   const handleClickAway = (event: MouseEvent | TouchEvent) => {
     if (
@@ -98,7 +100,7 @@ const CategoryEditor = () => {
     }
   }
 
-  if (!editorOpen) return null
+  if (!editorOpen || editorType !== EditorType.CATEGORY) return null
 
   return createPortal(
     <>
@@ -124,12 +126,12 @@ const CategoryEditor = () => {
                 fontWeight={500}
                 gutterBottom
               >
-                {editorMode === "add" ? "New category" : "Edit category"}
+                {editorMode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
               </Typography>
 
               <TextField
                 inputRef={inputRef}
-                placeholder="Category name"
+                placeholder={PLACEHOLDERS.NAME}
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 fullWidth
@@ -137,49 +139,34 @@ const CategoryEditor = () => {
                 margin="dense"
               />
 
-              <Box
-                mt={2}
-                mb={1}
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography variant="body2" fontWeight={500}>
-                  Selected color:
-                </Typography>
-                <Box
-                  sx={{
-                    width: 24,
-                    height: 24,
-                    borderRadius: "50%",
-                    backgroundColor: color
-                  }}
+              <Box display="flex" alignItems="center" gap={1} mt={2}>
+                <Input
+                  type="color"
+                  value={color}
+                  onChange={(e) => setColor(e.target.value)}
+                  sx={{ minWidth: 40, flex: 1 }}
                 />
+                <Button
+                  variant="contained"
+                  fullWidth
+                  onClick={editorMode === "add" ? handleAdd : handleEdit}
+                  disabled={loading}
+                >
+                  {editorMode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
+                </Button>
               </Box>
-
-              {/* You can add a color picker component here */}
-
-              <Button
-                variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-                onClick={editorMode === "add" ? handleAdd : handleEdit}
-                disabled={loading}
-              >
-                {editorMode === "add" ? "Add" : "Save"}
-              </Button>
             </>
           )}
 
           {editorMode === "delete" && (
             <>
               <Typography variant="body2">
-                Are you sure you want to delete this category?
+                {POPOVER.CONFIRM_DELETE_CATEGORY}
               </Typography>
 
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
                 <Button variant="text" size="small" onClick={closeEditor}>
-                  Cancel
+                  {BUTTONS.CANCEL}
                 </Button>
                 <Button
                   variant="contained"
@@ -188,7 +175,7 @@ const CategoryEditor = () => {
                   onClick={handleDelete}
                   disabled={loading}
                 >
-                  Delete
+                  {BUTTONS.DELETE}
                 </Button>
               </Box>
             </>

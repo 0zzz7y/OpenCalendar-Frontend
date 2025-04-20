@@ -75,7 +75,7 @@ const EventBox = ({
   const category = categories.find((c) => c.id === event.categoryId)
 
   const emoji = calendar?.emoji || ""
-  const backgroundColor = category?.color || event.color || "#1976d2"
+  const backgroundColor = category?.color || "#1976d2"
 
   return (
     <Box

@@ -17,7 +17,6 @@ import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined"
 
 import { useState } from "react"
 import MESSAGES from "@/constant/message"
-
 export type FormatCommand =
   | typeof MESSAGES.TOOLBAR.BOLD
   | typeof MESSAGES.TOOLBAR.ITALIC

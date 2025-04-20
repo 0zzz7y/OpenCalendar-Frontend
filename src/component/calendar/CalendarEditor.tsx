@@ -1,27 +1,24 @@
 import { useEffect, useRef, useState } from "react"
-import {
-  Paper,
-  TextField,
-  Typography,
-  Button,
-  Box,
-  ClickAwayListener
-} from "@mui/material"
-import EmojiPicker, {
-  EmojiClickData,
-  EmojiStyle,
-  SkinTones,
-  Theme
-} from "emoji-picker-react"
-import useCalendars from "../../hook/api/useCalendar"
-import MESSAGES from "../../constant/message"
+
+import { Box, Button, ClickAwayListener, Paper, TextField, Typography } from "@mui/material"
+
+import EmojiPicker, { EmojiClickData, EmojiStyle, SkinTones, Theme } from "emoji-picker-react"
+
 import { createPortal } from "react-dom"
+
 import useAppContext from "@/hook/context/useAppContext"
+import useCalendars from "@/hook/api/useCalendar"
+
+import EditorType from "@/type/utility/editorType"
+
+import PLACEHOLDERS from "@/constant/placeholders"
+import BUTTONS from "@/constant/buttons"
+import POPOVER from "@/constant/popover"
 
 const CalendarEditor = () => {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
-  const emojiPickerRef = useRef<HTMLDivElement | null>(null) // Ref for EmojiPicker
+  const emojiPickerRef = useRef<HTMLDivElement | null>(null)
 
   const {
     editorOpen,
@@ -33,6 +30,7 @@ const CalendarEditor = () => {
     setSelectedCalendar,
     reloadCalendars
   } = useAppContext()
+
   const { addCalendar, updateCalendar, deleteCalendar } = useCalendars()
 
   const [label, setLabel] = useState("")
@@ -51,9 +49,7 @@ const CalendarEditor = () => {
     }
   }, [editorOpen, editorData])
 
-  // Modified handleClickAway to check if click is inside EmojiPicker
   const handleClickAway = (event: MouseEvent | TouchEvent) => {
-    // Check if the click is outside the popover (containerRef) and EmojiPicker (emojiPickerRef)
     if (
       containerRef.current &&
       !containerRef.current.contains(event.target as Node) &&
@@ -110,7 +106,7 @@ const CalendarEditor = () => {
     }
   }
 
-  if (!editorOpen) return null
+  if (!editorOpen || editorType !== EditorType.CALENDAR) return null
 
   return createPortal(
     <>
@@ -136,14 +132,12 @@ const CalendarEditor = () => {
                 fontWeight={500}
                 gutterBottom
               >
-                {editorMode === "add"
-                  ? MESSAGES.PLACEHOLDERS.ADD_EVENT
-                  : MESSAGES.PLACEHOLDERS.EDIT_EVENT}
+                {editorMode === "add" ? BUTTONS.ADD_EVENT : BUTTONS.EDIT_EVENT}
               </Typography>
 
               <TextField
                 inputRef={inputRef}
-                placeholder={MESSAGES.PLACEHOLDERS.NAME}
+                placeholder={PLACEHOLDERS.NAME}
                 value={label}
                 onChange={(e) => setLabel(e.target.value)}
                 fullWidth
@@ -158,13 +152,9 @@ const CalendarEditor = () => {
                 alignItems="center"
                 justifyContent="space-between"
               >
-                <Typography variant="body2" fontWeight={500}>
-                  Selected emoji:
-                </Typography>
                 <Typography fontSize={24}>{emoji}</Typography>
               </Box>
 
-              {/* EmojiPicker with ref */}
               <div ref={emojiPickerRef}>
                 <EmojiPicker
                   width="100%"
@@ -190,9 +180,7 @@ const CalendarEditor = () => {
                 onClick={editorMode === "add" ? handleAdd : handleEdit}
                 disabled={loading}
               >
-                {editorMode === "add"
-                  ? MESSAGES.BUTTONS.ADD
-                  : MESSAGES.BUTTONS.SAVE}
+                {editorMode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
               </Button>
             </>
           )}
@@ -200,12 +188,12 @@ const CalendarEditor = () => {
           {editorMode === "delete" && (
             <>
               <Typography variant="body2">
-                {MESSAGES.POPOVER.CONFIRM_DELETE_EVENT}
+                {POPOVER.CONFIRM_DELETE_CALENDAR}
               </Typography>
 
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
                 <Button variant="text" size="small" onClick={closeEditor}>
-                  {MESSAGES.BUTTONS.CANCEL}
+                  {BUTTONS.CANCEL}
                 </Button>
                 <Button
                   variant="contained"
@@ -214,7 +202,7 @@ const CalendarEditor = () => {
                   onClick={handleDelete}
                   disabled={loading}
                 >
-                  {MESSAGES.BUTTONS.DELETE}
+                  {BUTTONS.DELETE}
                 </Button>
               </Box>
             </>
