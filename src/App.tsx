@@ -7,17 +7,20 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 
 import Dashboard from "./page/Dashboard"
 import AppProvider from "./provider/AppProvider"
+import ThemeModeProvider from "./provider/ThemeProvider"
 
 const App = () => {
   return (
     <>
       <AppProvider>
-        <DndProvider backend={HTML5Backend}>
+        <ThemeModeProvider>
           <LocalizationProvider dateAdapter={AdapterDateFns}>
-            <CssBaseline />
-            <Dashboard />
+            <DndProvider backend={HTML5Backend}>
+              <CssBaseline />
+              <Dashboard />
+            </DndProvider>
           </LocalizationProvider>
-        </DndProvider>
+        </ThemeModeProvider>
       </AppProvider>
     </>
   )

@@ -1,3 +1,5 @@
+import { useEffect, useState } from "react"
+
 import {
   Typography,
   MenuItem,
@@ -9,9 +11,10 @@ import {
 } from "@mui/material"
 
 import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material"
+
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+
 import dayjs from "dayjs"
-import { useEffect, useState } from "react"
 
 import type Task from "@/type/domain/task"
 import type Calendar from "@/type/domain/calendar"
@@ -68,7 +71,7 @@ const TaskCard = ({
   }
 
   const handleToggleExpand = () => {
-    setExpanded((prev) => !prev) // Toggle expanded state
+    setExpanded((prev) => !prev)
   }
 
   return (
@@ -88,19 +91,20 @@ const TaskCard = ({
         justifyContent="space-between"
         mb={1}
       >
-        <IconButton onClick={handleToggleExpand} size="small">
-          {expanded ? <ExpandLess /> : <ExpandMore />}
-        </IconButton>
-
-        <TextField
-          placeholder="Tytuł"
-          value={localTask.name}
-          onChange={(e) => handleFieldChange("name", e.target.value)}
-          size="small"
-          variant="outlined"
-          fullWidth
-          sx={fieldStyle}
-        />
+        <Box display="flex" alignItems="center" gap={1}>
+          <IconButton onClick={handleToggleExpand} size="small">
+            {expanded ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+          <TextField
+            placeholder="Tytuł"
+            value={localTask.name}
+            onChange={(e) => handleFieldChange("name", e.target.value)}
+            size="small"
+            variant="outlined"
+            fullWidth
+            sx={fieldStyle}
+          />
+        </Box>
 
         <IconButton onClick={() => onDelete(task.id)} size="small">
           <Delete />
@@ -116,13 +120,13 @@ const TaskCard = ({
             size="small"
             variant="outlined"
             fullWidth
+            multiline
+            minRows={3}
             sx={fieldStyle}
           />
 
           <DateTimePicker
-            value={
-              localTask.startDate ? dayjs(localTask.startDate).toDate() : null
-            } // Convert to native Date
+            value={localTask.startDate ? dayjs(localTask.startDate).toDate() : null}
             onChange={(newValue) =>
               handleFieldChange(
                 "startDate",
@@ -143,7 +147,7 @@ const TaskCard = ({
           />
 
           <DateTimePicker
-            value={localTask.endDate ? dayjs(localTask.endDate).toDate() : null} // Convert to native Date
+            value={localTask.endDate ? dayjs(localTask.endDate).toDate() : null}
             onChange={(newValue) =>
               handleFieldChange(
                 "endDate",
@@ -218,6 +222,9 @@ const TaskCard = ({
             fullWidth
             sx={fieldStyle}
           >
+            <MenuItem value="">
+              <Typography>None</Typography>
+            </MenuItem>
             {categories.map((cat) => (
               <MenuItem key={cat.id} value={cat.id}>
                 <Box display="flex" alignItems="center" gap={1}>

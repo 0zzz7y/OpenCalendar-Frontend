@@ -4,8 +4,8 @@ import { Theme } from "@mui/material/styles"
 
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
 
-import lightTheme from "./lightTheme"
-import darkTheme from "./darkTheme"
+import lightTheme from "../component/theme/lightTheme"
+import darkTheme from "../component/theme/darkTheme"
 
 import THEME from "@/constant/theme"
 
