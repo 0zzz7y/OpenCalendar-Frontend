@@ -1,8 +1,8 @@
+import useCalendars from "./useCalendar"
+import useCategories from "./useCategory"
 import useEvents from "./useEvent"
 import useTasks from "./useTask"
 import useNotes from "./useNote"
-import useCalendars from "./useCalendar"
-import useCategories from "./useCategory"
 
 const useDashboard = () => {
   const {

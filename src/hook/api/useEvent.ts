@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react"
+
 import axios from "axios"
+
 import { toast } from "react-toastify"
 
 import Event from "@/type/domain/event"
+import PaginatedResponse from "@/type/communication/paginatedResponse"
 
 const useEvent = () => {
   const [events, setEvents] = useState<Event[]>([])

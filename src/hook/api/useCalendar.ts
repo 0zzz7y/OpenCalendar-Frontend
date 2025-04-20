@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react"
+
 import axios from "axios"
+
 import { toast } from "react-toastify"
 
 import Calendar from "@/type/domain/calendar"
+import PaginatedResponse from "@/type/communication/paginatedResponse"
 
 const useCalendar = () => {
   const [calendars, setCalendars] = useState<Calendar[]>([])

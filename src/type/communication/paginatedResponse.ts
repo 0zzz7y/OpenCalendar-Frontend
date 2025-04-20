@@ -9,3 +9,5 @@ interface PaginatedResponse<T> {
   numberOfElements: number
   empty: boolean
 }
+
+export default PaginatedResponse

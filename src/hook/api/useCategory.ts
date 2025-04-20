@@ -1,8 +1,11 @@
 import { useState, useEffect } from "react"
+
 import axios from "axios"
+
 import { toast } from "react-toastify"
 
 import Category from "@/type/domain/category"
+import PaginatedResponse from "@/type/communication/paginatedResponse"
 
 const useCategory = () => {
   const [categories, setCategories] = useState<Category[]>([])

@@ -15,17 +15,23 @@ import NotesPanel from "@/component/note/NotesPanel"
 
 const Dashboard = () => {
   return (
-    <PanelGroup direction="horizontal" style={{ height: "100vh", width: "100%" }}>
+    <PanelGroup
+      direction="horizontal"
+      style={{ height: "100vh", width: "100%" }}
+    >
       {/* Left Panel */}
       <Panel>
-        <PanelGroup direction="vertical" style={{ height: "100%", width: "100%" }}>
+        <PanelGroup
+          direction="vertical"
+          style={{ height: "100%", width: "100%" }}
+        >
           {/* Calendar and Category section */}
           <Panel
             style={{
               border: "2px solid #ccc",
               borderRadius: "8px",
               padding: "10px",
-              margin: "10px 5px",
+              margin: "10px 5px"
             }}
           >
             <Box
@@ -54,7 +60,7 @@ const Dashboard = () => {
               borderRadius: "8px",
               padding: "10px",
               margin: "5px 5px",
-              position: "relative",
+              position: "relative"
             }}
           >
             <Box sx={{ alignSelf: "flex-start", mt: "-16px", ml: "-24px" }}>
@@ -67,7 +73,7 @@ const Dashboard = () => {
                 left: 0,
                 padding: "10px",
                 borderRadius: "8px",
-                width: "100%",
+                width: "100%"
               }}
             >
               <ThemeToggleButton />
@@ -83,7 +89,7 @@ const Dashboard = () => {
         style={{
           border: "2px solid #ccc",
           borderRadius: "8px",
-          margin: "10px 5px",
+          margin: "10px 5px"
         }}
       >
         <CenterPanel />
@@ -100,7 +106,7 @@ const Dashboard = () => {
           style={{
             border: "2px solid #ccc",
             borderRadius: "8px",
-            margin: "10px 5px",
+            margin: "10px 5px"
           }}
         >
           <Box height="0%">

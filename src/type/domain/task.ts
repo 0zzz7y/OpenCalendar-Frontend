@@ -1,7 +1,7 @@
 import TaskStatus from "./taskStatus"
 import RecurringPattern from "./recurringPattern"
 
-export default interface Task {
+interface Task {
   id: string
   name: string
   description?: string
@@ -12,3 +12,5 @@ export default interface Task {
   calendarId?: string
   categoryId?: string
 }
+
+export default Task

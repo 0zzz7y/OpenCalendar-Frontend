@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react"
+
 import axios from "axios"
+
 import { toast } from "react-toastify"
 
 import Note from "@/type/domain/note"
+import PaginatedResponse from "@/type/communication/paginatedResponse"
 
 const useNote = () => {
   const [notes, setNotes] = useState<Note[]>([])
@@ -74,7 +77,7 @@ const useNote = () => {
   }
 
   const addNote = async (note: Omit<Note, "id">): Promise<Note> => {
-    if (!note.name.trim() || !note.description.trim())
+    if (!note.name?.trim() || !note.description.trim())
       throw new Error("Note name and description cannot be empty.")
 
     const temporaryId = crypto.randomUUID()

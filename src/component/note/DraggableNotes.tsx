@@ -15,7 +15,7 @@ interface NoteItem {
 const initialNotes: NoteItem[] = [
   { id: "note-1", content: "Zrobić zakupy" },
   { id: "note-2", content: "Oddzwonić do Kasi" },
-  { id: "note-3", content: "Odebrać paczkę" },
+  { id: "note-3", content: "Odebrać paczkę" }
 ]
 
 const DraggableNotes = () => {

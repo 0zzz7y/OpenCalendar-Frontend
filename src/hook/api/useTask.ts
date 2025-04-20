@@ -1,8 +1,11 @@
 import { useEffect, useState } from "react"
+
 import axios from "axios"
+
 import { toast } from "react-toastify"
 
 import Task from "@/type/domain/task"
+import PaginatedResponse from "@/type/communication/paginatedResponse"
 
 const useTask = () => {
   const [tasks, setTasks] = useState<Task[]>([])

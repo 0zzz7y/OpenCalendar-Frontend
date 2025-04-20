@@ -1,6 +1,6 @@
 import RecurringPattern from "./recurringPattern"
 
-export default interface Event {
+interface Event {
   id: string
   name: string
   description?: string
@@ -10,3 +10,5 @@ export default interface Event {
   calendarId: string
   categoryId?: string
 }
+
+export default Event

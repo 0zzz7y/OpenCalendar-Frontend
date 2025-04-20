@@ -1,5 +1,7 @@
-export default interface Category {
+interface Category {
   id: string
   name: string
   color: string
 }
+
+export default Category
