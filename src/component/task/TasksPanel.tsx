@@ -7,8 +7,9 @@ import TaskBoard from "./TasksBoard"
 
 import useAppContext from "@/hook/context/useAppContext"
 
-import MESSAGES from "@/constant/message"
 import TaskStatus from "@/type/domain/taskStatus"
+
+import MESSAGES from "@/constant/message"
 
 const TasksPanel = () => {
   const { tasks, calendars, categories, addTask, updateTask, deleteTask } =

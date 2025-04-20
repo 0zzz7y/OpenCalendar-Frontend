@@ -14,18 +14,22 @@ import EditorType from "@/type/utility/editorType"
 import PLACEHOLDERS from "@/constant/placeholders"
 
 const CategorySelector = () => {
-  const { categories, selectedCategory, setSelectedCategory, openEditor } = useAppContext()
+  const { categories, selectedCategory, setSelectedCategory, openEditor } =
+    useAppContext()
 
-  const categoryOptions: { label: string; value: string; color?: string }[] = useMemo(() => {
-    return [
-      { label: "All", value: "all" },
-      ...categories.map((category: { name: string; id: string; color: string }) => ({
-        label: category.name,
-        value: category.id,
-        color: category.color
-      }))
-    ]
-  }, [categories])
+  const categoryOptions: { label: string; value: string; color?: string }[] =
+    useMemo(() => {
+      return [
+        { label: "All", value: "all" },
+        ...categories.map(
+          (category: { name: string; id: string; color: string }) => ({
+            label: category.name,
+            value: category.id,
+            color: category.color
+          })
+        )
+      ]
+    }, [categories])
 
   return (
     <>
@@ -40,7 +44,9 @@ const CategorySelector = () => {
           SelectProps={{
             renderValue: (selected: unknown) => {
               const selectedValue = selected as string
-              const item = categoryOptions.find((d) => d.value === selectedValue)
+              const item = categoryOptions.find(
+                (d) => d.value === selectedValue
+              )
               return (
                 <Box display="flex" alignItems="center" gap={1}>
                   {item?.color && (
@@ -59,7 +65,12 @@ const CategorySelector = () => {
         >
           {categoryOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+              >
                 <Box display="flex" alignItems="center" gap={1}>
                   {option.color && (
                     <Box

@@ -1,8 +1,20 @@
 import { useEffect, useRef, useState } from "react"
 
-import { Box, Button, ClickAwayListener, Paper, TextField, Typography } from "@mui/material"
+import {
+  Box,
+  Button,
+  ClickAwayListener,
+  Paper,
+  TextField,
+  Typography
+} from "@mui/material"
 
-import EmojiPicker, { EmojiClickData, EmojiStyle, SkinTones, Theme } from "emoji-picker-react"
+import EmojiPicker, {
+  EmojiClickData,
+  EmojiStyle,
+  SkinTones,
+  Theme
+} from "emoji-picker-react"
 
 import { createPortal } from "react-dom"
 

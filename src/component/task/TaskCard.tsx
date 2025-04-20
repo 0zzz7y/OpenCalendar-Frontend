@@ -126,7 +126,9 @@ const TaskCard = ({
           />
 
           <DateTimePicker
-            value={localTask.startDate ? dayjs(localTask.startDate).toDate() : null}
+            value={
+              localTask.startDate ? dayjs(localTask.startDate).toDate() : null
+            }
             onChange={(newValue) =>
               handleFieldChange(
                 "startDate",

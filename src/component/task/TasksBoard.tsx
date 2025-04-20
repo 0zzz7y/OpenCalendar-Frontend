@@ -35,11 +35,12 @@ const TaskBoard = ({
   onUpdate,
   onDelete
 }: Properties) => {
-  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } = {
-    TODO: { title: TaskStatus.TODO, icon: <HourglassEmpty /> },
-    IN_PROGRESS: { title: TaskStatus.IN_PROGRESS, icon: <Pending /> },
-    DONE: { title: TaskStatus.DONE, icon: <Done /> }
-  }
+  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } =
+    {
+      TODO: { title: TaskStatus.TODO, icon: <HourglassEmpty /> },
+      IN_PROGRESS: { title: TaskStatus.IN_PROGRESS, icon: <Pending /> },
+      DONE: { title: TaskStatus.DONE, icon: <Done /> }
+    }
 
   const [localOrder, setLocalOrder] = useState<Record<TaskStatus, Task[]>>({
     TODO: tasks.filter((t) => t.status === "TODO"),
@@ -70,7 +71,10 @@ const TaskBoard = ({
       }))
     } else {
       sourceTasks.splice(source.index, 1)
-      destTasks.splice(destination.index, 0, { ...draggedTask, status: destColumn })
+      destTasks.splice(destination.index, 0, {
+        ...draggedTask,
+        status: destColumn
+      })
 
       setLocalOrder((prev) => ({
         ...prev,
@@ -102,7 +106,9 @@ const TaskBoard = ({
                     flex: 1,
                     minWidth: 280,
                     transition: "background-color 0.2s ease",
-                    backgroundColor: snapshot.isDraggingOver ? "#f0f0f0" : "transparent"
+                    backgroundColor: snapshot.isDraggingOver
+                      ? "#f0f0f0"
+                      : "transparent"
                   }}
                 >
                   <TaskColumn title={title} icon={icon}>

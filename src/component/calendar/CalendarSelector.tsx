@@ -13,16 +13,19 @@ import EditorMode from "@/type/utility/editorMode"
 import EditorType from "@/type/utility/editorType"
 
 const CalendarSelector = () => {
-  const { calendars, selectedCalendar, setSelectedCalendar, openEditor } = useAppContext()
+  const { calendars, selectedCalendar, setSelectedCalendar, openEditor } =
+    useAppContext()
 
   const calendarOptions = useMemo(() => {
     return [
       { label: "All", value: "all", emoji: "📅" },
-      ...calendars.map((calendar: { name: string; id: string; emoji: string }) => ({
-        label: calendar.name,
-        value: calendar.id,
-        emoji: calendar.emoji
-      }))
+      ...calendars.map(
+        (calendar: { name: string; id: string; emoji: string }) => ({
+          label: calendar.name,
+          value: calendar.id,
+          emoji: calendar.emoji
+        })
+      )
     ]
   }, [calendars])
 
@@ -52,7 +55,12 @@ const CalendarSelector = () => {
         >
           {calendarOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
-              <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+              <Box
+                display="flex"
+                justifyContent="space-between"
+                alignItems="center"
+                width="100%"
+              >
                 <Box display="flex" alignItems="center" gap={1}>
                   <span>{option.emoji}</span>
                   <Typography variant="body2">{option.label}</Typography>
