@@ -1,5 +1,4 @@
 import { useEffect, useRef, useState } from "react"
-
 import {
   Paper,
   TextField,
@@ -9,9 +8,7 @@ import {
   ClickAwayListener
 } from "@mui/material"
 
-import useCategoryContext from "../../hook/context/useCategoryContext"
-import useCategories from "../../hook/api/useCategory"
-import MESSAGES from "../../constant/message"
+import useAppContext from "@/hook/context/useAppContext" // Using global AppContext
 import { createPortal } from "react-dom"
 
 const CategoryEditor = () => {
@@ -25,10 +22,11 @@ const CategoryEditor = () => {
     closeEditor,
     selectedCategory,
     setSelectedCategory,
-    reloadCategories
-  } = useCategoryContext()
-
-  const { addCategory, updateCategory, deleteCategory } = useCategories()
+    reloadCategories,
+    addCategory,
+    updateCategory,
+    deleteCategory
+  } = useAppContext() // Accessing state from AppContext
 
   const [label, setLabel] = useState("")
   const [color, setColor] = useState("#3b5bdb")
@@ -159,7 +157,7 @@ const CategoryEditor = () => {
                 />
               </Box>
 
-              {/* Możesz tu dodać swój komponent do wyboru koloru */}
+              {/* You can add a color picker component here */}
 
               <Button
                 variant="contained"

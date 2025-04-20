@@ -19,13 +19,15 @@ const useCategory = () => {
         {
           params: {
             page: pageNumber,
-            size 
+            size
           }
         }
       )
       const data = response.data
 
-      setCategories((prev) =>reset ? data.content : [...prev, ...data.content])
+      setCategories((prev) =>
+        reset ? data.content : [...prev, ...data.content]
+      )
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
@@ -86,7 +88,9 @@ const useCategory = () => {
       )
       const savedCategory = response.data
 
-      setCategories((prev) => prev.map((c) => (c.id === temporaryId ? { ...savedCategory } : c)))
+      setCategories((prev) =>
+        prev.map((c) => (c.id === temporaryId ? { ...savedCategory } : c))
+      )
       return savedCategory
     } catch (error) {
       toast.error("Failed to add category")
@@ -99,7 +103,9 @@ const useCategory = () => {
     const previous = categories.find((c) => c.id === id)
     if (!previous) return
 
-    setCategories((prev) =>prev.map((c) => (c.id === id ? { ...c, ...updated } : c)))
+    setCategories((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updated } : c))
+    )
 
     try {
       await axios.put(

@@ -5,12 +5,14 @@ import { AddCircleOutline } from "@mui/icons-material"
 
 import TaskBoard from "./TasksBoard"
 
-import useDashboardContext from "@/hook/context/useDashboardContext"
+import useAppContext from "@/hook/context/useAppContext"
 
 import MESSAGES from "@/constant/message"
+import TaskStatus from "@/type/domain/taskStatus"
 
 const TasksPanel = () => {
-  const { tasks, calendars, categories, addTask, updateTask, deleteTask } = useDashboardContext()
+  const { tasks, calendars, categories, addTask, updateTask, deleteTask } =
+    useAppContext()
 
   const [newTitle, setNewTitle] = useState("")
 
@@ -19,7 +21,7 @@ const TasksPanel = () => {
 
     await addTask({
       name: newTitle,
-      status: "TODO",
+      status: TaskStatus.TODO,
       calendarId: calendars[0]?.id || "",
       categoryId: categories[0]?.id || "",
       startDate: "",

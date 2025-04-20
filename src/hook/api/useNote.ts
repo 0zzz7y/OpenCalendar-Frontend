@@ -18,8 +18,8 @@ const useNote = () => {
         `${import.meta.env.VITE_BACKEND_URL}/notes`,
         {
           params: {
-            page:pageNumber,
-            size 
+            page: pageNumber,
+            size
           }
         }
       )
@@ -74,7 +74,8 @@ const useNote = () => {
   }
 
   const addNote = async (note: Omit<Note, "id">): Promise<Note> => {
-    if (!note.name.trim() || !note.description.trim()) throw new Error("Note name and description cannot be empty.")
+    if (!note.name.trim() || !note.description.trim())
+      throw new Error("Note name and description cannot be empty.")
 
     const temporaryId = crypto.randomUUID()
     const optimisticNote: Note = { ...note, id: temporaryId }
@@ -88,7 +89,9 @@ const useNote = () => {
       )
       const savedNote = response.data
 
-      setNotes((prev) =>prev.map((n) => (n.id === temporaryId ? { ...savedNote } : n)))
+      setNotes((prev) =>
+        prev.map((n) => (n.id === temporaryId ? { ...savedNote } : n))
+      )
       return savedNote
     } catch (error) {
       toast.error("Failed to add note")

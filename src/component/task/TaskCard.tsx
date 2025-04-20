@@ -13,11 +13,10 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import dayjs from "dayjs"
 import { useEffect, useState } from "react"
 
-import type Task from "../../type/task"
-import type Calendar from "../../type/calendar"
-import type Category from "../../type/category"
-
-import { useState, useEffect } from "react"
+import type Task from "@/type/domain/task"
+import type Calendar from "@/type/domain/calendar"
+import type Category from "@/type/domain/category"
+import RecurringPattern from "@/type/domain/recurringPattern"
 
 interface Properties {
   task: Task
@@ -66,6 +65,10 @@ const TaskCard = ({
     "& .MuiSelect-icon": {
       color: "#000"
     }
+  }
+
+  const handleToggleExpand = () => {
+    setExpanded((prev) => !prev) // Toggle expanded state
   }
 
   return (
@@ -117,9 +120,14 @@ const TaskCard = ({
           />
 
           <DateTimePicker
-            value={localTask.startDate ? dayjs(localTask.startDate) : null}
+            value={
+              localTask.startDate ? dayjs(localTask.startDate).toDate() : null
+            } // Convert to native Date
             onChange={(newValue) =>
-              handleFieldChange("startDate", newValue ? newValue.toISOString() : "")
+              handleFieldChange(
+                "startDate",
+                newValue ? newValue.toISOString() : ""
+              )
             }
             slotProps={{
               textField: {
@@ -135,9 +143,12 @@ const TaskCard = ({
           />
 
           <DateTimePicker
-            value={localTask.endDate ? dayjs(localTask.endDate) : null}
+            value={localTask.endDate ? dayjs(localTask.endDate).toDate() : null} // Convert to native Date
             onChange={(newValue) =>
-              handleFieldChange("endDate", newValue ? newValue.toISOString() : "")
+              handleFieldChange(
+                "endDate",
+                newValue ? newValue.toISOString() : ""
+              )
             }
             slotProps={{
               textField: {
@@ -157,17 +168,19 @@ const TaskCard = ({
               placeholder="Recurring"
               select
               value={localTask.recurringPattern || "NONE"}
-              onChange={(e) => handleFieldChange("recurringPattern", e.target.value)}
+              onChange={(e) =>
+                handleFieldChange("recurringPattern", e.target.value)
+              }
               size="small"
               variant="outlined"
               fullWidth
               sx={fieldStyle}
             >
-              <MenuItem value="NONE">{RECURRING_PATTERN.VALUE.NONE}</MenuItem>
-              <MenuItem value="DAILY">{RECURRING_PATTERN.VALUE.DAILY}</MenuItem>
-              <MenuItem value="WEEKLY">{RECURRING_PATTERN.VALUE.WEEKLY}</MenuItem>
-              <MenuItem value="MONTHLY">{RECURRING_PATTERN.VALUE.MONTHLY}</MenuItem>
-              <MenuItem value="YEARLY">{RECURRING_PATTERN.VALUE.YEARLY}</MenuItem>
+              <MenuItem value="NONE">{RecurringPattern.NONE}</MenuItem>
+              <MenuItem value="DAILY">{RecurringPattern.DAILY}</MenuItem>
+              <MenuItem value="WEEKLY">{RecurringPattern.WEEKLY}</MenuItem>
+              <MenuItem value="MONTHLY">{RecurringPattern.MONTHLY}</MenuItem>
+              <MenuItem value="YEARLY">{RecurringPattern.YEARLY}</MenuItem>
             </TextField>
           )}
 
@@ -184,7 +197,9 @@ const TaskCard = ({
             {calendars.map((cal) => (
               <MenuItem key={cal.id} value={cal.id}>
                 <Box display="flex" alignItems="center" gap={1}>
-                  <Typography sx={{ textAlign: "center", minWidth: 24, mt: -0.5 }}>
+                  <Typography
+                    sx={{ textAlign: "center", minWidth: 24, mt: -0.5 }}
+                  >
                     {cal.emoji}
                   </Typography>
                   <Typography>{cal.name}</Typography>

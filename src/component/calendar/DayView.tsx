@@ -110,8 +110,7 @@ const DayView = ({
               startDate: dayjs(selectedDatetime).toISOString(),
               endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
               calendarId: "",
-              categoryId: undefined,
-              color: "#1976d2"
+              categoryId: undefined
             }
           }
         />

@@ -233,7 +233,7 @@ const NoteCard = ({
             onClearText={clearText}
             onDelete={() =>
               contentRef.current?.innerText.trim()
-                ? handleConfirm(MESSAGES.POPOVER.CONFIRM_DELETE_NOTE, () =>
+                ? handleConfirm(MESSAGES.POPOVER.CONFIRM_CLEAR_CONTENTS, () =>
                     onDelete?.(id)
                   )
                 : onDelete?.(id)

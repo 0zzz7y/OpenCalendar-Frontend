@@ -83,7 +83,9 @@ const useTask = () => {
       )
       const savedTask = response.data
 
-      setTasks((prev) =>prev.map((t) => (t.id === temporaryId ? { ...savedTask } : t)))
+      setTasks((prev) =>
+        prev.map((t) => (t.id === temporaryId ? { ...savedTask } : t))
+      )
       return savedTask
     } catch (error) {
       toast.error("Failed to add task")
@@ -96,7 +98,9 @@ const useTask = () => {
     const previous = tasks.find((t) => t.id === id)
     if (!previous) return
 
-    setTasks((prev) =>prev.map((t) => (t.id === id ? { ...t, ...updated } : t)))
+    setTasks((prev) =>
+      prev.map((t) => (t.id === id ? { ...t, ...updated } : t))
+    )
 
     try {
       await axios.put(

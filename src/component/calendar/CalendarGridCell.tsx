@@ -1,8 +1,7 @@
 import { Box } from "@mui/material"
 import { useDrop } from "react-dnd"
 import { useRef, useEffect } from "react"
-
-import Event from "../../type/domain/event"
+import Event from "../../type/domain/event" // Ensure the type includes `color`
 
 interface CalendarGridCellProperties {
   datetime: Date
@@ -52,7 +51,6 @@ const CalendarGridCell = ({
         description: moved.description,
         calendarId: moved.calendarId,
         categoryId: moved.categoryId,
-        color: moved.color,
         startDate: newStart.toISOString(),
         endDate: newEnd.toISOString()
       })

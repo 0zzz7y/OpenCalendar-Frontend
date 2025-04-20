@@ -14,13 +14,13 @@ import EventPopover from "../event/EventCreationPopover"
 import EventInformationPopover from "../event/EventInformationPopover"
 
 import useFilters from "@/hook/api/useFilter"
-import useDashboardContext from "@/hook/context/useDashboardContext"
+import useAppContext from "@/hook/context/useAppContext"
 
 import Event from "@/type/domain/event"
 
 const CenterPanel = () => {
   const { events, calendars, categories, addEvent, updateEvent, deleteEvent } =
-    useDashboardContext()
+    useAppContext()
 
   const { selectedCalendar, selectedCategory } = useFilters()
 
@@ -66,7 +66,9 @@ const CenterPanel = () => {
   const handleSave = async (data: Partial<Event>) => {
     if (!data.startDate) return
 
-    const exists = events.find((e) => e.id === data.id)
+    const exists = events.find(
+      (e: { id: string | undefined }) => e.id === data.id
+    )
 
     if (exists && data.id) {
       await updateEvent(data.id, data)
@@ -202,7 +204,7 @@ const CenterPanel = () => {
                 selectedDatetime.getTime() + 60 * 60 * 1000
               ).toISOString(),
               calendarId: "",
-              categoryId: undefined,
+              categoryId: undefined
             }
           }
         />

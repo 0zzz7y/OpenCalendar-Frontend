@@ -14,7 +14,6 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import FormatBoldIcon from "@mui/icons-material/FormatBold"
 import FormatItalicIcon from "@mui/icons-material/FormatItalic"
 import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined"
-import FormatListBulletedIcon from "@mui/icons-material/FormatListBulleted"
 
 import { useState } from "react"
 import MESSAGES from "@/constant/message"
@@ -23,7 +22,6 @@ export type FormatCommand =
   | typeof MESSAGES.TOOLBAR.BOLD
   | typeof MESSAGES.TOOLBAR.ITALIC
   | typeof MESSAGES.TOOLBAR.UNDERLINE
-  | typeof MESSAGES.TOOLBAR.BULLET
 
 interface NoteToolbarProperties {
   isCollapsed: boolean
@@ -117,8 +115,7 @@ const NoteToolBar = ({
           {[
             MESSAGES.TOOLBAR.BOLD,
             MESSAGES.TOOLBAR.ITALIC,
-            MESSAGES.TOOLBAR.UNDERLINE,
-            MESSAGES.TOOLBAR.BULLET
+            MESSAGES.TOOLBAR.UNDERLINE
           ].map((cmd) => {
             const Icon =
               cmd === MESSAGES.TOOLBAR.BOLD
@@ -127,7 +124,7 @@ const NoteToolBar = ({
                   ? FormatItalicIcon
                   : cmd === MESSAGES.TOOLBAR.UNDERLINE
                     ? FormatUnderlinedIcon
-                    : FormatListBulletedIcon
+                    : FormatUnderlinedIcon
             return (
               <IconButton
                 key={cmd}

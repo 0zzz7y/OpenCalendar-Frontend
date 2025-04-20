@@ -133,7 +133,7 @@ const MonthView = ({
                   sx={{
                     width: 8,
                     height: 8,
-                    bgcolor: category?.color || ev.color,
+                    bgcolor: category?.color,
                     borderRadius: "50%"
                   }}
                 />
@@ -191,8 +191,7 @@ const MonthView = ({
             startDate: dayjs(createDate).toISOString(),
             endDate: dayjs(createDate).add(1, "hour").toISOString(),
             calendarId: "",
-            categoryId: undefined,
-            color: "#1976d2"
+            categoryId: undefined
           }}
         />
       )}

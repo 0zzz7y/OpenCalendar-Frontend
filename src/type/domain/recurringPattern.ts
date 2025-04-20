@@ -1,3 +1,9 @@
-type RecurringPattern = "NONE" | "DAILY" | "WEEKLY" | "MONTHLY" | "YEARLY"
+enum RecurringPattern {
+  NONE = "NONE",
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY"
+}
 
 export default RecurringPattern

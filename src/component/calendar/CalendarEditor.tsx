@@ -7,33 +7,32 @@ import {
   Box,
   ClickAwayListener
 } from "@mui/material"
-
 import EmojiPicker, {
   EmojiClickData,
   EmojiStyle,
   SkinTones,
   Theme
 } from "emoji-picker-react"
-
-import useCalendarContext from "../../hook/context/useCalendarContext"
 import useCalendars from "../../hook/api/useCalendar"
 import MESSAGES from "../../constant/message"
 import { createPortal } from "react-dom"
+import useAppContext from "@/hook/context/useAppContext"
 
 const CalendarEditor = () => {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
+  const emojiPickerRef = useRef<HTMLDivElement | null>(null) // Ref for EmojiPicker
 
   const {
     editorOpen,
+    editorType,
     editorMode,
     editorData,
     closeEditor,
     selectedCalendar,
     setSelectedCalendar,
     reloadCalendars
-  } = useCalendarContext()
-
+  } = useAppContext()
   const { addCalendar, updateCalendar, deleteCalendar } = useCalendars()
 
   const [label, setLabel] = useState("")
@@ -52,10 +51,14 @@ const CalendarEditor = () => {
     }
   }, [editorOpen, editorData])
 
+  // Modified handleClickAway to check if click is inside EmojiPicker
   const handleClickAway = (event: MouseEvent | TouchEvent) => {
+    // Check if the click is outside the popover (containerRef) and EmojiPicker (emojiPickerRef)
     if (
       containerRef.current &&
-      !containerRef.current.contains(event.target as Node)
+      !containerRef.current.contains(event.target as Node) &&
+      emojiPickerRef.current &&
+      !emojiPickerRef.current.contains(event.target as Node)
     ) {
       closeEditor()
     }
@@ -161,21 +164,24 @@ const CalendarEditor = () => {
                 <Typography fontSize={24}>{emoji}</Typography>
               </Box>
 
-              <EmojiPicker
-                width="100%"
-                height={300}
-                searchDisabled
-                previewConfig={{ showPreview: false }}
-                onEmojiClick={(emojiData: EmojiClickData) =>
-                  setEmoji(emojiData.emoji)
-                }
-                emojiStyle={EmojiStyle.NATIVE}
-                skinTonesDisabled
-                lazyLoadEmojis
-                defaultSkinTone={SkinTones.NEUTRAL}
-                theme={Theme.LIGHT}
-                autoFocusSearch={false}
-              />
+              {/* EmojiPicker with ref */}
+              <div ref={emojiPickerRef}>
+                <EmojiPicker
+                  width="100%"
+                  height={300}
+                  searchDisabled
+                  previewConfig={{ showPreview: false }}
+                  onEmojiClick={(emojiData: EmojiClickData) =>
+                    setEmoji(emojiData.emoji)
+                  }
+                  emojiStyle={EmojiStyle.NATIVE}
+                  skinTonesDisabled
+                  lazyLoadEmojis
+                  defaultSkinTone={SkinTones.NEUTRAL}
+                  theme={Theme.LIGHT}
+                  autoFocusSearch={false}
+                />
+              </div>
 
               <Button
                 variant="contained"

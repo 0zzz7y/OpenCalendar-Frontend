@@ -27,9 +27,7 @@ const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <ThemeModeContext.Provider value={{ mode, toggle }}>
-        <MuiThemeProvider theme={theme}>
-          {children}
-        </MuiThemeProvider>
+        <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
       </ThemeModeContext.Provider>
     </>
   )

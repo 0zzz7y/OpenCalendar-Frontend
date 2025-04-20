@@ -25,7 +25,9 @@ const useCalendar = () => {
       )
       const data = response.data
 
-      setCalendars((prev) => reset ? data.content : [...prev, ...data.content])
+      setCalendars((prev) =>
+        reset ? data.content : [...prev, ...data.content]
+      )
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
@@ -90,7 +92,9 @@ const useCalendar = () => {
       )
       const savedCalendar = response.data
 
-      setCalendars((prev) =>prev.map((c) => (c.id === tempId ? { ...savedCalendar } : c)))
+      setCalendars((prev) =>
+        prev.map((c) => (c.id === tempId ? { ...savedCalendar } : c))
+      )
       return savedCalendar
     } catch (error) {
       toast.error("Failed to add calendar")
@@ -103,7 +107,9 @@ const useCalendar = () => {
     const previous = calendars.find((c) => c.id === id)
     if (!previous) return
 
-    setCalendars((prev) => prev.map((c) => (c.id === id ? { ...c, ...updated } : c)))
+    setCalendars((prev) =>
+      prev.map((c) => (c.id === id ? { ...c, ...updated } : c))
+    )
 
     try {
       await axios.put(
