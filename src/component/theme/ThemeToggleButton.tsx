@@ -4,13 +4,15 @@ import DarkModeIcon from "@mui/icons-material/DarkMode"
 
 import { useThemeMode } from "./ThemeProvider"
 
+import THEME from "@/constant/theme"
+
 const ThemeToggleButton = () => {
   const { mode, toggle } = useThemeMode()
 
   return (
     <>
       <IconButton onClick={toggle} color="inherit">
-        {mode === "dark" ? <LightModeIcon /> : <DarkModeIcon />}
+        {mode === THEME.DARK ? <LightModeIcon /> : <DarkModeIcon />}
       </IconButton>
     </>
   )
