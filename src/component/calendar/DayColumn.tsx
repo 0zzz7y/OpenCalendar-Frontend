@@ -70,7 +70,8 @@ const DayColumn = ({
 
     groups.forEach((group) => {
       const sorted = [...group].sort(
-        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        (a, b) =>
+          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
       )
       const width = 100 / sorted.length
       const gap = 4
@@ -83,7 +84,8 @@ const DayColumn = ({
             width: `calc(${width}% - ${gap}px)`,
             left: `calc(${i * width}% + ${i * gap}px)`,
             opacity: dragTargetId ? 0.6 : 1,
-            pointerEvents: dragTargetId && dragTargetId !== event.id ? "none" : "auto"
+            pointerEvents:
+              dragTargetId && dragTargetId !== event.id ? "none" : "auto"
           }
         })
       })

@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useContext, useState } from "react"
 import { Box } from "@mui/material"
 import dayjs from "dayjs"
 
@@ -7,14 +7,15 @@ import EventPopover from "@/component/event/EventCreationPopover"
 import EventInformationPopover from "@/component/event/EventInformationPopover"
 
 import Event from "@/type/domain/event"
+import AppContext from "@/context/AppContext"
+import useEvent from "@/hook/api/useEvent"
+import useAppContext from "@/hook/context/useAppContext"
 
 interface DayViewProperties {
   date: Date
   events: Event[]
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
-  onSave: (event: Partial<Event>) => void
-  onSlotClick: (element: HTMLElement, datetime: Date) => void
   onEventClick?: (event: Event) => void
 }
 
@@ -23,10 +24,10 @@ const DayView = ({
   events,
   calendars,
   categories,
-  onSave,
-  onSlotClick,
   onEventClick
 }: DayViewProperties) => {
+  const { updateEvent } = useAppContext()
+
   const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
   const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
   const [editingEvent, setEditingEvent] = useState<Event | null>(null)
@@ -40,7 +41,6 @@ const DayView = ({
     setSelectedDatetime(datetime)
     setEditingEvent(null)
     setInfoEvent(null)
-    onSlotClick(element, datetime)
   }
 
   const handleEventClick = (event: Event) => {
@@ -58,11 +58,6 @@ const DayView = ({
     setEditingEvent(null)
   }
 
-  const handleSave = (data: Partial<Event>) => {
-    onSave(data)
-    handleClosePopover()
-  }
-
   const handleEditEvent = () => {
     setEditingEvent(infoEvent)
     setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null)
@@ -70,8 +65,8 @@ const DayView = ({
     setInfoEvent(null)
   }
 
-  const handleDeleteEvent = (id: string) => {
-    onSave({ id })
+  const handleDeleteEvent = async (id: string) => {
+    await updateEvent(id, { name: "" }) // implement real delete logic if needed
   }
 
   return (
@@ -87,7 +82,9 @@ const DayView = ({
           allEvents={events}
           calendars={calendars}
           categories={categories}
-          onSave={onSave}
+          onSave={(data) => {
+            if (data.id) updateEvent(data.id, data)
+          }}
           onSlotClick={handleSlotClick}
           onEventClick={handleEventClick}
         />
@@ -97,7 +94,6 @@ const DayView = ({
         <EventPopover
           anchorEl={selectedSlot}
           onClose={handleClosePopover}
-          onSave={handleSave}
           calendars={calendars}
           categories={categories}
           initialEvent={

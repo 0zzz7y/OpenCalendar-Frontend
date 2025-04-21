@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react"
-
+import { useEffect, useState, useContext } from "react"
 import axios from "axios"
-
 import { toast } from "react-toastify"
-
 import Note from "@/type/domain/note"
 import PaginatedResponse from "@/type/communication/paginatedResponse"
+import { toNote, toNoteDto } from "@/type/mapper/noteMapper"
+import NoteDto from "@/type/dto/noteDto"
+import AppContext from "@/context/AppContext"
 
 const useNote = () => {
+  const { calendars = [], categories = [] } = useContext(AppContext) || {}
+
   const [notes, setNotes] = useState<Note[]>([])
   const [page, setPage] = useState(0)
   const [size] = useState(10)
@@ -17,7 +19,7 @@ const useNote = () => {
 
   const fetchNotes = async (pageNumber = 0, reset = false) => {
     try {
-      const response = await axios.get<PaginatedResponse<Note>>(
+      const response = await axios.get<PaginatedResponse<NoteDto>>(
         `${import.meta.env.VITE_BACKEND_URL}/notes`,
         {
           params: {
@@ -27,8 +29,18 @@ const useNote = () => {
         }
       )
       const data = response.data
+      const mappedNotes = data.content.map((noteDto) => {
+        const calendar = calendars.find((cal) => cal.id === noteDto.calendarId)
+        const category = categories.find((cat) => cat.id === noteDto.categoryId)
+        if (!calendar) {
+          throw new Error(`Calendar not found for note ${noteDto.id}`)
+        }
+        return toNote(noteDto, calendar, category)
+      })
 
-      setNotes((prev) => (reset ? data.content : [...prev, ...data.content]))
+      setNotes((prev) =>
+        reset ? mappedNotes : [...prev, ...mappedNotes]
+      )
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
@@ -44,7 +56,7 @@ const useNote = () => {
       let total = 1
 
       do {
-        const response = await axios.get<PaginatedResponse<Note>>(
+        const response = await axios.get<PaginatedResponse<NoteDto>>(
           `${import.meta.env.VITE_BACKEND_URL}/notes`,
           {
             params: {
@@ -53,9 +65,17 @@ const useNote = () => {
             }
           }
         )
-
         const data = response.data
-        allNotes = [...allNotes, ...data.content]
+
+        const mappedNotes = data.content.map((noteDto) => {
+          const calendar = calendars.find((cal) => cal.id === noteDto.calendarId)
+          const category = categories.find((cat) => cat.id === noteDto.categoryId)
+          if (!calendar || !category) {
+            throw new Error(`Calendar or Category not found for note ${noteDto.id}`)
+          }
+          return toNote(noteDto, calendar, category)
+        })
+        allNotes = [...allNotes, ...mappedNotes]
         total = data.totalPages
         currentPage++
       } while (currentPage < total)
@@ -80,25 +100,25 @@ const useNote = () => {
     if (!note.name?.trim() || !note.description.trim())
       throw new Error("Note name and description cannot be empty.")
 
-    const temporaryId = crypto.randomUUID()
-    const optimisticNote: Note = { ...note, id: temporaryId }
+    const tempId = crypto.randomUUID()
+    const optimisticNote: Note = { ...note, id: tempId }
 
     setNotes((prev) => [...prev, optimisticNote])
 
     try {
-      const response = await axios.post<Note>(
+      const response = await axios.post<NoteDto>(
         `${import.meta.env.VITE_BACKEND_URL}/notes`,
-        note
+        toNoteDto({ id: "", ...note })
       )
-      const savedNote = response.data
+      const savedNote = toNote(response.data, note.calendar, note.category)
 
       setNotes((prev) =>
-        prev.map((n) => (n.id === temporaryId ? { ...savedNote } : n))
+        prev.map((n) => (n.id === tempId ? { ...savedNote } : n))
       )
       return savedNote
     } catch (error) {
       toast.error("Failed to add note")
-      setNotes((prev) => prev.filter((n) => n.id !== temporaryId))
+      setNotes((prev) => prev.filter((n) => n.id !== tempId))
       throw error
     }
   }
@@ -140,7 +160,7 @@ const useNote = () => {
 
   useEffect(() => {
     reloadNotes()
-  }, [])
+  }, [reloadNotes])
 
   return {
     notes,

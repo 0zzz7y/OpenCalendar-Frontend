@@ -4,8 +4,11 @@ import axios from "axios"
 
 import { toast } from "react-toastify"
 
-import Calendar from "@/type/domain/calendar"
 import PaginatedResponse from "@/type/communication/paginatedResponse"
+
+import Calendar from "@/type/domain/calendar"
+import { toCalendar, toCalendarDto } from "@/type/mapper/calendarMapper"
+import CalendarDto from "@/type/dto/calendarDto"
 
 const useCalendar = () => {
   const [calendars, setCalendars] = useState<Calendar[]>([])
@@ -17,7 +20,7 @@ const useCalendar = () => {
 
   const fetchCalendars = async (pageNumber = 0, reset = false) => {
     try {
-      const response = await axios.get<PaginatedResponse<Calendar>>(
+      const response = await axios.get<PaginatedResponse<CalendarDto>>(
         `${import.meta.env.VITE_BACKEND_URL}/calendars`,
         {
           params: {
@@ -27,9 +30,10 @@ const useCalendar = () => {
         }
       )
       const data = response.data
+      const mappedCalendars = data.content.map(toCalendar)
 
       setCalendars((prev) =>
-        reset ? data.content : [...prev, ...data.content]
+        reset ? mappedCalendars : [...prev, ...mappedCalendars]
       )
       setPage(data.number)
       setTotalPages(data.totalPages)
@@ -46,7 +50,7 @@ const useCalendar = () => {
       let total = 1
 
       do {
-        const response = await axios.get<PaginatedResponse<Calendar>>(
+        const response = await axios.get<PaginatedResponse<CalendarDto>>(
           `${import.meta.env.VITE_BACKEND_URL}/calendars`,
           {
             params: {
@@ -57,7 +61,8 @@ const useCalendar = () => {
         )
         const data = response.data
 
-        allCalendars = [...allCalendars, ...data.content]
+        const mappedCalendars = data.content.map(toCalendar)
+        allCalendars = [...allCalendars, ...mappedCalendars]
         total = data.totalPages
         currentPage++
       } while (currentPage < total)
@@ -89,11 +94,11 @@ const useCalendar = () => {
     setCalendars((prev) => [...prev, optimisticCalendar])
 
     try {
-      const response = await axios.post<Calendar>(
+      const response = await axios.post<CalendarDto>(
         `${import.meta.env.VITE_BACKEND_URL}/calendars`,
-        calendar
+        toCalendarDto({ id: "", ...calendar })
       )
-      const savedCalendar = response.data
+      const savedCalendar = toCalendar(response.data)
 
       setCalendars((prev) =>
         prev.map((c) => (c.id === tempId ? { ...savedCalendar } : c))
@@ -115,9 +120,14 @@ const useCalendar = () => {
     )
 
     try {
+      const updatedWithId = {
+        id,
+        name: updated.name ?? "",
+        emoji: updated.emoji ?? ""
+      }
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/calendars/${id}`,
-        updated
+        toCalendarDto(updatedWithId)
       )
     } catch (error) {
       toast.error("Failed to update calendar")

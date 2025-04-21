@@ -1,11 +1,10 @@
 import { useState, useEffect } from "react"
-
 import axios from "axios"
-
 import { toast } from "react-toastify"
-
 import Category from "@/type/domain/category"
 import PaginatedResponse from "@/type/communication/paginatedResponse"
+import { toCategory, toCategoryDto } from "@/type/mapper/categoryMapper"
+import CategoryDto from "@/type/dto/categoryDto"
 
 const useCategory = () => {
   const [categories, setCategories] = useState<Category[]>([])
@@ -17,7 +16,7 @@ const useCategory = () => {
 
   const fetchCategories = async (pageNumber = 0, reset = false) => {
     try {
-      const response = await axios.get<PaginatedResponse<Category>>(
+      const response = await axios.get<PaginatedResponse<CategoryDto>>(
         `${import.meta.env.VITE_BACKEND_URL}/categories`,
         {
           params: {
@@ -27,9 +26,10 @@ const useCategory = () => {
         }
       )
       const data = response.data
+      const mappedCategories = data.content.map(toCategory)
 
       setCategories((prev) =>
-        reset ? data.content : [...prev, ...data.content]
+        reset ? mappedCategories : [...prev, ...mappedCategories]
       )
       setPage(data.number)
       setTotalPages(data.totalPages)
@@ -46,13 +46,14 @@ const useCategory = () => {
       let total = 1
 
       do {
-        const response = await axios.get<PaginatedResponse<Category>>(
+        const response = await axios.get<PaginatedResponse<CategoryDto>>(
           `${import.meta.env.VITE_BACKEND_URL}/categories`,
           { params: { page: currentPage, size } }
         )
         const data = response.data
 
-        allCategories = [...allCategories, ...data.content]
+        const mappedCategories = data.content.map(toCategory)
+        allCategories = [...allCategories, ...mappedCategories]
         total = data.totalPages
         currentPage++
       } while (currentPage < total)
@@ -85,11 +86,11 @@ const useCategory = () => {
     setCategories((prev) => [...prev, optimisticCategory])
 
     try {
-      const response = await axios.post<Category>(
+      const response = await axios.post<CategoryDto>(
         `${import.meta.env.VITE_BACKEND_URL}/categories`,
-        category
+        toCategoryDto({ ...category, id: "" })
       )
-      const savedCategory = response.data
+      const savedCategory = toCategory(response.data)
 
       setCategories((prev) =>
         prev.map((c) => (c.id === temporaryId ? { ...savedCategory } : c))
@@ -111,9 +112,14 @@ const useCategory = () => {
     )
 
     try {
+      const updatedWithId = {
+        id,
+        name: updated.name ?? "",
+        color: updated.color ?? ""
+      }
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/categories/${id}`,
-        updated
+        toCategoryDto(updatedWithId)
       )
     } catch (error) {
       toast.error("Failed to update category")

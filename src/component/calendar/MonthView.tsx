@@ -90,12 +90,16 @@ const MonthView = ({
           openCreatePopover(e.currentTarget as HTMLElement, day.toDate())
         }
         sx={{
-          p: 1,
           minHeight: 100,
-          border: `1px solid ${theme.palette.divider}`,
-          display: "flex",
-          flexDirection: "column",
-          cursor: "pointer"
+          p: 1,
+          border: "1px solid",
+          borderColor: "divider",
+          cursor: "pointer",
+          transition: "background-color 0.15s ease-in-out",
+          "&:hover": {
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark" ? "#3d3d3d" : "#e0e0e0"
+          }
         }}
       >
         <Typography

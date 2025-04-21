@@ -1,9 +1,12 @@
+import Calendar from "./calendar"
+import Category from "./category"
+
 interface Note {
   id: string
   name?: string
   description: string
-  categoryId?: string
-  calendarId: string
+  calendar: Calendar
+  category?: Category
 }
 
 export default Note

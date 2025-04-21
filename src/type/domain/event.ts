@@ -1,3 +1,5 @@
+import Calendar from "./calendar"
+import Category from "./category"
 import RecurringPattern from "./recurringPattern"
 
 interface Event {
@@ -6,9 +8,9 @@ interface Event {
   description?: string
   startDate: string
   endDate: string
-  recurringPattern?: RecurringPattern
-  calendarId: string
-  categoryId?: string
+  recurringPattern: RecurringPattern
+  calendar: Calendar
+  category?: Category
 }
 
 export default Event

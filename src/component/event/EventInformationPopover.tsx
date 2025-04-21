@@ -11,7 +11,7 @@ import { useState } from "react"
 
 import Event from "@/type/domain/event"
 
-interface EventInformationPopoverProperties {
+interface Properties {
   anchorEl: HTMLElement | null
   event: Event | null
   onClose: () => void
@@ -25,25 +25,17 @@ const EventInformationPopover = ({
   onClose,
   onEdit,
   onDelete
-}: EventInformationPopoverProperties) => {
+}: Properties) => {
   const open = Boolean(anchorEl && event)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
-  const handleDeleteClick = () => {
-    setConfirmingDelete(true)
-  }
-
+  const handleDeleteClick = () => setConfirmingDelete(true)
   const handleConfirmDelete = () => {
-    if (event) {
-      onDelete(event.id)
-    }
+    if (event) onDelete(event.id)
     setConfirmingDelete(false)
     onClose()
   }
-
-  const handleCancelDelete = () => {
-    setConfirmingDelete(false)
-  }
+  const handleCancelDelete = () => setConfirmingDelete(false)
 
   return (
     <Popover
@@ -75,7 +67,7 @@ const EventInformationPopover = ({
           {!confirmingDelete ? (
             <>
               <Typography variant="body2" color="text.secondary">
-                {new Date(event.startDate).toLocaleString()} -{" "}
+                {new Date(event.startDate).toLocaleString()} –{" "}
                 {new Date(event.endDate).toLocaleString()}
               </Typography>
               {event.description && (

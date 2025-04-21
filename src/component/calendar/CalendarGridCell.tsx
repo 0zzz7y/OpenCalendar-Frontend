@@ -32,23 +32,10 @@ const CalendarGridCell = ({
         new Date(moved.endDate).getTime() - originalStart.getTime()
       const newEnd = new Date(newStart.getTime() + duration)
 
-      const overlappingEvents = allEvents.filter((e) => {
-        const start = new Date(e.startDate).getTime()
-        const end = new Date(e.endDate).getTime()
-        return (
-          e.id !== moved.id &&
-          start < newEnd.getTime() &&
-          end > newStart.getTime()
-        )
-      })
-
-      const totalSlots = overlappingEvents.length + 1
-      const widthPercent = 100 / totalSlots
-
       onSave({
         id: moved.id,
         name: moved.name,
-        description: moved.description,
+        description: moved.description ?? "",
         calendarId: moved.calendarId,
         categoryId: moved.categoryId,
         startDate: newStart.toISOString(),
@@ -85,7 +72,10 @@ const CalendarGridCell = ({
 
   const isFullHour = datetime.getMinutes() === 0
 
-  const use12Hour = useMemo(() => Intl.DateTimeFormat().resolvedOptions().hour12, [])
+  const use12Hour = useMemo(
+    () => Intl.DateTimeFormat().resolvedOptions().hour12,
+    []
+  )
 
   const formattedHour = useMemo(
     () =>
@@ -116,7 +106,7 @@ const CalendarGridCell = ({
         border: isOver && canDrop ? "2px dashed #1976d2" : undefined,
         "&:hover": {
           backgroundColor: (theme) =>
-            theme.palette.mode === "dark" ? "#2c2c2c" : "#f5f5f5"
+            theme.palette.mode === "dark" ? "#3d3d3d" : "#e0e0e0"
         }
       }}
     >

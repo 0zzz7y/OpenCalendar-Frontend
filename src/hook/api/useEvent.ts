@@ -1,13 +1,15 @@
-import { useEffect, useState } from "react"
-
+import { useEffect, useState, useContext } from "react"
 import axios from "axios"
-
 import { toast } from "react-toastify"
-
 import Event from "@/type/domain/event"
 import PaginatedResponse from "@/type/communication/paginatedResponse"
+import { toEvent, toEventDto } from "@/type/mapper/eventMapper"
+import EventDto from "@/type/dto/eventDto"
+import AppContext from "@/context/AppContext"
 
 const useEvent = () => {
+  const { calendars = [], categories = [] } = useContext(AppContext) || {}
+
   const [events, setEvents] = useState<Event[]>([])
   const [page, setPage] = useState(0)
   const [size] = useState(10)
@@ -17,7 +19,7 @@ const useEvent = () => {
 
   const fetchEvents = async (pageNumber = 0, reset = false) => {
     try {
-      const response = await axios.get<PaginatedResponse<Event>>(
+      const response = await axios.get<PaginatedResponse<EventDto>>(
         `${import.meta.env.VITE_BACKEND_URL}/events`,
         {
           params: {
@@ -27,8 +29,18 @@ const useEvent = () => {
         }
       )
       const data = response.data
+      const mappedEvents = data.content.map((eventDto) => {
+        const calendar = calendars.find((cal) => cal.id === eventDto.calendarId)
+        const category = categories.find((cat) => cat.id === eventDto.categoryId)
+        if (!calendar) {
+          throw new Error(`Calendar not found for event ${eventDto.id}`)
+        }
+        return toEvent(eventDto, calendar, category)
+      })
 
-      setEvents((prev) => (reset ? data.content : [...prev, ...data.content]))
+      setEvents((prev) =>
+        reset ? mappedEvents : [...prev, ...mappedEvents]
+      )
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
@@ -44,7 +56,7 @@ const useEvent = () => {
       let total = 1
 
       do {
-        const response = await axios.get<PaginatedResponse<Event>>(
+        const response = await axios.get<PaginatedResponse<EventDto>>(
           `${import.meta.env.VITE_BACKEND_URL}/events`,
           {
             params: {
@@ -55,7 +67,15 @@ const useEvent = () => {
         )
         const data = response.data
 
-        allEvents = [...allEvents, ...data.content]
+        const mappedEvents = data.content.map((eventDto) => {
+          const calendar = calendars.find((cal) => cal.id === eventDto.calendarId)
+          const category = categories.find((cat) => cat.id === eventDto.categoryId)
+          if (!calendar || !category) {
+            throw new Error(`Calendar or Category not found for event ${eventDto.id}`)
+          }
+          return toEvent(eventDto, calendar, category)
+        })
+        allEvents = [...allEvents, ...mappedEvents]
         total = data.totalPages
         currentPage++
       } while (currentPage < total)
@@ -78,19 +98,19 @@ const useEvent = () => {
 
   const addEvent = async (event: Omit<Event, "id">): Promise<Event> => {
     if (!event.name.trim()) throw new Error("Event name cannot be empty.")
-
+  
     const tempId = crypto.randomUUID()
     const optimisticEvent: Event = { ...event, id: tempId }
-
+  
     setEvents((prev) => [...prev, optimisticEvent])
-
+  
     try {
-      const response = await axios.post<Event>(
+      const response = await axios.post<EventDto>(
         `${import.meta.env.VITE_BACKEND_URL}/events`,
-        event
+        toEventDto({ id: "", ...event }) // Add id as an empty string to match EventDto
       )
-      const savedEvent = response.data
-
+      const savedEvent = toEvent(response.data, event.calendar, event.category)
+  
       setEvents((prev) =>
         prev.map((e) => (e.id === tempId ? { ...savedEvent } : e))
       )
@@ -111,9 +131,19 @@ const useEvent = () => {
     )
 
     try {
+      const updatedWithId = {
+        id,
+        name: updated.name ?? "",
+        description: updated.description ?? "",
+        startDate: updated.startDate ?? "",
+        endDate: updated.endDate ?? "",
+        recurringPattern: updated.recurringPattern ?? previous.recurringPattern,
+        calendar: updated.calendar ?? previous.calendar,
+        category: updated.category ?? previous.category
+      }
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/events/${id}`,
-        updated
+        toEventDto(updatedWithId)
       )
     } catch (error) {
       toast.error("Failed to update event")
@@ -139,14 +169,13 @@ const useEvent = () => {
 
   useEffect(() => {
     reloadEvents()
-  }, [])
+  }, [reloadEvents])
 
   return {
     events,
     addEvent,
     updateEvent,
     deleteEvent,
-    reloadEvents,
     loadNextPage,
     page,
     size,
