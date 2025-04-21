@@ -1,11 +1,13 @@
+import AppContext from "@/context/AppContext"
+import PaginatedResponse from "@/type/communication/paginatedResponse"
+import Note from "@/type/domain/note"
+import NoteDto from "@/type/dto/noteDto"
+import { toNote, toNoteDto } from "@/type/mapper/noteMapper"
+
 import { useEffect, useState, useContext } from "react"
+
 import axios from "axios"
 import { toast } from "react-toastify"
-import Note from "@/type/domain/note"
-import PaginatedResponse from "@/type/communication/paginatedResponse"
-import { toNote, toNoteDto } from "@/type/mapper/noteMapper"
-import NoteDto from "@/type/dto/noteDto"
-import AppContext from "@/context/AppContext"
 
 const useNote = () => {
   const { calendars = [], categories = [] } = useContext(AppContext) || {}
@@ -29,16 +31,16 @@ const useNote = () => {
         }
       )
       const data = response.data
-      const mappedNotes = data.content.map(noteDto => {
-        const calendar = calendars.find(cal => cal.id === noteDto.calendarId)
-        const category = categories.find(cat => cat.id === noteDto.categoryId)
+      const mappedNotes = data.content.map((noteDto) => {
+        const calendar = calendars.find((cal) => cal.id === noteDto.calendarId)
+        const category = categories.find((cat) => cat.id === noteDto.categoryId)
         if (!calendar) {
           throw new Error(`Calendar not found for note ${noteDto.id}`)
         }
         return toNote(noteDto, calendar, category)
       })
 
-      setNotes(prev => (reset ? mappedNotes : [...prev, ...mappedNotes]))
+      setNotes((prev) => (reset ? mappedNotes : [...prev, ...mappedNotes]))
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
@@ -65,9 +67,13 @@ const useNote = () => {
         )
         const data = response.data
 
-        const mappedNotes = data.content.map(noteDto => {
-          const calendar = calendars.find(cal => cal.id === noteDto.calendarId)
-          const category = categories.find(cat => cat.id === noteDto.categoryId)
+        const mappedNotes = data.content.map((noteDto) => {
+          const calendar = calendars.find(
+            (cal) => cal.id === noteDto.calendarId
+          )
+          const category = categories.find(
+            (cat) => cat.id === noteDto.categoryId
+          )
           if (!calendar || !category) {
             throw new Error(
               `Calendar or Category not found for note ${noteDto.id}`
@@ -103,7 +109,7 @@ const useNote = () => {
     const tempId = crypto.randomUUID()
     const optimisticNote: Note = { ...note, id: tempId }
 
-    setNotes(prev => [...prev, optimisticNote])
+    setNotes((prev) => [...prev, optimisticNote])
 
     try {
       const response = await axios.post<NoteDto>(
@@ -112,20 +118,24 @@ const useNote = () => {
       )
       const savedNote = toNote(response.data, note.calendar, note.category)
 
-      setNotes(prev => prev.map(n => (n.id === tempId ? { ...savedNote } : n)))
+      setNotes((prev) =>
+        prev.map((n) => (n.id === tempId ? { ...savedNote } : n))
+      )
       return savedNote
     } catch (error) {
       toast.error("Failed to add note")
-      setNotes(prev => prev.filter(n => n.id !== tempId))
+      setNotes((prev) => prev.filter((n) => n.id !== tempId))
       throw error
     }
   }
 
   const updateNote = async (id: string, updated: Partial<Note>) => {
-    const previous = notes.find(n => n.id === id)
+    const previous = notes.find((n) => n.id === id)
     if (!previous) return
 
-    setNotes(prev => prev.map(n => (n.id === id ? { ...n, ...updated } : n)))
+    setNotes((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, ...updated } : n))
+    )
 
     try {
       await axios.put(
@@ -134,22 +144,22 @@ const useNote = () => {
       )
     } catch (error) {
       toast.error("Failed to update note")
-      setNotes(prev => prev.map(n => (n.id === id ? previous : n)))
+      setNotes((prev) => prev.map((n) => (n.id === id ? previous : n)))
       throw error
     }
   }
 
   const deleteNote = async (id: string) => {
-    const deleted = notes.find(n => n.id === id)
+    const deleted = notes.find((n) => n.id === id)
     if (!deleted) return
 
-    setNotes(prev => prev.filter(n => n.id !== id))
+    setNotes((prev) => prev.filter((n) => n.id !== id))
 
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/notes/${id}`)
     } catch (error) {
       toast.error("Failed to delete note")
-      setNotes(prev => [...prev, deleted])
+      setNotes((prev) => [...prev, deleted])
       throw error
     }
   }

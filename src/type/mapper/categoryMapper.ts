@@ -1,5 +1,5 @@
-import CategoryDto from "../dto/categoryDto"
 import Category from "../domain/category"
+import CategoryDto from "../dto/categoryDto"
 
 export const toCategory = (dto: CategoryDto): Category => ({
   id: dto.id ?? "",

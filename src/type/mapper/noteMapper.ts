@@ -1,7 +1,7 @@
-import NoteDto from "../dto/noteDto"
-import Note from "../domain/note"
 import Calendar from "../domain/calendar"
 import Category from "../domain/category"
+import Note from "../domain/note"
+import NoteDto from "../dto/noteDto"
 
 export const toNote = (
   dto: NoteDto,

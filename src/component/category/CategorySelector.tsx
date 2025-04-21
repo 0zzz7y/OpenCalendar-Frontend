@@ -1,17 +1,14 @@
-import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
-
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import EditIcon from "@mui/icons-material/Edit"
-import DeleteIcon from "@mui/icons-material/Delete"
-
-import { useMemo } from "react"
-
+import PLACEHOLDERS from "@/constant/placeholders"
 import useAppContext from "@/hook/context/useAppContext"
-
 import EditorMode from "@/type/utility/editorMode"
 import EditorType from "@/type/utility/editorType"
 
-import PLACEHOLDERS from "@/constant/placeholders"
+import { useMemo } from "react"
+
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+import DeleteIcon from "@mui/icons-material/Delete"
+import EditIcon from "@mui/icons-material/Edit"
+import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
 
 const CategorySelector = () => {
   const { categories, selectedCategory, setSelectedCategory, openEditor } =
@@ -38,13 +35,15 @@ const CategorySelector = () => {
           select
           label={PLACEHOLDERS.CATEGORY}
           value={selectedCategory || "all"}
-          onChange={e => setSelectedCategory(e.target.value || null)}
+          onChange={(e) => setSelectedCategory(e.target.value || null)}
           fullWidth
           size="small"
           SelectProps={{
             renderValue: (selected: unknown) => {
               const selectedValue = selected as string
-              const item = categoryOptions.find(d => d.value === selectedValue)
+              const item = categoryOptions.find(
+                (d) => d.value === selectedValue
+              )
               return (
                 <Box display="flex" alignItems="center" gap={1}>
                   {item?.color && (
@@ -61,7 +60,7 @@ const CategorySelector = () => {
             }
           }}
         >
-          {categoryOptions.map(option => (
+          {categoryOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               <Box
                 display="flex"
@@ -84,7 +83,7 @@ const CategorySelector = () => {
                   <Box display="flex" gap={1}>
                     <IconButton
                       size="small"
-                      onClick={e => {
+                      onClick={(e) => {
                         e.stopPropagation()
                         openEditor(EditorType.CATEGORY, EditorMode.EDIT, {
                           id: option.value,
@@ -98,7 +97,7 @@ const CategorySelector = () => {
                     <IconButton
                       size="small"
                       disabled={option.value === selectedCategory}
-                      onClick={e => {
+                      onClick={(e) => {
                         e.stopPropagation()
                         openEditor(EditorType.CATEGORY, EditorMode.DELETE, {
                           id: option.value,

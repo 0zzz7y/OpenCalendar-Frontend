@@ -1,22 +1,19 @@
-import { useState } from "react"
+import useFilters from "@/hook/api/useFilter"
+import useAppContext from "@/hook/context/useAppContext"
+import Event from "@/type/domain/event"
 
-import { Box, Typography, Button } from "@mui/material"
+import { useState } from "react"
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
-
+import { Box, Typography, Button } from "@mui/material"
 import dayjs from "dayjs"
 
 import DayView from "../calendar/DayView"
-import WeekView from "../calendar/WeekView"
 import MonthView from "../calendar/MonthView"
+import WeekView from "../calendar/WeekView"
 import EventPopover from "../event/EventCreationPopover"
 import EventInformationPopover from "../event/EventInformationPopover"
-
-import useFilters from "@/hook/api/useFilter"
-import useAppContext from "@/hook/context/useAppContext"
-
-import Event from "@/type/domain/event"
 
 const CenterPanel = () => {
   const { events, calendars, categories, addEvent, updateEvent, deleteEvent } =
@@ -33,7 +30,7 @@ const CenterPanel = () => {
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
   const filteredEvents = Array.isArray(events)
-    ? events.filter(event => {
+    ? events.filter((event) => {
         const calendarMatch =
           selectedCalendar === "all" || event.calendarId === selectedCalendar
         const categoryMatch =

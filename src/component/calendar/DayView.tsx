@@ -1,15 +1,16 @@
+import EventPopover from "@/component/event/EventCreationPopover"
+import EventInformationPopover from "@/component/event/EventInformationPopover"
+import AppContext from "@/context/AppContext"
+import useEvent from "@/hook/api/useEvent"
+import useAppContext from "@/hook/context/useAppContext"
+import Event from "@/type/domain/event"
+
 import { useContext, useState } from "react"
+
 import { Box } from "@mui/material"
 import dayjs from "dayjs"
 
 import DayColumn from "./DayColumn"
-import EventPopover from "@/component/event/EventCreationPopover"
-import EventInformationPopover from "@/component/event/EventInformationPopover"
-
-import Event from "@/type/domain/event"
-import AppContext from "@/context/AppContext"
-import useEvent from "@/hook/api/useEvent"
-import useAppContext from "@/hook/context/useAppContext"
 
 interface DayViewProperties {
   date: Date
@@ -34,7 +35,7 @@ const DayView = ({
   const [infoEvent, setInfoEvent] = useState<Event | null>(null)
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
-  const dayEvents = events.filter(e => dayjs(e.startDate).isSame(date, "day"))
+  const dayEvents = events.filter((e) => dayjs(e.startDate).isSame(date, "day"))
 
   const handleSlotClick = (element: HTMLElement, datetime: Date) => {
     setSelectedSlot(element)
@@ -82,7 +83,7 @@ const DayView = ({
           allEvents={events}
           calendars={calendars}
           categories={categories}
-          onSave={data => {
+          onSave={(data) => {
             if (data.id) updateEvent(data.id, data)
           }}
           onSlotClick={handleSlotClick}

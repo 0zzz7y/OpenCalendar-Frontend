@@ -1,7 +1,7 @@
-import TaskStatus from "./taskStatus"
-import RecurringPattern from "./recurringPattern"
 import Calendar from "./calendar"
 import Category from "./category"
+import RecurringPattern from "./recurringPattern"
+import TaskStatus from "./taskStatus"
 
 interface Task {
   id: string

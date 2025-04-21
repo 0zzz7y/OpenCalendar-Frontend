@@ -8,12 +8,7 @@
   "trailingComma": "none",
   "bracketSpacing": true,
   "semi": false,
-  "importOrder": [
-    "^react$",
-    "^@?\\w",
-    "^[./]"
-  ],
+  "importOrder": ["^react$", "^@?\\w", "^[./]"],
   "importOrderSeparation": true,
-  "commentSort": "none",
-  "noComments": true
+  "plugins": ["@trivago/prettier-plugin-sort-imports"]
 }

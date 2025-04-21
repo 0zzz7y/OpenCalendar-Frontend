@@ -1,8 +1,8 @@
-import EventDto from "../dto/eventDto"
-import Event from "../domain/event"
 import Calendar from "../domain/calendar"
 import Category from "../domain/category"
+import Event from "../domain/event"
 import RecurringPattern from "../domain/recurringPattern"
+import EventDto from "../dto/eventDto"
 
 export const toEvent = (
   dto: EventDto,

@@ -1,5 +1,5 @@
-import TaskStatus from "../domain/taskStatus"
 import RecurringPattern from "../domain/recurringPattern"
+import TaskStatus from "../domain/taskStatus"
 
 interface TaskDto {
   id?: string

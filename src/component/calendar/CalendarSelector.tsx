@@ -1,16 +1,13 @@
-import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
-
-import EditIcon from "@mui/icons-material/Edit"
-import DeleteIcon from "@mui/icons-material/Delete"
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+import useAppContext from "@/hook/context/useAppContext"
+import EditorMode from "@/type/utility/editorMode"
+import EditorType from "@/type/utility/editorType"
 
 import { useMemo } from "react"
 
-import useAppContext from "@/hook/context/useAppContext"
-
-import EditorMode from "@/type/utility/editorMode"
-
-import EditorType from "@/type/utility/editorType"
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+import DeleteIcon from "@mui/icons-material/Delete"
+import EditIcon from "@mui/icons-material/Edit"
+import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
 
 const CalendarSelector = () => {
   const { calendars, selectedCalendar, setSelectedCalendar, openEditor } =
@@ -36,12 +33,12 @@ const CalendarSelector = () => {
           select
           label="Calendar"
           value={selectedCalendar || "all"}
-          onChange={e => setSelectedCalendar(e.target.value || null)}
+          onChange={(e) => setSelectedCalendar(e.target.value || null)}
           fullWidth
           size="small"
           SelectProps={{
-            renderValue: selected => {
-              const item = calendarOptions.find(d => d.value === selected)
+            renderValue: (selected) => {
+              const item = calendarOptions.find((d) => d.value === selected)
               return (
                 <>
                   <Box display="flex" alignItems="center" gap={1}>
@@ -53,7 +50,7 @@ const CalendarSelector = () => {
             }
           }}
         >
-          {calendarOptions.map(option => (
+          {calendarOptions.map((option) => (
             <MenuItem key={option.value} value={option.value}>
               <Box
                 display="flex"
@@ -69,7 +66,7 @@ const CalendarSelector = () => {
                   <Box display="flex" gap={1}>
                     <IconButton
                       size="small"
-                      onClick={e => {
+                      onClick={(e) => {
                         e.stopPropagation()
                         openEditor(EditorType.CALENDAR, EditorMode.EDIT, {
                           id: option.value,
@@ -83,7 +80,7 @@ const CalendarSelector = () => {
                     <IconButton
                       size="small"
                       disabled={option.value === selectedCalendar}
-                      onClick={e => {
+                      onClick={(e) => {
                         e.stopPropagation()
                         openEditor(EditorType.CALENDAR, EditorMode.DELETE, {
                           id: option.value,

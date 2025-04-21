@@ -1,13 +1,14 @@
-import { Box, Typography } from "@mui/material"
+import EventPopover from "@/component/event/EventCreationPopover"
+import EventInformationPopover from "@/component/event/EventInformationPopover"
+import useAppContext from "@/hook/context/useAppContext"
+import Event from "@/type/domain/event"
+
 import { useContext, useState } from "react"
+
+import { Box, Typography } from "@mui/material"
 import dayjs from "dayjs"
 
 import DayColumn from "./DayColumn"
-import EventPopover from "@/component/event/EventCreationPopover"
-import EventInformationPopover from "@/component/event/EventInformationPopover"
-
-import Event from "@/type/domain/event"
-import useAppContext from "@/hook/context/useAppContext"
 
 interface WeekViewProperties {
   date: Date
@@ -135,13 +136,13 @@ const WeekView = ({
               <DayColumn
                 date={day}
                 events={(events ?? []).filter(
-                  e =>
+                  (e) =>
                     new Date(e.startDate).toDateString() === day.toDateString()
                 )}
                 allEvents={events}
                 calendars={calendars}
                 categories={categories}
-                onSave={data => {
+                onSave={(data) => {
                   if (data.id) updateEvent(data.id, data)
                 }}
                 onSlotClick={handleSlotClick}

@@ -1,3 +1,9 @@
+import BUTTONS from "@/constant/buttons"
+import PLACEHOLDERS from "@/constant/placeholders"
+import POPOVER from "@/constant/popover"
+import useAppContext from "@/hook/context/useAppContext"
+import EditorType from "@/type/utility/editorType"
+
 import { useEffect, useRef, useState } from "react"
 
 import {
@@ -9,16 +15,7 @@ import {
   Typography,
   Input
 } from "@mui/material"
-
 import { createPortal } from "react-dom"
-
-import useAppContext from "@/hook/context/useAppContext"
-
-import EditorType from "@/type/utility/editorType"
-
-import PLACEHOLDERS from "@/constant/placeholders"
-import BUTTONS from "@/constant/buttons"
-import POPOVER from "@/constant/popover"
 
 const CategoryEditor = () => {
   const inputRef = useRef<HTMLInputElement | null>(null)
@@ -141,7 +138,7 @@ const CategoryEditor = () => {
                 inputRef={inputRef}
                 placeholder={PLACEHOLDERS.NAME}
                 value={label}
-                onChange={e => setLabel(e.target.value)}
+                onChange={(e) => setLabel(e.target.value)}
                 fullWidth
                 size="small"
                 margin="dense"
@@ -151,7 +148,7 @@ const CategoryEditor = () => {
                 <Input
                   type="color"
                   value={color}
-                  onChange={e => setColor(e.target.value)}
+                  onChange={(e) => setColor(e.target.value)}
                   sx={{ minWidth: 40, flex: 1 }}
                 />
                 <Button

@@ -1,5 +1,6 @@
-import { Box, Typography } from "@mui/material"
 import { useEffect, useRef, useState } from "react"
+
+import { Box, Typography } from "@mui/material"
 import { useDrag } from "react-dnd"
 
 import Event from "../../type/domain/event"
@@ -31,7 +32,7 @@ const EventBox = ({
       type: "event",
       item: { id: event.id },
       canDrag: () => enableDrag,
-      collect: monitor => ({
+      collect: (monitor) => ({
         isDragging: monitor.isDragging()
       })
     }),
@@ -71,8 +72,8 @@ const EventBox = ({
   const top = (minutesFromStart / 15) * 32
   const height = (duration / 15) * 32
 
-  const calendar = calendars.find(c => c.id === event.calendarId)
-  const category = categories.find(c => c.id === event.categoryId)
+  const calendar = calendars.find((c) => c.id === event.calendarId)
+  const category = categories.find((c) => c.id === event.categoryId)
 
   const emoji = calendar?.emoji || ""
   const backgroundColor = category?.color || "#1976d2"

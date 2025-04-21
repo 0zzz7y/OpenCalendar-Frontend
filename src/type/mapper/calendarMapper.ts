@@ -1,5 +1,5 @@
-import CalendarDto from "../dto/calendarDto"
 import Calendar from "../domain/calendar"
+import CalendarDto from "../dto/calendarDto"
 
 export const toCalendar = (dto: CalendarDto): Calendar => ({
   id: dto.id ?? "",

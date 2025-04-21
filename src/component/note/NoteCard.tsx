@@ -1,4 +1,9 @@
+import MESSAGES from "@/constant/message"
+import Category from "@/type/domain/category"
+import Note from "@/type/dto/note"
+
 import { useEffect, useRef, useState } from "react"
+
 import {
   Box,
   Paper,
@@ -11,11 +16,6 @@ import {
 } from "@mui/material"
 
 import NoteToolbar, { FormatCommand } from "./NoteToolbar"
-
-import Note from "@/type/dto/note"
-import Category from "@/type/domain/category"
-
-import MESSAGES from "@/constant/message"
 
 export interface NoteCardProperties {
   id: string
@@ -78,7 +78,7 @@ const NoteCard = ({
   }, [])
 
   const getCategoryColor = (categoryId: string | null) =>
-    categories.find(c => c.id === categoryId)?.color || color
+    categories.find((c) => c.id === categoryId)?.color || color
 
   const clearText = () => {
     if (contentRef.current) contentRef.current.innerHTML = ""
@@ -88,7 +88,7 @@ const NoteCard = ({
     contentRef.current?.focus()
     setTimeout(() => {
       document.execCommand(command, false)
-      setActiveFormats(prev => ({
+      setActiveFormats((prev) => ({
         ...prev,
         [command]: !prev[command]
       }))
@@ -229,7 +229,7 @@ const NoteCard = ({
         <Box ref={toolbarRef}>
           <NoteToolbar
             isCollapsed={collapsed}
-            onToggleCollapse={() => setCollapsed(c => !c)}
+            onToggleCollapse={() => setCollapsed((c) => !c)}
             onClearText={clearText}
             onDelete={() =>
               contentRef.current?.innerText.trim()

@@ -1,16 +1,18 @@
+import CalendarEditor from "@/component/calendar/CalendarEditor"
+import CalendarSelector from "@/component/calendar/CalendarSelector"
+import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
+import CategoryEditor from "@/component/category/CategoryEditor"
+import CategorySelector from "@/component/category/CategorySelector"
+import NotesPanel from "@/component/note/NotesPanel"
+import TasksPanel from "@/component/task/TasksPanel"
+import ThemeToggleButton from "@/component/theme/ThemeToggleButton"
+
 import React from "react"
+
 import { Box } from "@mui/material"
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
 
-import CalendarSelector from "@/component/calendar/CalendarSelector"
-import CalendarEditor from "@/component/calendar/CalendarEditor"
-import CategorySelector from "@/component/category/CategorySelector"
-import CategoryEditor from "@/component/category/CategoryEditor"
-import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
-import ThemeToggleButton from "@/component/theme/ThemeToggleButton"
-import TasksPanel from "@/component/task/TasksPanel"
 import CenterPanel from "../component/layout/CenterPanel"
-import NotesPanel from "@/component/note/NotesPanel"
 
 const Dashboard = () => {
   return (
@@ -19,7 +21,7 @@ const Dashboard = () => {
       style={{ height: "100vh", width: "100%" }}
     >
       {/* Left Panel */}
-      <Panel defaultSize={20}>
+      <Panel defaultSize={22.5}>
         <PanelGroup
           direction="vertical"
           style={{ height: "100%", width: "100%" }}
@@ -52,7 +54,8 @@ const Dashboard = () => {
           <PanelResizeHandle />
 
           {/* Monthly Calendar section */}
-          <Panel defaultSize={85}
+          <Panel
+            defaultSize={82}
             style={{
               minHeight: "150px",
               border: "2px solid #ccc",
@@ -108,9 +111,7 @@ const Dashboard = () => {
             margin: "10px 5px"
           }}
         >
-          <Box height="0%">
-            {/* <NotesPanel></NotesPanel> */}
-          </Box>
+          <Box height="0%">{/* <NotesPanel></NotesPanel> */}</Box>
 
           <Box flexGrow={1} overflow="auto">
             <TasksPanel />

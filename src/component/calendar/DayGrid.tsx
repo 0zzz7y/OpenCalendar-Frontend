@@ -37,7 +37,7 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
         {slots.map(({ hour, minute }, i) => (
           <Box
             key={i}
-            onClick={e => onSlotClick(hour, minute, e.currentTarget)}
+            onClick={(e) => onSlotClick(hour, minute, e.currentTarget)}
             sx={{
               borderBottom: `1px solid ${theme.palette.divider}`,
               padding: "6px 12px",

@@ -1,8 +1,8 @@
-import TaskDto from "../dto/taskDto"
-import Task from "../domain/task"
 import Calendar from "../domain/calendar"
 import Category from "../domain/category"
 import RecurringPattern from "../domain/recurringPattern"
+import Task from "../domain/task"
+import TaskDto from "../dto/taskDto"
 
 export const toTask = (
   dto: TaskDto,

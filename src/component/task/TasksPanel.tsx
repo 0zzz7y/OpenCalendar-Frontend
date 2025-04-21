@@ -1,15 +1,13 @@
-import { useState } from "react"
-
-import { Box, TextField } from "@mui/material"
-import { AddCircleOutline } from "@mui/icons-material"
-
-import TaskBoard from "./TasksBoard"
-
+import MESSAGES from "@/constant/message"
 import useAppContext from "@/hook/context/useAppContext"
-
 import TaskStatus from "@/type/domain/taskStatus"
 
-import MESSAGES from "@/constant/message"
+import { useState } from "react"
+
+import { AddCircleOutline } from "@mui/icons-material"
+import { Box, TextField } from "@mui/material"
+
+import TaskBoard from "./TasksBoard"
 
 const TasksPanel = () => {
   const { tasks, calendars, categories, addTask, updateTask, deleteTask } =
@@ -50,8 +48,8 @@ const TasksPanel = () => {
         <TextField
           label={MESSAGES.PLACEHOLDERS.NEW_TASK}
           value={newTitle}
-          onChange={e => setNewTitle(e.target.value)}
-          onKeyDown={e => e.key === "Enter" && handleCreate()}
+          onChange={(e) => setNewTitle(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleCreate()}
           InputProps={{
             endAdornment: (
               <AddCircleOutline

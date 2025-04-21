@@ -1,4 +1,7 @@
+import useAppContext from "@/hook/context/useAppContext"
+
 import { useEffect, useState } from "react"
+
 import {
   Popover,
   TextField,
@@ -13,7 +16,6 @@ import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
 import { toast } from "react-toastify"
 
 import Event from "../../type/domain/event"
-import useAppContext from "@/hook/context/useAppContext"
 
 interface Properties {
   anchorEl: HTMLElement | null
@@ -130,19 +132,19 @@ const EventCreationPopover = ({
         <TextField
           label="Title"
           value={title}
-          onChange={e => setTitle(e.target.value)}
+          onChange={(e) => setTitle(e.target.value)}
           fullWidth
         />
 
         <TextField
           label="Calendar"
           value={calendarId}
-          onChange={e => setCalendarId(e.target.value)}
+          onChange={(e) => setCalendarId(e.target.value)}
           select
           fullWidth
         >
           <MenuItem value="">Brak</MenuItem>
-          {calendars.map(cal => (
+          {calendars.map((cal) => (
             <MenuItem key={cal.id} value={cal.id}>
               {cal.emoji} {cal.name}
             </MenuItem>
@@ -152,12 +154,12 @@ const EventCreationPopover = ({
         <TextField
           label="Category"
           value={categoryId}
-          onChange={e => setCategoryId(e.target.value)}
+          onChange={(e) => setCategoryId(e.target.value)}
           select
           fullWidth
         >
           <MenuItem value="">Brak</MenuItem>
-          {categories.map(cat => (
+          {categories.map((cat) => (
             <MenuItem key={cat.id} value={cat.id}>
               <Box
                 display="inline-block"
@@ -175,24 +177,24 @@ const EventCreationPopover = ({
         <Divider />
 
         <Typography variant="body2">Start</Typography>
-        <DateCalendar value={start} onChange={v => v && setStart(v)} />
+        <DateCalendar value={start} onChange={(v) => v && setStart(v)} />
         <TimePicker
           label="Start time"
           value={start}
-          onChange={v => v && setStart(v)}
+          onChange={(v) => v && setStart(v)}
         />
 
         <Typography variant="body2">End</Typography>
         <TimePicker
           label="End time"
           value={end}
-          onChange={v => v && setEnd(v)}
+          onChange={(v) => v && setEnd(v)}
         />
 
         <TextField
           label="Description"
           value={description}
-          onChange={e => setDescription(e.target.value)}
+          onChange={(e) => setDescription(e.target.value)}
           fullWidth
           multiline
           minRows={2}
