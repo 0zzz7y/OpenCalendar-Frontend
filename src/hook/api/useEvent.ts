@@ -29,18 +29,16 @@ const useEvent = () => {
         }
       )
       const data = response.data
-      const mappedEvents = data.content.map((eventDto) => {
-        const calendar = calendars.find((cal) => cal.id === eventDto.calendarId)
-        const category = categories.find((cat) => cat.id === eventDto.categoryId)
+      const mappedEvents = data.content.map(eventDto => {
+        const calendar = calendars.find(cal => cal.id === eventDto.calendarId)
+        const category = categories.find(cat => cat.id === eventDto.categoryId)
         if (!calendar) {
           throw new Error(`Calendar not found for event ${eventDto.id}`)
         }
         return toEvent(eventDto, calendar, category)
       })
 
-      setEvents((prev) =>
-        reset ? mappedEvents : [...prev, ...mappedEvents]
-      )
+      setEvents(prev => (reset ? mappedEvents : [...prev, ...mappedEvents]))
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
@@ -67,11 +65,15 @@ const useEvent = () => {
         )
         const data = response.data
 
-        const mappedEvents = data.content.map((eventDto) => {
-          const calendar = calendars.find((cal) => cal.id === eventDto.calendarId)
-          const category = categories.find((cat) => cat.id === eventDto.categoryId)
+        const mappedEvents = data.content.map(eventDto => {
+          const calendar = calendars.find(cal => cal.id === eventDto.calendarId)
+          const category = categories.find(
+            cat => cat.id === eventDto.categoryId
+          )
           if (!calendar || !category) {
-            throw new Error(`Calendar or Category not found for event ${eventDto.id}`)
+            throw new Error(
+              `Calendar or Category not found for event ${eventDto.id}`
+            )
           }
           return toEvent(eventDto, calendar, category)
         })
@@ -98,37 +100,35 @@ const useEvent = () => {
 
   const addEvent = async (event: Omit<Event, "id">): Promise<Event> => {
     if (!event.name.trim()) throw new Error("Event name cannot be empty.")
-  
+
     const tempId = crypto.randomUUID()
     const optimisticEvent: Event = { ...event, id: tempId }
-  
-    setEvents((prev) => [...prev, optimisticEvent])
-  
+
+    setEvents(prev => [...prev, optimisticEvent])
+
     try {
       const response = await axios.post<EventDto>(
         `${import.meta.env.VITE_BACKEND_URL}/events`,
         toEventDto({ id: "", ...event }) // Add id as an empty string to match EventDto
       )
       const savedEvent = toEvent(response.data, event.calendar, event.category)
-  
-      setEvents((prev) =>
-        prev.map((e) => (e.id === tempId ? { ...savedEvent } : e))
+
+      setEvents(prev =>
+        prev.map(e => (e.id === tempId ? { ...savedEvent } : e))
       )
       return savedEvent
     } catch (error) {
       toast.error("Failed to add event")
-      setEvents((prev) => prev.filter((e) => e.id !== tempId))
+      setEvents(prev => prev.filter(e => e.id !== tempId))
       throw error
     }
   }
 
   const updateEvent = async (id: string, updated: Partial<Event>) => {
-    const previous = events.find((e) => e.id === id)
+    const previous = events.find(e => e.id === id)
     if (!previous) return
 
-    setEvents((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...updated } : e))
-    )
+    setEvents(prev => prev.map(e => (e.id === id ? { ...e, ...updated } : e)))
 
     try {
       const updatedWithId = {
@@ -147,22 +147,22 @@ const useEvent = () => {
       )
     } catch (error) {
       toast.error("Failed to update event")
-      setEvents((prev) => prev.map((e) => (e.id === id ? previous : e)))
+      setEvents(prev => prev.map(e => (e.id === id ? previous : e)))
       throw error
     }
   }
 
   const deleteEvent = async (id: string) => {
-    const deleted = events.find((e) => e.id === id)
+    const deleted = events.find(e => e.id === id)
     if (!deleted) return
 
-    setEvents((prev) => prev.filter((e) => e.id !== id))
+    setEvents(prev => prev.filter(e => e.id !== id))
 
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/events/${id}`)
     } catch (error) {
       toast.error("Failed to delete event")
-      setEvents((prev) => [...prev, deleted])
+      setEvents(prev => [...prev, deleted])
       throw error
     }
   }
@@ -176,6 +176,7 @@ const useEvent = () => {
     addEvent,
     updateEvent,
     deleteEvent,
+    reloadEvents,
     loadNextPage,
     page,
     size,

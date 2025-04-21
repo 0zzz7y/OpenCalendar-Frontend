@@ -20,7 +20,7 @@ const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
   const [mode, setMode] = useState<THEME.LIGHT | THEME.DARK>(THEME.LIGHT)
 
   const toggle = () => {
-    setMode((prev) => (prev === THEME.LIGHT ? THEME.DARK : THEME.LIGHT))
+    setMode(prev => (prev === THEME.LIGHT ? THEME.DARK : THEME.LIGHT))
   }
 
   const theme: Theme = useMemo(

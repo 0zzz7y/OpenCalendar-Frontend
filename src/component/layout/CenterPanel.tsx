@@ -33,7 +33,7 @@ const CenterPanel = () => {
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
   const filteredEvents = Array.isArray(events)
-    ? events.filter((event) => {
+    ? events.filter(event => {
         const calendarMatch =
           selectedCalendar === "all" || event.calendarId === selectedCalendar
         const categoryMatch =

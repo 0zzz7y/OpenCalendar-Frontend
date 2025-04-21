@@ -141,7 +141,7 @@ const CategoryEditor = () => {
                 inputRef={inputRef}
                 placeholder={PLACEHOLDERS.NAME}
                 value={label}
-                onChange={(e) => setLabel(e.target.value)}
+                onChange={e => setLabel(e.target.value)}
                 fullWidth
                 size="small"
                 margin="dense"
@@ -151,7 +151,7 @@ const CategoryEditor = () => {
                 <Input
                   type="color"
                   value={color}
-                  onChange={(e) => setColor(e.target.value)}
+                  onChange={e => setColor(e.target.value)}
                   sx={{ minWidth: 40, flex: 1 }}
                 />
                 <Button

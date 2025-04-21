@@ -151,7 +151,7 @@ const CalendarEditor = () => {
                 inputRef={inputRef}
                 placeholder={PLACEHOLDERS.NAME}
                 value={label}
-                onChange={(e) => setLabel(e.target.value)}
+                onChange={e => setLabel(e.target.value)}
                 fullWidth
                 size="small"
                 margin="dense"

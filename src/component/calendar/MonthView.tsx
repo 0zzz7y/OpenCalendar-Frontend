@@ -78,15 +78,13 @@ const MonthView = ({
   const cells: React.ReactNode[] = []
   for (let i = 0; i < 42; i++) {
     const day = startDay.add(i, "day")
-    const dayEvents = events.filter((e) =>
-      dayjs(e.startDate).isSame(day, "day")
-    )
+    const dayEvents = events.filter(e => dayjs(e.startDate).isSame(day, "day"))
 
     cells.push(
       <Paper
         key={day.format("YYYY-MM-DD")}
         elevation={0}
-        onClick={(e) =>
+        onClick={e =>
           openCreatePopover(e.currentTarget as HTMLElement, day.toDate())
         }
         sx={{
@@ -97,7 +95,7 @@ const MonthView = ({
           cursor: "pointer",
           transition: "background-color 0.15s ease-in-out",
           "&:hover": {
-            backgroundColor: (theme) =>
+            backgroundColor: theme =>
               theme.palette.mode === "dark" ? "#3d3d3d" : "#e0e0e0"
           }
         }}
@@ -113,9 +111,9 @@ const MonthView = ({
         </Typography>
 
         <Box sx={{ mt: 0.5 }}>
-          {dayEvents.slice(0, 3).map((ev) => {
-            const category = categories.find((c) => c.id === ev.categoryId)
-            const calendar = calendars.find((c) => c.id === ev.calendarId)
+          {dayEvents.slice(0, 3).map(ev => {
+            const category = categories.find(c => c.id === ev.categoryId)
+            const calendar = calendars.find(c => c.id === ev.calendarId)
 
             return (
               <Box
@@ -128,7 +126,7 @@ const MonthView = ({
                   mb: 0.5,
                   "&:hover": { bgcolor: theme.palette.action.hover }
                 }}
-                onClick={(e) => {
+                onClick={e => {
                   e.stopPropagation()
                   openInfoPopover(ev, e.currentTarget as HTMLElement)
                 }}

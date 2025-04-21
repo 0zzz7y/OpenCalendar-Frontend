@@ -29,14 +29,14 @@ const NotesPanel = () => {
   }, [notes])
 
   const handleUpdate = (updatedNote: Note) => {
-    setLocalNotes((prev) =>
-      prev.map((note) => (note.id === updatedNote.id ? updatedNote : note))
+    setLocalNotes(prev =>
+      prev.map(note => (note.id === updatedNote.id ? updatedNote : note))
     )
     updateNote(updatedNote.id, updatedNote)
   }
 
   const handleDelete = async (id: string) => {
-    setLocalNotes((prev) => prev.filter((note) => note.id !== id))
+    setLocalNotes(prev => prev.filter(note => note.id !== id))
     await deleteNote(id)
   }
 
@@ -50,7 +50,7 @@ const NotesPanel = () => {
       calendarId: ""
     }
 
-    setLocalNotes((prev) => [...prev, newNote])
+    setLocalNotes(prev => [...prev, newNote])
 
     const savedNote = await addNote({
       name: newNote.name,
@@ -59,8 +59,8 @@ const NotesPanel = () => {
       calendarId: newNote.calendarId
     })
 
-    setLocalNotes((prev) =>
-      prev.map((note) =>
+    setLocalNotes(prev =>
+      prev.map(note =>
         note.id === tempId && savedNote?.id
           ? { ...savedNote, ...note, id: savedNote.id }
           : note
@@ -70,7 +70,7 @@ const NotesPanel = () => {
 
   return (
     <Box position="absolute" top={0} left={0} width="0vh" height="0vh">
-      {localNotes.map((note) => (
+      {localNotes.map(note => (
         <NoteCard
           key={note.id}
           id={note.id}

@@ -50,8 +50,8 @@ const TasksPanel = () => {
         <TextField
           label={MESSAGES.PLACEHOLDERS.NEW_TASK}
           value={newTitle}
-          onChange={(e) => setNewTitle(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+          onChange={e => setNewTitle(e.target.value)}
+          onKeyDown={e => e.key === "Enter" && handleCreate()}
           InputProps={{
             endAdornment: (
               <AddCircleOutline

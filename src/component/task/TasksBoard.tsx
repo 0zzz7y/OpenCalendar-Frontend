@@ -43,9 +43,9 @@ const TaskBoard = ({
     }
 
   const [localOrder, setLocalOrder] = useState<Record<TaskStatus, Task[]>>({
-    TODO: tasks.filter((t) => t.status === "TODO"),
-    IN_PROGRESS: tasks.filter((t) => t.status === "IN_PROGRESS"),
-    DONE: tasks.filter((t) => t.status === "DONE")
+    TODO: tasks.filter(t => t.status === "TODO"),
+    IN_PROGRESS: tasks.filter(t => t.status === "IN_PROGRESS"),
+    DONE: tasks.filter(t => t.status === "DONE")
   })
 
   const onDragEnd = (result: DropResult) => {
@@ -58,14 +58,14 @@ const TaskBoard = ({
     const sourceTasks = Array.from(localOrder[sourceColumn])
     const destTasks = Array.from(localOrder[destColumn])
 
-    const draggedTask = sourceTasks.find((t) => t.id === draggableId)
+    const draggedTask = sourceTasks.find(t => t.id === draggableId)
     if (!draggedTask) return
 
     if (sourceColumn === destColumn) {
       sourceTasks.splice(source.index, 1)
       sourceTasks.splice(destination.index, 0, draggedTask)
 
-      setLocalOrder((prev) => ({
+      setLocalOrder(prev => ({
         ...prev,
         [sourceColumn]: sourceTasks
       }))
@@ -76,7 +76,7 @@ const TaskBoard = ({
         status: destColumn
       })
 
-      setLocalOrder((prev) => ({
+      setLocalOrder(prev => ({
         ...prev,
         [sourceColumn]: sourceTasks,
         [destColumn]: destTasks

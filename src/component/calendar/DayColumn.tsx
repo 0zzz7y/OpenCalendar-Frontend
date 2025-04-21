@@ -50,10 +50,10 @@ const DayColumn = ({
 
   const groupOverlappingEvents = (events: Event[]) => {
     const groups: Event[][] = []
-    events.forEach((event) => {
+    events.forEach(event => {
       let added = false
       for (const group of groups) {
-        if (group.some((e) => doEventsOverlap(e, event))) {
+        if (group.some(e => doEventsOverlap(e, event))) {
           group.push(event)
           added = true
           break
@@ -68,7 +68,7 @@ const DayColumn = ({
     const layouted: (Event & { customStyle: React.CSSProperties })[] = []
     const groups = groupOverlappingEvents(events)
 
-    groups.forEach((group) => {
+    groups.forEach(group => {
       const sorted = [...group].sort(
         (a, b) =>
           new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
@@ -109,11 +109,11 @@ const DayColumn = ({
           datetime={slot}
           allEvents={allEvents}
           onSave={onSave}
-          onClick={(el) => handleSlotClick(slot, el)}
+          onClick={el => handleSlotClick(slot, el)}
         />
       ))}
 
-      {layoutedEvents.map((event) => (
+      {layoutedEvents.map(event => (
         <EventBox
           key={event.id}
           event={event}

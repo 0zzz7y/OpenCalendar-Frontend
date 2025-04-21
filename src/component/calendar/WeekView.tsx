@@ -135,13 +135,13 @@ const WeekView = ({
               <DayColumn
                 date={day}
                 events={(events ?? []).filter(
-                  (e) =>
+                  e =>
                     new Date(e.startDate).toDateString() === day.toDateString()
                 )}
                 allEvents={events}
                 calendars={calendars}
                 categories={categories}
-                onSave={(data) => {
+                onSave={data => {
                   if (data.id) updateEvent(data.id, data)
                 }}
                 onSlotClick={handleSlotClick}

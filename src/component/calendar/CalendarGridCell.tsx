@@ -21,7 +21,7 @@ const CalendarGridCell = ({
   const [{ isOver, canDrop, item }, drop] = useDrop(() => ({
     accept: "event",
     drop: (item: { id: string }) => {
-      const moved = allEvents.find((e) => e.id === item.id)
+      const moved = allEvents.find(e => e.id === item.id)
       if (!moved) return
 
       const newStart = new Date(datetime)
@@ -42,7 +42,7 @@ const CalendarGridCell = ({
         endDate: newEnd.toISOString()
       })
     },
-    collect: (monitor) => ({
+    collect: monitor => ({
       isOver: monitor.isOver(),
       canDrop: monitor.canDrop(),
       item: monitor.getItem()
@@ -59,7 +59,7 @@ const CalendarGridCell = ({
     onClick?.(e.currentTarget)
   }
 
-  const previewEvent = allEvents.find((e) => e.id === item?.id)
+  const previewEvent = allEvents.find(e => e.id === item?.id)
   const previewHeight = previewEvent
     ? Math.max(
         32,
@@ -94,7 +94,7 @@ const CalendarGridCell = ({
       sx={{
         display: "flex",
         alignItems: "center",
-        borderBottom: (theme) =>
+        borderBottom: theme =>
           theme.palette.mode === "dark" ? "1px solid #333" : "1px solid #eee",
         padding: "6px",
         minHeight: 32,
@@ -105,7 +105,7 @@ const CalendarGridCell = ({
         fontSize: "0.75rem",
         border: isOver && canDrop ? "2px dashed #1976d2" : undefined,
         "&:hover": {
-          backgroundColor: (theme) =>
+          backgroundColor: theme =>
             theme.palette.mode === "dark" ? "#3d3d3d" : "#e0e0e0"
         }
       }}

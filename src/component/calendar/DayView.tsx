@@ -34,7 +34,7 @@ const DayView = ({
   const [infoEvent, setInfoEvent] = useState<Event | null>(null)
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
-  const dayEvents = events.filter((e) => dayjs(e.startDate).isSame(date, "day"))
+  const dayEvents = events.filter(e => dayjs(e.startDate).isSame(date, "day"))
 
   const handleSlotClick = (element: HTMLElement, datetime: Date) => {
     setSelectedSlot(element)
@@ -82,7 +82,7 @@ const DayView = ({
           allEvents={events}
           calendars={calendars}
           categories={categories}
-          onSave={(data) => {
+          onSave={data => {
             if (data.id) updateEvent(data.id, data)
           }}
           onSlotClick={handleSlotClick}

@@ -88,7 +88,8 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     deleteCategory
   } = useCategories()
 
-  const { events, reloadEvents, addEvent, updateEvent, deleteEvent } = useEvents()
+  const { events, reloadEvents, addEvent, updateEvent, deleteEvent } =
+    useEvents()
   const { tasks, reloadTasks, addTask, updateTask, deleteTask } = useTasks()
   const { notes, reloadNotes, addNote, updateNote, deleteNote } = useNotes()
 

@@ -38,15 +38,13 @@ const CategorySelector = () => {
           select
           label={PLACEHOLDERS.CATEGORY}
           value={selectedCategory || "all"}
-          onChange={(e) => setSelectedCategory(e.target.value || null)}
+          onChange={e => setSelectedCategory(e.target.value || null)}
           fullWidth
           size="small"
           SelectProps={{
             renderValue: (selected: unknown) => {
               const selectedValue = selected as string
-              const item = categoryOptions.find(
-                (d) => d.value === selectedValue
-              )
+              const item = categoryOptions.find(d => d.value === selectedValue)
               return (
                 <Box display="flex" alignItems="center" gap={1}>
                   {item?.color && (
@@ -63,7 +61,7 @@ const CategorySelector = () => {
             }
           }}
         >
-          {categoryOptions.map((option) => (
+          {categoryOptions.map(option => (
             <MenuItem key={option.value} value={option.value}>
               <Box
                 display="flex"
@@ -86,7 +84,7 @@ const CategorySelector = () => {
                   <Box display="flex" gap={1}>
                     <IconButton
                       size="small"
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
                         openEditor(EditorType.CATEGORY, EditorMode.EDIT, {
                           id: option.value,
@@ -100,7 +98,7 @@ const CategorySelector = () => {
                     <IconButton
                       size="small"
                       disabled={option.value === selectedCategory}
-                      onClick={(e) => {
+                      onClick={e => {
                         e.stopPropagation()
                         openEditor(EditorType.CATEGORY, EditorMode.DELETE, {
                           id: option.value,

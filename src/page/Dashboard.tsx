@@ -8,7 +8,6 @@ import CategorySelector from "@/component/category/CategorySelector"
 import CategoryEditor from "@/component/category/CategoryEditor"
 import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
 import ThemeToggleButton from "@/component/theme/ThemeToggleButton"
-import DraggableNotes from "@/component/note/DraggableNotes"
 import TasksPanel from "@/component/task/TasksPanel"
 import CenterPanel from "../component/layout/CenterPanel"
 import NotesPanel from "@/component/note/NotesPanel"
@@ -20,7 +19,7 @@ const Dashboard = () => {
       style={{ height: "100vh", width: "100%" }}
     >
       {/* Left Panel */}
-      <Panel>
+      <Panel defaultSize={20}>
         <PanelGroup
           direction="vertical"
           style={{ height: "100%", width: "100%" }}
@@ -53,7 +52,7 @@ const Dashboard = () => {
           <PanelResizeHandle />
 
           {/* Monthly Calendar section */}
-          <Panel
+          <Panel defaultSize={85}
             style={{
               minHeight: "150px",
               border: "2px solid #ccc",
@@ -98,7 +97,7 @@ const Dashboard = () => {
       <PanelResizeHandle />
 
       {/* Right Panel */}
-      <Panel>
+      <Panel defaultSize={20.5}>
         <Box
           display="flex"
           flexDirection="column"
@@ -110,7 +109,7 @@ const Dashboard = () => {
           }}
         >
           <Box height="0%">
-            <NotesPanel></NotesPanel>
+            {/* <NotesPanel></NotesPanel> */}
           </Box>
 
           <Box flexGrow={1} overflow="auto">

@@ -78,7 +78,7 @@ const NoteCard = ({
   }, [])
 
   const getCategoryColor = (categoryId: string | null) =>
-    categories.find((c) => c.id === categoryId)?.color || color
+    categories.find(c => c.id === categoryId)?.color || color
 
   const clearText = () => {
     if (contentRef.current) contentRef.current.innerHTML = ""
@@ -88,7 +88,7 @@ const NoteCard = ({
     contentRef.current?.focus()
     setTimeout(() => {
       document.execCommand(command, false)
-      setActiveFormats((prev) => ({
+      setActiveFormats(prev => ({
         ...prev,
         [command]: !prev[command]
       }))
@@ -229,7 +229,7 @@ const NoteCard = ({
         <Box ref={toolbarRef}>
           <NoteToolbar
             isCollapsed={collapsed}
-            onToggleCollapse={() => setCollapsed((c) => !c)}
+            onToggleCollapse={() => setCollapsed(c => !c)}
             onClearText={clearText}
             onDelete={() =>
               contentRef.current?.innerText.trim()

@@ -33,18 +33,18 @@ const useTask = () => {
         }
       )
       const data = response.data
-      const mappedTasks = data.content.map((taskDto) => {
-        const calendar = calendars.find((cal) => cal.id === taskDto.calendarId)
-        const category = categories.find((cat) => cat.id === taskDto.categoryId)
+      const mappedTasks = data.content.map(taskDto => {
+        const calendar = calendars.find(cal => cal.id === taskDto.calendarId)
+        const category = categories.find(cat => cat.id === taskDto.categoryId)
         if (!calendar || !category) {
-          throw new Error(`Calendar or Category not found for task ${taskDto.id}`)
+          throw new Error(
+            `Calendar or Category not found for task ${taskDto.id}`
+          )
         }
         return toTask(taskDto, calendar, category)
       })
 
-      setTasks((prev) =>
-        reset ? mappedTasks : [...prev, ...mappedTasks]
-      )
+      setTasks(prev => (reset ? mappedTasks : [...prev, ...mappedTasks]))
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
@@ -71,11 +71,13 @@ const useTask = () => {
         )
         const data = response.data
 
-        const mappedTasks = data.content.map((taskDto) => {
-          const calendar = calendars.find((cal) => cal.id === taskDto.calendarId)
-          const category = categories.find((cat) => cat.id === taskDto.categoryId)
+        const mappedTasks = data.content.map(taskDto => {
+          const calendar = calendars.find(cal => cal.id === taskDto.calendarId)
+          const category = categories.find(cat => cat.id === taskDto.categoryId)
           if (!calendar || !category) {
-            throw new Error(`Calendar or Category not found for task ${taskDto.id}`)
+            throw new Error(
+              `Calendar or Category not found for task ${taskDto.id}`
+            )
           }
           return toTask(taskDto, calendar, category)
         })
@@ -106,7 +108,7 @@ const useTask = () => {
     const tempId = crypto.randomUUID()
     const optimisticTask: Task = { ...task, id: tempId }
 
-    setTasks((prev) => [...prev, optimisticTask])
+    setTasks(prev => [...prev, optimisticTask])
 
     try {
       const response = await axios.post<TaskDto>(
@@ -115,24 +117,20 @@ const useTask = () => {
       )
       const savedTask = toTask(response.data, task.calendar, task.category)
 
-      setTasks((prev) =>
-        prev.map((t) => (t.id === tempId ? { ...savedTask } : t))
-      )
+      setTasks(prev => prev.map(t => (t.id === tempId ? { ...savedTask } : t)))
       return savedTask
     } catch (error) {
       toast.error("Failed to add task")
-      setTasks((prev) => prev.filter((t) => t.id !== tempId))
+      setTasks(prev => prev.filter(t => t.id !== tempId))
       throw error
     }
   }
 
   const updateTask = async (id: string, updated: Partial<Task>) => {
-    const previous = tasks.find((t) => t.id === id)
+    const previous = tasks.find(t => t.id === id)
     if (!previous) return
 
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updated } : t))
-    )
+    setTasks(prev => prev.map(t => (t.id === id ? { ...t, ...updated } : t)))
 
     try {
       const updatedWithId = {
@@ -152,22 +150,22 @@ const useTask = () => {
       )
     } catch (error) {
       toast.error("Failed to update task")
-      setTasks((prev) => prev.map((t) => (t.id === id ? previous : t)))
+      setTasks(prev => prev.map(t => (t.id === id ? previous : t)))
       throw error
     }
   }
 
   const deleteTask = async (id: string) => {
-    const deleted = tasks.find((t) => t.id === id)
+    const deleted = tasks.find(t => t.id === id)
     if (!deleted) return
 
-    setTasks((prev) => prev.filter((t) => t.id !== id))
+    setTasks(prev => prev.filter(t => t.id !== id))
 
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/tasks/${id}`)
     } catch (error) {
       toast.error("Failed to delete task")
-      setTasks((prev) => [...prev, deleted])
+      setTasks(prev => [...prev, deleted])
       throw error
     }
   }
@@ -181,6 +179,7 @@ const useTask = () => {
     addTask,
     updateTask,
     deleteTask,
+    reloadTasks,
     loadNextPage,
     page,
     size,

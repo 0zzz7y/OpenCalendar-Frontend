@@ -77,7 +77,7 @@ const NoteToolBar = ({
         <IconButton
           size="small"
           onClick={onToggleCollapse}
-          onMouseDown={(e) => e.stopPropagation()}
+          onMouseDown={e => e.stopPropagation()}
         >
           {isCollapsed ? (
             <ChevronRightIcon
@@ -92,10 +92,10 @@ const NoteToolBar = ({
         <TextField
           placeholder="Name"
           value={noteName}
-          onChange={(e) => onNameChange(e.target.value)}
+          onChange={e => onNameChange(e.target.value)}
           variant="outlined"
           size="small"
-          onMouseDown={(e) => e.stopPropagation()}
+          onMouseDown={e => e.stopPropagation()}
           onBlur={onNameBlur}
           sx={{
             ml: 1,
@@ -115,7 +115,7 @@ const NoteToolBar = ({
             MESSAGES.TOOLBAR.BOLD,
             MESSAGES.TOOLBAR.ITALIC,
             MESSAGES.TOOLBAR.UNDERLINE
-          ].map((cmd) => {
+          ].map(cmd => {
             const Icon =
               cmd === MESSAGES.TOOLBAR.BOLD
                 ? FormatBoldIcon
@@ -129,7 +129,7 @@ const NoteToolBar = ({
                 key={cmd}
                 size="small"
                 onClick={() => onFormatText(cmd)}
-                onMouseDown={(e) => e.stopPropagation()}
+                onMouseDown={e => e.stopPropagation()}
                 sx={{ bgcolor: activeFormats[cmd] ? "#ddd" : "transparent" }}
               >
                 <Icon fontSize="small" sx={{ color: "#000" }} />
@@ -140,15 +140,15 @@ const NoteToolBar = ({
           <IconButton
             size="small"
             onClick={onClearText}
-            onMouseDown={(e) => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
           >
             <ClearIcon fontSize="small" sx={{ color: "#000" }} />
           </IconButton>
 
           <IconButton
             size="small"
-            onClick={(e) => onCategoryMenuOpen(e.currentTarget)}
-            onMouseDown={(e) => e.stopPropagation()}
+            onClick={e => onCategoryMenuOpen(e.currentTarget)}
+            onMouseDown={e => e.stopPropagation()}
           >
             <Box
               sx={{
@@ -165,7 +165,7 @@ const NoteToolBar = ({
           <IconButton
             size="small"
             onClick={handleDeleteClick}
-            onMouseDown={(e) => e.stopPropagation()}
+            onMouseDown={e => e.stopPropagation()}
           >
             <DeleteIcon fontSize="small" sx={{ color: "#000" }} />
           </IconButton>

@@ -43,8 +43,8 @@ const TaskCard = ({
     setLocalTask(task)
   }, [task])
 
-  const currentCalendar = calendars.find((c) => c.id === localTask.calendarId)
-  const currentCategory = categories.find((c) => c.id === localTask.categoryId)
+  const currentCalendar = calendars.find(c => c.id === localTask.calendarId)
+  const currentCategory = categories.find(c => c.id === localTask.categoryId)
   const cardColor = currentCategory?.color
 
   const handleFieldChange = (field: keyof Task, value: any) => {
@@ -71,7 +71,7 @@ const TaskCard = ({
   }
 
   const handleToggleExpand = () => {
-    setExpanded((prev) => !prev)
+    setExpanded(prev => !prev)
   }
 
   return (
@@ -98,7 +98,7 @@ const TaskCard = ({
           <TextField
             placeholder="Tytuł"
             value={localTask.name}
-            onChange={(e) => handleFieldChange("name", e.target.value)}
+            onChange={e => handleFieldChange("name", e.target.value)}
             size="small"
             variant="outlined"
             fullWidth
@@ -116,7 +116,7 @@ const TaskCard = ({
           <TextField
             placeholder="Description"
             value={localTask.description || ""}
-            onChange={(e) => handleFieldChange("description", e.target.value)}
+            onChange={e => handleFieldChange("description", e.target.value)}
             size="small"
             variant="outlined"
             fullWidth
@@ -129,7 +129,7 @@ const TaskCard = ({
             value={
               localTask.startDate ? dayjs(localTask.startDate).toDate() : null
             }
-            onChange={(newValue) =>
+            onChange={newValue =>
               handleFieldChange(
                 "startDate",
                 newValue ? newValue.toISOString() : ""
@@ -150,7 +150,7 @@ const TaskCard = ({
 
           <DateTimePicker
             value={localTask.endDate ? dayjs(localTask.endDate).toDate() : null}
-            onChange={(newValue) =>
+            onChange={newValue =>
               handleFieldChange(
                 "endDate",
                 newValue ? newValue.toISOString() : ""
@@ -174,7 +174,7 @@ const TaskCard = ({
               placeholder="Recurring"
               select
               value={localTask.recurringPattern || "NONE"}
-              onChange={(e) =>
+              onChange={e =>
                 handleFieldChange("recurringPattern", e.target.value)
               }
               size="small"
@@ -194,13 +194,13 @@ const TaskCard = ({
             placeholder="Calendar"
             select
             value={localTask.calendarId || ""}
-            onChange={(e) => handleFieldChange("calendarId", e.target.value)}
+            onChange={e => handleFieldChange("calendarId", e.target.value)}
             size="small"
             variant="outlined"
             fullWidth
             sx={fieldStyle}
           >
-            {calendars.map((cal) => (
+            {calendars.map(cal => (
               <MenuItem key={cal.id} value={cal.id}>
                 <Box display="flex" alignItems="center" gap={1}>
                   <Typography
@@ -218,7 +218,7 @@ const TaskCard = ({
             placeholder="Category"
             select
             value={localTask.categoryId || ""}
-            onChange={(e) => handleFieldChange("categoryId", e.target.value)}
+            onChange={e => handleFieldChange("categoryId", e.target.value)}
             size="small"
             variant="outlined"
             fullWidth
@@ -227,7 +227,7 @@ const TaskCard = ({
             <MenuItem value="">
               <Typography>None</Typography>
             </MenuItem>
-            {categories.map((cat) => (
+            {categories.map(cat => (
               <MenuItem key={cat.id} value={cat.id}>
                 <Box display="flex" alignItems="center" gap={1}>
                   <Box

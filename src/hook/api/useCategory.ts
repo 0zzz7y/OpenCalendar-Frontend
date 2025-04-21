@@ -28,7 +28,7 @@ const useCategory = () => {
       const data = response.data
       const mappedCategories = data.content.map(toCategory)
 
-      setCategories((prev) =>
+      setCategories(prev =>
         reset ? mappedCategories : [...prev, ...mappedCategories]
       )
       setPage(data.number)
@@ -83,7 +83,7 @@ const useCategory = () => {
 
     const temporaryId = crypto.randomUUID()
     const optimisticCategory: Category = { ...category, id: temporaryId }
-    setCategories((prev) => [...prev, optimisticCategory])
+    setCategories(prev => [...prev, optimisticCategory])
 
     try {
       const response = await axios.post<CategoryDto>(
@@ -92,23 +92,23 @@ const useCategory = () => {
       )
       const savedCategory = toCategory(response.data)
 
-      setCategories((prev) =>
-        prev.map((c) => (c.id === temporaryId ? { ...savedCategory } : c))
+      setCategories(prev =>
+        prev.map(c => (c.id === temporaryId ? { ...savedCategory } : c))
       )
       return savedCategory
     } catch (error) {
       toast.error("Failed to add category")
-      setCategories((prev) => prev.filter((c) => c.id !== temporaryId))
+      setCategories(prev => prev.filter(c => c.id !== temporaryId))
       throw error
     }
   }
 
   const updateCategory = async (id: string, updated: Partial<Category>) => {
-    const previous = categories.find((c) => c.id === id)
+    const previous = categories.find(c => c.id === id)
     if (!previous) return
 
-    setCategories((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, ...updated } : c))
+    setCategories(prev =>
+      prev.map(c => (c.id === id ? { ...c, ...updated } : c))
     )
 
     try {
@@ -123,22 +123,22 @@ const useCategory = () => {
       )
     } catch (error) {
       toast.error("Failed to update category")
-      setCategories((prev) => prev.map((c) => (c.id === id ? previous : c)))
+      setCategories(prev => prev.map(c => (c.id === id ? previous : c)))
       throw error
     }
   }
 
   const deleteCategory = async (id: string) => {
-    const deleted = categories.find((c) => c.id === id)
+    const deleted = categories.find(c => c.id === id)
     if (!deleted) return
 
-    setCategories((prev) => prev.filter((c) => c.id !== id))
+    setCategories(prev => prev.filter(c => c.id !== id))
 
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/categories/${id}`)
     } catch (error) {
       toast.error("Failed to delete category")
-      setCategories((prev) => [...prev, deleted])
+      setCategories(prev => [...prev, deleted])
       throw error
     }
   }
