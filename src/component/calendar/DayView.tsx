@@ -2,10 +2,9 @@ import { useState } from "react"
 import { Box } from "@mui/material"
 import dayjs from "dayjs"
 
-import TimeColumn from "./TimeColumn"
 import DayColumn from "./DayColumn"
-import EventPopover from "../event/EventCreationPopover"
-import EventInformationPopover from "../event/EventInformationPopover"
+import EventPopover from "@/component/event/EventCreationPopover"
+import EventInformationPopover from "@/component/event/EventInformationPopover"
 
 import Event from "@/type/domain/event"
 
@@ -82,7 +81,6 @@ const DayView = ({
         height="100%"
         sx={{ p: 2, height: "100vh", overflow: "auto" }}
       >
-        <TimeColumn />
         <DayColumn
           date={date}
           events={dayEvents}

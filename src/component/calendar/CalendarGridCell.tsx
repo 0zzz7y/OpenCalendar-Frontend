@@ -1,7 +1,7 @@
 import { Box } from "@mui/material"
 import { useDrop } from "react-dnd"
-import { useRef, useEffect } from "react"
-import Event from "../../type/domain/event" // Ensure the type includes `color`
+import { useRef, useEffect, useMemo } from "react"
+import Event from "../../type/domain/event"
 
 interface CalendarGridCellProperties {
   datetime: Date
@@ -83,12 +83,29 @@ const CalendarGridCell = ({
       )
     : 32
 
+  const isFullHour = datetime.getMinutes() === 0
+
+  const use12Hour = useMemo(() => Intl.DateTimeFormat().resolvedOptions().hour12, [])
+
+  const formattedHour = useMemo(
+    () =>
+      new Intl.DateTimeFormat(undefined, {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: use12Hour
+      }).format(datetime),
+    [datetime, use12Hour]
+  )
+
   return (
     <Box
       ref={ref}
       onClick={handleClick}
       sx={{
-        borderBottom: "1px solid #eee",
+        display: "flex",
+        alignItems: "center",
+        borderBottom: (theme) =>
+          theme.palette.mode === "dark" ? "1px solid #333" : "1px solid #eee",
         padding: "6px",
         minHeight: 32,
         position: "relative",
@@ -98,10 +115,26 @@ const CalendarGridCell = ({
         fontSize: "0.75rem",
         border: isOver && canDrop ? "2px dashed #1976d2" : undefined,
         "&:hover": {
-          backgroundColor: "#f5f5f5"
+          backgroundColor: (theme) =>
+            theme.palette.mode === "dark" ? "#2c2c2c" : "#f5f5f5"
         }
       }}
     >
+      {isFullHour && (
+        <Box
+          sx={{
+            width: 50,
+            color: "#999",
+            fontSize: "0.75rem",
+            pr: 1,
+            whiteSpace: "nowrap",
+            flexShrink: 0
+          }}
+        >
+          {formattedHour}
+        </Box>
+      )}
+
       {isOver && canDrop && (
         <Box
           sx={{

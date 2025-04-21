@@ -3,7 +3,7 @@ import { Box } from "@mui/material"
 import CalendarGridCell from "./CalendarGridCell"
 import EventBox from "../event/EventBox"
 
-import Event from "../../type/domain/event"
+import Event from "@/type/domain/event"
 
 interface DayColumnProperties {
   date: Date
@@ -30,9 +30,9 @@ const DayColumn = ({
   dragTargetId,
   onEventClick
 }: DayColumnProperties) => {
-  const slots = Array.from({ length: 24 * 4 }, (_, i) => {
+  const slots = Array.from({ length: 48 }, (_, i) => {
     const d = new Date(date)
-    d.setHours(Math.floor(i / 4), (i % 4) * 15, 0, 0)
+    d.setHours(Math.floor(i / 2), i % 2 === 0 ? 0 : 30, 0, 0)
     return d
   })
 
@@ -50,10 +50,8 @@ const DayColumn = ({
 
   const groupOverlappingEvents = (events: Event[]) => {
     const groups: Event[][] = []
-
     events.forEach((event) => {
       let added = false
-
       for (const group of groups) {
         if (group.some((e) => doEventsOverlap(e, event))) {
           group.push(event)
@@ -61,12 +59,8 @@ const DayColumn = ({
           break
         }
       }
-
-      if (!added) {
-        groups.push([event])
-      }
+      if (!added) groups.push([event])
     })
-
     return groups
   }
 
@@ -76,10 +70,8 @@ const DayColumn = ({
 
     groups.forEach((group) => {
       const sorted = [...group].sort(
-        (a, b) =>
-          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+        (a, b) => new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
       )
-
       const width = 100 / sorted.length
       const gap = 4
 
@@ -91,8 +83,7 @@ const DayColumn = ({
             width: `calc(${width}% - ${gap}px)`,
             left: `calc(${i * width}% + ${i * gap}px)`,
             opacity: dragTargetId ? 0.6 : 1,
-            pointerEvents:
-              dragTargetId && dragTargetId !== event.id ? "none" : "auto"
+            pointerEvents: dragTargetId && dragTargetId !== event.id ? "none" : "auto"
           }
         })
       })
@@ -108,7 +99,7 @@ const DayColumn = ({
       flex={1}
       borderLeft="1px solid #ddd"
       position="relative"
-      minHeight={24 * 4 * 32}
+      minHeight={48 * 32}
     >
       {slots.map((slot, i) => (
         <CalendarGridCell

@@ -9,7 +9,15 @@ const darkTheme = createTheme({
     },
 
     background: {
-      default: "#121212"
+      default: "#2a2a2a",
+      paper: "#3a3a3a"
+    },
+
+    divider: "#555",
+
+    text: {
+      primary: "#e0e0e0",
+      secondary: "#bbb"
     }
   }
 })

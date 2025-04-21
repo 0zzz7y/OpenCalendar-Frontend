@@ -9,7 +9,15 @@ const lightTheme = createTheme({
     },
 
     background: {
-      default: "#f5f5f5"
+      default: "#f3f3f3",
+      paper: "#ffffff"
+    },
+
+    divider: "#ddd",
+
+    text: {
+      primary: "#222",
+      secondary: "#555"
     }
   }
 })

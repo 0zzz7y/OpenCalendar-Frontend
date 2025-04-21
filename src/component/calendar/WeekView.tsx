@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material"
 
 import DayColumn from "./DayColumn"
-import TimeColumn from "./TimeColumn"
 
 import Event from "@/type/domain/event"
 
@@ -46,8 +45,6 @@ const WeekView = ({
       height="100%"
       sx={{ p: 2, height: "100vh", overflow: "auto" }}
     >
-      <TimeColumn />
-
       {days.map((day, index) => {
         const isToday = day.toDateString() === new Date().toDateString()
 
@@ -58,6 +55,7 @@ const WeekView = ({
             display="flex"
             flexDirection="column"
             borderRight="1px solid #ccc"
+            minHeight={`${48 * 32}px`}
           >
             <Box
               px={1}
