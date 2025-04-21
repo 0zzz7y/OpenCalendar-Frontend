@@ -100,7 +100,7 @@ const Dashboard = () => {
       <PanelResizeHandle />
 
       {/* Right Panel */}
-      <Panel defaultSize={20.5}>
+      <Panel defaultSize={26}>
         <Box
           display="flex"
           flexDirection="column"
