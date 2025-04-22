@@ -8,7 +8,10 @@ enum LABELS {
   END_DATE = "End date",
   END_TIME = "End time",
   CALENDAR = "Calendar",
-  CATEGORY = "Category"
+  CATEGORY = "Category",
+  TODO = "To-Do",
+  IN_PROGRESS = "In progress",
+  DONE = "Done"
 }
 
 export default LABELS

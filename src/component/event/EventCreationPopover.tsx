@@ -171,7 +171,6 @@ const EventCreationPopover = ({
           select
           fullWidth
         >
-          <MenuItem value="">Brak</MenuItem>
           {calendars.map((cal) => (
             <MenuItem key={cal.id} value={cal.id}>
               {cal.emoji} {cal.name}
@@ -186,7 +185,7 @@ const EventCreationPopover = ({
           select
           fullWidth
         >
-          <MenuItem value="">Brak</MenuItem>
+          <MenuItem value="">None</MenuItem>
           {categories.map((cat) => (
             <MenuItem key={cat.id} value={cat.id}>
               <Box
@@ -234,12 +233,6 @@ const EventCreationPopover = ({
           <Button onClick={onClose} color="inherit">
             {BUTTONS.CANCEL}
           </Button>
-
-          {initialEvent?.id && (
-            <Button onClick={handleDelete} color="error">
-              {BUTTONS.DELETE}
-            </Button>
-          )}
 
           <Button onClick={handleSave} variant="contained">
             {BUTTONS.SAVE}

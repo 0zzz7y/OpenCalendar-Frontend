@@ -131,11 +131,8 @@ const DayColumn = ({
 
       {layoutedEvents.map((event) => (
         <EventBox
-          event={event as Event} // Cast to Event when passing to EventBox
-          calendars={calendars}
-          categories={categories}
+          event={event as Event}
           dragTargetId={dragTargetId}
-          showPopoverLine={showPopoverLine}
           customStyle={{
             zIndex: 20,
             ...event.customStyle

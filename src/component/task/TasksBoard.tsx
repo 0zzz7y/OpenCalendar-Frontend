@@ -17,6 +17,7 @@ import { Box } from "@mui/material"
 
 import TaskCard from "./TaskCard"
 import TaskColumn from "./TaskColumn"
+import LABELS from "@/constant/labels"
 
 interface Properties {
   tasks: Task[]
@@ -35,9 +36,9 @@ const TaskBoard = ({
 }: Properties) => {
   const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } =
     {
-      TODO: { title: TaskStatus.TODO, icon: <HourglassEmpty /> },
-      IN_PROGRESS: { title: TaskStatus.IN_PROGRESS, icon: <Pending /> },
-      DONE: { title: TaskStatus.DONE, icon: <Done /> }
+      TODO: { title: LABELS.IN_PROGRESS, icon: <HourglassEmpty /> },
+      IN_PROGRESS: { title: LABELS.IN_PROGRESS, icon: <Pending /> },
+      DONE: { title: LABELS.DONE, icon: <Done /> }
     }
 
   const [localOrder, setLocalOrder] = useState<Record<TaskStatus, Task[]>>({

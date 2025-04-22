@@ -184,7 +184,7 @@ const WeekView = ({
 
       {infoEvent && infoAnchor && (
         <EventInformationPopover
-          anchorEl={infoAnchor}
+          anchorElement={infoAnchor}
           event={infoEvent}
           onClose={() => setInfoEvent(null)}
           onEdit={handleEditEvent}
