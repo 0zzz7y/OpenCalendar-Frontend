@@ -141,7 +141,9 @@ const useEvent = () => {
   }
 
   useEffect(() => {
-    if (calendars.length > 0) reloadEvents()
+    if (calendars.length > 0 && categories.length > 0) {
+      reloadEvents()
+    }
   }, [calendars, categories])
 
   return {

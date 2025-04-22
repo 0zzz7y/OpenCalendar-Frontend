@@ -60,8 +60,8 @@ interface AppContextState {
 const AppContext = createContext<AppContextState | undefined>(undefined)
 
 export const AppProvider = ({ children }: { children: ReactNode }) => {
-  const [selectedCalendar, setSelectedCalendar] = useState<string | null>("all")
-  const [selectedCategory, setSelectedCategory] = useState<string | null>("all")
+  const [selectedCalendar, setSelectedCalendar] = useState<string | null>(null)
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [editorOpen, setEditorOpen] = useState(false)
   const [editorType, setEditorType] = useState<EditorType>(EditorType.CALENDAR)
   const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
@@ -113,16 +113,13 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true
     const initialize = async () => {
-      await Promise.all([reloadCalendars(), reloadCategories()])
-      if (mounted) await reloadEvents()
+      if (mounted) await Promise.all([reloadCalendars(), reloadCategories()])
     }
     initialize()
     return () => {
       mounted = false
     }
   }, [])
-
-  
 
   const openEditor = (
     type: EditorType,

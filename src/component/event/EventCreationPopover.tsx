@@ -17,6 +17,7 @@ import { toast } from "react-toastify"
 
 import Event from "../../type/domain/event"
 import RecurringPattern from "@/type/domain/recurringPattern"
+import dayjs from "dayjs"
 
 interface Properties {
   anchorEl: HTMLElement | null
@@ -90,8 +91,8 @@ const EventCreationPopover = ({
       description,
       calendar,
       category,
-      startDate: start.toISOString(),
-      endDate: end.toISOString(),
+      startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
       recurringPattern: RecurringPattern.NONE
     }
 

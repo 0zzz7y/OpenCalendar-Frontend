@@ -1,7 +1,7 @@
 import Event from "@/type/domain/event"
+import useAppContext from "@/hook/context/useAppContext"
 
-import { useState } from "react"
-
+import { useEffect, useState } from "react"
 import { Edit, Delete } from "@mui/icons-material"
 import {
   Box,
@@ -28,7 +28,22 @@ const EventInformationPopover = ({
   onDelete
 }: Properties) => {
   const open = Boolean(anchorEl && event)
+  const { events, reloadEvents } = useAppContext()
+
+  const [currentEvent, setCurrentEvent] = useState<Event | null>(event)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
+
+  useEffect(() => {
+    const refresh = async () => {
+      await reloadEvents()
+      if (event?.id) {
+        const updated = events.find((e) => e.id === event.id)
+        if (updated) setCurrentEvent(updated)
+      }
+    }
+
+    if (event?.id) refresh()
+  }, [event?.id, events])
 
   const handleDeleteClick = () => setConfirmingDelete(true)
   const handleConfirmDelete = () => {
@@ -47,10 +62,10 @@ const EventInformationPopover = ({
       transformOrigin={{ vertical: "top", horizontal: "left" }}
       PaperProps={{ sx: { p: 2, width: 300 } }}
     >
-      {event && (
+      {currentEvent && (
         <Stack spacing={2}>
           <Stack direction="row" justifyContent="space-between">
-            <Typography variant="h6">{event.name}</Typography>
+            <Typography variant="h6">{currentEvent.name}</Typography>
             <Box>
               {!confirmingDelete && (
                 <>
@@ -68,11 +83,11 @@ const EventInformationPopover = ({
           {!confirmingDelete ? (
             <>
               <Typography variant="body2" color="text.secondary">
-                {new Date(event.startDate).toLocaleString()} –{" "}
-                {new Date(event.endDate).toLocaleString()}
+                {new Date(currentEvent.startDate).toLocaleString()} –{" "}
+                {new Date(currentEvent.endDate).toLocaleString()}
               </Typography>
-              {event.description && (
-                <Typography>{event.description}</Typography>
+              {currentEvent.description && (
+                <Typography>{currentEvent.description}</Typography>
               )}
             </>
           ) : (

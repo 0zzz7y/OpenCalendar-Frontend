@@ -35,7 +35,7 @@ const WeekView = ({
   categories,
   onEventClick
 }: WeekViewProperties) => {
-  const { updateEvent } = useAppContext()
+  const { updateEvent, reloadEvents } = useAppContext()
 
   const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
   const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
@@ -138,13 +138,16 @@ const WeekView = ({
                 date={day}
                 events={(events ?? []).filter(
                   (e) =>
-                    new Date(e.startDate).toDateString() === day.toDateString()
+                    dayjs(e.startDate).isSame(day, "day")
                 )}
                 allEvents={events}
                 calendars={calendars}
                 categories={categories}
-                onSave={(data) => {
-                  if (data.id) updateEvent(data.id, data)
+                onSave={async (data) => {
+                  if (data.id) {
+                    await updateEvent(data.id, data)
+                    await reloadEvents()
+                  }
                 }}
                 onSlotClick={handleSlotClick}
                 onEventClick={handleEventClick}
