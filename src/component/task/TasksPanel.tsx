@@ -1,19 +1,17 @@
 import MESSAGES from "@/constant/message"
+import useCalendar from "@/hook/api/useCalendar"
+import useCategory from "@/hook/api/useCategory"
+import useTask from "@/hook/api/useTask"
+import RecurringPattern from "@/type/domain/recurringPattern"
+import Task from "@/type/domain/task"
+import TaskStatus from "@/type/domain/taskStatus"
 
 import { useEffect, useRef, useState } from "react"
 
 import { AddCircleOutline } from "@mui/icons-material"
 import { Box, TextField } from "@mui/material"
 
-import useCategory from "@/hook/api/useCategory"
-import useCalendar from "@/hook/api/useCalendar"
-import useTask from "@/hook/api/useTask"
-
 import TaskBoard from "./TasksBoard"
-
-import Task from "@/type/domain/task"
-import TaskStatus from "@/type/domain/taskStatus"
-import RecurringPattern from "@/type/domain/recurringPattern"
 
 const TasksPanel = () => {
   const { categories } = useCategory()
@@ -70,7 +68,9 @@ const TasksPanel = () => {
     if (savedTask?.id) {
       setLocalTasks((prev) =>
         prev.map((task) =>
-          task.id === tempId ? { ...savedTask, ...task, id: savedTask.id } : task
+          task.id === tempId
+            ? { ...savedTask, ...task, id: savedTask.id }
+            : task
         )
       )
     }

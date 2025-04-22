@@ -10,12 +10,12 @@ import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import { Box, Typography, Button } from "@mui/material"
 import dayjs from "dayjs"
 
+import CalendarViewSwitcher from "../calendar/CalendarViewSwitcher"
+import EventPopover from "../event/EventCreationPopover"
+import EventInformationPopover from "../event/EventInformationPopover"
 import DayView from "./DayView"
 import MonthView from "./MonthView"
 import WeekView from "./WeekView"
-import EventPopover from "../event/EventCreationPopover"
-import EventInformationPopover from "../event/EventInformationPopover"
-import CalendarViewSwitcher from "../calendar/CalendarViewSwitcher"
 
 const CalendarPanel = () => {
   const {
@@ -72,7 +72,9 @@ const CalendarPanel = () => {
   const handleSave = async (data: Partial<Event>) => {
     if (!data.startDate || !data.calendar) return
 
-    const exists = events.find((e: { id: string | undefined }) => e.id === data.id)
+    const exists = events.find(
+      (e: { id: string | undefined }) => e.id === data.id
+    )
 
     if (exists && data.id) {
       await updateEvent(data.id, data)

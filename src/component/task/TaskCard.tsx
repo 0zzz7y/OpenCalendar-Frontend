@@ -6,7 +6,6 @@ import type Task from "@/type/domain/task"
 import { useEffect, useState } from "react"
 
 import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material"
-
 import {
   Typography,
   MenuItem,
@@ -16,9 +15,7 @@ import {
   TextField,
   Card
 } from "@mui/material"
-
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-
 import dayjs from "dayjs"
 
 interface Properties {
@@ -159,7 +156,9 @@ const TaskCard = ({
             />
 
             <DateTimePicker
-              value={localTask.endDate ? dayjs(localTask.endDate).toDate() : null}
+              value={
+                localTask.endDate ? dayjs(localTask.endDate).toDate() : null
+              }
               onChange={(newValue) =>
                 handleFieldChange(
                   "endDate",

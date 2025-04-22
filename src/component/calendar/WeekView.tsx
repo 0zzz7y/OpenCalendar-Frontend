@@ -136,9 +136,8 @@ const WeekView = ({
 
               <DayColumn
                 date={day}
-                events={(events ?? []).filter(
-                  (e) =>
-                    dayjs(e.startDate).isSame(day, "day")
+                events={(events ?? []).filter((e) =>
+                  dayjs(e.startDate).isSame(day, "day")
                 )}
                 allEvents={events}
                 calendars={calendars}

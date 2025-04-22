@@ -86,34 +86,24 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     deleteCategory
   } = useCategories()
 
-  const {
-    events,
-    reloadEvents,
-    addEvent,
-    updateEvent,
-    deleteEvent
-  } = useEvents()
+  const { events, reloadEvents, addEvent, updateEvent, deleteEvent } =
+    useEvents()
 
-  const {
-    tasks,
-    reloadTasks,
-    addTask,
-    updateTask,
-    deleteTask
-  } = useTasks()
+  const { tasks, reloadTasks, addTask, updateTask, deleteTask } = useTasks()
 
-  const {
-    notes,
-    reloadNotes,
-    addNote,
-    updateNote,
-    deleteNote
-  } = useNotes()
+  const { notes, reloadNotes, addNote, updateNote, deleteNote } = useNotes()
 
   useEffect(() => {
     let mounted = true
     const initialize = async () => {
-      if (mounted) await Promise.all([reloadCalendars(), reloadCategories(), reloadEvents(), reloadTasks(), reloadNotes()])
+      if (mounted)
+        await Promise.all([
+          reloadCalendars(),
+          reloadCategories(),
+          reloadEvents(),
+          reloadTasks(),
+          reloadNotes()
+        ])
     }
     initialize()
     return () => {

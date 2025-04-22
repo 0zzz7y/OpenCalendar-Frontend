@@ -1,10 +1,14 @@
-import Category from "@/type/domain/category"
 import Calendar from "@/type/domain/calendar"
+import Category from "@/type/domain/category"
 import Note from "@/type/domain/note"
 
+import {
+  Droppable,
+  Draggable,
+  DragDropContext,
+  DropResult
+} from "@hello-pangea/dnd"
 import { Box } from "@mui/material"
-
-import { Droppable, Draggable, DragDropContext, DropResult } from "@hello-pangea/dnd"
 
 import NoteCard from "./NoteCard"
 
@@ -43,7 +47,9 @@ const NoteDock = ({
     }
   }
 
-  const dockedNotes = notes.filter((n) => n.positionX === 0 && n.positionY === 0)
+  const dockedNotes = notes.filter(
+    (n) => n.positionX === 0 && n.positionY === 0
+  )
 
   return (
     <DragDropContext onDragEnd={handleDragEnd}>
@@ -57,7 +63,9 @@ const NoteDock = ({
               gap: 2,
               p: 2,
               overflowX: "auto",
-              backgroundColor: snapshot.isDraggingOver ? "#f5f5f5" : "transparent",
+              backgroundColor: snapshot.isDraggingOver
+                ? "#f5f5f5"
+                : "transparent",
               borderTop: "1px solid #ccc"
             }}
           >

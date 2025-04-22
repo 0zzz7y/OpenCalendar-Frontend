@@ -1,5 +1,4 @@
 import MESSAGES from "@/constant/message"
-
 import Calendar from "@/type/domain/calendar"
 import Category from "@/type/domain/category"
 import Task from "@/type/domain/task"
@@ -13,7 +12,6 @@ import {
   Draggable,
   DropResult
 } from "@hello-pangea/dnd"
-
 import { HourglassEmpty, Done, Pending } from "@mui/icons-material"
 import { Box } from "@mui/material"
 
@@ -132,7 +130,9 @@ const TaskBoard = ({
                             {...provided.dragHandleProps}
                             sx={{
                               opacity: snapshot.isDragging ? 0.85 : 1,
-                              transform: snapshot.isDragging ? "scale(1.02)" : "none",
+                              transform: snapshot.isDragging
+                                ? "scale(1.02)"
+                                : "none",
                               transition: "all 0.15s ease",
                               cursor: snapshot.isDragging ? "grabbing" : "grab"
                             }}

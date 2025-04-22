@@ -1,7 +1,8 @@
-import Event from "@/type/domain/event"
 import useAppContext from "@/hook/context/useAppContext"
+import Event from "@/type/domain/event"
 
 import { useEffect, useState } from "react"
+
 import { Edit, Delete } from "@mui/icons-material"
 import {
   Box,

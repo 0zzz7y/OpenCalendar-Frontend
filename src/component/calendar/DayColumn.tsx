@@ -1,8 +1,8 @@
+import EventBox from "@/component/event/EventBox"
 import Event from "@/type/domain/event"
 
 import { Box } from "@mui/material"
 
-import EventBox from "@/component/event/EventBox"
 import CalendarGridCell from "./CalendarGridCell"
 
 interface DayColumnProperties {

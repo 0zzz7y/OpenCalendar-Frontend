@@ -1,4 +1,5 @@
 import CalendarEditor from "@/component/calendar/CalendarEditor"
+import CalendarPanel from "@/component/calendar/CalendarPanel"
 import CalendarSelector from "@/component/calendar/CalendarSelector"
 import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
 import CategoryEditor from "@/component/category/CategoryEditor"
@@ -9,8 +10,6 @@ import ThemeToggleButton from "@/component/theme/ThemeToggleButton"
 
 import { Box } from "@mui/material"
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
-
-import CalendarPanel from "@/component/calendar/CalendarPanel"
 
 const Dashboard = () => {
   return (
@@ -109,9 +108,7 @@ const Dashboard = () => {
             margin: "10px 5px"
           }}
         >
-          <Box height="0%">{
-          <NotesPanel />
-          }</Box>
+          <Box height="0%">{<NotesPanel />}</Box>
 
           <Box flexGrow={1} overflow="auto">
             <TasksPanel />

@@ -1,4 +1,5 @@
 import Event from "@/type/domain/event"
+import RecurringPattern from "@/type/domain/recurringPattern"
 
 import { useState } from "react"
 
@@ -7,7 +8,6 @@ import dayjs from "dayjs"
 
 import EventCreationPopover from "../event/EventCreationPopover"
 import EventInformationPopover from "../event/EventInformationPopover"
-import RecurringPattern from "@/type/domain/recurringPattern"
 
 interface MonthViewProperties {
   date: Date
@@ -141,7 +141,8 @@ const MonthView = ({
                 }}
               />
               <Typography variant="caption" noWrap>
-                {dayjs(ev.startDate).format("H:mm")} {ev.name} {ev.calendar?.emoji}
+                {dayjs(ev.startDate).format("H:mm")} {ev.name}{" "}
+                {ev.calendar?.emoji}
               </Typography>
             </Box>
           ))}

@@ -1,4 +1,10 @@
-import { MenuItem, Select, SelectChangeEvent, FormControl, InputLabel } from "@mui/material"
+import {
+  MenuItem,
+  Select,
+  SelectChangeEvent,
+  FormControl,
+  InputLabel
+} from "@mui/material"
 
 interface CalendarViewSwitcherProperties {
   view: "day" | "week" | "month"

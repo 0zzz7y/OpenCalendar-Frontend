@@ -1,7 +1,6 @@
 import MESSAGES from "@/constant/message"
-
-import Category from "@/type/domain/category"
 import Calendar from "@/type/domain/calendar"
+import Category from "@/type/domain/category"
 import Note from "@/type/domain/note"
 
 import { useEffect, useRef, useState } from "react"
@@ -56,12 +55,18 @@ const NoteCard = ({
   const [position, setPosition] = useState(positionRef.current)
   const [dragging, setDragging] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined)
-  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(null)
+  const [selectedCategory, setSelectedCategory] = useState<
+    Category | undefined
+  >(undefined)
+  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(
+    null
+  )
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {})
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
-  const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
+  const [activeFormats, setActiveFormats] = useState<
+    Record<FormatCommand, boolean>
+  >({
     bold: false,
     italic: false,
     underline: false,
@@ -135,7 +140,10 @@ const NoteCard = ({
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       const newWidth = Math.max(150, startWidth + (moveEvent.clientX - startX))
-      const newHeight = Math.max(100, startHeight + (moveEvent.clientY - startY))
+      const newHeight = Math.max(
+        100,
+        startHeight + (moveEvent.clientY - startY)
+      )
       setDimensions({ width: newWidth, height: newHeight })
     }
 
