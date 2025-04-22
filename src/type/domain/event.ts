@@ -1,14 +1,13 @@
 import Calendar from "./calendar"
 import Category from "./category"
-import RecurringPattern from "./recurringPattern"
+import Schedulable from "./schedulable"
 
-interface Event {
+interface Event extends Schedulable {
   id: string
   name: string
   description?: string
-  startDate: string
-  endDate: string
-  recurringPattern: RecurringPattern
+  startDate: string,
+  endDate: string,
   calendar: Calendar
   category?: Category
 }

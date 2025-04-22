@@ -30,7 +30,8 @@ const CalendarGridCell = ({
       const startTime = new Date(moved.startDate)
       newStart.setSeconds(0, 0)
 
-      const duration = new Date(moved.endDate).getTime() - startTime.getTime()
+      const duration =
+        new Date(moved.endDate).getTime() - startTime.getTime()
       const newEnd = new Date(newStart.getTime() + duration)
 
       onSave({

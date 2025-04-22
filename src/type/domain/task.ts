@@ -1,15 +1,14 @@
 import Calendar from "./calendar"
 import Category from "./category"
-import RecurringPattern from "./recurringPattern"
+import Schedulable from "./schedulable"
 import TaskStatus from "./taskStatus"
 
-interface Task {
+interface Task extends Schedulable {
   id: string
   name: string
   description?: string
   startDate?: string
   endDate?: string
-  recurringPattern: RecurringPattern
   status: TaskStatus
   calendar: Calendar
   category?: Category

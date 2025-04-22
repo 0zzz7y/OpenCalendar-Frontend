@@ -11,6 +11,7 @@ import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 
 import NoteCard from "./NoteCard"
+import NotesDock from "./NotesDock"
 
 const NotesPanel = () => {
   const { notes, addNote, updateNote, deleteNote, reloadNotes } = useNotes()
@@ -82,6 +83,7 @@ const NotesPanel = () => {
   }
 
   return (
+    <>
     <Box position="absolute" top={0} left={0} width="0vh" height="0vh">
       {localNotes.map((note) => (
         <NoteCard
@@ -113,6 +115,7 @@ const NotesPanel = () => {
         <AddIcon />
       </IconButton>
     </Box>
+    </>
   )
 }
 

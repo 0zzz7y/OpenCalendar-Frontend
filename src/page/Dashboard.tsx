@@ -18,7 +18,7 @@ const Dashboard = () => {
       style={{ height: "100vh", width: "100%" }}
     >
       {/* Left Panel */}
-      <Panel defaultSize={22.5}>
+      <Panel defaultSize={16}>
         <PanelGroup
           direction="vertical"
           style={{ height: "100%", width: "100%" }}
@@ -52,7 +52,7 @@ const Dashboard = () => {
 
           {/* Monthly Calendar section */}
           <Panel
-            defaultSize={82}
+            defaultSize={30}
             style={{
               minHeight: "150px",
               border: "2px solid #ccc",
@@ -65,19 +65,48 @@ const Dashboard = () => {
             <Box sx={{ alignSelf: "flex-start", mt: "-16px", ml: "-24px" }}>
               <MonthlyCalendar />
             </Box>
+          </Panel>
+
+          <PanelResizeHandle />
+
+          {/* Notes section */}
+          <Panel
+            defaultSize={58.5}
+            style={{
+              border: "2px solid #ccc",
+              borderRadius: "8px",
+              margin: "10px 5px"
+            }}
+          >
             <Box
+              display="flex"
+              flexDirection="column"
+              width="100%"
+              style={{
+                border: "2px solid #ccc",
+                borderRadius: "8px",
+                margin: "10px 5px"
+              }}
+            >
+              <Box flexGrow={1} overflow="auto">
+                <NotesPanel />
+              </Box>
+              <Box
               sx={{
                 position: "absolute",
                 bottom: 0,
                 left: 0,
                 padding: "10px",
                 borderRadius: "8px",
-                width: "100%"
+                width: "100%",
+                margin: "5px 0 "
               }}
             >
               <ThemeToggleButton />
             </Box>
+            </Box>
           </Panel>
+
         </PanelGroup>
       </Panel>
 
@@ -102,14 +131,13 @@ const Dashboard = () => {
           display="flex"
           flexDirection="column"
           width="100%"
+          height="100%"
           style={{
             border: "2px solid #ccc",
             borderRadius: "8px",
-            margin: "10px 5px"
+            margin: "10px 10px 5px 5px"
           }}
         >
-          <Box height="0%">{<NotesPanel />}</Box>
-
           <Box flexGrow={1} overflow="auto">
             <TasksPanel />
           </Box>
