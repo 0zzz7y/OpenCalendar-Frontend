@@ -1,10 +1,11 @@
 import { Box, Typography, useTheme } from "@mui/material"
 
 interface DayGridProperties {
+  date: Date
   onSlotClick: (datetime: Date, element: HTMLElement) => void
 }
 
-const DayGrid = ({ onSlotClick }: DayGridProperties) => {
+const DayGrid = ({ date, onSlotClick }: DayGridProperties) => {
   const theme = useTheme()
 
   const slots = Array.from({ length: 48 }, (_, i) => {
@@ -14,12 +15,12 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
   })
 
   const formatTime = (hour: number, minute: number) => {
-    const date = new Date()
-    date.setHours(hour, minute, 0, 0)
+    const d = new Date()
+    d.setHours(hour, minute, 0, 0)
     return Intl.DateTimeFormat(undefined, {
       hour: "numeric",
       minute: "2-digit"
-    }).format(date)
+    }).format(d)
   }
 
   return (
@@ -38,11 +39,10 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
           <Box
             key={i}
             onClick={(e) => {
-              const now = new Date()
               const slotDate = new Date(
-                now.getFullYear(),
-                now.getMonth(),
-                now.getDate(),
+                date.getFullYear(),
+                date.getMonth(),
+                date.getDate(),
                 hour,
                 minute,
                 0,

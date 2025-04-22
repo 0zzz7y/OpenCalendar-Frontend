@@ -1,4 +1,3 @@
-import useAppContext from "@/hook/context/useAppContext"
 import RecurringPattern from "@/type/domain/recurringPattern"
 
 import { useEffect, useState } from "react"
@@ -17,14 +16,16 @@ import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
 import dayjs from "dayjs"
 import { toast } from "react-toastify"
 
+import Schedulable from "../../type/domain/schedulable"
 import Event from "../../type/domain/event"
+import useEvent from "@/hook/api/useEvent"
 
 interface Properties {
   anchorEl: HTMLElement | null
   onClose: () => void
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
-  initialEvent?: Event
+  initialEvent?: Schedulable
 }
 
 const EventCreationPopover = ({
@@ -34,7 +35,7 @@ const EventCreationPopover = ({
   categories,
   initialEvent
 }: Properties) => {
-  const { updateEvent, addEvent, deleteEvent } = useAppContext()
+  const { updateEvent, addEvent, deleteEvent } = useEvent()
 
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
@@ -47,10 +48,10 @@ const EventCreationPopover = ({
 
   useEffect(() => {
     if (initialEvent) {
-      const start = new Date(initialEvent.startDate)
-      const end = new Date(initialEvent.endDate)
+      const start = new Date(initialEvent.startDate || new Date())
+      const end = new Date(initialEvent.endDate || new Date())
 
-      setTitle(initialEvent.name)
+      setTitle(initialEvent.name || "")
       setDescription(initialEvent.description || "")
       setStart(start)
       setEnd(end)

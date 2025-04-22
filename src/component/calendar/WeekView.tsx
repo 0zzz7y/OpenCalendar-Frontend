@@ -1,19 +1,21 @@
 import EventPopover from "@/component/event/EventCreationPopover"
 import EventInformationPopover from "@/component/event/EventInformationPopover"
-import useAppContext from "@/hook/context/useAppContext"
 import Event from "@/type/domain/event"
 import RecurringPattern from "@/type/domain/recurringPattern"
 
-import { useContext, useState } from "react"
+import { useState } from "react"
 
 import { Box, Typography } from "@mui/material"
 import dayjs from "dayjs"
 
 import DayColumn from "./DayColumn"
 
+import useEvent from "@/hook/api/useEvent"
+import Schedulable from "@/type/domain/schedulable"
+
 interface WeekViewProperties {
   date: Date
-  events: Event[]
+  events: Schedulable[]  // Zmienione na Schedulable[], aby obsługiwać Event i Task
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
   onEventClick?: (event: Event) => void
@@ -35,7 +37,7 @@ const WeekView = ({
   categories,
   onEventClick
 }: WeekViewProperties) => {
-  const { updateEvent, reloadEvents } = useAppContext()
+  const { updateEvent, reloadEvents } = useEvent()
 
   const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
   const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
@@ -57,12 +59,14 @@ const WeekView = ({
     setInfoEvent(null)
   }
 
-  const handleEventClick = (event: Event) => {
-    const element = document.querySelector(`#event-${event.id}`) as HTMLElement
-    if (element) {
-      setInfoAnchor(element)
-      setInfoEvent(event)
-      onEventClick?.(event)
+  const handleEventClick = (event: Schedulable) => {
+    if ("id" in event && "name" in event && "calendar" in event) {
+      const element = document.querySelector(`#event-${event.id}`) as HTMLElement
+      if (element) {
+        setInfoAnchor(element)
+        setInfoEvent(event as Event)  // Cast to Event
+        onEventClick?.(event as Event)  // Cast to Event
+      }
     }
   }
 
@@ -170,7 +174,7 @@ const WeekView = ({
               startDate: dayjs(selectedDatetime).toISOString(),
               endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
               recurringPattern: RecurringPattern.NONE,
-              calendar: { id: "", name: "", emoji: "" },
+              calendar: calendars[0],
               category: { id: "", name: "", color: "" }
             }
           }

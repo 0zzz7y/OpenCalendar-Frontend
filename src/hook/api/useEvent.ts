@@ -1,4 +1,3 @@
-import AppContext from "@/context/AppContext"
 import PaginatedResponse from "@/type/communication/paginatedResponse"
 import Event from "@/type/domain/event"
 import EventDto from "@/type/dto/eventDto"
@@ -9,8 +8,12 @@ import { useEffect, useState, useContext } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 
+import useCalendar from "./useCalendar"
+import useCategory from "./useCategory"
+
 const useEvent = () => {
-  const { calendars = [], categories = [] } = useContext(AppContext) || {}
+  const { categories = [] } = useCategory() || {}
+  const { calendars = [] } = useCalendar() || {}
 
   const [events, setEvents] = useState<Event[]>([])
   const [page, setPage] = useState(0)

@@ -1,8 +1,8 @@
 import EventPopover from "@/component/event/EventCreationPopover"
 import EventInformationPopover from "@/component/event/EventInformationPopover"
-import useAppContext from "@/hook/context/useAppContext"
-import Event from "@/type/domain/event"
 import RecurringPattern from "@/type/domain/recurringPattern"
+import Schedulable from "@/type/domain/schedulable"
+import Event from "@/type/domain/event"
 
 import { useState } from "react"
 
@@ -10,10 +10,12 @@ import { Box } from "@mui/material"
 import dayjs from "dayjs"
 
 import DayColumn from "./DayColumn"
+import DayGrid from "./DayGrid"
+import useEvent from "@/hook/api/useEvent"
 
 interface DayViewProperties {
   date: Date
-  events: Event[]
+  events: Schedulable[]
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
   onEventClick?: (event: Event) => void
@@ -26,7 +28,7 @@ const DayView = ({
   categories,
   onEventClick
 }: DayViewProperties) => {
-  const { updateEvent } = useAppContext()
+  const { updateEvent } = useEvent()
 
   const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
   const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
@@ -34,21 +36,25 @@ const DayView = ({
   const [infoEvent, setInfoEvent] = useState<Event | null>(null)
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
-  const dayEvents = events.filter((e) => dayjs(e.startDate).isSame(date, "day"))
+  const dayEvents = events.filter(
+    (e) => e.startDate && dayjs(e.startDate).isSame(date, "day")
+  )
 
-  const handleSlotClick = (element: HTMLElement, datetime: Date) => {
-    setSelectedSlot(element)
+  const handleSlotClick = (slot: HTMLElement, datetime: Date) => {
+    setSelectedSlot(slot)
     setSelectedDatetime(datetime)
     setEditingEvent(null)
     setInfoEvent(null)
   }
 
-  const handleEventClick = (event: Event) => {
-    const element = document.querySelector(`#event-${event.id}`) as HTMLElement
-    if (element) {
-      setInfoAnchor(element)
-      setInfoEvent(event)
-      onEventClick?.(event)
+  const handleEventClick = (event: Schedulable) => {
+    if ("id" in event && "name" in event && "calendar" in event) {
+      const element = document.querySelector(`#event-${event.id}`) as HTMLElement
+      if (element) {
+        setInfoAnchor(element)
+        setInfoEvent(event as Event)
+        onEventClick?.(event as Event)
+      }
     }
   }
 
@@ -104,8 +110,8 @@ const DayView = ({
               startDate: dayjs(selectedDatetime).toISOString(),
               endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
               recurringPattern: RecurringPattern.NONE,
-              calendar: { id: "", name: "", emoji: "" },
-              category: { id: "", name: "", color: "" }
+              calendar: calendars[0],
+              category: undefined
             }
           }
         />

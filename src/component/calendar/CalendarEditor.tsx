@@ -1,9 +1,9 @@
 import BUTTONS from "@/constant/buttons"
 import PLACEHOLDERS from "@/constant/placeholders"
 import POPOVER from "@/constant/popover"
-import useCalendars from "@/hook/api/useCalendar"
-import useAppContext from "@/hook/context/useAppContext"
-import EditorType from "@/type/utility/editorType"
+import useCalendar from "@/hook/api/useCalendar"
+import useEditor from "@/hook/editor/useEditor"
+import EditorType from "@/type/editor/editorType"
 
 import { useEffect, useRef, useState } from "react"
 
@@ -35,11 +35,11 @@ const CalendarEditor = () => {
     editorData,
     closeEditor,
     selectedCalendar,
-    setSelectedCalendar,
-    reloadCalendars
-  } = useAppContext()
+    setSelectedCalendar
+  } = useEditor()
 
-  const { addCalendar, updateCalendar, deleteCalendar } = useCalendars()
+  const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } =
+    useCalendar()
 
   const [label, setLabel] = useState("")
   const [emoji, setEmoji] = useState("📅")

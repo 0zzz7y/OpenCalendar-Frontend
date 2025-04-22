@@ -1,5 +1,4 @@
-import useAppContext from "@/hook/context/useAppContext"
-import Event from "@/type/domain/event"
+import Schedulable from "@/type/domain/schedulable"
 
 import { useEffect, useState } from "react"
 
@@ -12,10 +11,11 @@ import {
   Popover,
   Button
 } from "@mui/material"
+import useEvent from "@/hook/api/useEvent"
 
 interface Properties {
   anchorEl: HTMLElement | null
-  event: Event | null
+  event: Schedulable | null  // Zmienione na Schedulable, aby obsługiwało zarówno Event, jak i Task
   onClose: () => void
   onEdit: () => void
   onDelete: (eventId: string) => void
@@ -29,9 +29,9 @@ const EventInformationPopover = ({
   onDelete
 }: Properties) => {
   const open = Boolean(anchorEl && event)
-  const { events, reloadEvents } = useAppContext()
+  const { events, reloadEvents } = useEvent()
 
-  const [currentEvent, setCurrentEvent] = useState<Event | null>(event)
+  const [currentEvent, setCurrentEvent] = useState<Schedulable | null>(event)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
   useEffect(() => {
@@ -66,7 +66,7 @@ const EventInformationPopover = ({
       {currentEvent && (
         <Stack spacing={2}>
           <Stack direction="row" justifyContent="space-between">
-            <Typography variant="h6">{currentEvent.name}</Typography>
+            <Typography variant="h6">{currentEvent.name || "Untitled"}</Typography>
             <Box>
               {!confirmingDelete && (
                 <>
@@ -84,8 +84,9 @@ const EventInformationPopover = ({
           {!confirmingDelete ? (
             <>
               <Typography variant="body2" color="text.secondary">
-                {new Date(currentEvent.startDate).toLocaleString()} –{" "}
-                {new Date(currentEvent.endDate).toLocaleString()}
+                {currentEvent.startDate && currentEvent.endDate
+                  ? `${new Date(currentEvent.startDate).toLocaleString()} – ${new Date(currentEvent.endDate).toLocaleString()}`
+                  : "No date available"}
               </Typography>
               {currentEvent.description && (
                 <Typography>{currentEvent.description}</Typography>

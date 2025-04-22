@@ -1,4 +1,3 @@
-import AppContext from "@/context/AppContext"
 import PaginatedResponse from "@/type/communication/paginatedResponse"
 import Task from "@/type/domain/task"
 import TaskDto from "@/type/dto/taskDto"
@@ -9,8 +8,12 @@ import { useEffect, useState, useContext } from "react"
 import axios from "axios"
 import { toast } from "react-toastify"
 
+import useCalendar from "./useCalendar"
+import useCategory from "./useCategory"
+
 const useTask = () => {
-  const { calendars = [], categories = [] } = useContext(AppContext) || {}
+  const { categories = [] } = useCategory() || {}
+  const { calendars = [] } = useCalendar() || {}
 
   const [tasks, setTasks] = useState<Task[]>([])
   const [page, setPage] = useState(0)

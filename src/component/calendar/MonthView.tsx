@@ -1,5 +1,7 @@
+import EventInformationPopover from "@/component/event/EventInformationPopover"
 import Event from "@/type/domain/event"
 import RecurringPattern from "@/type/domain/recurringPattern"
+import Schedulable from "@/type/domain/schedulable"
 
 import { useState } from "react"
 
@@ -7,11 +9,10 @@ import { Box, Typography, Paper, useTheme } from "@mui/material"
 import dayjs from "dayjs"
 
 import EventCreationPopover from "../event/EventCreationPopover"
-import EventInformationPopover from "../event/EventInformationPopover"
 
 interface MonthViewProperties {
   date: Date
-  events: Event[]
+  events: Schedulable[]  // Zmienione na Schedulable[], aby obsługiwało Event i Task
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
   onSave: (data: Partial<Event>) => void
@@ -39,10 +40,12 @@ const MonthView = ({
   const startDay = startOfMonth.startOf("week")
   const today = dayjs()
 
-  const openInfoPopover = (event: Event, anchor: HTMLElement) => {
-    setInfoEvent(event)
-    setInfoAnchor(anchor)
-    onEventClick?.(event)
+  const openInfoPopover = (event: Schedulable, anchor: HTMLElement) => {
+    if ("id" in event && "name" in event && "calendar" in event) {
+      setInfoEvent(event as Event)  // Cast to Event
+      setInfoAnchor(anchor)
+      onEventClick?.(event as Event)  // Cast to Event
+    }
   }
 
   const closeInfoPopover = () => {

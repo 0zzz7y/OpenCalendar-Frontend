@@ -92,21 +92,20 @@ const Dashboard = () => {
                 <NotesPanel />
               </Box>
               <Box
-              sx={{
-                position: "absolute",
-                bottom: 0,
-                left: 0,
-                padding: "10px",
-                borderRadius: "8px",
-                width: "100%",
-                margin: "5px 0 "
-              }}
-            >
-              <ThemeToggleButton />
-            </Box>
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  padding: "10px",
+                  borderRadius: "8px",
+                  width: "100%",
+                  margin: "5px 0 "
+                }}
+              >
+                <ThemeToggleButton />
+              </Box>
             </Box>
           </Panel>
-
         </PanelGroup>
       </Panel>
 

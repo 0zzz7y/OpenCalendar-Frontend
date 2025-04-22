@@ -1,11 +1,10 @@
+import Category from "@/type/domain/category"
+import Note from "@/type/domain/note"
+
+import { Box } from "@mui/material"
 import { useDrop } from "react-dnd"
 
 import NoteCard from "./NoteCard"
-
-import { Box } from "@mui/material"
-
-import Note from "@/type/domain/note"
-import Category from "@/type/domain/category"
 
 interface NotesDockProperties {
   notes: Note[]

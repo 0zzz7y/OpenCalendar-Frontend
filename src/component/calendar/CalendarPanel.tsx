@@ -1,7 +1,11 @@
+import useCalendar from "@/hook/api/useCalendar"
+import useCategory from "@/hook/api/useCategory"
+import useEvent from "@/hook/api/useEvent"
 import useFilters from "@/hook/api/useFilter"
-import useAppContext from "@/hook/context/useAppContext"
+import useTask from "@/hook/api/useTask"
 import Event from "@/type/domain/event"
 import RecurringPattern from "@/type/domain/recurringPattern"
+import Schedulable from "@/type/domain/schedulable"
 
 import { useEffect, useState } from "react"
 
@@ -18,16 +22,11 @@ import MonthView from "./MonthView"
 import WeekView from "./WeekView"
 
 const CalendarPanel = () => {
-  const {
-    events,
-    calendars,
-    categories,
-    addEvent,
-    updateEvent,
-    deleteEvent,
-    reloadEvents
-  } = useAppContext()
-
+  const { events, addEvent, updateEvent, deleteEvent, reloadEvents } =
+    useEvent()
+  const { tasks, reloadTasks } = useTask()
+  const { calendars } = useCalendar()
+  const { categories } = useCategory()
   const { selectedCalendar, selectedCategory } = useFilters()
 
   const [view, setView] = useState<"day" | "week" | "month">("week")
@@ -38,15 +37,21 @@ const CalendarPanel = () => {
   const [infoEvent, setInfoEvent] = useState<Event | null>(null)
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
-  const filteredEvents = Array.isArray(events)
-    ? events.filter((event) => {
-        const calendarMatch =
-          selectedCalendar === "all" || event.calendar.id === selectedCalendar
-        const categoryMatch =
-          selectedCategory === "all" || event.category?.id === selectedCategory
-        return calendarMatch && categoryMatch
-      })
-    : []
+  useEffect(() => {
+    reloadEvents()
+    reloadTasks()
+  }, [])
+
+  const schedulables: Schedulable[] = [
+    ...events,
+    ...tasks.filter((task) => task.startDate && task.endDate)
+  ].filter((item) => {
+    const calendarMatch =
+      selectedCalendar === "all" || item.calendar.id === selectedCalendar
+    const categoryMatch =
+      selectedCategory === "all" || item.category?.id === selectedCategory
+    return calendarMatch && categoryMatch
+  })
 
   const handleSlotClick = (element: HTMLElement, datetime: Date) => {
     setSelectedSlot(element)
@@ -72,15 +77,13 @@ const CalendarPanel = () => {
   const handleSave = async (data: Partial<Event>) => {
     if (!data.startDate || !data.calendar) return
 
-    const exists = events.find(
-      (e: { id: string | undefined }) => e.id === data.id
-    )
+    const exists = events.find((e) => e.id === data.id)
 
     if (exists && data.id) {
       await updateEvent(data.id, data)
     } else {
       const newEvent: Omit<Event, "id"> = {
-        name: data.name ?? "Nowe wydarzenie",
+        name: data.name ?? "New event",
         description: data.description ?? "",
         startDate: data.startDate,
         endDate: data.endDate ?? data.startDate,
@@ -142,7 +145,7 @@ const CalendarPanel = () => {
       {view === "day" && (
         <DayView
           date={selectedDate}
-          events={filteredEvents}
+          events={schedulables}
           onEventClick={handleEventClick}
           calendars={calendars}
           categories={categories}
@@ -152,7 +155,7 @@ const CalendarPanel = () => {
       {view === "week" && (
         <WeekView
           date={selectedDate}
-          events={filteredEvents}
+          events={schedulables}
           onEventClick={handleEventClick}
           calendars={calendars}
           categories={categories}
@@ -162,7 +165,7 @@ const CalendarPanel = () => {
       {view === "month" && (
         <MonthView
           date={selectedDate}
-          events={filteredEvents}
+          events={schedulables}
           onSlotClick={handleSlotClick}
           onSave={handleSave}
           onEventClick={handleEventClick}

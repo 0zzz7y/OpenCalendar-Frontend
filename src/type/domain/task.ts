@@ -1,5 +1,3 @@
-import Calendar from "./calendar"
-import Category from "./category"
 import Schedulable from "./schedulable"
 import TaskStatus from "./taskStatus"
 
@@ -10,8 +8,6 @@ interface Task extends Schedulable {
   startDate?: string
   endDate?: string
   status: TaskStatus
-  calendar: Calendar
-  category?: Category
 }
 
 export default Task

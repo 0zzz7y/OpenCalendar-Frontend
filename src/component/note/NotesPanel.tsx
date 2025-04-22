@@ -84,37 +84,37 @@ const NotesPanel = () => {
 
   return (
     <>
-    <Box position="absolute" top={0} left={0} width="0vh" height="0vh">
-      {localNotes.map((note) => (
-        <NoteCard
-          key={note.id}
-          id={note.id}
-          name={note.name}
-          content={note.description || ""}
-          calendar={note.calendar}
-          categories={categories}
-          onUpdate={handleUpdate}
-          onDelete={handleDelete}
-        />
-      ))}
+      <Box position="absolute" top={0} left={0} width="0vh" height="0vh">
+        {localNotes.map((note) => (
+          <NoteCard
+            key={note.id}
+            id={note.id}
+            name={note.name}
+            content={note.description || ""}
+            calendar={note.calendar}
+            categories={categories}
+            onUpdate={handleUpdate}
+            onDelete={handleDelete}
+          />
+        ))}
 
-      <IconButton
-        onClick={handleAddNote}
-        sx={{
-          position: "fixed",
-          bottom: 16,
-          right: 16,
-          backgroundColor: "primary.main",
-          color: "white",
-          zIndex: 1000,
-          "&:hover": {
-            backgroundColor: "primary.dark"
-          }
-        }}
-      >
-        <AddIcon />
-      </IconButton>
-    </Box>
+        <IconButton
+          onClick={handleAddNote}
+          sx={{
+            position: "fixed",
+            bottom: 16,
+            right: 16,
+            backgroundColor: "primary.main",
+            color: "white",
+            zIndex: 1000,
+            "&:hover": {
+              backgroundColor: "primary.dark"
+            }
+          }}
+        >
+          <AddIcon />
+        </IconButton>
+      </Box>
     </>
   )
 }

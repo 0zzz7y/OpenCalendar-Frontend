@@ -3,10 +3,11 @@ import { useEffect, useRef, useState } from "react"
 import { Box, Typography } from "@mui/material"
 import { useDrag } from "react-dnd"
 
-import Event from "../../type/domain/event"
+import Schedulable from "@/type/domain/schedulable"
+import Event from "@/type/domain/event"
 
 interface EventBoxProperties {
-  event: Event
+  event: Schedulable
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
   dragTargetId?: string | null
@@ -62,9 +63,10 @@ const EventBox = ({
     setEnableDrag(false)
   }
 
-  const start = new Date(event.startDate)
-  const end = new Date(event.endDate)
-
+  // Sprawdzanie, czy event to rzeczywiście Event z wymaganymi właściwościami
+  const start = new Date("startDate" in event ? event.startDate || new Date() : new Date())
+  const end = new Date("endDate" in event ? event.endDate || new Date() : new Date())
+  
   const minutesFromStart = start.getHours() * 60 + start.getMinutes()
   const minutesToEnd = end.getHours() * 60 + end.getMinutes()
   const duration = Math.max(15, minutesToEnd - minutesFromStart)
@@ -72,8 +74,9 @@ const EventBox = ({
   const top = (minutesFromStart / 15) * 32
   const height = (duration / 15) * 32
 
-  const emoji = event.calendar?.emoji || ""
-  const backgroundColor = event.category?.color || "#1976d2"
+  // Ustalamy emoji i kolor na podstawie Event lub Task
+  const emoji = "calendar" in event ? event.calendar?.emoji : ""
+  const backgroundColor = "category" in event ? event.category?.color : "#1976d2"
 
   return (
     <>
@@ -104,7 +107,7 @@ const EventBox = ({
         }}
       >
         <Typography variant="caption" fontWeight={500} noWrap flexGrow={1}>
-          {event.name}
+          {"name" in event ? event.name : "Untitled Event"}
         </Typography>
         {emoji && (
           <Typography variant="caption" ml={1}>

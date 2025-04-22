@@ -1,9 +1,16 @@
-import RecurringPattern from "./recurringPattern";
+import Calendar from "./calendar"
+import Category from "./category"
+import RecurringPattern from "./recurringPattern"
 
 interface Schedulable {
-  startDate?: string,
-  endDate?: string,
+  id: string
+  name?: string
+  description?: string
+  startDate?: string
+  endDate?: string
   recurringPattern: RecurringPattern
+  calendar: Calendar
+  category?: Category
 }
 
 export default Schedulable

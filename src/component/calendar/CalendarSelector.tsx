@@ -1,6 +1,5 @@
-import useAppContext from "@/hook/context/useAppContext"
-import EditorMode from "@/type/utility/editorMode"
-import EditorType from "@/type/utility/editorType"
+import EditorMode from "@/type/editor/editorMode"
+import EditorType from "@/type/editor/editorType"
 
 import { useMemo } from "react"
 
@@ -8,10 +7,13 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
 import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
+import useCalendar from "@/hook/api/useCalendar"
+import useEditor from "@/hook/editor/useEditor"
 
 const CalendarSelector = () => {
-  const { calendars, selectedCalendar, setSelectedCalendar, openEditor } =
-    useAppContext()
+  const { calendars } = useCalendar()
+
+    const { selectedCalendar, setSelectedCalendar, openEditor } = useEditor()
 
   const calendarOptions = useMemo(() => {
     return [

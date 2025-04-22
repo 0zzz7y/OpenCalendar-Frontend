@@ -1,4 +1,5 @@
 import EventBox from "@/component/event/EventBox"
+import Schedulable from "@/type/domain/schedulable"
 import Event from "@/type/domain/event"
 
 import { Box } from "@mui/material"
@@ -7,8 +8,8 @@ import CalendarGridCell from "./CalendarGridCell"
 
 interface DayColumnProperties {
   date: Date
-  events: Event[]
-  allEvents: Event[]
+  events: Schedulable[]
+  allEvents: Schedulable[]
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
   onSave: (event: Partial<Event> & { startDate: string }) => void
@@ -40,7 +41,8 @@ const DayColumn = ({
     onSlotClick?.(element, datetime)
   }
 
-  const doEventsOverlap = (a: Event, b: Event) => {
+  const doEventsOverlap = (a: Schedulable, b: Schedulable) => {
+    if (!a.startDate || !a.endDate || !b.startDate || !b.endDate) return false
     const startA = new Date(a.startDate).getTime()
     const endA = new Date(a.endDate).getTime()
     const startB = new Date(b.startDate).getTime()
@@ -48,8 +50,8 @@ const DayColumn = ({
     return startA < endB && startB < endA
   }
 
-  const groupOverlappingEvents = (events: Event[]) => {
-    const groups: Event[][] = []
+  const groupOverlappingEvents = (events: Schedulable[]) => {
+    const groups: Schedulable[][] = []
     events.forEach((event) => {
       let added = false
       for (const group of groups) {
@@ -64,21 +66,21 @@ const DayColumn = ({
     return groups
   }
 
-  const computeLayout = (events: Event[]) => {
-    const layouted: (Event & { customStyle: React.CSSProperties })[] = []
+  const computeLayout = (events: Schedulable[]) => {
+    const layouted: (Schedulable & { customStyle: React.CSSProperties })[] = []
     const groups = groupOverlappingEvents(events)
 
     groups.forEach((group) => {
       const sorted = [...group].sort(
         (a, b) =>
-          new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+          new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime()
       )
       const width = 100 / sorted.length
       const gap = 4
 
       sorted.forEach((event, i) => {
-        const start = new Date(event.startDate)
-        const end = new Date(event.endDate)
+        const start = new Date(event.startDate!)
+        const end = new Date(event.endDate!)
 
         const startMinutes = start.getHours() * 60 + start.getMinutes()
         const endMinutes = end.getHours() * 60 + end.getMinutes()
@@ -95,7 +97,7 @@ const DayColumn = ({
             left: `calc(${i * width}% + ${i * gap}px)`,
             opacity: dragTargetId ? 0.6 : 1,
             pointerEvents:
-              dragTargetId && dragTargetId !== event.id ? "none" : "auto"
+              dragTargetId && "id" in event && dragTargetId !== event.id ? "none" : "auto"
           }
         })
       })
@@ -104,7 +106,9 @@ const DayColumn = ({
     return layouted
   }
 
-  const layoutedEvents = computeLayout(events)
+  const layoutedEvents = computeLayout(
+    events.filter((e) => e.startDate && e.endDate)
+  )
 
   return (
     <Box
@@ -117,7 +121,7 @@ const DayColumn = ({
         <CalendarGridCell
           key={i}
           datetime={slot}
-          allEvents={allEvents}
+          allEvents={allEvents.filter((e) => e.startDate && e.endDate)} // Filter for events with startDate and endDate
           onSave={onSave}
           onClick={(el) => handleSlotClick(slot, el)}
         />
@@ -125,8 +129,7 @@ const DayColumn = ({
 
       {layoutedEvents.map((event) => (
         <EventBox
-          key={event.id}
-          event={event}
+          event={event as Event} // Cast to Event when passing to EventBox
           calendars={calendars}
           categories={categories}
           dragTargetId={dragTargetId}
@@ -135,7 +138,11 @@ const DayColumn = ({
             zIndex: 20,
             ...event.customStyle
           }}
-          onClick={() => onEventClick?.(event)}
+          onClick={() => {
+            if ("id" in event && "name" in event && "calendar" in event) {
+              onEventClick?.(event as Event) // Cast to Event when passing to onEventClick
+            }
+          }}
         />
       ))}
     </Box>

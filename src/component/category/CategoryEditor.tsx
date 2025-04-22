@@ -1,8 +1,9 @@
 import BUTTONS from "@/constant/buttons"
 import PLACEHOLDERS from "@/constant/placeholders"
 import POPOVER from "@/constant/popover"
-import useAppContext from "@/hook/context/useAppContext"
-import EditorType from "@/type/utility/editorType"
+import useCategory from "@/hook/api/useCategory"
+import useEditor from "@/hook/editor/useEditor"
+import EditorType from "@/type/editor/editorType"
 
 import { useEffect, useRef, useState } from "react"
 
@@ -21,19 +22,18 @@ const CategoryEditor = () => {
   const inputRef = useRef<HTMLInputElement | null>(null)
   const containerRef = useRef<HTMLDivElement | null>(null)
 
+  const { reloadCategories, addCategory, updateCategory, deleteCategory } =
+    useCategory()
+
   const {
     editorOpen,
+    editorType,
     editorMode,
     editorData,
     closeEditor,
-    editorType,
     selectedCategory,
-    setSelectedCategory,
-    reloadCategories,
-    addCategory,
-    updateCategory,
-    deleteCategory
-  } = useAppContext()
+    setSelectedCategory
+  } = useEditor()
 
   const [label, setLabel] = useState("")
   const [color, setColor] = useState("#3b5bdb")
