@@ -1,4 +1,4 @@
-import MESSAGES from "@/constant/message"
+import MESSAGES from "@/constant/messages"
 import Calendar from "@/type/domain/calendar"
 import Category from "@/type/domain/category"
 import Note from "@/type/domain/note"
@@ -41,7 +41,7 @@ const NoteCard = ({
   onDelete,
   onUpdate,
   calendar,
-  name = MESSAGES.PLACEHOLDERS.NEW_NOTE
+  name = MESSAGES.NEW_NOTE
 }: NoteCardProperties) => {
   const contentRef = useRef<HTMLDivElement | null>(null)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
@@ -248,7 +248,7 @@ const NoteCard = ({
             onClearText={clearText}
             onDelete={() =>
               contentRef.current?.innerText.trim()
-                ? handleConfirm(MESSAGES.POPOVER.CONFIRM_CLEAR_CONTENTS, () =>
+                ? handleConfirm(MESSAGES.CONFIRM_CLEAR_CONTENTS, () =>
                     onDelete?.(id)
                   )
                 : onDelete?.(id)
@@ -306,7 +306,7 @@ const NoteCard = ({
         PaperProps={{ sx: { p: 2 } }}
       >
         <Typography variant="body2" gutterBottom>
-          {MESSAGES.POPOVER.CONFIRM_CLEAR_CONTENTS}
+          {MESSAGES.CONFIRM_CLEAR_CONTENTS}
         </Typography>
         <Box display="flex" gap={1} justifyContent="flex-end">
           <Button size="small" onClick={handleConfirmClose}>

@@ -1,6 +1,6 @@
 import BUTTONS from "@/constant/buttons"
-import PLACEHOLDERS from "@/constant/placeholders"
-import POPOVER from "@/constant/popover"
+import PLACEHOLDERS from "@/constant/labels"
+import MESSAGES from "@/constant/messages"
 import useCalendar from "@/hook/api/useCalendar"
 import useEditor from "@/hook/editor/useEditor"
 import EditorType from "@/type/editor/editorType"
@@ -140,7 +140,7 @@ const CalendarEditor = () => {
                 fontWeight={500}
                 gutterBottom
               >
-                {editorMode === "add" ? BUTTONS.ADD_EVENT : BUTTONS.EDIT_EVENT}
+                {editorMode === "add" ? MESSAGES.ADD_EVENT : MESSAGES.EDIT_EVENT}
               </Typography>
 
               <TextField
@@ -196,7 +196,7 @@ const CalendarEditor = () => {
           {editorMode === "delete" && (
             <>
               <Typography variant="body2">
-                {POPOVER.CONFIRM_DELETE_CALENDAR}
+                {MESSAGES.CONFIRM_DELETE_CALENDAR}
               </Typography>
 
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>

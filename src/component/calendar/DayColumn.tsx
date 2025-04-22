@@ -1,6 +1,6 @@
 import EventBox from "@/component/event/EventBox"
-import Schedulable from "@/type/domain/schedulable"
 import Event from "@/type/domain/event"
+import Schedulable from "@/type/domain/schedulable"
 
 import { Box } from "@mui/material"
 
@@ -97,7 +97,9 @@ const DayColumn = ({
             left: `calc(${i * width}% + ${i * gap}px)`,
             opacity: dragTargetId ? 0.6 : 1,
             pointerEvents:
-              dragTargetId && "id" in event && dragTargetId !== event.id ? "none" : "auto"
+              dragTargetId && "id" in event && dragTargetId !== event.id
+                ? "none"
+                : "auto"
           }
         })
       })

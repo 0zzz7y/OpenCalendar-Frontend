@@ -1,4 +1,5 @@
-import MESSAGES from "@/constant/message"
+import TOOLBAR from "@/constant/toolbar"
+import MESSAGES from "@/constant/messages"
 
 import { useState } from "react"
 
@@ -19,9 +20,9 @@ import {
 } from "@mui/material"
 
 export type FormatCommand =
-  | typeof MESSAGES.TOOLBAR.BOLD
-  | typeof MESSAGES.TOOLBAR.ITALIC
-  | typeof MESSAGES.TOOLBAR.UNDERLINE
+  | typeof TOOLBAR.BOLD
+  | typeof TOOLBAR.ITALIC
+  | typeof TOOLBAR.UNDERLINE
 
 interface NoteToolbarProperties {
   isCollapsed: boolean
@@ -113,16 +114,16 @@ const NoteToolBar = ({
       {!isCollapsed && (
         <Box display="flex" gap={0.5} alignItems="center">
           {[
-            MESSAGES.TOOLBAR.BOLD,
-            MESSAGES.TOOLBAR.ITALIC,
-            MESSAGES.TOOLBAR.UNDERLINE
+            TOOLBAR.BOLD,
+            TOOLBAR.ITALIC,
+            TOOLBAR.UNDERLINE
           ].map((cmd) => {
             const Icon =
-              cmd === MESSAGES.TOOLBAR.BOLD
+              cmd === TOOLBAR.BOLD
                 ? FormatBoldIcon
-                : cmd === MESSAGES.TOOLBAR.ITALIC
+                : cmd === TOOLBAR.ITALIC
                   ? FormatItalicIcon
-                  : cmd === MESSAGES.TOOLBAR.UNDERLINE
+                  : cmd === TOOLBAR.UNDERLINE
                     ? FormatUnderlinedIcon
                     : FormatUnderlinedIcon
             return (
@@ -180,7 +181,7 @@ const NoteToolBar = ({
             PaperProps={{ sx: { p: 2 } }}
           >
             <Typography variant="body2" gutterBottom>
-              {MESSAGES.POPOVER.CONFIRM_DELETE_NOTE}
+              {MESSAGES.CONFIRM_DELETE_NOTE}
             </Typography>
             <Box display="flex" gap={1} justifyContent="flex-end">
               <Button size="small" onClick={handleCancel}>

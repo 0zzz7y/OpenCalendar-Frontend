@@ -1,13 +1,14 @@
+import Event from "@/type/domain/event"
+import Schedulable from "@/type/domain/schedulable"
+
 import { useRef, useEffect, useMemo } from "react"
+
 import { Box } from "@mui/material"
 import { useDrop } from "react-dnd"
 
-import Schedulable from "@/type/domain/schedulable"
-import Event from "@/type/domain/event"
-
 interface CalendarGridCellProperties {
   datetime: Date
-  allEvents: Schedulable[]  // Zmienione na Schedulable[], aby obsługiwało zarówno Event jak i Task
+  allEvents: Schedulable[] // Zmienione na Schedulable[], aby obsługiwało zarówno Event jak i Task
   onSave: (event: Partial<Event> & { startDate: string }) => void
   onClick?: (element: HTMLElement) => void
 }
@@ -30,7 +31,8 @@ const CalendarGridCell = ({
       const startTime = new Date(moved.startDate ?? "")
       newStart.setSeconds(0, 0)
 
-      const duration = new Date(moved.endDate ?? "").getTime() - startTime.getTime()
+      const duration =
+        new Date(moved.endDate ?? "").getTime() - startTime.getTime()
       const newEnd = new Date(newStart.getTime() + duration)
 
       onSave({

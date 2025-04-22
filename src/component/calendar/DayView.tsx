@@ -1,8 +1,9 @@
 import EventPopover from "@/component/event/EventCreationPopover"
 import EventInformationPopover from "@/component/event/EventInformationPopover"
+import useEvent from "@/hook/api/useEvent"
+import Event from "@/type/domain/event"
 import RecurringPattern from "@/type/domain/recurringPattern"
 import Schedulable from "@/type/domain/schedulable"
-import Event from "@/type/domain/event"
 
 import { useState } from "react"
 
@@ -11,7 +12,6 @@ import dayjs from "dayjs"
 
 import DayColumn from "./DayColumn"
 import DayGrid from "./DayGrid"
-import useEvent from "@/hook/api/useEvent"
 
 interface DayViewProperties {
   date: Date
@@ -49,7 +49,9 @@ const DayView = ({
 
   const handleEventClick = (event: Schedulable) => {
     if ("id" in event && "name" in event && "calendar" in event) {
-      const element = document.querySelector(`#event-${event.id}`) as HTMLElement
+      const element = document.querySelector(
+        `#event-${event.id}`
+      ) as HTMLElement
       if (element) {
         setInfoAnchor(element)
         setInfoEvent(event as Event)

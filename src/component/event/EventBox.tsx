@@ -1,34 +1,42 @@
+import Schedulable from "@/type/domain/schedulable"
+
 import { useEffect, useRef, useState } from "react"
 
 import { Box, Typography } from "@mui/material"
 import { useDrag } from "react-dnd"
 
-import Schedulable from "@/type/domain/schedulable"
-import Event from "@/type/domain/event"
-
 interface EventBoxProperties {
   event: Schedulable
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
   dragTargetId?: string | null
-  showPopoverLine?: boolean
   customStyle?: React.CSSProperties
   onClick?: () => void
 }
 
 const EventBox = ({
   event,
-  calendars,
-  categories,
   dragTargetId,
-  showPopoverLine,
   customStyle,
   onClick
 }: EventBoxProperties) => {
-  const eventRef = useRef<HTMLDivElement>(null)
+  const eventReference = useRef<HTMLDivElement>(null)
+  const timeoutReference = useRef<number | null>(null)
+
+  const start = new Date("startDate" in event ? event.startDate || new Date() : new Date())
+  const end = new Date("endDate" in event ? event.endDate || new Date() : new Date())
+  
+  const minutesFromStart = start.getHours() * 60 + start.getMinutes()
+  const minutesToEnd = end.getHours() * 60 + end.getMinutes()
+  const duration = Math.max(15, minutesToEnd - minutesFromStart)
+
+  const top = (minutesFromStart / 15) * 32
+  const height = (duration / 15) * 32
+
+  const emoji = "calendar" in event ? event.calendar?.emoji : ""
+  const backgroundColor = "category" in event ? event.category?.color : "#1976d2"
+
   const [enableDrag, setEnableDrag] = useState(false)
 
-  const [{ isDragging }, drag] = useDrag(
+  const [{isDragging}, drag] = useDrag(
     () => ({
       type: "event",
       item: { id: event.id },
@@ -40,22 +48,14 @@ const EventBox = ({
     [enableDrag]
   )
 
-  useEffect(() => {
-    if (eventRef.current) {
-      drag(eventRef.current)
-    }
-  }, [drag])
-
-  const timeoutRef = useRef<number | null>(null)
-
   const handleMouseDown = () => {
-    timeoutRef.current = window.setTimeout(() => setEnableDrag(true), 200)
+    timeoutReference.current = window.setTimeout(() => setEnableDrag(true), 200)
   }
 
   const handleMouseUp = () => {
-    if (timeoutRef.current !== null) {
-      clearTimeout(timeoutRef.current)
-      timeoutRef.current = null
+    if (timeoutReference.current !== null) {
+      clearTimeout(timeoutReference.current)
+      timeoutReference.current = null
     }
     if (!enableDrag) {
       onClick?.()
@@ -63,26 +63,17 @@ const EventBox = ({
     setEnableDrag(false)
   }
 
-  // Sprawdzanie, czy event to rzeczywiście Event z wymaganymi właściwościami
-  const start = new Date("startDate" in event ? event.startDate || new Date() : new Date())
-  const end = new Date("endDate" in event ? event.endDate || new Date() : new Date())
-  
-  const minutesFromStart = start.getHours() * 60 + start.getMinutes()
-  const minutesToEnd = end.getHours() * 60 + end.getMinutes()
-  const duration = Math.max(15, minutesToEnd - minutesFromStart)
-
-  const top = (minutesFromStart / 15) * 32
-  const height = (duration / 15) * 32
-
-  // Ustalamy emoji i kolor na podstawie Event lub Task
-  const emoji = "calendar" in event ? event.calendar?.emoji : ""
-  const backgroundColor = "category" in event ? event.category?.color : "#1976d2"
+  useEffect(() => {
+    if (eventReference.current) {
+      drag(eventReference.current)
+    }
+  }, [drag])
 
   return (
     <>
       <Box
         id={`event-${event.id}`}
-        ref={eventRef}
+        ref={eventReference}
         onMouseDown={handleMouseDown}
         onMouseUp={handleMouseUp}
         sx={{

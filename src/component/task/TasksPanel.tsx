@@ -1,4 +1,4 @@
-import MESSAGES from "@/constant/message"
+import MESSAGES from "@/constant/messages"
 import useCalendar from "@/hook/api/useCalendar"
 import useCategory from "@/hook/api/useCategory"
 import useTask from "@/hook/api/useTask"
@@ -102,7 +102,7 @@ const TasksPanel = () => {
         }}
       >
         <TextField
-          label={MESSAGES.PLACEHOLDERS.NEW_TASK}
+          label={MESSAGES.NEW_TASK}
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleCreate()}

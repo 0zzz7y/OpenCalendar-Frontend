@@ -1,6 +1,6 @@
 import BUTTONS from "@/constant/buttons"
-import PLACEHOLDERS from "@/constant/placeholders"
-import POPOVER from "@/constant/popover"
+import PLACEHOLDERS from "@/constant/labels"
+import MESSAGES from "@/constant/messages"
 import useCategory from "@/hook/api/useCategory"
 import useEditor from "@/hook/editor/useEditor"
 import EditorType from "@/type/editor/editorType"
@@ -166,7 +166,7 @@ const CategoryEditor = () => {
           {editorMode === "delete" && (
             <>
               <Typography variant="body2">
-                {POPOVER.CONFIRM_DELETE_CATEGORY}
+                {MESSAGES.CONFIRM_DELETE_CATEGORY}
               </Typography>
 
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>

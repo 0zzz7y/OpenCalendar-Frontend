@@ -1,4 +1,4 @@
-import MESSAGES from "@/constant/message"
+import MESSAGES from "@/constant/messages"
 import Calendar from "@/type/domain/calendar"
 import Category from "@/type/domain/category"
 import Task from "@/type/domain/task"

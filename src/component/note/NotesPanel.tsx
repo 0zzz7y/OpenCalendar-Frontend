@@ -1,4 +1,4 @@
-import MESSAGES from "@/constant/message"
+import MESSAGES from "@/constant/messages"
 import useCalendars from "@/hook/api/useCalendar"
 import useCategories from "@/hook/api/useCategory"
 import useNotes from "@/hook/api/useNote"

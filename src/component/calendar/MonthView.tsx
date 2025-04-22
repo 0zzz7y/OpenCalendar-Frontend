@@ -12,7 +12,7 @@ import EventCreationPopover from "../event/EventCreationPopover"
 
 interface MonthViewProperties {
   date: Date
-  events: Schedulable[]  // Zmienione na Schedulable[], aby obsługiwało Event i Task
+  events: Schedulable[] // Zmienione na Schedulable[], aby obsługiwało Event i Task
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
   onSave: (data: Partial<Event>) => void
@@ -42,9 +42,9 @@ const MonthView = ({
 
   const openInfoPopover = (event: Schedulable, anchor: HTMLElement) => {
     if ("id" in event && "name" in event && "calendar" in event) {
-      setInfoEvent(event as Event)  // Cast to Event
+      setInfoEvent(event as Event) // Cast to Event
       setInfoAnchor(anchor)
-      onEventClick?.(event as Event)  // Cast to Event
+      onEventClick?.(event as Event) // Cast to Event
     }
   }
 
