@@ -1,6 +1,8 @@
 import MESSAGES from "@/constant/message"
+
 import Category from "@/type/domain/category"
-import Note from "@/type/dto/note"
+import Calendar from "@/type/domain/calendar"
+import Note from "@/type/domain/note"
 
 import { useEffect, useRef, useState } from "react"
 
@@ -26,7 +28,7 @@ export interface NoteCardProperties {
   categories: Category[]
   onDelete?: (id: string) => void
   onUpdate?: (note: Note) => void
-  calendarId?: string
+  calendar: Calendar
   name?: string
 }
 
@@ -39,7 +41,7 @@ const NoteCard = ({
   categories,
   onDelete,
   onUpdate,
-  calendarId,
+  calendar,
   name = MESSAGES.PLACEHOLDERS.NEW_NOTE
 }: NoteCardProperties) => {
   const contentRef = useRef<HTMLDivElement | null>(null)
@@ -54,16 +56,12 @@ const NoteCard = ({
   const [position, setPosition] = useState(positionRef.current)
   const [dragging, setDragging] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(
-    null
-  )
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined)
+  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(null)
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {})
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
-  const [activeFormats, setActiveFormats] = useState<
-    Record<FormatCommand, boolean>
-  >({
+  const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
     bold: false,
     italic: false,
     underline: false,
@@ -77,8 +75,8 @@ const NoteCard = ({
     }
   }, [])
 
-  const getCategoryColor = (categoryId: string | null) =>
-    categories.find((c) => c.id === categoryId)?.color || color
+  const getCategoryColor = (category: Category | undefined) =>
+    category?.color || color
 
   const clearText = () => {
     if (contentRef.current) contentRef.current.innerHTML = ""
@@ -137,10 +135,7 @@ const NoteCard = ({
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       const newWidth = Math.max(150, startWidth + (moveEvent.clientX - startX))
-      const newHeight = Math.max(
-        100,
-        startHeight + (moveEvent.clientY - startY)
-      )
+      const newHeight = Math.max(100, startHeight + (moveEvent.clientY - startY))
       setDimensions({ width: newWidth, height: newHeight })
     }
 
@@ -170,8 +165,8 @@ const NoteCard = ({
         id,
         name: noteName,
         description: contentRef.current?.innerHTML || "",
-        categoryId: selectedCategory || "",
-        calendarId: calendarId || ""
+        category: selectedCategory,
+        calendar
       })
     }
   }
@@ -193,8 +188,8 @@ const NoteCard = ({
         id,
         name: noteName,
         description: contentRef.current?.innerHTML || "",
-        categoryId: selectedCategory || "",
-        calendarId: calendarId || ""
+        category: selectedCategory,
+        calendar
       })
     }
   }, [selectedCategory])
@@ -240,7 +235,7 @@ const NoteCard = ({
             }
             onFormatText={formatText}
             activeFormats={activeFormats}
-            selectedCategory={selectedCategory}
+            selectedCategory={selectedCategory?.id || null}
             onCategoryMenuOpen={(e: any) => setMenuAnchorEl(e)}
             noteName={noteName}
             onNameChange={setNoteName}
@@ -319,12 +314,12 @@ const NoteCard = ({
         transformOrigin={{ vertical: "top", horizontal: "right" }}
         MenuListProps={{ dense: true }}
       >
-        {categories.map(({ id, name, color }) => (
+        {categories.map((cat) => (
           <MenuItem
-            key={id}
-            selected={selectedCategory === id}
+            key={cat.id}
+            selected={selectedCategory?.id === cat.id}
             onClick={() => {
-              setSelectedCategory(id)
+              setSelectedCategory(cat)
               setMenuAnchorEl(null)
             }}
             sx={{ display: "flex", alignItems: "center", gap: 1 }}
@@ -335,11 +330,11 @@ const NoteCard = ({
                 width: 12,
                 height: 12,
                 borderRadius: "50%",
-                backgroundColor: color,
+                backgroundColor: cat.color,
                 mr: 1
               }}
             />
-            {name}
+            {cat.name}
           </MenuItem>
         ))}
       </Menu>

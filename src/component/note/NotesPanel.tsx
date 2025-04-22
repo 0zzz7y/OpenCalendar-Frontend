@@ -6,14 +6,19 @@ import AddIcon from "@mui/icons-material/Add"
 import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 
-import useCategories from "../../hook/api/useCategory"
-import useNotes from "../../hook/api/useNote"
-import Note from "../../type/dto/note"
+import useCategories from "@/hook/api/useCategory"
+import useNotes from "@/hook/api/useNote"
+
+import Note from "@/type/domain/note"
+import useCalendars from "@/hook/api/useCalendar"
+
 import NoteCard from "./NoteCard"
 
 const NotesPanel = () => {
   const { notes, addNote, updateNote, deleteNote, reloadNotes } = useNotes()
   const { categories, reloadCategories } = useCategories()
+  const { calendars, reloadCalendars } = useCalendars()
+
   const didFetchRef = useRef(false)
 
   const [localNotes, setLocalNotes] = useState<Note[]>([])
@@ -22,6 +27,7 @@ const NotesPanel = () => {
     if (!didFetchRef.current) {
       reloadNotes()
       reloadCategories()
+      reloadCalendars()
       didFetchRef.current = true
     }
   }, [])
@@ -44,12 +50,17 @@ const NotesPanel = () => {
 
   const handleAddNote = async () => {
     const tempId = ""
+    const defaultCalendar = calendars[0]
+    const defaultCategory = categories[0]
+
+    if (!defaultCalendar) return
+
     const newNote: Note = {
       id: tempId,
       name: MESSAGES.PLACEHOLDERS.NEW_NOTE,
       description: "",
-      categoryId: "",
-      calendarId: ""
+      category: defaultCategory,
+      calendar: defaultCalendar
     }
 
     setLocalNotes((prev) => [...prev, newNote])
@@ -57,8 +68,8 @@ const NotesPanel = () => {
     const savedNote = await addNote({
       name: newNote.name,
       description: newNote.description,
-      categoryId: newNote.categoryId,
-      calendarId: newNote.calendarId
+      category: defaultCategory,
+      calendar: defaultCalendar
     })
 
     setLocalNotes((prev) =>
@@ -78,7 +89,7 @@ const NotesPanel = () => {
           id={note.id}
           name={note.name}
           content={note.description || ""}
-          calendarId={note.calendarId}
+          calendar={note.calendar}
           categories={categories}
           onUpdate={handleUpdate}
           onDelete={handleDelete}

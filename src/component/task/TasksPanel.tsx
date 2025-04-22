@@ -1,5 +1,7 @@
 import MESSAGES from "@/constant/message"
+
 import useAppContext from "@/hook/context/useAppContext"
+
 import TaskStatus from "@/type/domain/taskStatus"
 
 import { useState } from "react"
@@ -8,6 +10,7 @@ import { AddCircleOutline } from "@mui/icons-material"
 import { Box, TextField } from "@mui/material"
 
 import TaskBoard from "./TasksBoard"
+import RecurringPattern from "@/type/domain/recurringPattern"
 
 const TasksPanel = () => {
   const { tasks, calendars, categories, addTask, updateTask, deleteTask } =
@@ -21,8 +24,9 @@ const TasksPanel = () => {
     await addTask({
       name: newTitle,
       status: TaskStatus.TODO,
-      calendarId: calendars[0]?.id || "",
-      categoryId: categories[0]?.id || "",
+      recurringPattern: RecurringPattern.NONE,
+      calendar: calendars[0] || null,
+      category: categories[0] || null,
       startDate: "",
       endDate: ""
     })

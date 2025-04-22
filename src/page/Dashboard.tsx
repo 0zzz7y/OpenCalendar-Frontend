@@ -109,9 +109,9 @@ const Dashboard = () => {
             margin: "10px 5px"
           }}
         >
-          <Box height="0%">{
-          /* <NotesPanel></NotesPanel> */
-          }</Box>
+          <Box height="0%">
+            <NotesPanel />
+          </Box>
 
           <Box flexGrow={1} overflow="auto">
             <TasksPanel />
