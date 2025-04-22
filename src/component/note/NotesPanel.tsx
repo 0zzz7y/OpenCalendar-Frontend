@@ -16,8 +16,8 @@ import NoteCard from "./NoteCard"
 
 const NotesPanel = () => {
   const { notes, addNote, updateNote, deleteNote, reloadNotes } = useNotes()
-  const { categories, reloadCategories } = useCategories()
-  const { calendars, reloadCalendars } = useCalendars()
+  const { categories } = useCategories()
+  const { calendars } = useCalendars()
 
   const didFetchRef = useRef(false)
 
@@ -26,8 +26,6 @@ const NotesPanel = () => {
   useEffect(() => {
     if (!didFetchRef.current) {
       reloadNotes()
-      reloadCategories()
-      reloadCalendars()
       didFetchRef.current = true
     }
   }, [])
@@ -60,7 +58,9 @@ const NotesPanel = () => {
       name: MESSAGES.PLACEHOLDERS.NEW_NOTE,
       description: "",
       category: defaultCategory,
-      calendar: defaultCalendar
+      calendar: defaultCalendar,
+      positionX: Math.floor(Math.random() * 100),
+      positionY: Math.floor(Math.random() * 100)
     }
 
     setLocalNotes((prev) => [...prev, newNote])
@@ -69,7 +69,9 @@ const NotesPanel = () => {
       name: newNote.name,
       description: newNote.description,
       category: defaultCategory,
-      calendar: defaultCalendar
+      calendar: defaultCalendar,
+      positionX: newNote.positionX,
+      positionY: newNote.positionY
     })
 
     setLocalNotes((prev) =>

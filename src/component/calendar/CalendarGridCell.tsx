@@ -136,7 +136,6 @@ const CalendarGridCell = ({
               left: 0,
               right: 0,
               height: previewHeight,
-              border: "2px dashed #1976d2",
               borderRadius: 1,
               backgroundColor: "rgba(25, 118, 210, 0.1)",
               zIndex: 1

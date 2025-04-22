@@ -113,7 +113,7 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     let mounted = true
     const initialize = async () => {
-      if (mounted) await Promise.all([reloadCalendars(), reloadCategories()])
+      if (mounted) await Promise.all([reloadCalendars(), reloadCategories(), reloadEvents(), reloadTasks(), reloadNotes()])
     }
     initialize()
     return () => {

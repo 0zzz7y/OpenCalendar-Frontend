@@ -1,41 +1,93 @@
 import MESSAGES from "@/constant/message"
 
-import useAppContext from "@/hook/context/useAppContext"
-
-import TaskStatus from "@/type/domain/taskStatus"
-
-import { useState } from "react"
+import { useEffect, useRef, useState } from "react"
 
 import { AddCircleOutline } from "@mui/icons-material"
 import { Box, TextField } from "@mui/material"
 
+import useCategory from "@/hook/api/useCategory"
+import useCalendar from "@/hook/api/useCalendar"
+import useTask from "@/hook/api/useTask"
+
 import TaskBoard from "./TasksBoard"
+
+import Task from "@/type/domain/task"
+import TaskStatus from "@/type/domain/taskStatus"
 import RecurringPattern from "@/type/domain/recurringPattern"
 
 const TasksPanel = () => {
-  const { tasks, calendars, categories, addTask, updateTask, deleteTask } =
-    useAppContext()
+  const { categories } = useCategory()
+  const { calendars } = useCalendar()
+  const { tasks, addTask, updateTask, deleteTask, reloadTasks } = useTask()
 
   const [newTitle, setNewTitle] = useState("")
+  const [localTasks, setLocalTasks] = useState<Task[]>([])
+
+  const didFetchRef = useRef(false)
+
+  useEffect(() => {
+    if (!didFetchRef.current) {
+      reloadTasks()
+      didFetchRef.current = true
+    }
+  }, [])
+
+  useEffect(() => {
+    setLocalTasks(tasks)
+  }, [tasks])
 
   const handleCreate = async () => {
     if (!newTitle.trim()) return
 
-    await addTask({
+    const tempId = ""
+    const defaultCalendar = calendars[0] || null
+    const defaultCategory = categories[0] || null
+
+    const newTask: Task = {
+      id: tempId,
       name: newTitle,
+      description: "",
+      calendar: defaultCalendar,
+      category: defaultCategory,
       status: TaskStatus.TODO,
       recurringPattern: RecurringPattern.NONE,
-      calendar: calendars[0] || null,
-      category: categories[0] || null,
       startDate: "",
       endDate: ""
+    }
+
+    setLocalTasks((prev) => [...prev, newTask])
+
+    const savedTask = await addTask({
+      name: newTask.name,
+      status: newTask.status,
+      recurringPattern: newTask.recurringPattern,
+      calendar: defaultCalendar,
+      category: defaultCategory,
+      startDate: newTask.startDate,
+      endDate: newTask.endDate
     })
+
+    if (savedTask?.id) {
+      setLocalTasks((prev) =>
+        prev.map((task) =>
+          task.id === tempId ? { ...savedTask, ...task, id: savedTask.id } : task
+        )
+      )
+    }
 
     setNewTitle("")
   }
 
-  const handleUpdate = async (updated: any) => {
+  const handleUpdate = async (updated: Task) => {
+    setLocalTasks((prev) =>
+      prev.map((task) => (task.id === updated.id ? updated : task))
+    )
     await updateTask(updated.id, updated)
+  }
+
+  const handleDelete = async (id: string) => {
+    setLocalTasks((prev) => prev.filter((task) => task.id !== id))
+    await deleteTask(id)
   }
 
   return (
@@ -66,11 +118,11 @@ const TasksPanel = () => {
         />
 
         <TaskBoard
-          tasks={tasks}
+          tasks={localTasks}
           calendars={calendars}
           categories={categories}
           onUpdate={handleUpdate}
-          onDelete={deleteTask}
+          onDelete={handleDelete}
         />
       </Box>
     </>

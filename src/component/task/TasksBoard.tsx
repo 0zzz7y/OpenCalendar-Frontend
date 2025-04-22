@@ -1,10 +1,11 @@
 import MESSAGES from "@/constant/message"
+
 import Calendar from "@/type/domain/calendar"
 import Category from "@/type/domain/category"
 import Task from "@/type/domain/task"
 import TaskStatus from "@/type/domain/taskStatus"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import {
   DragDropContext,
@@ -12,6 +13,7 @@ import {
   Draggable,
   DropResult
 } from "@hello-pangea/dnd"
+
 import { HourglassEmpty, Done, Pending } from "@mui/icons-material"
 import { Box } from "@mui/material"
 
@@ -41,13 +43,13 @@ const TaskBoard = ({
     }
 
   const [localOrder, setLocalOrder] = useState<Record<TaskStatus, Task[]>>({
-    TODO: tasks.filter((t) => t.status === "TODO"),
-    IN_PROGRESS: tasks.filter((t) => t.status === "IN_PROGRESS"),
-    DONE: tasks.filter((t) => t.status === "DONE")
+    TODO: [],
+    IN_PROGRESS: [],
+    DONE: []
   })
 
   const onDragEnd = (result: DropResult) => {
-    const { source, destination, draggableId } = result
+    const { source, destination } = result
     if (!destination) return
 
     const sourceColumn = source.droppableId as TaskStatus
@@ -56,11 +58,12 @@ const TaskBoard = ({
     const sourceTasks = Array.from(localOrder[sourceColumn])
     const destTasks = Array.from(localOrder[destColumn])
 
-    const draggedTask = sourceTasks.find((t) => t.id === draggableId)
+    const draggedTaskIndex = source.index
+    const draggedTask = sourceTasks[draggedTaskIndex]
     if (!draggedTask) return
 
     if (sourceColumn === destColumn) {
-      sourceTasks.splice(source.index, 1)
+      sourceTasks.splice(draggedTaskIndex, 1)
       sourceTasks.splice(destination.index, 0, draggedTask)
 
       setLocalOrder((prev) => ({
@@ -68,11 +71,9 @@ const TaskBoard = ({
         [sourceColumn]: sourceTasks
       }))
     } else {
-      sourceTasks.splice(source.index, 1)
-      destTasks.splice(destination.index, 0, {
-        ...draggedTask,
-        status: destColumn
-      })
+      sourceTasks.splice(draggedTaskIndex, 1)
+      const updatedTask = { ...draggedTask, status: destColumn }
+      destTasks.splice(destination.index, 0, updatedTask)
 
       setLocalOrder((prev) => ({
         ...prev,
@@ -80,9 +81,17 @@ const TaskBoard = ({
         [destColumn]: destTasks
       }))
 
-      onUpdate({ ...draggedTask, status: destColumn })
+      onUpdate(updatedTask)
     }
   }
+
+  useEffect(() => {
+    setLocalOrder({
+      TODO: tasks.filter((t) => t.status === "TODO"),
+      IN_PROGRESS: tasks.filter((t) => t.status === "IN_PROGRESS"),
+      DONE: tasks.filter((t) => t.status === "DONE")
+    })
+  }, [tasks])
 
   return (
     <>
@@ -122,8 +131,10 @@ const TaskBoard = ({
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             sx={{
-                              opacity: snapshot.isDragging ? 0.8 : 1,
-                              transition: "opacity 0.2s ease"
+                              opacity: snapshot.isDragging ? 0.85 : 1,
+                              transform: snapshot.isDragging ? "scale(1.02)" : "none",
+                              transition: "all 0.15s ease",
+                              cursor: snapshot.isDragging ? "grabbing" : "grab"
                             }}
                           >
                             <TaskCard

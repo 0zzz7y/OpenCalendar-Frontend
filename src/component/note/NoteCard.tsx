@@ -166,7 +166,9 @@ const NoteCard = ({
         name: noteName,
         description: contentRef.current?.innerHTML || "",
         category: selectedCategory,
-        calendar
+        calendar,
+        positionX: positionRef.current.x,
+        positionY: positionRef.current.y
       })
     }
   }
@@ -189,7 +191,9 @@ const NoteCard = ({
         name: noteName,
         description: contentRef.current?.innerHTML || "",
         category: selectedCategory,
-        calendar
+        calendar,
+        positionX: positionRef.current.x,
+        positionY: positionRef.current.y
       })
     }
   }, [selectedCategory])
@@ -204,7 +208,9 @@ const NoteCard = ({
         width: dimensions.width,
         userSelect: "none",
         zIndex: dragging ? 1000 : 100,
-        pointerEvents: "auto"
+        pointerEvents: "auto",
+        transition: "all 0.15s ease",
+        transform: dragging ? "scale(1.02)" : "none"
       }}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
@@ -217,11 +223,17 @@ const NoteCard = ({
           borderRadius: 2,
           boxShadow: dragging ? "0 0 10px #2196f3" : 3,
           overflow: "hidden",
-          cursor: dragging ? "grabbing" : "default",
+          cursor: "default",
           position: "relative"
         }}
       >
-        <Box ref={toolbarRef}>
+        <Box
+          ref={toolbarRef}
+          sx={{
+            cursor: dragging ? "grabbing" : "grab",
+            transition: "cursor 0.15s ease"
+          }}
+        >
           <NoteToolbar
             isCollapsed={collapsed}
             onToggleCollapse={() => setCollapsed((c) => !c)}

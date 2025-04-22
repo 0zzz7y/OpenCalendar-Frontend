@@ -12,7 +12,9 @@ export const toNote = (
   name: dto.name,
   description: dto.description,
   calendar,
-  category
+  category,
+  positionX: 0,
+  positionY: 0
 })
 
 export const toNoteDto = (note: Note): NoteDto => ({
