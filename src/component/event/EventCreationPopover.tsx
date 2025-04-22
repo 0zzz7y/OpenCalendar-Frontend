@@ -16,6 +16,7 @@ import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
 import { toast } from "react-toastify"
 
 import Event from "../../type/domain/event"
+import RecurringPattern from "@/type/domain/recurringPattern"
 
 interface Properties {
   anchorEl: HTMLElement | null
@@ -52,8 +53,8 @@ const EventCreationPopover = ({
       setDescription(initialEvent.description || "")
       setStart(start)
       setEnd(end)
-      setCalendarId(initialEvent.calendarId || "")
-      setCategoryId(initialEvent.categoryId || "")
+      setCalendarId(initialEvent.calendar?.id || "")
+      setCategoryId(initialEvent.category?.id || "")
     } else {
       const now = new Date()
       setTitle("")
@@ -63,7 +64,7 @@ const EventCreationPopover = ({
       setCalendarId(calendars[0]?.id || "")
       setCategoryId("")
     }
-  }, [initialEvent, open])
+  }, [initialEvent, anchorEl])
 
   const handleSave = async () => {
     if (!title.trim()) {
@@ -76,13 +77,22 @@ const EventCreationPopover = ({
       return
     }
 
+    const calendar = calendars.find((c) => c.id === calendarId)
+    const category = categories.find((c) => c.id === categoryId)
+
+    if (!calendar) {
+      toast.error("Calendar is required")
+      return
+    }
+
     const payload = {
       name: title,
       description,
-      calendarId,
-      categoryId,
+      calendar,
+      category,
       startDate: start.toISOString(),
-      endDate: end.toISOString()
+      endDate: end.toISOString(),
+      recurringPattern: RecurringPattern.NONE
     }
 
     try {

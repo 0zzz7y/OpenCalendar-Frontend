@@ -1,23 +1,32 @@
 import useFilters from "@/hook/api/useFilter"
 import useAppContext from "@/hook/context/useAppContext"
 import Event from "@/type/domain/event"
+import RecurringPattern from "@/type/domain/recurringPattern"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 import { Box, Typography, Button } from "@mui/material"
 import dayjs from "dayjs"
 
-import DayView from "../calendar/DayView"
-import MonthView from "../calendar/MonthView"
-import WeekView from "../calendar/WeekView"
+import DayView from "./DayView"
+import MonthView from "./MonthView"
+import WeekView from "./WeekView"
 import EventPopover from "../event/EventCreationPopover"
 import EventInformationPopover from "../event/EventInformationPopover"
+import CalendarViewSwitcher from "../calendar/CalendarViewSwitcher"
 
-const CenterPanel = () => {
-  const { events, calendars, categories, addEvent, updateEvent, deleteEvent } =
-    useAppContext()
+const CalendarPanel = () => {
+  const {
+    events,
+    calendars,
+    categories,
+    addEvent,
+    updateEvent,
+    deleteEvent,
+    reloadEvents
+  } = useAppContext()
 
   const { selectedCalendar, selectedCategory } = useFilters()
 
@@ -32,9 +41,9 @@ const CenterPanel = () => {
   const filteredEvents = Array.isArray(events)
     ? events.filter((event) => {
         const calendarMatch =
-          selectedCalendar === "all" || event.calendarId === selectedCalendar
+          selectedCalendar === "all" || event.calendar.id === selectedCalendar
         const categoryMatch =
-          selectedCategory === "all" || event.categoryId === selectedCategory
+          selectedCategory === "all" || event.category?.id === selectedCategory
         return calendarMatch && categoryMatch
       })
     : []
@@ -61,11 +70,9 @@ const CenterPanel = () => {
   }
 
   const handleSave = async (data: Partial<Event>) => {
-    if (!data.startDate) return
+    if (!data.startDate || !data.calendar) return
 
-    const exists = events.find(
-      (e: { id: string | undefined }) => e.id === data.id
-    )
+    const exists = events.find((e: { id: string | undefined }) => e.id === data.id)
 
     if (exists && data.id) {
       await updateEvent(data.id, data)
@@ -75,8 +82,9 @@ const CenterPanel = () => {
         description: data.description ?? "",
         startDate: data.startDate,
         endDate: data.endDate ?? data.startDate,
-        calendarId: data.calendarId ?? "",
-        categoryId: data.categoryId
+        calendar: data.calendar,
+        category: data.category,
+        recurringPattern: RecurringPattern.NONE
       }
 
       await addEvent(newEvent)
@@ -126,34 +134,13 @@ const CenterPanel = () => {
           </Button>
         </Box>
 
-        <Box display="flex" gap={2}>
-          <Button
-            onClick={() => setView("day")}
-            variant={view === "day" ? "outlined" : "text"}
-          >
-            Day
-          </Button>
-          <Button
-            onClick={() => setView("week")}
-            variant={view === "week" ? "outlined" : "text"}
-          >
-            Week
-          </Button>
-          <Button
-            onClick={() => setView("month")}
-            variant={view === "month" ? "outlined" : "text"}
-          >
-            Month
-          </Button>
-        </Box>
+        <CalendarViewSwitcher view={view} onChange={setView} />
       </Box>
 
       {view === "day" && (
         <DayView
           date={selectedDate}
           events={filteredEvents}
-          onSlotClick={handleSlotClick}
-          onSave={handleSave}
           onEventClick={handleEventClick}
           calendars={calendars}
           categories={categories}
@@ -164,8 +151,6 @@ const CenterPanel = () => {
         <WeekView
           date={selectedDate}
           events={filteredEvents}
-          onSlotClick={handleSlotClick}
-          onSave={handleSave}
           onEventClick={handleEventClick}
           calendars={calendars}
           categories={categories}
@@ -188,7 +173,6 @@ const CenterPanel = () => {
         <EventPopover
           anchorEl={selectedSlot}
           onClose={handleClosePopover}
-          onSave={handleSave}
           calendars={calendars}
           categories={categories}
           initialEvent={
@@ -200,8 +184,9 @@ const CenterPanel = () => {
               endDate: new Date(
                 selectedDatetime.getTime() + 60 * 60 * 1000
               ).toISOString(),
-              calendarId: "",
-              categoryId: undefined
+              calendar: calendars[0],
+              category: undefined,
+              recurringPattern: RecurringPattern.NONE
             }
           }
         />
@@ -218,4 +203,4 @@ const CenterPanel = () => {
   )
 }
 
-export default CenterPanel
+export default CalendarPanel

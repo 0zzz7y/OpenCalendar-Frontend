@@ -19,34 +19,30 @@ const useEvent = () => {
   const [totalElements, setTotalElements] = useState(0)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
 
+  const mapDtoToEvent = (eventDto: EventDto): Event => {
+    const calendar = calendars.find((cal) => cal.id === eventDto.calendarId)
+    const category = categories.find((cat) => cat.id === eventDto.categoryId)
+
+    if (!calendar)
+      throw new Error(`Calendar not found for event ${eventDto.id}`)
+
+    return toEvent(eventDto, calendar, category)
+  }
+
   const fetchEvents = async (pageNumber = 0, reset = false) => {
     try {
       const response = await axios.get<PaginatedResponse<EventDto>>(
         `${import.meta.env.VITE_BACKEND_URL}/events`,
-        {
-          params: {
-            page: pageNumber,
-            size
-          }
-        }
+        { params: { page: pageNumber, size } }
       )
       const data = response.data
-      const mappedEvents = data.content.map((eventDto) => {
-        const calendar = calendars.find((cal) => cal.id === eventDto.calendarId)
-        const category = categories.find(
-          (cat) => cat.id === eventDto.categoryId
-        )
-        if (!calendar) {
-          throw new Error(`Calendar not found for event ${eventDto.id}`)
-        }
-        return toEvent(eventDto, calendar, category)
-      })
+      const mappedEvents = data.content.map(mapDtoToEvent)
 
       setEvents((prev) => (reset ? mappedEvents : [...prev, ...mappedEvents]))
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch events")
     }
   }
@@ -60,29 +56,11 @@ const useEvent = () => {
       do {
         const response = await axios.get<PaginatedResponse<EventDto>>(
           `${import.meta.env.VITE_BACKEND_URL}/events`,
-          {
-            params: {
-              page: currentPage,
-              size
-            }
-          }
+          { params: { page: currentPage, size } }
         )
         const data = response.data
+        const mappedEvents = data.content.map(mapDtoToEvent)
 
-        const mappedEvents = data.content.map((eventDto) => {
-          const calendar = calendars.find(
-            (cal) => cal.id === eventDto.calendarId
-          )
-          const category = categories.find(
-            (cat) => cat.id === eventDto.categoryId
-          )
-          if (!calendar || !category) {
-            throw new Error(
-              `Calendar or Category not found for event ${eventDto.id}`
-            )
-          }
-          return toEvent(eventDto, calendar, category)
-        })
         allEvents = [...allEvents, ...mappedEvents]
         total = data.totalPages
         currentPage++
@@ -92,7 +70,7 @@ const useEvent = () => {
       setPage(0)
       setTotalPages(1)
       setTotalElements(allEvents.length)
-    } catch (error) {
+    } catch {
       toast.error("Failed to reload all events")
     }
   }
@@ -109,19 +87,15 @@ const useEvent = () => {
 
     const tempId = crypto.randomUUID()
     const optimisticEvent: Event = { ...event, id: tempId }
-
     setEvents((prev) => [...prev, optimisticEvent])
 
     try {
       const response = await axios.post<EventDto>(
         `${import.meta.env.VITE_BACKEND_URL}/events`,
-        toEventDto({ id: "", ...event }) // Add id as an empty string to match EventDto
+        toEventDto({ id: "", ...event })
       )
       const savedEvent = toEvent(response.data, event.calendar, event.category)
-
-      setEvents((prev) =>
-        prev.map((e) => (e.id === tempId ? { ...savedEvent } : e))
-      )
+      setEvents((prev) => prev.map((e) => (e.id === tempId ? savedEvent : e)))
       return savedEvent
     } catch (error) {
       toast.error("Failed to add event")
@@ -134,29 +108,21 @@ const useEvent = () => {
     const previous = events.find((e) => e.id === id)
     if (!previous) return
 
-    setEvents((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, ...updated } : e))
-    )
+    const merged = {
+      ...previous,
+      ...updated
+    }
+
+    setEvents((prev) => prev.map((e) => (e.id === id ? merged : e)))
 
     try {
-      const updatedWithId = {
-        id,
-        name: updated.name ?? "",
-        description: updated.description ?? "",
-        startDate: updated.startDate ?? "",
-        endDate: updated.endDate ?? "",
-        recurringPattern: updated.recurringPattern ?? previous.recurringPattern,
-        calendar: updated.calendar ?? previous.calendar,
-        category: updated.category ?? previous.category
-      }
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/events/${id}`,
-        toEventDto(updatedWithId)
+        toEventDto(merged)
       )
-    } catch (error) {
+    } catch {
       toast.error("Failed to update event")
       setEvents((prev) => prev.map((e) => (e.id === id ? previous : e)))
-      throw error
     }
   }
 
@@ -168,16 +134,15 @@ const useEvent = () => {
 
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/events/${id}`)
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete event")
       setEvents((prev) => [...prev, deleted])
-      throw error
     }
   }
 
   useEffect(() => {
-    reloadEvents()
-  }, [reloadEvents])
+    if (calendars.length > 0) reloadEvents()
+  }, [calendars, categories])
 
   return {
     events,

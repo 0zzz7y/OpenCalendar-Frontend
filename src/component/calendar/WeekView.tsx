@@ -2,6 +2,7 @@ import EventPopover from "@/component/event/EventCreationPopover"
 import EventInformationPopover from "@/component/event/EventInformationPopover"
 import useAppContext from "@/hook/context/useAppContext"
 import Event from "@/type/domain/event"
+import RecurringPattern from "@/type/domain/recurringPattern"
 
 import { useContext, useState } from "react"
 
@@ -166,8 +167,9 @@ const WeekView = ({
               description: "",
               startDate: dayjs(selectedDatetime).toISOString(),
               endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
-              calendarId: "",
-              categoryId: undefined
+              recurringPattern: RecurringPattern.NONE,
+              calendar: { id: "", name: "", emoji: "" },
+              category: { id: "", name: "", color: "" }
             }
           }
         />

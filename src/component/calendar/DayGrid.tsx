@@ -1,7 +1,7 @@
 import { Box, Typography, useTheme } from "@mui/material"
 
 interface DayGridProperties {
-  onSlotClick: (hour: number, minute: number, element: HTMLElement) => void
+  onSlotClick: (datetime: Date, element: HTMLElement) => void
 }
 
 const DayGrid = ({ onSlotClick }: DayGridProperties) => {
@@ -29,7 +29,7 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
         flexDirection="column"
         flexGrow={1}
         sx={{
-          minHeight: `${48 * 32}px`,
+          height: `${48 * 24}px`,
           border: `1px solid ${theme.palette.divider}`,
           overflow: "visible"
         }}
@@ -37,15 +37,29 @@ const DayGrid = ({ onSlotClick }: DayGridProperties) => {
         {slots.map(({ hour, minute }, i) => (
           <Box
             key={i}
-            onClick={(e) => onSlotClick(hour, minute, e.currentTarget)}
+            onClick={(e) => {
+              const now = new Date()
+              const slotDate = new Date(
+                now.getFullYear(),
+                now.getMonth(),
+                now.getDate(),
+                hour,
+                minute,
+                0,
+                0
+              )
+              onSlotClick(slotDate, e.currentTarget)
+            }}
             sx={{
               borderBottom: `1px solid ${theme.palette.divider}`,
               padding: "6px 12px",
-              minHeight: 32,
+              height: 32,
               cursor: "pointer",
               display: "flex",
               alignItems: "center",
               flexShrink: 0,
+              position: "relative",
+              zIndex: 1,
               "&:hover": {
                 backgroundColor: theme.palette.action.hover
               }

@@ -2,7 +2,7 @@ import Event from "@/type/domain/event"
 
 import { Box } from "@mui/material"
 
-import EventBox from "../event/EventBox"
+import EventBox from "@/component/event/EventBox"
 import CalendarGridCell from "./CalendarGridCell"
 
 interface DayColumnProperties {
@@ -77,10 +77,20 @@ const DayColumn = ({
       const gap = 4
 
       sorted.forEach((event, i) => {
+        const start = new Date(event.startDate)
+        const end = new Date(event.endDate)
+
+        const startMinutes = start.getHours() * 60 + start.getMinutes()
+        const endMinutes = end.getHours() * 60 + end.getMinutes()
+        const top = (startMinutes * 32) / 30
+        const height = Math.max(16, ((endMinutes - startMinutes) * 32) / 30)
+
         layouted.push({
           ...event,
           customStyle: {
             position: "absolute",
+            top,
+            height,
             width: `calc(${width}% - ${gap}px)`,
             left: `calc(${i * width}% + ${i * gap}px)`,
             opacity: dragTargetId ? 0.6 : 1,

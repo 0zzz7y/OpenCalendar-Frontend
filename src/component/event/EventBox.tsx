@@ -72,48 +72,47 @@ const EventBox = ({
   const top = (minutesFromStart / 15) * 32
   const height = (duration / 15) * 32
 
-  const calendar = calendars.find((c) => c.id === event.calendarId)
-  const category = categories.find((c) => c.id === event.categoryId)
-
-  const emoji = calendar?.emoji || ""
-  const backgroundColor = category?.color || "#1976d2"
+  const emoji = event.calendar?.emoji || ""
+  const backgroundColor = event.category?.color || "#1976d2"
 
   return (
-    <Box
-      id={`event-${event.id}`}
-      ref={eventRef}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
-      sx={{
-        position: "absolute",
-        top,
-        height,
-        backgroundColor,
-        color: "#fff",
-        borderRadius: 1,
-        padding: "2px 4px",
-        fontSize: "0.75rem",
-        opacity: dragTargetId && dragTargetId !== event.id ? 0.5 : 1,
-        pointerEvents:
-          dragTargetId && dragTargetId !== event.id ? "none" : "auto",
-        cursor: enableDrag ? "move" : "pointer",
-        overflow: "hidden",
-        zIndex: dragTargetId === event.id ? 1500 : 10,
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "flex-start",
-        ...customStyle
-      }}
-    >
-      <Typography variant="caption" fontWeight={500} noWrap flexGrow={1}>
-        {event.name}
-      </Typography>
-      {emoji && (
-        <Typography variant="caption" ml={1}>
-          {emoji}
+    <>
+      <Box
+        id={`event-${event.id}`}
+        ref={eventRef}
+        onMouseDown={handleMouseDown}
+        onMouseUp={handleMouseUp}
+        sx={{
+          position: "absolute",
+          top,
+          height,
+          backgroundColor,
+          color: "#fff",
+          borderRadius: 1,
+          padding: "2px 4px",
+          fontSize: "0.75rem",
+          opacity: dragTargetId && dragTargetId !== event.id ? 0.5 : 1,
+          pointerEvents:
+            dragTargetId && dragTargetId !== event.id ? "none" : "auto",
+          cursor: enableDrag ? "move" : "pointer",
+          overflow: "hidden",
+          zIndex: dragTargetId === event.id ? 1500 : 10,
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          ...customStyle
+        }}
+      >
+        <Typography variant="caption" fontWeight={500} noWrap flexGrow={1}>
+          {event.name}
         </Typography>
-      )}
-    </Box>
+        {emoji && (
+          <Typography variant="caption" ml={1}>
+            {emoji}
+          </Typography>
+        )}
+      </Box>
+    </>
   )
 }
 

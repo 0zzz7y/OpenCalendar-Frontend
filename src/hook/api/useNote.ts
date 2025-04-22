@@ -19,32 +19,29 @@ const useNote = () => {
   const [totalElements, setTotalElements] = useState(0)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
 
+  const mapDtoToNote = (noteDto: NoteDto): Note => {
+    const calendar = calendars.find((cal) => cal.id === noteDto.calendarId)
+    const category = categories.find((cat) => cat.id === noteDto.categoryId)
+
+    if (!calendar) throw new Error(`Calendar not found for note ${noteDto.id}`)
+
+    return toNote(noteDto, calendar, category)
+  }
+
   const fetchNotes = async (pageNumber = 0, reset = false) => {
     try {
       const response = await axios.get<PaginatedResponse<NoteDto>>(
         `${import.meta.env.VITE_BACKEND_URL}/notes`,
-        {
-          params: {
-            page: pageNumber,
-            size
-          }
-        }
+        { params: { page: pageNumber, size } }
       )
       const data = response.data
-      const mappedNotes = data.content.map((noteDto) => {
-        const calendar = calendars.find((cal) => cal.id === noteDto.calendarId)
-        const category = categories.find((cat) => cat.id === noteDto.categoryId)
-        if (!calendar) {
-          throw new Error(`Calendar not found for note ${noteDto.id}`)
-        }
-        return toNote(noteDto, calendar, category)
-      })
+      const mappedNotes = data.content.map(mapDtoToNote)
 
       setNotes((prev) => (reset ? mappedNotes : [...prev, ...mappedNotes]))
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch notes")
     }
   }
@@ -58,29 +55,11 @@ const useNote = () => {
       do {
         const response = await axios.get<PaginatedResponse<NoteDto>>(
           `${import.meta.env.VITE_BACKEND_URL}/notes`,
-          {
-            params: {
-              page: currentPage,
-              size
-            }
-          }
+          { params: { page: currentPage, size } }
         )
         const data = response.data
+        const mappedNotes = data.content.map(mapDtoToNote)
 
-        const mappedNotes = data.content.map((noteDto) => {
-          const calendar = calendars.find(
-            (cal) => cal.id === noteDto.calendarId
-          )
-          const category = categories.find(
-            (cat) => cat.id === noteDto.categoryId
-          )
-          if (!calendar || !category) {
-            throw new Error(
-              `Calendar or Category not found for note ${noteDto.id}`
-            )
-          }
-          return toNote(noteDto, calendar, category)
-        })
         allNotes = [...allNotes, ...mappedNotes]
         total = data.totalPages
         currentPage++
@@ -90,7 +69,7 @@ const useNote = () => {
       setPage(0)
       setTotalPages(1)
       setTotalElements(allNotes.length)
-    } catch (error) {
+    } catch {
       toast.error("Failed to reload all notes")
     }
   }
@@ -103,12 +82,12 @@ const useNote = () => {
   }
 
   const addNote = async (note: Omit<Note, "id">): Promise<Note> => {
-    if (!note.name?.trim() || !note.description.trim())
+    if (!note.name?.trim() || !note.description.trim()) {
       throw new Error("Note name and description cannot be empty.")
+    }
 
     const tempId = crypto.randomUUID()
     const optimisticNote: Note = { ...note, id: tempId }
-
     setNotes((prev) => [...prev, optimisticNote])
 
     try {
@@ -117,10 +96,7 @@ const useNote = () => {
         toNoteDto({ id: "", ...note })
       )
       const savedNote = toNote(response.data, note.calendar, note.category)
-
-      setNotes((prev) =>
-        prev.map((n) => (n.id === tempId ? { ...savedNote } : n))
-      )
+      setNotes((prev) => prev.map((n) => (n.id === tempId ? savedNote : n)))
       return savedNote
     } catch (error) {
       toast.error("Failed to add note")
@@ -133,19 +109,21 @@ const useNote = () => {
     const previous = notes.find((n) => n.id === id)
     if (!previous) return
 
-    setNotes((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, ...updated } : n))
-    )
+    const merged = {
+      ...previous,
+      ...updated
+    }
+
+    setNotes((prev) => prev.map((n) => (n.id === id ? merged : n)))
 
     try {
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/notes/${id}`,
-        updated
+        toNoteDto(merged)
       )
-    } catch (error) {
+    } catch {
       toast.error("Failed to update note")
       setNotes((prev) => prev.map((n) => (n.id === id ? previous : n)))
-      throw error
     }
   }
 
@@ -157,16 +135,15 @@ const useNote = () => {
 
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/notes/${id}`)
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete note")
       setNotes((prev) => [...prev, deleted])
-      throw error
     }
   }
 
   useEffect(() => {
-    reloadNotes()
-  }, [reloadNotes])
+    if (calendars.length > 0) reloadNotes()
+  }, [calendars, categories])
 
   return {
     notes,

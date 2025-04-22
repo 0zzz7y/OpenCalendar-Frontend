@@ -1,31 +1,51 @@
-import { openDB, DBSchema } from "idb"
-
 import Calendar from "@/type/domain/calendar"
 import Category from "@/type/domain/category"
 import Event from "@/type/domain/event"
-import Task from "@/type/domain/task"
 import Note from "@/type/domain/note"
+import Task from "@/type/domain/task"
+
+import { openDB, DBSchema } from "idb"
 
 interface Database extends DBSchema {
   calendars: {
     key: string
-    value: Calendar & { localOnly?: boolean; shouldUpdate?: boolean; shouldDelete?: boolean }
+    value: Calendar & {
+      localOnly?: boolean
+      shouldUpdate?: boolean
+      shouldDelete?: boolean
+    }
   }
   categories: {
     key: string
-    value: Category & { localOnly?: boolean; shouldUpdate?: boolean; shouldDelete?: boolean }
+    value: Category & {
+      localOnly?: boolean
+      shouldUpdate?: boolean
+      shouldDelete?: boolean
+    }
   }
   events: {
     key: string
-    value: Event & { localOnly?: boolean; shouldUpdate?: boolean; shouldDelete?: boolean }
+    value: Event & {
+      localOnly?: boolean
+      shouldUpdate?: boolean
+      shouldDelete?: boolean
+    }
   }
   tasks: {
     key: string
-    value: Task & { localOnly?: boolean; shouldUpdate?: boolean; shouldDelete?: boolean }
+    value: Task & {
+      localOnly?: boolean
+      shouldUpdate?: boolean
+      shouldDelete?: boolean
+    }
   }
   notes: {
     key: string
-    value: Note & { localOnly?: boolean; shouldUpdate?: boolean; shouldDelete?: boolean }
+    value: Note & {
+      localOnly?: boolean
+      shouldUpdate?: boolean
+      shouldDelete?: boolean
+    }
   }
 }
 
@@ -49,8 +69,14 @@ class SynchronizationManager {
     private addTask: (data: Task) => Promise<Task>,
     private addNote: (data: Note) => Promise<Note>,
 
-    private updateCalendar: (id: string, updated: Partial<Calendar>) => Promise<void>,
-    private updateCategory: (id: string, updated: Partial<Category>) => Promise<void>,
+    private updateCalendar: (
+      id: string,
+      updated: Partial<Calendar>
+    ) => Promise<void>,
+    private updateCategory: (
+      id: string,
+      updated: Partial<Category>
+    ) => Promise<void>,
     private updateEvent: (id: string, updated: Partial<Event>) => Promise<void>,
     private updateTask: (id: string, updated: Partial<Task>) => Promise<void>,
     private updateNote: (id: string, updated: Partial<Note>) => Promise<void>,
@@ -85,17 +111,45 @@ class SynchronizationManager {
   synchronize = async () => {
     if (!navigator.onLine) return
 
-    await this.syncStore("calendars", this.addCalendar, this.updateCalendar, this.deleteCalendar)
-    await this.syncStore("categories", this.addCategory, this.updateCategory, this.deleteCategory)
-    await this.syncStore("events", this.addEvent, this.updateEvent, this.deleteEvent)
-    await this.syncStore("tasks", this.addTask, this.updateTask, this.deleteTask)
-    await this.syncStore("notes", this.addNote, this.updateNote, this.deleteNote)
+    await this.syncStore(
+      "calendars",
+      this.addCalendar,
+      this.updateCalendar,
+      this.deleteCalendar
+    )
+    await this.syncStore(
+      "categories",
+      this.addCategory,
+      this.updateCategory,
+      this.deleteCategory
+    )
+    await this.syncStore(
+      "events",
+      this.addEvent,
+      this.updateEvent,
+      this.deleteEvent
+    )
+    await this.syncStore(
+      "tasks",
+      this.addTask,
+      this.updateTask,
+      this.deleteTask
+    )
+    await this.syncStore(
+      "notes",
+      this.addNote,
+      this.updateNote,
+      this.deleteNote
+    )
   }
 
   private async syncStore<K extends StoreName>(
     store: K,
     create: (data: Database[K]["value"]) => Promise<any>,
-    update: (id: string, updated: Partial<Database[K]["value"]>) => Promise<void>,
+    update: (
+      id: string,
+      updated: Partial<Database[K]["value"]>
+    ) => Promise<void>,
     remove: (id: string) => Promise<void>
   ) {
     const db = await this.databasePromise
@@ -119,7 +173,10 @@ class SynchronizationManager {
           await db.delete(store, item.id)
         }
       } catch (err) {
-        console.error(`Synchronization failed for ${store} item: ${item.id}`, err)
+        console.error(
+          `Synchronization failed for ${store} item: ${item.id}`,
+          err
+        )
       }
     }
   }

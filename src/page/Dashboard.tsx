@@ -7,12 +7,10 @@ import NotesPanel from "@/component/note/NotesPanel"
 import TasksPanel from "@/component/task/TasksPanel"
 import ThemeToggleButton from "@/component/theme/ThemeToggleButton"
 
-import React from "react"
-
 import { Box } from "@mui/material"
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
 
-import CenterPanel from "../component/layout/CenterPanel"
+import CalendarPanel from "@/component/calendar/CalendarPanel"
 
 const Dashboard = () => {
   return (
@@ -94,7 +92,7 @@ const Dashboard = () => {
           margin: "10px 5px"
         }}
       >
-        <CenterPanel />
+        <CalendarPanel />
       </Panel>
 
       <PanelResizeHandle />
@@ -111,7 +109,9 @@ const Dashboard = () => {
             margin: "10px 5px"
           }}
         >
-          <Box height="0%">{/* <NotesPanel></NotesPanel> */}</Box>
+          <Box height="0%">{
+          /* <NotesPanel></NotesPanel> */
+          }</Box>
 
           <Box flexGrow={1} overflow="auto">
             <TasksPanel />

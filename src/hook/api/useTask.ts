@@ -1,10 +1,6 @@
 import AppContext from "@/context/AppContext"
 import PaginatedResponse from "@/type/communication/paginatedResponse"
-import Calendar from "@/type/domain/calendar"
-import Category from "@/type/domain/category"
-import RecurringPattern from "@/type/domain/recurringPattern"
 import Task from "@/type/domain/task"
-import TaskStatus from "@/type/domain/taskStatus"
 import TaskDto from "@/type/dto/taskDto"
 import { toTask, toTaskDto } from "@/type/mapper/taskMapper"
 
@@ -23,34 +19,29 @@ const useTask = () => {
   const [totalElements, setTotalElements] = useState(0)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
 
+  const mapDtoToTask = (taskDto: TaskDto): Task => {
+    const calendar = calendars.find((cal) => cal.id === taskDto.calendarId)
+    const category = categories.find((cat) => cat.id === taskDto.categoryId)
+
+    if (!calendar) throw new Error(`Calendar not found for task ${taskDto.id}`)
+
+    return toTask(taskDto, calendar, category)
+  }
+
   const fetchTasks = async (pageNumber = 0, reset = false) => {
     try {
       const response = await axios.get<PaginatedResponse<TaskDto>>(
         `${import.meta.env.VITE_BACKEND_URL}/tasks`,
-        {
-          params: {
-            page: pageNumber,
-            size
-          }
-        }
+        { params: { page: pageNumber, size } }
       )
       const data = response.data
-      const mappedTasks = data.content.map((taskDto) => {
-        const calendar = calendars.find((cal) => cal.id === taskDto.calendarId)
-        const category = categories.find((cat) => cat.id === taskDto.categoryId)
-        if (!calendar || !category) {
-          throw new Error(
-            `Calendar or Category not found for task ${taskDto.id}`
-          )
-        }
-        return toTask(taskDto, calendar, category)
-      })
+      const mappedTasks = data.content.map(mapDtoToTask)
 
       setTasks((prev) => (reset ? mappedTasks : [...prev, ...mappedTasks]))
       setPage(data.number)
       setTotalPages(data.totalPages)
       setTotalElements(data.totalElements)
-    } catch (error) {
+    } catch {
       toast.error("Failed to fetch tasks")
     }
   }
@@ -64,29 +55,11 @@ const useTask = () => {
       do {
         const response = await axios.get<PaginatedResponse<TaskDto>>(
           `${import.meta.env.VITE_BACKEND_URL}/tasks`,
-          {
-            params: {
-              page: currentPage,
-              size
-            }
-          }
+          { params: { page: currentPage, size } }
         )
         const data = response.data
+        const mappedTasks = data.content.map(mapDtoToTask)
 
-        const mappedTasks = data.content.map((taskDto) => {
-          const calendar = calendars.find(
-            (cal) => cal.id === taskDto.calendarId
-          )
-          const category = categories.find(
-            (cat) => cat.id === taskDto.categoryId
-          )
-          if (!calendar || !category) {
-            throw new Error(
-              `Calendar or Category not found for task ${taskDto.id}`
-            )
-          }
-          return toTask(taskDto, calendar, category)
-        })
         allTasks = [...allTasks, ...mappedTasks]
         total = data.totalPages
         currentPage++
@@ -96,7 +69,7 @@ const useTask = () => {
       setPage(0)
       setTotalPages(1)
       setTotalElements(allTasks.length)
-    } catch (error) {
+    } catch {
       toast.error("Failed to reload all tasks")
     }
   }
@@ -113,7 +86,6 @@ const useTask = () => {
 
     const tempId = crypto.randomUUID()
     const optimisticTask: Task = { ...task, id: tempId }
-
     setTasks((prev) => [...prev, optimisticTask])
 
     try {
@@ -122,10 +94,7 @@ const useTask = () => {
         toTaskDto({ id: "", ...task })
       )
       const savedTask = toTask(response.data, task.calendar, task.category)
-
-      setTasks((prev) =>
-        prev.map((t) => (t.id === tempId ? { ...savedTask } : t))
-      )
+      setTasks((prev) => prev.map((t) => (t.id === tempId ? savedTask : t)))
       return savedTask
     } catch (error) {
       toast.error("Failed to add task")
@@ -138,30 +107,21 @@ const useTask = () => {
     const previous = tasks.find((t) => t.id === id)
     if (!previous) return
 
-    setTasks((prev) =>
-      prev.map((t) => (t.id === id ? { ...t, ...updated } : t))
-    )
+    const merged = {
+      ...previous,
+      ...updated
+    }
+
+    setTasks((prev) => prev.map((t) => (t.id === id ? merged : t)))
 
     try {
-      const updatedWithId = {
-        id,
-        name: updated.name ?? "",
-        description: updated.description ?? "",
-        startDate: updated.startDate,
-        endDate: updated.endDate,
-        recurringPattern: updated.recurringPattern ?? RecurringPattern.NONE,
-        status: updated.status ?? TaskStatus.TODO,
-        calendar: updated.calendar ?? previous.calendar,
-        category: updated.category ?? previous.category
-      }
       await axios.put(
         `${import.meta.env.VITE_BACKEND_URL}/tasks/${id}`,
-        toTaskDto(updatedWithId)
+        toTaskDto(merged)
       )
-    } catch (error) {
+    } catch {
       toast.error("Failed to update task")
       setTasks((prev) => prev.map((t) => (t.id === id ? previous : t)))
-      throw error
     }
   }
 
@@ -173,16 +133,15 @@ const useTask = () => {
 
     try {
       await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/tasks/${id}`)
-    } catch (error) {
+    } catch {
       toast.error("Failed to delete task")
       setTasks((prev) => [...prev, deleted])
-      throw error
     }
   }
 
   useEffect(() => {
-    reloadTasks()
-  }, [reloadTasks])
+    if (calendars.length > 0) reloadTasks()
+  }, [calendars, categories])
 
   return {
     tasks,

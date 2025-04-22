@@ -27,19 +27,19 @@ const CalendarGridCell = ({
       if (!moved) return
 
       const newStart = new Date(datetime)
-      const originalStart = new Date(moved.startDate)
-      if (newStart.getTime() === originalStart.getTime()) return
+      const startTime = new Date(moved.startDate)
+      newStart.setSeconds(0, 0)
 
       const duration =
-        new Date(moved.endDate).getTime() - originalStart.getTime()
+        new Date(moved.endDate).getTime() - startTime.getTime()
       const newEnd = new Date(newStart.getTime() + duration)
 
       onSave({
         id: moved.id,
         name: moved.name,
         description: moved.description ?? "",
-        calendarId: moved.calendarId,
-        categoryId: moved.categoryId,
+        calendar: moved.calendar,
+        category: moved.category,
         startDate: newStart.toISOString(),
         endDate: newEnd.toISOString()
       })
@@ -68,7 +68,7 @@ const CalendarGridCell = ({
         ((new Date(previewEvent.endDate).getTime() -
           new Date(previewEvent.startDate).getTime()) /
           (1000 * 60)) *
-          (32 / 15)
+          (32 / 30)
       )
     : 32
 
@@ -90,59 +90,61 @@ const CalendarGridCell = ({
   )
 
   return (
-    <Box
-      ref={ref}
-      onClick={handleClick}
-      sx={{
-        display: "flex",
-        alignItems: "center",
-        borderBottom: (theme) =>
-          theme.palette.mode === "dark" ? "1px solid #333" : "1px solid #eee",
-        padding: "6px",
-        minHeight: 32,
-        position: "relative",
-        cursor: "pointer",
-        zIndex: 10,
-        bgcolor: isOver && canDrop ? "#e3f2fd" : "transparent",
-        fontSize: "0.75rem",
-        border: isOver && canDrop ? "2px dashed #1976d2" : undefined,
-        "&:hover": {
-          backgroundColor: (theme) =>
-            theme.palette.mode === "dark" ? "#3d3d3d" : "#e0e0e0"
-        }
-      }}
-    >
-      {isFullHour && (
-        <Box
-          sx={{
-            width: 50,
-            color: "#999",
-            fontSize: "0.75rem",
-            pr: 1,
-            whiteSpace: "nowrap",
-            flexShrink: 0
-          }}
-        >
-          {formattedHour}
-        </Box>
-      )}
+    <>
+      <Box
+        ref={ref}
+        onClick={handleClick}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          borderBottom: (theme) =>
+            theme.palette.mode === "dark" ? "1px solid #333" : "1px solid #eee",
+          padding: "6px",
+          minHeight: 32,
+          position: "relative",
+          cursor: "pointer",
+          zIndex: 10,
+          bgcolor: isOver && canDrop ? "#e3f2fd" : "transparent",
+          fontSize: "0.75rem",
+          border: isOver && canDrop ? "2px dashed #1976d2" : undefined,
+          "&:hover": {
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark" ? "#3d3d3d" : "#e0e0e0"
+          }
+        }}
+      >
+        {isFullHour && (
+          <Box
+            sx={{
+              width: 50,
+              color: "#999",
+              fontSize: "0.75rem",
+              pr: 1,
+              whiteSpace: "nowrap",
+              flexShrink: 0
+            }}
+          >
+            {formattedHour}
+          </Box>
+        )}
 
-      {isOver && canDrop && (
-        <Box
-          sx={{
-            position: "absolute",
-            top: 0,
-            left: 0,
-            right: 0,
-            height: previewHeight,
-            border: "2px dashed #1976d2",
-            borderRadius: 1,
-            backgroundColor: "rgba(25, 118, 210, 0.1)",
-            zIndex: 1
-          }}
-        />
-      )}
-    </Box>
+        {isOver && canDrop && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: previewHeight,
+              border: "2px dashed #1976d2",
+              borderRadius: 1,
+              backgroundColor: "rgba(25, 118, 210, 0.1)",
+              zIndex: 1
+            }}
+          />
+        )}
+      </Box>
+    </>
   )
 }
 

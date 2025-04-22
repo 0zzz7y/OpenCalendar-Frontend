@@ -12,7 +12,7 @@ import EditorData from "@/type/utility/editorData"
 import EditorMode from "@/type/utility/editorMode"
 import EditorType from "@/type/utility/editorType"
 
-import { createContext, useState, ReactNode } from "react"
+import { createContext, useEffect, useState, ReactNode } from "react"
 
 interface AppContextState {
   calendars: Calendar[]
@@ -86,10 +86,43 @@ export const AppProvider = ({ children }: { children: ReactNode }) => {
     deleteCategory
   } = useCategories()
 
-  const { events, reloadEvents, addEvent, updateEvent, deleteEvent } =
-    useEvents()
-  const { tasks, reloadTasks, addTask, updateTask, deleteTask } = useTasks()
-  const { notes, reloadNotes, addNote, updateNote, deleteNote } = useNotes()
+  const {
+    events,
+    reloadEvents,
+    addEvent,
+    updateEvent,
+    deleteEvent
+  } = useEvents()
+
+  const {
+    tasks,
+    reloadTasks,
+    addTask,
+    updateTask,
+    deleteTask
+  } = useTasks()
+
+  const {
+    notes,
+    reloadNotes,
+    addNote,
+    updateNote,
+    deleteNote
+  } = useNotes()
+
+  useEffect(() => {
+    let mounted = true
+    const initialize = async () => {
+      await Promise.all([reloadCalendars(), reloadCategories()])
+      if (mounted) await reloadEvents()
+    }
+    initialize()
+    return () => {
+      mounted = false
+    }
+  }, [])
+
+  
 
   const openEditor = (
     type: EditorType,

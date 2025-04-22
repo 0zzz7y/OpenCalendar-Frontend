@@ -7,6 +7,7 @@ import dayjs from "dayjs"
 
 import EventCreationPopover from "../event/EventCreationPopover"
 import EventInformationPopover from "../event/EventInformationPopover"
+import RecurringPattern from "@/type/domain/recurringPattern"
 
 interface MonthViewProperties {
   date: Date
@@ -115,41 +116,35 @@ const MonthView = ({
         </Typography>
 
         <Box sx={{ mt: 0.5 }}>
-          {dayEvents.slice(0, 3).map((ev) => {
-            const category = categories.find((c) => c.id === ev.categoryId)
-            const calendar = calendars.find((c) => c.id === ev.calendarId)
-
-            return (
+          {dayEvents.slice(0, 3).map((ev) => (
+            <Box
+              key={ev.id}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+                gap: 0.5,
+                mb: 0.5,
+                "&:hover": { bgcolor: theme.palette.action.hover }
+              }}
+              onClick={(e) => {
+                e.stopPropagation()
+                openInfoPopover(ev, e.currentTarget as HTMLElement)
+              }}
+            >
               <Box
-                key={ev.id}
                 sx={{
-                  display: "flex",
-                  alignItems: "center",
-                  cursor: "pointer",
-                  gap: 0.5,
-                  mb: 0.5,
-                  "&:hover": { bgcolor: theme.palette.action.hover }
+                  width: 8,
+                  height: 8,
+                  bgcolor: ev.category?.color,
+                  borderRadius: "50%"
                 }}
-                onClick={(e) => {
-                  e.stopPropagation()
-                  openInfoPopover(ev, e.currentTarget as HTMLElement)
-                }}
-              >
-                <Box
-                  sx={{
-                    width: 8,
-                    height: 8,
-                    bgcolor: category?.color,
-                    borderRadius: "50%"
-                  }}
-                />
-                <Typography variant="caption" noWrap>
-                  {dayjs(ev.startDate).format("H:mm")} {ev.name}{" "}
-                  {calendar?.emoji}
-                </Typography>
-              </Box>
-            )
-          })}
+              />
+              <Typography variant="caption" noWrap>
+                {dayjs(ev.startDate).format("H:mm")} {ev.name} {ev.calendar?.emoji}
+              </Typography>
+            </Box>
+          ))}
 
           {dayEvents.length > 3 && (
             <Typography variant="caption" color="text.secondary">
@@ -187,7 +182,6 @@ const MonthView = ({
         <EventCreationPopover
           anchorEl={createAnchor}
           onClose={closeCreatePopover}
-          onSave={handleSave}
           calendars={calendars}
           categories={categories}
           initialEvent={{
@@ -196,8 +190,9 @@ const MonthView = ({
             description: "",
             startDate: dayjs(createDate).toISOString(),
             endDate: dayjs(createDate).add(1, "hour").toISOString(),
-            calendarId: "",
-            categoryId: undefined
+            calendar: { id: "", name: "", emoji: "" },
+            category: undefined,
+            recurringPattern: RecurringPattern.NONE
           }}
         />
       )}

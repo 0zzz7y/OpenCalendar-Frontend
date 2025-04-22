@@ -1,11 +1,10 @@
 import EventPopover from "@/component/event/EventCreationPopover"
 import EventInformationPopover from "@/component/event/EventInformationPopover"
-import AppContext from "@/context/AppContext"
-import useEvent from "@/hook/api/useEvent"
 import useAppContext from "@/hook/context/useAppContext"
 import Event from "@/type/domain/event"
+import RecurringPattern from "@/type/domain/recurringPattern"
 
-import { useContext, useState } from "react"
+import { useState } from "react"
 
 import { Box } from "@mui/material"
 import dayjs from "dayjs"
@@ -67,7 +66,7 @@ const DayView = ({
   }
 
   const handleDeleteEvent = async (id: string) => {
-    await updateEvent(id, { name: "" }) // implement real delete logic if needed
+    await updateEvent(id, { name: "" })
   }
 
   return (
@@ -104,8 +103,9 @@ const DayView = ({
               description: "",
               startDate: dayjs(selectedDatetime).toISOString(),
               endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
-              calendarId: "",
-              categoryId: undefined
+              recurringPattern: RecurringPattern.NONE,
+              calendar: { id: "", name: "", emoji: "" },
+              category: { id: "", name: "", color: "" }
             }
           }
         />
