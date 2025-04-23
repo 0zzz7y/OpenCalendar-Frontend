@@ -1,6 +1,6 @@
 import EventBox from "@/component/event/EventBox"
-import Event from "@/type/domain/event"
-import Schedulable from "@/type/domain/schedulable"
+import Event from "@/model/domain/event"
+import Schedulable from "@/model/domain/schedulable"
 
 import { Box } from "@mui/material"
 

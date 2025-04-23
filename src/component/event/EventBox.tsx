@@ -1,4 +1,4 @@
-import Schedulable from "@/type/domain/schedulable"
+import Schedulable from "@/model/domain/schedulable"
 
 import { useEffect, useRef, useState } from "react"
 

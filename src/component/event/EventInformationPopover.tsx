@@ -1,7 +1,7 @@
-import BUTTONS from "@/constant/buttons"
-import MESSAGES from "@/constant/messages"
-import useEvent from "@/hook/api/useEvent"
-import Schedulable from "@/type/domain/schedulable"
+import BUTTONS from "@/constant/ui/buttons"
+import MESSAGES from "@/constant/ui/messages"
+import useEvent from "@/hook/useEvent"
+import Schedulable from "@/model/domain/schedulable"
 
 import { useEffect, useState } from "react"
 

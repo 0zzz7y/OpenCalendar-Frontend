@@ -1,7 +1,4 @@
-import useCalendar from "@/hook/api/useCalendar"
-import useEditor from "@/hook/editor/useEditor"
-import EditorMode from "@/type/editor/editorMode"
-import EditorType from "@/type/editor/editorType"
+import useCalendar from "@/hook/useCalendar"
 
 import { useMemo } from "react"
 
@@ -11,7 +8,7 @@ import EditIcon from "@mui/icons-material/Edit"
 import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
 
 const CalendarSelector = () => {
-  const { calendars } = useCalendar()
+  const { calendars } = useAppStore()
 
   const { selectedCalendar, setSelectedCalendar, openEditor } = useEditor()
 

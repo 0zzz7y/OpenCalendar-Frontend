@@ -1,12 +1,13 @@
-import THEME from "@/constant/theme"
+import THEME from "@/constant/utility/theme"
 
-import React, { useMemo, useState, createContext, useContext } from "react"
+import type React from "react"
+import { useMemo, useState, createContext, useContext } from "react"
 
 import { ThemeProvider as MuiThemeProvider } from "@mui/material"
-import { Theme } from "@mui/material/styles"
+import type { Theme } from "@mui/material/styles"
 
-import darkTheme from "../component/theme/darkTheme"
-import lightTheme from "../component/theme/lightTheme"
+import darkTheme from "./darkTheme"
+import lightTheme from "./lightTheme"
 
 const ThemeModeContext = createContext({
   mode: THEME.LIGHT,

@@ -1,9 +1,9 @@
 import EventPopover from "@/component/event/EventCreationPopover"
 import EventInformationPopover from "@/component/event/EventInformationPopover"
-import useEvent from "@/hook/api/useEvent"
-import Event from "@/type/domain/event"
-import RecurringPattern from "@/type/domain/recurringPattern"
-import Schedulable from "@/type/domain/schedulable"
+import useEvent from "@/hook/useEvent"
+import Event from "@/model/domain/event"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import Schedulable from "@/model/domain/schedulable"
 
 import { useState } from "react"
 
@@ -121,7 +121,7 @@ const DayView = ({
 
       {infoEvent && infoAnchor && (
         <EventInformationPopover
-          anchorEl={infoAnchor}
+          anchorElement={infoAnchor}
           event={infoEvent}
           onClose={() => setInfoEvent(null)}
           onEdit={handleEditEvent}

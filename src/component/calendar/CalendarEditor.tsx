@@ -1,9 +1,7 @@
-import BUTTONS from "@/constant/buttons"
-import PLACEHOLDERS from "@/constant/labels"
-import MESSAGES from "@/constant/messages"
-import useCalendar from "@/hook/api/useCalendar"
-import useEditor from "@/hook/editor/useEditor"
-import EditorType from "@/type/editor/editorType"
+import BUTTONS from "@/constant/ui/buttons"
+import PLACEHOLDERS from "@/constant/ui/labels"
+import MESSAGES from "@/constant/ui/messages"
+import useCalendar from "@/hook/useCalendar"
 
 import { useEffect, useRef, useState } from "react"
 
@@ -16,7 +14,7 @@ import {
   Typography
 } from "@mui/material"
 import EmojiPicker, {
-  EmojiClickData,
+  type EmojiClickData,
   EmojiStyle,
   SkinTones,
   Theme

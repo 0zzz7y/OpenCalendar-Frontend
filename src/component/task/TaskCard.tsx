@@ -1,7 +1,7 @@
-import type Calendar from "@/type/domain/calendar"
-import type Category from "@/type/domain/category"
-import RecurringPattern from "@/type/domain/recurringPattern"
-import type Task from "@/type/domain/task"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import type Task from "@/model/domain/task"
 
 import { useEffect, useState } from "react"
 

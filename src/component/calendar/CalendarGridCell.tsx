@@ -1,5 +1,5 @@
-import Event from "@/type/domain/event"
-import Schedulable from "@/type/domain/schedulable"
+import Event from "@/model/domain/event"
+import Schedulable from "@/model/domain/schedulable"
 
 import { useRef, useEffect, useMemo } from "react"
 

@@ -1,7 +1,7 @@
 import EventInformationPopover from "@/component/event/EventInformationPopover"
-import Event from "@/type/domain/event"
-import RecurringPattern from "@/type/domain/recurringPattern"
-import Schedulable from "@/type/domain/schedulable"
+import Event from "@/model/domain/event"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import Schedulable from "@/model/domain/schedulable"
 
 import { useState } from "react"
 
@@ -174,7 +174,7 @@ const MonthView = ({
 
       {infoEvent && infoAnchor && (
         <EventInformationPopover
-          anchorEl={infoAnchor}
+          anchorElement={infoAnchor}
           event={infoEvent}
           onClose={closeInfoPopover}
           onEdit={editEvent}

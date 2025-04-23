@@ -1,5 +1,5 @@
-import Category from "@/type/domain/category"
-import Note from "@/type/domain/note"
+import Category from "@/model/domain/category"
+import Note from "@/model/domain/note"
 
 import { Box } from "@mui/material"
 import { useDrop } from "react-dnd"

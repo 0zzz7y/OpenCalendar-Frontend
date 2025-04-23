@@ -1,8 +1,8 @@
-import MESSAGES from "@/constant/messages"
-import Calendar from "@/type/domain/calendar"
-import Category from "@/type/domain/category"
-import Task from "@/type/domain/task"
-import TaskStatus from "@/type/domain/taskStatus"
+import MESSAGES from "@/constant/ui/messages"
+import Calendar from "@/model/domain/calendar"
+import Category from "@/model/domain/category"
+import Task from "@/model/domain/task"
+import TaskStatus from "@/model/domain/taskStatus"
 
 import { useEffect, useState } from "react"
 
@@ -17,7 +17,7 @@ import { Box } from "@mui/material"
 
 import TaskCard from "./TaskCard"
 import TaskColumn from "./TaskColumn"
-import LABELS from "@/constant/labels"
+import LABELS from "@/constant/ui/labels"
 
 interface Properties {
   tasks: Task[]
@@ -149,7 +149,6 @@ const TaskBoard = ({
                         )}
                       </Draggable>
                     ))}
-
                     {provided.placeholder}
                   </TaskColumn>
                 </Box>

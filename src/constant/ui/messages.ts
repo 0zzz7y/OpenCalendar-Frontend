@@ -9,10 +9,14 @@ enum MESSAGES {
   ADD_EVENT = "Add event",
   ADD_TASK = "Add task",
   ADD_NOTE = "Add note",
+  ADD_CATEGORY = "Add category",
+  ADD_CALENDAR = "Add calendar",
 
   EDIT_EVENT = "Edit event",
   EDIT_TASK = "Edit task",
   EDIT_NOTE = "Edit note",
+  EDIT_CATEGORY = "Edit category",
+  EDIT_CALENDAR = "Edit calendar",
 
   CONFIRM_CLEAR_CONTENTS = "Are you sure you want to clear contents?",
   CONFIRM_CLEAR_TEXT = "Are you sure you want to clear text?",

@@ -1,7 +1,7 @@
-import BUTTONS from "@/constant/buttons"
-import PLACEHOLDERS from "@/constant/labels"
-import MESSAGES from "@/constant/messages"
-import useCategory from "@/hook/api/useCategory"
+import BUTTONS from "@/constant/ui/buttons"
+import PLACEHOLDERS from "@/constant/ui/labels"
+import MESSAGES from "@/constant/ui/messages"
+import useCategory from "@/hook/useCategory"
 import useEditor from "@/hook/editor/useEditor"
 import EditorType from "@/type/editor/editorType"
 

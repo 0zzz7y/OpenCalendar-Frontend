@@ -1,11 +1,11 @@
-import useCalendar from "@/hook/api/useCalendar"
-import useCategory from "@/hook/api/useCategory"
-import useEvent from "@/hook/api/useEvent"
-import useFilters from "@/hook/api/useFilter"
-import useTask from "@/hook/api/useTask"
-import Event from "@/type/domain/event"
-import RecurringPattern from "@/type/domain/recurringPattern"
-import Schedulable from "@/type/domain/schedulable"
+import useCalendar from "@/hook/useCalendar"
+import useCategory from "@/hook/useCategory"
+import useEvent from "@/hook/useEvent"
+import useFilters from "@/hook/useFilter"
+import useTask from "@/hook/useTask"
+import Event from "@/model/domain/event"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import Schedulable from "@/model/domain/schedulable"
 
 import { useEffect, useState } from "react"
 
@@ -198,7 +198,7 @@ const CalendarPanel = () => {
       )}
 
       <EventInformationPopover
-        anchorEl={infoAnchor}
+        anchorElement={infoAnchor}
         event={infoEvent}
         onClose={() => setInfoEvent(null)}
         onEdit={handleEditEvent}

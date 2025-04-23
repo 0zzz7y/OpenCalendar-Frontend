@@ -1,10 +1,9 @@
-import BUTTONS from "@/constant/buttons"
-import LABELS from "@/constant/labels"
-import MESSAGES from "@/constant/messages"
-import useEvent from "@/hook/api/useEvent"
-import useTask from "@/hook/api/useTask"
-import RecurringPattern from "@/type/domain/recurringPattern"
-import Schedulable from "@/type/domain/schedulable"
+import BUTTONS from "@/constant/ui/buttons"
+import LABELS from "@/constant/ui/labels"
+import MESSAGES from "@/constant/ui/messages"
+import useEvent from "@/hook/useEvent"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import Schedulable from "@/model/domain/schedulable"
 
 import { useEffect, useState } from "react"
 

@@ -1,7 +1,7 @@
-import MESSAGES from "@/constant/messages"
-import Calendar from "@/type/domain/calendar"
-import Category from "@/type/domain/category"
-import Note from "@/type/domain/note"
+import MESSAGES from "@/constant/ui/messages"
+import Calendar from "@/model/domain/calendar"
+import Category from "@/model/domain/category"
+import Note from "@/model/domain/note"
 
 import { useEffect, useRef, useState } from "react"
 
@@ -51,7 +51,7 @@ const NoteCard = ({
   const animationFrameRef = useRef<number | null>(null)
   const dragReady = useRef(false)
 
-  const [dimensions, setDimensions] = useState({ width: 420, height: 270 })
+  const [dimensions, setDimensions] = useState({ width: 380, height: 200 })
   const [position, setPosition] = useState(positionRef.current)
   const [dragging, setDragging] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
@@ -69,8 +69,7 @@ const NoteCard = ({
   >({
     bold: false,
     italic: false,
-    underline: false,
-    insertUnorderedList: false
+    underline: false
   })
   const [noteName, setNoteName] = useState(name)
 

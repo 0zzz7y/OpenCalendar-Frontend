@@ -7,9 +7,9 @@ import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 import { ToastContainer } from "react-toastify"
 
-import ThemeProvider from "./ThemeProvider"
+import ThemeProvider from "@/theme/ThemeProvider"
 
-const App = ({ children }: { children: React.ReactNode }) => {
+const Application = ({ children }: { children: React.ReactNode }) => {
   return (
     <>
       <ThemeProvider>
@@ -25,4 +25,4 @@ const App = ({ children }: { children: React.ReactNode }) => {
   )
 }
 
-export default App
+export default Application

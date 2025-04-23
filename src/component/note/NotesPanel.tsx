@@ -1,8 +1,6 @@
-import MESSAGES from "@/constant/messages"
-import useCalendars from "@/hook/api/useCalendar"
-import useCategories from "@/hook/api/useCategory"
-import useNotes from "@/hook/api/useNote"
-import Note from "@/type/domain/note"
+import MESSAGES from "@/constant/ui/messages"
+import useNotes from "@/hook/useNote"
+import Note from "@/model/domain/note"
 
 import { useEffect, useRef, useState } from "react"
 
@@ -11,12 +9,11 @@ import Box from "@mui/material/Box"
 import IconButton from "@mui/material/IconButton"
 
 import NoteCard from "./NoteCard"
-import NotesDock from "./NotesDock"
+import useAppStore from "@/store/useAppStore"
 
 const NotesPanel = () => {
-  const { notes, addNote, updateNote, deleteNote, reloadNotes } = useNotes()
-  const { categories } = useCategories()
-  const { calendars } = useCalendars()
+  const { addNote, updateNote, deleteNote, reloadNotes } = useNotes()
+  const { notes, categories, calendars } = useAppStore()
 
   const didFetchRef = useRef(false)
 
@@ -54,7 +51,7 @@ const NotesPanel = () => {
 
     const newNote: Note = {
       id: tempId,
-      name: MESSAGES.PLACEHOLDERS.NEW_NOTE,
+      name: MESSAGES.NEW_NOTE,
       description: "",
       category: defaultCategory,
       calendar: defaultCalendar,

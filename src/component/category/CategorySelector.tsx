@@ -1,5 +1,5 @@
-import PLACEHOLDERS from "@/constant/labels"
-import useCategory from "@/hook/api/useCategory"
+import PLACEHOLDERS from "@/constant/ui/labels"
+import useCategory from "@/hook/useCategory"
 import useEditor from "@/hook/editor/useEditor"
 import EditorMode from "@/type/editor/editorMode"
 import EditorType from "@/type/editor/editorType"
@@ -10,9 +10,10 @@ import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 import DeleteIcon from "@mui/icons-material/Delete"
 import EditIcon from "@mui/icons-material/Edit"
 import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
+import useAppStore from "@/store/useAppStore"
 
 const CategorySelector = () => {
-  const { categories } = useCategory()
+  const { categories } = useAppStore()
 
   const { selectedCategory, setSelectedCategory, openEditor } = useEditor()
 

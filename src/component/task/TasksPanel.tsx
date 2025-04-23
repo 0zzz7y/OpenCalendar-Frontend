@@ -1,10 +1,10 @@
-import MESSAGES from "@/constant/messages"
-import useCalendar from "@/hook/api/useCalendar"
-import useCategory from "@/hook/api/useCategory"
-import useTask from "@/hook/api/useTask"
-import RecurringPattern from "@/type/domain/recurringPattern"
-import Task from "@/type/domain/task"
-import TaskStatus from "@/type/domain/taskStatus"
+import MESSAGES from "@/constant/ui/messages"
+import useCalendar from "@/hook/useCalendar"
+import useCategory from "@/hook/useCategory"
+import useTask from "@/hook//useTask"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import Task from "@/model/domain/task"
+import TaskStatus from "@/model/domain/taskStatus"
 
 import { useEffect, useRef, useState } from "react"
 

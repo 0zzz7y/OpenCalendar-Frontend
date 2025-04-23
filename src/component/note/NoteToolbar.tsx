@@ -1,5 +1,5 @@
-import TOOLBAR from "@/constant/toolbar"
-import MESSAGES from "@/constant/messages"
+import TOOLBAR from "@/constant/utility/toolbar"
+import MESSAGES from "@/constant/ui/messages"
 
 import { useState } from "react"
 
