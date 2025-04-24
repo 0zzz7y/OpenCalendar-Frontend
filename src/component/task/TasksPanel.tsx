@@ -19,8 +19,6 @@ const TasksPanel = () => {
   const [newTitle, setNewTitle] = useState("")
   const [localTasks, setLocalTasks] = useState<Task[]>([])
 
-  const didFetchRef = useRef(false)
-
   useEffect(() => {
     setLocalTasks(tasks)
   }, [tasks])
@@ -107,6 +105,7 @@ const TasksPanel = () => {
               />
             )
           }}
+          sx={{padding: 1, marginBottom: 2}}
         />
 
       <Box sx={{ flex: 1, overflow: "hidden" }}>

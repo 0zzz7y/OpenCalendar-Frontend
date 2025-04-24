@@ -36,7 +36,7 @@ const TaskBoard = ({
 }: Properties) => {
   const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } =
     {
-      TODO: { title: LABELS.IN_PROGRESS, icon: <HourglassEmpty /> },
+      TODO: { title: LABELS.TODO, icon: <HourglassEmpty /> },
       IN_PROGRESS: { title: LABELS.IN_PROGRESS, icon: <Pending /> },
       DONE: { title: LABELS.DONE, icon: <Done /> }
     }
