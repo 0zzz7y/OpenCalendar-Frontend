@@ -1,19 +1,23 @@
 import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"
-import RecurringPattern from "@/model/domain/recurringPattern"
 import type Task from "@/model/domain/task"
+import RecurringPattern from "@/model/domain/recurringPattern"
 
 import { useEffect, useState } from "react"
 
-import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material"
 import {
-  Typography,
-  MenuItem,
+  Delete,
+  ExpandLess,
+  ExpandMore
+} from "@mui/icons-material"
+import {
   Box,
-  IconButton,
+  Card,
   Collapse,
+  IconButton,
+  MenuItem,
   TextField,
-  Card
+  Typography
 } from "@mui/material"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import dayjs from "dayjs"
@@ -41,22 +45,12 @@ const TaskCard = ({
   }, [task])
 
   const currentCategory = localTask.category
-  const cardColor = currentCategory?.color
+  const cardColor = currentCategory?.color || "#f5f5f5"
 
   const handleFieldChange = (field: keyof Task, value: any) => {
     const updatedTask = { ...localTask, [field]: value }
     setLocalTask(updatedTask)
-    onUpdate(updatedTask)
-  }
-
-  const handleCalendarChange = (calendarId: string) => {
-    const calendar = calendars.find((c) => c.id === calendarId) || null
-    handleFieldChange("calendar", calendar)
-  }
-
-  const handleCategoryChange = (categoryId: string) => {
-    const category = categories.find((c) => c.id === categoryId) || null
-    handleFieldChange("category", category)
+    onUpdate?.(updatedTask)
   }
 
   const fieldStyle = {
@@ -76,187 +70,153 @@ const TaskCard = ({
     }
   }
 
-  const handleToggleExpand = () => {
-    setExpanded((prev) => !prev)
-  }
-
   return (
-    <>
-      <Card
-        sx={{
-          backgroundColor: cardColor,
-          p: 1.5,
-          mb: 2,
-          boxShadow: 3,
-          borderRadius: 2,
-          minWidth: 220
-        }}
-      >
-        <Box
-          display="flex"
-          alignItems="center"
-          justifyContent="space-between"
-          mb={1}
-        >
-          <Box display="flex" alignItems="center" gap={1}>
-            <IconButton onClick={handleToggleExpand} size="small">
-              {expanded ? <ExpandLess /> : <ExpandMore />}
-            </IconButton>
-            <TextField
-              placeholder="Tytuł"
-              value={localTask.name}
-              onChange={(e) => handleFieldChange("name", e.target.value)}
-              size="small"
-              variant="outlined"
-              fullWidth
-              sx={fieldStyle}
-            />
-          </Box>
-
-          <IconButton onClick={() => onDelete(task.id)} size="small">
-            <Delete />
+    <Card
+      sx={{
+        backgroundColor: cardColor,
+        p: 1.5,
+        mb: 2,
+        boxShadow: 3,
+        borderRadius: 2,
+        minWidth: 220
+      }}
+    >
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+        <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
+          <IconButton onClick={() => setExpanded((prev) => !prev)} size="small">
+            {expanded ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
+          <TextField
+            placeholder="Tytuł"
+            value={localTask.name}
+            onChange={(e) => handleFieldChange("name", e.target.value)}
+            size="small"
+            variant="outlined"
+            fullWidth
+            sx={fieldStyle}
+          />
         </Box>
 
-        <Collapse in={expanded}>
-          <Box display="flex" flexDirection="column" gap={1.5}>
+        <IconButton onClick={() => onDelete(task.id)} size="small">
+          <Delete />
+        </IconButton>
+      </Box>
+
+      <Collapse in={expanded}>
+        <Box display="flex" flexDirection="column" gap={1.5}>
+          <TextField
+            placeholder="Opis"
+            value={localTask.description || ""}
+            onChange={(e) => handleFieldChange("description", e.target.value)}
+            size="small"
+            variant="outlined"
+            fullWidth
+            multiline
+            minRows={2}
+            sx={fieldStyle}
+          />
+
+          <DateTimePicker
+            label="Start"
+            value={localTask.startDate ? dayjs(localTask.startDate).toDate() : null}
+            onChange={(date) =>
+              handleFieldChange("startDate", date ? date.toISOString() : "")
+            }
+            slotProps={{
+              textField: { size: "small", sx: fieldStyle }
+            }}
+          />
+
+          <DateTimePicker
+            label="End"
+            value={localTask.endDate ? dayjs(localTask.endDate).toDate() : null}
+            onChange={(date) =>
+              handleFieldChange("endDate", date ? date.toISOString() : "")
+            }
+            slotProps={{
+              textField: { size: "small", sx: fieldStyle }
+            }}
+          />
+
+          {localTask.startDate && (
             <TextField
-              placeholder="Description"
-              value={localTask.description || ""}
-              onChange={(e) => handleFieldChange("description", e.target.value)}
-              size="small"
-              variant="outlined"
-              fullWidth
-              multiline
-              minRows={3}
-              sx={fieldStyle}
-            />
-
-            <DateTimePicker
-              value={
-                localTask.startDate ? dayjs(localTask.startDate).toDate() : null
-              }
-              onChange={(newValue) =>
-                handleFieldChange(
-                  "startDate",
-                  newValue ? newValue.toISOString() : ""
-                )
-              }
-              slotProps={{
-                textField: {
-                  size: "small",
-                  sx: {
-                    ...fieldStyle,
-                    "& .MuiSvgIcon-root": {
-                      color: "#000"
-                    }
-                  }
-                }
-              }}
-            />
-
-            <DateTimePicker
-              value={
-                localTask.endDate ? dayjs(localTask.endDate).toDate() : null
-              }
-              onChange={(newValue) =>
-                handleFieldChange(
-                  "endDate",
-                  newValue ? newValue.toISOString() : ""
-                )
-              }
-              slotProps={{
-                textField: {
-                  size: "small",
-                  sx: {
-                    ...fieldStyle,
-                    "& .MuiSvgIcon-root": {
-                      color: "#000"
-                    }
-                  }
-                }
-              }}
-            />
-
-            {localTask.startDate && (
-              <TextField
-                placeholder="Recurring"
-                select
-                value={localTask.recurringPattern || "NONE"}
-                onChange={(e) =>
-                  handleFieldChange("recurringPattern", e.target.value)
-                }
-                size="small"
-                variant="outlined"
-                fullWidth
-                sx={fieldStyle}
-              >
-                <MenuItem value="NONE">{RecurringPattern.NONE}</MenuItem>
-                <MenuItem value="DAILY">{RecurringPattern.DAILY}</MenuItem>
-                <MenuItem value="WEEKLY">{RecurringPattern.WEEKLY}</MenuItem>
-                <MenuItem value="MONTHLY">{RecurringPattern.MONTHLY}</MenuItem>
-                <MenuItem value="YEARLY">{RecurringPattern.YEARLY}</MenuItem>
-              </TextField>
-            )}
-
-            <TextField
-              placeholder="Calendar"
+              label="Powtarzalność"
               select
-              value={localTask.calendar?.id || ""}
-              onChange={(e) => handleCalendarChange(e.target.value)}
+              value={localTask.recurringPattern || "NONE"}
+              onChange={(e) => handleFieldChange("recurringPattern", e.target.value)}
               size="small"
               variant="outlined"
               fullWidth
               sx={fieldStyle}
             >
-              {calendars.map((cal) => (
-                <MenuItem key={cal.id} value={cal.id}>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Typography
-                      sx={{ textAlign: "center", minWidth: 24, mt: -0.5 }}
-                    >
-                      {cal.emoji}
-                    </Typography>
-                    <Typography>{cal.name}</Typography>
-                  </Box>
+              {Object.entries(RecurringPattern).map(([key, val]) => (
+                <MenuItem key={key} value={val}>
+                  {val}
                 </MenuItem>
               ))}
             </TextField>
+          )}
 
-            <TextField
-              placeholder="Category"
-              select
-              value={localTask.category?.id || ""}
-              onChange={(e) => handleCategoryChange(e.target.value)}
-              size="small"
-              variant="outlined"
-              fullWidth
-              sx={fieldStyle}
-            >
-              <MenuItem value="">
-                <Typography>None</Typography>
+          <TextField
+            label="Kalendarz"
+            select
+            value={localTask.calendar?.id || ""}
+            onChange={(e) =>
+              handleFieldChange(
+                "calendar",
+                calendars.find((c) => c.id === e.target.value) || null
+              )
+            }
+            size="small"
+            variant="outlined"
+            fullWidth
+            sx={fieldStyle}
+          >
+            {calendars.map((cal) => (
+              <MenuItem key={cal.id} value={cal.id}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Typography sx={{ minWidth: 24 }}>{cal.emoji}</Typography>
+                  <Typography>{cal.name}</Typography>
+                </Box>
               </MenuItem>
-              {categories.map((cat) => (
-                <MenuItem key={cat.id} value={cat.id}>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <Box
-                      sx={{
-                        width: 12,
-                        height: 12,
-                        borderRadius: "50%",
-                        backgroundColor: cat.color,
-                        mt: -0.5
-                      }}
-                    />
-                    <Typography>{cat.name}</Typography>
-                  </Box>
-                </MenuItem>
-              ))}
-            </TextField>
-          </Box>
-        </Collapse>
-      </Card>
-    </>
+            ))}
+          </TextField>
+
+          <TextField
+            label="Kategoria"
+            select
+            value={localTask.category?.id || ""}
+            onChange={(e) =>
+              handleFieldChange(
+                "category",
+                categories.find((c) => c.id === e.target.value) || null
+              )
+            }
+            size="small"
+            variant="outlined"
+            fullWidth
+            sx={fieldStyle}
+          >
+            <MenuItem value="">Brak</MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box
+                    sx={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      backgroundColor: cat.color
+                    }}
+                  />
+                  <Typography>{cat.name}</Typography>
+                </Box>
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+      </Collapse>
+    </Card>
   )
 }
 

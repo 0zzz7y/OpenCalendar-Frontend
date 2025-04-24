@@ -1,7 +1,7 @@
 enum TOOLBAR {
-  BOLD = "Bold",
-  ITALIC = "Italic",
-  UNDERLINE = "Underline"
+  BOLD = "bold",
+  ITALIC = "italic",
+  UNDERLINE = "underline"
 }
 
 export default TOOLBAR

@@ -1,6 +1,4 @@
 import MESSAGES from "@/constant/ui/messages"
-import useCalendar from "@/hook/useCalendar"
-import useCategory from "@/hook/useCategory"
 import useTask from "@/hook//useTask"
 import RecurringPattern from "@/model/domain/recurringPattern"
 import Task from "@/model/domain/task"
@@ -9,14 +7,14 @@ import TaskStatus from "@/model/domain/taskStatus"
 import { useEffect, useRef, useState } from "react"
 
 import { AddCircleOutline } from "@mui/icons-material"
-import { Box, TextField } from "@mui/material"
+import { Box, TextField, Paper } from "@mui/material"
 
 import TaskBoard from "./TasksBoard"
+import useAppStore from "@/store/useAppStore"
 
 const TasksPanel = () => {
-  const { categories } = useCategory()
-  const { calendars } = useCalendar()
-  const { tasks, addTask, updateTask, deleteTask, reloadTasks } = useTask()
+  const { tasks, categories, calendars } = useAppStore()
+  const { addTask, updateTask, deleteTask, reloadTasks } = useTask()
 
   const [newTitle, setNewTitle] = useState("")
   const [localTasks, setLocalTasks] = useState<Task[]>([])
@@ -91,21 +89,23 @@ const TasksPanel = () => {
   }
 
   return (
-    <>
-      <Box
-        sx={{
-          p: 2,
-          maxHeight: "100vh",
-          overflowY: "auto",
-          boxSizing: "border-box",
-          height: "100vh"
-        }}
-      >
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        overflow: "hidden",
+        p: 2,
+        boxSizing: "border-box"
+      }}
+    >
+
         <TextField
           label={MESSAGES.NEW_TASK}
           value={newTitle}
           onChange={(e) => setNewTitle(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+          fullWidth
           InputProps={{
             endAdornment: (
               <AddCircleOutline
@@ -114,9 +114,9 @@ const TasksPanel = () => {
               />
             )
           }}
-          sx={{ mb: 2, width: 300 }}
         />
 
+      <Box sx={{ flex: 1, overflow: "hidden" }}>
         <TaskBoard
           tasks={localTasks}
           calendars={calendars}
@@ -125,7 +125,7 @@ const TasksPanel = () => {
           onDelete={handleDelete}
         />
       </Box>
-    </>
+    </Box>
   )
 }
 

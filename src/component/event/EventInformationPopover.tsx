@@ -14,8 +14,9 @@ import {
   Popover,
   Button
 } from "@mui/material"
+import useAppStore from "@/store/useAppStore"
 
-interface Properties {
+interface EventInformationPopoverProperties {
   anchorElement: HTMLElement | null
   event: Schedulable | null
   onClose: () => void
@@ -29,10 +30,10 @@ const EventInformationPopover = ({
   onClose,
   onEdit,
   onDelete
-}: Properties) => {
+}: EventInformationPopoverProperties) => {
   const open = Boolean(anchorElement && event)
-
-  const { events, reloadEvents } = useEvent()
+  const { events } = useAppStore()
+  const { reloadEvents } = useEvent()
 
   const [currentEvent, setCurrentEvent] = useState<Schedulable | null>(event)
   const [confirmingDelete, setConfirmingDelete] = useState(false)

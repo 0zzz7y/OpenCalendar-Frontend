@@ -16,7 +16,8 @@ import {
   Button
 } from "@mui/material"
 
-import NoteToolbar, { FormatCommand } from "./NoteToolbar"
+import NoteToolbar from "./NoteToolbar"
+import FormatCommand from "@/model/utility/formatCommand"
 
 export interface NoteCardProperties {
   id: string
@@ -55,18 +56,12 @@ const NoteCard = ({
   const [position, setPosition] = useState(positionRef.current)
   const [dragging, setDragging] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<
-    Category | undefined
-  >(undefined)
-  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(
-    null
-  )
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined)
+  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(null)
   const [confirmAction, setConfirmAction] = useState<() => void>(() => {})
   const [confirmOpen, setConfirmOpen] = useState(false)
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
-  const [activeFormats, setActiveFormats] = useState<
-    Record<FormatCommand, boolean>
-  >({
+  const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
     bold: false,
     italic: false,
     underline: false
@@ -79,8 +74,7 @@ const NoteCard = ({
     }
   }, [])
 
-  const getCategoryColor = (category: Category | undefined) =>
-    category?.color || color
+  const getCategoryColor = (category: Category | undefined) => category?.color || color
 
   const clearText = () => {
     if (contentRef.current) contentRef.current.innerHTML = ""
@@ -139,10 +133,7 @@ const NoteCard = ({
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       const newWidth = Math.max(150, startWidth + (moveEvent.clientX - startX))
-      const newHeight = Math.max(
-        100,
-        startHeight + (moveEvent.clientY - startY)
-      )
+      const newHeight = Math.max(100, startHeight + (moveEvent.clientY - startY))
       setDimensions({ width: newWidth, height: newHeight })
     }
 
@@ -247,9 +238,7 @@ const NoteCard = ({
             onClearText={clearText}
             onDelete={() =>
               contentRef.current?.innerText.trim()
-                ? handleConfirm(MESSAGES.CONFIRM_CLEAR_CONTENTS, () =>
-                    onDelete?.(id)
-                  )
+                ? handleConfirm(MESSAGES.CONFIRM_CLEAR_CONTENTS, () => onDelete?.(id))
                 : onDelete?.(id)
             }
             onFormatText={formatText}

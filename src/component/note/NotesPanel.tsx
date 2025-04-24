@@ -16,7 +16,6 @@ const NotesPanel = () => {
   const { notes, categories, calendars } = useAppStore()
 
   const didFetchRef = useRef(false)
-
   const [localNotes, setLocalNotes] = useState<Note[]>([])
 
   useEffect(() => {
@@ -27,7 +26,9 @@ const NotesPanel = () => {
   }, [])
 
   useEffect(() => {
-    setLocalNotes(Array.isArray(notes) ? notes : [])
+    if (Array.isArray(notes)) {
+      setLocalNotes(notes)
+    }
   }, [notes])
 
   const handleUpdate = (updatedNote: Note) => {
@@ -43,77 +44,75 @@ const NotesPanel = () => {
   }
 
   const handleAddNote = async () => {
-    const tempId = ""
     const defaultCalendar = calendars[0]
     const defaultCategory = categories[0]
 
     if (!defaultCalendar) return
 
-    const newNote: Note = {
-      id: tempId,
+    const tempNote: Note = {
+      id: "", // temporary ID
       name: MESSAGES.NEW_NOTE,
       description: "",
-      category: defaultCategory,
       calendar: defaultCalendar,
-      positionX: Math.floor(Math.random() * 100),
-      positionY: Math.floor(Math.random() * 100)
+      category: defaultCategory,
+      positionX: Math.floor(Math.random() * 300),
+      positionY: Math.floor(Math.random() * 200)
     }
 
-    setLocalNotes((prev) => [...prev, newNote])
+    setLocalNotes((prev) => [...prev, tempNote])
 
     const savedNote = await addNote({
-      name: newNote.name,
-      description: newNote.description,
-      category: defaultCategory,
-      calendar: defaultCalendar,
-      positionX: newNote.positionX,
-      positionY: newNote.positionY
+      name: tempNote.name,
+      description: tempNote.description,
+      calendar: tempNote.calendar,
+      category: tempNote.category,
+      positionX: tempNote.positionX,
+      positionY: tempNote.positionY
     })
 
-    setLocalNotes((prev) =>
-      prev.map((note) =>
-        note.id === tempId && savedNote?.id
-          ? { ...savedNote, ...note, id: savedNote.id }
-          : note
+    if (savedNote) {
+      setLocalNotes((prev) =>
+        prev.map((note) =>
+          note.id === "" ? { ...savedNote, ...note, id: savedNote.id } : note
+        )
       )
-    )
+    }
   }
 
   return (
-    <>
-      <Box position="absolute" top={0} left={0} width="0vh" height="0vh">
-      {Array.isArray(localNotes) &&
-  localNotes.map((note) => (
-          <NoteCard
-            key={note.id}
-            id={note.id}
-            name={note.name}
-            content={note.description || ""}
-            calendar={note.calendar}
-            categories={categories}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
-          />
-        ))}
+    <Box position="absolute" top={0} left={0} width="100vw" height="100vh" zIndex={1}>
+      {localNotes.map((note) => (
+        <NoteCard
+          key={note.id}
+          id={note.id}
+          name={note.name}
+          content={note.description || ""}
+          calendar={note.calendar}
+          categories={categories}
+          initialX={note.positionX}
+          initialY={note.positionY}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+        />
+      ))}
 
-        <IconButton
-          onClick={handleAddNote}
-          sx={{
-            position: "fixed",
-            bottom: 16,
-            right: 16,
-            backgroundColor: "primary.main",
-            color: "white",
-            zIndex: 1000,
-            "&:hover": {
-              backgroundColor: "primary.dark"
-            }
-          }}
-        >
-          <AddIcon />
-        </IconButton>
-      </Box>
-    </>
+      <IconButton
+        onClick={handleAddNote}
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+          backgroundColor: "primary.main",
+          color: "white",
+          zIndex: 1300,
+          "&:hover": {
+            backgroundColor: "primary.dark"
+          }
+        }}
+      >
+        <AddIcon />
+      </IconButton>
+    </Box>
   )
 }
 

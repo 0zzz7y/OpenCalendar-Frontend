@@ -21,7 +21,7 @@ import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
 import dayjs from "dayjs"
 import { toast } from "react-toastify"
 
-interface Properties {
+interface EventCreationPopoverProperties {
   anchorEl: HTMLElement | null
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
@@ -35,9 +35,10 @@ const EventCreationPopover = ({
   categories,
   initialEvent,
   onClose
-}: Properties) => {
+}: EventCreationPopoverProperties) => {
   const { reloadEvents, updateEvent, addEvent, deleteEvent } = useEvent()
 
+  const isEditMode = Boolean(initialEvent?.id)
   const [title, setTitle] = useState("")
   const [description, setDescription] = useState("")
   const [start, setStart] = useState<Date>(new Date())
@@ -48,55 +49,32 @@ const EventCreationPopover = ({
   const isValidAnchor = anchorEl && document.body.contains(anchorEl)
 
   useEffect(() => {
-    if (initialEvent) {
-      const title: string = initialEvent.name || ""
-      const description: string = initialEvent.description || ""
-      const startDate: Date = new Date(initialEvent.startDate || new Date())
-      const endDate: Date = new Date(initialEvent.endDate || new Date())
-      const calendarId: string = initialEvent.calendar?.id || ""
-      const categoryId: string = initialEvent.category?.id || ""
-
-      setTitle(title)
-      setDescription(description)
-      setStart(startDate)
-      setEnd(endDate)
-      setCalendarId(calendarId)
-      setCategoryId(categoryId)
+    if (isEditMode && initialEvent) {
+      setTitle(initialEvent.name || "")
+      setDescription(initialEvent.description || "")
+      setStart(new Date(initialEvent.startDate || new Date()))
+      setEnd(new Date(initialEvent.endDate || new Date()))
+      setCalendarId(initialEvent.calendar?.id || "")
+      setCategoryId(initialEvent.category?.id || "")
     } else {
-      const title: string = ""
-      const description: string = ""
-      const startDate: Date = new Date()
-      const endDate: Date = new Date(startDate.getTime() + 60 * 60 * 1000)
-      const calendarId: string = calendars[0]?.id || ""
-      const categoryId: string = ""
-
-      setTitle(title)
-      setDescription(description)
-      setStart(startDate)
-      setEnd(endDate)
-      setCalendarId(calendarId)
-      setCategoryId(categoryId)
+      const now = new Date()
+      setTitle("")
+      setDescription("")
+      setStart(now)
+      setEnd(new Date(now.getTime() + 60 * 60 * 1000))
+      setCalendarId(calendars[0]?.id || "")
+      setCategoryId("")
     }
-  }, [initialEvent, anchorEl])
+  }, [initialEvent, anchorEl, isEditMode])
 
   const handleSave = async () => {
-    if (!title.trim()) {
-      toast.error("Title is required")
-      return
-    }
-
-    if (!start || !end || end <= start) {
-      toast.error("End time must be after start time")
-      return
-    }
+    if (!title.trim()) return toast.error("Title is required")
+    if (!start || !end || end <= start) return toast.error("End must be after start")
 
     const calendar = calendars.find((c) => c.id === calendarId)
-    const category = categories.find((c) => c.id === categoryId)
+    if (!calendar) return toast.error("Calendar is required")
 
-    if (!calendar) {
-      toast.error("Calendar is required")
-      return
-    }
+    const category = categories.find((c) => c.id === categoryId)
 
     const payload = {
       name: title,
@@ -109,7 +87,7 @@ const EventCreationPopover = ({
     }
 
     try {
-      if (initialEvent?.id) {
+      if (isEditMode && initialEvent?.id) {
         await updateEvent(initialEvent.id, payload)
       } else {
         await addEvent(payload)
@@ -123,7 +101,7 @@ const EventCreationPopover = ({
   }
 
   const handleDelete = async () => {
-    if (initialEvent?.id) {
+    if (isEditMode && initialEvent?.id) {
       try {
         await deleteEvent(initialEvent.id)
         toast.success("Event deleted successfully")
@@ -153,7 +131,7 @@ const EventCreationPopover = ({
     >
       <Stack spacing={2}>
         <Typography variant="h6">
-          {initialEvent ? MESSAGES.EDIT_EVENT : MESSAGES.ADD_EVENT}
+          {isEditMode ? MESSAGES.EDIT_EVENT : MESSAGES.ADD_EVENT}
         </Typography>
 
         <TextField
@@ -232,6 +210,12 @@ const EventCreationPopover = ({
           <Button onClick={onClose} color="inherit">
             {BUTTONS.CANCEL}
           </Button>
+
+          {isEditMode && (
+            <Button onClick={handleDelete} color="error">
+              {BUTTONS.DELETE}
+            </Button>
+          )}
 
           <Button onClick={handleSave} variant="contained">
             {BUTTONS.SAVE}

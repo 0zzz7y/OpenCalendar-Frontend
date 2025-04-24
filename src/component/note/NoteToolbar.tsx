@@ -1,5 +1,6 @@
 import TOOLBAR from "@/constant/utility/toolbar"
 import MESSAGES from "@/constant/ui/messages"
+import FormatCommand from "@/model/utility/formatCommand"
 
 import { useState } from "react"
 
@@ -19,11 +20,6 @@ import {
   TextField
 } from "@mui/material"
 
-export type FormatCommand =
-  | typeof TOOLBAR.BOLD
-  | typeof TOOLBAR.ITALIC
-  | typeof TOOLBAR.UNDERLINE
-
 interface NoteToolbarProperties {
   isCollapsed: boolean
   onToggleCollapse: () => void
@@ -38,7 +34,7 @@ interface NoteToolbarProperties {
   onNameBlur?: () => void
 }
 
-const NoteToolBar = ({
+const NoteToolbar = ({
   isCollapsed,
   onToggleCollapse,
   onClearText,
@@ -53,16 +49,16 @@ const NoteToolBar = ({
 }: NoteToolbarProperties) => {
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
-  const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {
-    setAnchorEl(event.currentTarget)
+  const handleDeleteClick = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget)
   }
 
-  const handleConfirm = () => {
+  const handleConfirmDelete = () => {
     onDelete()
     setAnchorEl(null)
   }
 
-  const handleCancel = () => {
+  const handleCancelDelete = () => {
     setAnchorEl(null)
   }
 
@@ -95,10 +91,10 @@ const NoteToolBar = ({
           placeholder="Name"
           value={noteName}
           onChange={(e) => onNameChange(e.target.value)}
+          onBlur={onNameBlur}
           variant="outlined"
           size="small"
           onMouseDown={(e) => e.stopPropagation()}
-          onBlur={onNameBlur}
           sx={{
             ml: 1,
             width: 140,
@@ -113,19 +109,14 @@ const NoteToolBar = ({
 
       {!isCollapsed && (
         <Box display="flex" gap={0.5} alignItems="center">
-          {[
-            TOOLBAR.BOLD,
-            TOOLBAR.ITALIC,
-            TOOLBAR.UNDERLINE
-          ].map((cmd) => {
+          {[TOOLBAR.BOLD, TOOLBAR.ITALIC, TOOLBAR.UNDERLINE].map((cmd) => {
             const Icon =
               cmd === TOOLBAR.BOLD
                 ? FormatBoldIcon
                 : cmd === TOOLBAR.ITALIC
-                  ? FormatItalicIcon
-                  : cmd === TOOLBAR.UNDERLINE
-                    ? FormatUnderlinedIcon
-                    : FormatUnderlinedIcon
+                ? FormatItalicIcon
+                : FormatUnderlinedIcon
+
             return (
               <IconButton
                 key={cmd}
@@ -154,11 +145,10 @@ const NoteToolBar = ({
           >
             <Box
               sx={{
-                color: "#000",
                 width: 14,
                 height: 14,
                 borderRadius: "50%",
-                backgroundColor: selectedCategory || "#fff59d",
+                bgcolor: selectedCategory || "#fff59d",
                 border: "1px solid #333"
               }}
             />
@@ -171,36 +161,36 @@ const NoteToolBar = ({
           >
             <DeleteIcon fontSize="small" sx={{ color: "#000" }} />
           </IconButton>
-
-          <Popover
-            open={Boolean(anchorEl)}
-            anchorEl={anchorEl}
-            onClose={handleCancel}
-            anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-            transformOrigin={{ vertical: "top", horizontal: "center" }}
-            PaperProps={{ sx: { p: 2 } }}
-          >
-            <Typography variant="body2" gutterBottom>
-              {MESSAGES.CONFIRM_DELETE_NOTE}
-            </Typography>
-            <Box display="flex" gap={1} justifyContent="flex-end">
-              <Button size="small" onClick={handleCancel}>
-                Cancel
-              </Button>
-              <Button
-                size="small"
-                color="error"
-                variant="contained"
-                onClick={handleConfirm}
-              >
-                Delete
-              </Button>
-            </Box>
-          </Popover>
         </Box>
       )}
+
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleCancelDelete}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        PaperProps={{ sx: { p: 2 } }}
+      >
+        <Typography variant="body2" gutterBottom>
+          {MESSAGES.CONFIRM_DELETE_NOTE}
+        </Typography>
+        <Box display="flex" gap={1} justifyContent="flex-end">
+          <Button size="small" onClick={handleCancelDelete}>
+            Cancel
+          </Button>
+          <Button
+            size="small"
+            color="error"
+            variant="contained"
+            onClick={handleConfirmDelete}
+          >
+            Delete
+          </Button>
+        </Box>
+      </Popover>
     </Box>
   )
 }
 
-export default NoteToolBar
+export default NoteToolbar
