@@ -1,7 +1,7 @@
-import BUTTONS from "@/constant/ui/buttons"
-import PLACEHOLDERS from "@/constant/ui/labels"
-import MESSAGES from "@/constant/ui/messages"
-import useCalendar from "@/hook/useCalendar"
+import BUTTONS from "@/constant/ui/buttons";
+import PLACEHOLDERS from "@/constant/ui/labels";
+import MESSAGES from "@/constant/ui/messages";
+import useCalendar from "@/repository/calendar.repository";
 
 import {
   Box,
@@ -9,23 +9,23 @@ import {
   IconButton,
   Popover,
   TextField,
-  Typography
-} from "@mui/material"
+  Typography,
+} from "@mui/material";
 import EmojiPicker, {
   type EmojiClickData,
   EmojiStyle,
-  Theme
-} from "emoji-picker-react"
-import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"
-import { useEffect, useRef, useState } from "react"
-import EditorMode from "@/model/utility/editorMode"
+  Theme,
+} from "emoji-picker-react";
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
+import { useEffect, useRef, useState } from "react";
+import EditorMode from "@/model/utility/editorMode";
 
 interface CalendarEditorProperties {
-  open: boolean
-  anchorEl: HTMLElement | null
-  mode: EditorMode
-  initialData?: { id?: string; label?: string; emoji?: string }
-  onClose: () => void
+  open: boolean;
+  anchorEl: HTMLElement | null;
+  mode: EditorMode;
+  initialData?: { id?: string; label?: string; emoji?: string };
+  onClose: () => void;
 }
 
 const CalendarEditor = ({
@@ -33,55 +33,56 @@ const CalendarEditor = ({
   anchorEl,
   mode,
   initialData = {},
-  onClose
+  onClose,
 }: CalendarEditorProperties) => {
-  const inputRef = useRef<HTMLInputElement | null>(null)
-  const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } = useCalendar()
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } =
+    useCalendar();
 
-  const [label, setLabel] = useState(initialData.label || "")
-  const [emoji, setEmoji] = useState(initialData.emoji || "📅")
-  const [pickerOpen, setPickerOpen] = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [label, setLabel] = useState(initialData.label || "");
+  const [emoji, setEmoji] = useState(initialData.emoji || "📅");
+  const [pickerOpen, setPickerOpen] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setLabel(initialData.label || "")
-      setEmoji(initialData.emoji || "📅")
-      setTimeout(() => inputRef.current?.focus(), 100)
+      setLabel(initialData.label || "");
+      setEmoji(initialData.emoji || "📅");
+      setTimeout(() => inputRef.current?.focus(), 100);
     }
-  }, [open, initialData])
+  }, [open, initialData]);
 
   const handleSave = async () => {
-    if (!label.trim()) return
-    setLoading(true)
+    if (!label.trim()) return;
+    setLoading(true);
     try {
       if (mode === EditorMode.ADD) {
-        await addCalendar({ name: label.trim(), emoji })
+        await addCalendar({ name: label.trim(), emoji });
       } else if (mode === EditorMode.EDIT && initialData.id) {
-        await updateCalendar(initialData.id, { name: label.trim(), emoji })
+        await updateCalendar(initialData.id, { name: label.trim(), emoji });
       }
-      await reloadCalendars()
-      onClose()
+      await reloadCalendars();
+      onClose();
     } catch (e) {
-      console.error("Failed to save calendar", e)
+      console.error("Failed to save calendar", e);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!initialData.id) return
-    setLoading(true)
+    if (!initialData.id) return;
+    setLoading(true);
     try {
-      await deleteCalendar(initialData.id)
-      await reloadCalendars()
-      onClose()
+      await deleteCalendar(initialData.id);
+      await reloadCalendars();
+      onClose();
     } catch (e) {
-      console.error("Failed to delete calendar", e)
+      console.error("Failed to delete calendar", e);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Popover
@@ -95,7 +96,9 @@ const CalendarEditor = ({
         {mode !== EditorMode.DELETE ? (
           <>
             <Typography variant="subtitle2" color="primary" fontWeight={500}>
-              {mode === EditorMode.ADD ? MESSAGES.ADD_EVENT : MESSAGES.EDIT_EVENT}
+              {mode === EditorMode.ADD
+                ? MESSAGES.ADD_EVENT
+                : MESSAGES.EDIT_EVENT}
             </Typography>
 
             <TextField
@@ -108,7 +111,13 @@ const CalendarEditor = ({
               margin="dense"
             />
 
-            <Box display="flex" alignItems="center" justifyContent="space-between" mt={2} mb={1}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              mt={2}
+              mb={1}
+            >
               <Typography fontSize={24}>{emoji}</Typography>
               <IconButton onClick={() => setPickerOpen((prev) => !prev)}>
                 <EmojiEmotionsIcon fontSize="small" />
@@ -120,8 +129,8 @@ const CalendarEditor = ({
                 width="100%"
                 height={300}
                 onEmojiClick={(e: EmojiClickData) => {
-                  setEmoji(e.emoji)
-                  setPickerOpen(false)
+                  setEmoji(e.emoji);
+                  setPickerOpen(false);
                 }}
                 searchDisabled
                 skinTonesDisabled
@@ -143,9 +152,13 @@ const CalendarEditor = ({
           </>
         ) : (
           <>
-            <Typography variant="body2">{MESSAGES.CONFIRM_DELETE_CALENDAR}</Typography>
+            <Typography variant="body2">
+              {MESSAGES.CONFIRM_DELETE_CALENDAR}
+            </Typography>
             <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
-              <Button onClick={onClose} size="small">{BUTTONS.CANCEL}</Button>
+              <Button onClick={onClose} size="small">
+                {BUTTONS.CANCEL}
+              </Button>
               <Button
                 onClick={handleDelete}
                 size="small"
@@ -160,7 +173,7 @@ const CalendarEditor = ({
         )}
       </Box>
     </Popover>
-  )
-}
+  );
+};
 
-export default CalendarEditor
+export default CalendarEditor;

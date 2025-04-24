@@ -1,23 +1,23 @@
-import EventPopover from "@/component/event/EventCreationPopover"
-import EventInformationPopover from "@/component/event/EventInformationPopover"
-import useEvent from "@/hook/useEvent"
-import Event from "@/model/domain/event"
-import RecurringPattern from "@/model/domain/recurringPattern"
-import Schedulable from "@/model/domain/schedulable"
+import EventPopover from "@/component/event/EventCreationPopover";
+import EventInformationPopover from "@/component/event/EventInformationPopover";
+import useEvent from "@/repository/event.repository";
+import Event from "@/model/domain/event";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import Schedulable from "@/model/domain/schedulable";
 
-import { useState } from "react"
+import { useState } from "react";
 
-import { Box } from "@mui/material"
-import dayjs from "dayjs"
+import { Box } from "@mui/material";
+import dayjs from "dayjs";
 
-import DayColumn from "./DayColumn"
+import DayColumn from "./DayColumn";
 
 interface DayViewProperties {
-  date: Date
-  events: Schedulable[]
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
-  onEventClick?: (event: Event) => void
+  date: Date;
+  events: Schedulable[];
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
+  onEventClick?: (event: Event) => void;
 }
 
 const DayView = ({
@@ -25,56 +25,56 @@ const DayView = ({
   events,
   calendars,
   categories,
-  onEventClick
+  onEventClick,
 }: DayViewProperties) => {
-  const { updateEvent } = useEvent()
+  const { updateEvent } = useEvent();
 
-  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
-  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
-  const [infoEvent, setInfoEvent] = useState<Event | null>(null)
-  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
+  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null);
+  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
 
   const dayEvents = events.filter(
     (e) => e.startDate && dayjs(e.startDate).isSame(date, "day")
-  )
+  );
 
   const handleSlotClick = (slot: HTMLElement, datetime: Date) => {
-    setSelectedSlot(slot)
-    setSelectedDatetime(datetime)
-    setEditingEvent(null)
-    setInfoEvent(null)
-  }
+    setSelectedSlot(slot);
+    setSelectedDatetime(datetime);
+    setEditingEvent(null);
+    setInfoEvent(null);
+  };
 
   const handleEventClick = (event: Schedulable) => {
     if ("id" in event && "name" in event && "calendar" in event) {
       const element = document.querySelector(
         `#event-${event.id}`
-      ) as HTMLElement
+      ) as HTMLElement;
       if (element) {
-        setInfoAnchor(element)
-        setInfoEvent(event as Event)
-        onEventClick?.(event as Event)
+        setInfoAnchor(element);
+        setInfoEvent(event as Event);
+        onEventClick?.(event as Event);
       }
     }
-  }
+  };
 
   const handleClosePopover = () => {
-    setSelectedSlot(null)
-    setSelectedDatetime(null)
-    setEditingEvent(null)
-  }
+    setSelectedSlot(null);
+    setSelectedDatetime(null);
+    setEditingEvent(null);
+  };
 
   const handleEditEvent = () => {
-    setEditingEvent(infoEvent)
-    setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null)
-    setSelectedSlot(infoAnchor)
-    setInfoEvent(null)
-  }
+    setEditingEvent(infoEvent);
+    setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null);
+    setSelectedSlot(infoAnchor);
+    setInfoEvent(null);
+  };
 
   const handleDeleteEvent = async (id: string) => {
-    await updateEvent(id, { name: "" })
-  }
+    await updateEvent(id, { name: "" });
+  };
 
   return (
     <>
@@ -90,7 +90,7 @@ const DayView = ({
           calendars={calendars}
           categories={categories}
           onSave={(data) => {
-            if (data.id) updateEvent(data.id, data)
+            if (data.id) updateEvent(data.id, data);
           }}
           onSlotClick={handleSlotClick}
           onEventClick={handleEventClick}
@@ -112,7 +112,7 @@ const DayView = ({
               endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
               recurringPattern: RecurringPattern.NONE,
               calendar: calendars[0],
-              category: undefined
+              category: undefined,
             }
           }
         />
@@ -128,7 +128,7 @@ const DayView = ({
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default DayView
+export default DayView;

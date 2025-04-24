@@ -1,23 +1,4 @@
-import type Category from "@/model/domain/category"
-import axios from "axios"
-
-const base = `${import.meta.env.VITE_BASE_URL}/categories`
-
-export const getCategories = async (): Promise<Category[]> => {
-  const result = await axios.get(base)
-  return result.data
-}
-
-export const createCategory = async (category: { name: string; emoji?: string; color?: string }): Promise<Category> => {
-  const result = await axios.post(base, category)
-  return result.data
-}
-
-export const updateCategory = async (id: string, updates: Partial<Category>): Promise<Category> => {
-  const result = await axios.put(`${base}/${id}`, updates)
-  return result.data
-}
-
-export const deleteCategory = async (id: string): Promise<void> => {
-  await axios.delete(`${base}/${id}`)
-}
+import type CategoryDto from "@/model/dto/category.dto";
+import { createCrudService } from "./crud.service";
+export const { getAll: getCategories, create: createCategory, update: updateCategory, delete: deleteCategory } =
+  createCrudService<CategoryDto>("categories");

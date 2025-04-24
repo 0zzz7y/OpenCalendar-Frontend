@@ -1,11 +1,11 @@
-import BUTTONS from "@/constant/ui/buttons"
-import LABELS from "@/constant/ui/labels"
-import MESSAGES from "@/constant/ui/messages"
-import useEvent from "@/hook/useEvent"
-import RecurringPattern from "@/model/domain/recurringPattern"
-import Schedulable from "@/model/domain/schedulable"
+import BUTTONS from "@/constant/ui/buttons";
+import LABELS from "@/constant/ui/labels";
+import MESSAGES from "@/constant/ui/messages";
+import useEvent from "@/repository/event.repository";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import Schedulable from "@/model/domain/schedulable";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
 import {
   Popover,
@@ -15,18 +15,18 @@ import {
   Stack,
   Divider,
   Typography,
-  Box
-} from "@mui/material"
-import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
-import dayjs from "dayjs"
-import { toast } from "react-toastify"
+  Box,
+} from "@mui/material";
+import { DateCalendar, TimePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
+import { toast } from "react-toastify";
 
 interface EventCreationPopoverProperties {
-  anchorEl: HTMLElement | null
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
-  initialEvent?: Schedulable
-  onClose: () => void
+  anchorEl: HTMLElement | null;
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
+  initialEvent?: Schedulable;
+  onClose: () => void;
 }
 
 const EventCreationPopover = ({
@@ -34,47 +34,48 @@ const EventCreationPopover = ({
   calendars,
   categories,
   initialEvent,
-  onClose
+  onClose,
 }: EventCreationPopoverProperties) => {
-  const { reloadEvents, updateEvent, addEvent, deleteEvent } = useEvent()
+  const { reloadEvents, updateEvent, addEvent, deleteEvent } = useEvent();
 
-  const isEditMode = Boolean(initialEvent?.id)
-  const [title, setTitle] = useState("")
-  const [description, setDescription] = useState("")
-  const [start, setStart] = useState<Date>(new Date())
-  const [end, setEnd] = useState<Date>(new Date(Date.now() + 60 * 60 * 1000))
-  const [calendarId, setCalendarId] = useState("")
-  const [categoryId, setCategoryId] = useState("")
+  const isEditMode = Boolean(initialEvent?.id);
+  const [title, setTitle] = useState("");
+  const [description, setDescription] = useState("");
+  const [start, setStart] = useState<Date>(new Date());
+  const [end, setEnd] = useState<Date>(new Date(Date.now() + 60 * 60 * 1000));
+  const [calendarId, setCalendarId] = useState("");
+  const [categoryId, setCategoryId] = useState("");
 
-  const isValidAnchor = anchorEl && document.body.contains(anchorEl)
+  const isValidAnchor = anchorEl && document.body.contains(anchorEl);
 
   useEffect(() => {
     if (isEditMode && initialEvent) {
-      setTitle(initialEvent.name || "")
-      setDescription(initialEvent.description || "")
-      setStart(new Date(initialEvent.startDate || new Date()))
-      setEnd(new Date(initialEvent.endDate || new Date()))
-      setCalendarId(initialEvent.calendar?.id || "")
-      setCategoryId(initialEvent.category?.id || "")
+      setTitle(initialEvent.name || "");
+      setDescription(initialEvent.description || "");
+      setStart(new Date(initialEvent.startDate || new Date()));
+      setEnd(new Date(initialEvent.endDate || new Date()));
+      setCalendarId(initialEvent.calendar?.id || "");
+      setCategoryId(initialEvent.category?.id || "");
     } else {
-      const now = new Date()
-      setTitle("")
-      setDescription("")
-      setStart(now)
-      setEnd(new Date(now.getTime() + 60 * 60 * 1000))
-      setCalendarId(calendars[0]?.id || "")
-      setCategoryId("")
+      const now = new Date();
+      setTitle("");
+      setDescription("");
+      setStart(now);
+      setEnd(new Date(now.getTime() + 60 * 60 * 1000));
+      setCalendarId(calendars[0]?.id || "");
+      setCategoryId("");
     }
-  }, [initialEvent, anchorEl, isEditMode])
+  }, [initialEvent, anchorEl, isEditMode]);
 
   const handleSave = async () => {
-    if (!title.trim()) return toast.error("Title is required")
-    if (!start || !end || end <= start) return toast.error("End must be after start")
+    if (!title.trim()) return toast.error("Title is required");
+    if (!start || !end || end <= start)
+      return toast.error("End must be after start");
 
-    const calendar = calendars.find((c) => c.id === calendarId)
-    if (!calendar) return toast.error("Calendar is required")
+    const calendar = calendars.find((c) => c.id === calendarId);
+    if (!calendar) return toast.error("Calendar is required");
 
-    const category = categories.find((c) => c.id === categoryId)
+    const category = categories.find((c) => c.id === categoryId);
 
     const payload = {
       name: title,
@@ -83,35 +84,35 @@ const EventCreationPopover = ({
       endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
       recurringPattern: RecurringPattern.NONE,
       calendar,
-      category
-    }
+      category,
+    };
 
     try {
       if (isEditMode && initialEvent?.id) {
-        await updateEvent(initialEvent.id, payload)
+        await updateEvent(initialEvent.id, payload);
       } else {
-        await addEvent(payload)
+        await addEvent(payload);
       }
-      toast.success("Event saved successfully")
-      reloadEvents()
-      onClose()
+      toast.success("Event saved successfully");
+      reloadEvents();
+      onClose();
     } catch (error) {
-      toast.error("Failed to save event")
+      toast.error("Failed to save event");
     }
-  }
+  };
 
   const handleDelete = async () => {
     if (isEditMode && initialEvent?.id) {
       try {
-        await deleteEvent(initialEvent.id)
-        toast.success("Event deleted successfully")
-        reloadEvents()
-        onClose()
+        await deleteEvent(initialEvent.id);
+        toast.success("Event deleted successfully");
+        reloadEvents();
+        onClose();
       } catch (error) {
-        toast.error("Failed to delete event")
+        toast.error("Failed to delete event");
       }
     }
-  }
+  };
 
   return (
     <Popover
@@ -125,8 +126,8 @@ const EventCreationPopover = ({
           p: 2,
           width: 340,
           maxHeight: "90vh",
-          overflowY: "auto"
-        }
+          overflowY: "auto",
+        },
       }}
     >
       <Stack spacing={2}>
@@ -222,7 +223,7 @@ const EventCreationPopover = ({
         </Stack>
       </Stack>
     </Popover>
-  )
-}
+  );
+};
 
-export default EventCreationPopover
+export default EventCreationPopover;

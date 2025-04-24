@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react";
 import {
   Box,
   Button,
@@ -7,22 +7,22 @@ import {
   Paper,
   Popover,
   TextField,
-  Typography
-} from "@mui/material"
-import type Category from "@/model/domain/category"
-import useCategory from "@/hook/useCategory"
-import useAppStore from "@/store/useAppStore"
-import MESSAGES from "@/constant/ui/messages"
-import BUTTONS from "@/constant/ui/buttons"
-import PLACEHOLDERS from "@/constant/ui/labels"
-import EditorMode from "@/model/utility/editorMode"
+  Typography,
+} from "@mui/material";
+import type Category from "@/model/domain/category";
+import useCategory from "@/repository/category.repository";
+import useAppStore from "@/store/useAppStore";
+import MESSAGES from "@/constant/ui/messages";
+import BUTTONS from "@/constant/ui/buttons";
+import PLACEHOLDERS from "@/constant/ui/labels";
+import EditorMode from "@/model/utility/editorMode";
 
 interface CategoryEditorProperties {
-  open: boolean
-  anchorEl: HTMLElement | null
-  mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE
-  initialData?: Partial<Category>
-  onClose: () => void
+  open: boolean;
+  anchorEl: HTMLElement | null;
+  mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE;
+  initialData?: Partial<Category>;
+  onClose: () => void;
 }
 
 const CategoryEditor = ({
@@ -30,72 +30,68 @@ const CategoryEditor = ({
   anchorEl,
   mode,
   initialData,
-  onClose
+  onClose,
 }: CategoryEditorProperties) => {
-  const inputRef = useRef<HTMLInputElement | null>(null)
-  const {
-    addCategory,
-    updateCategory,
-    deleteCategory,
-    reloadCategories
-  } = useCategory()
-  const selectedCategory = useAppStore((s) => s.selectedCategory)
-  const setSelectedCategory = useAppStore((s) => s.setSelectedCategory)
+  const inputRef = useRef<HTMLInputElement | null>(null);
+  const { addCategory, updateCategory, deleteCategory, reloadCategories } =
+    useCategory();
+  const selectedCategory = useAppStore((s) => s.selectedCategory);
+  const setSelectedCategory = useAppStore((s) => s.setSelectedCategory);
 
-  const [label, setLabel] = useState("")
-  const [color, setColor] = useState("#3b5bdb")
-  const [loading, setLoading] = useState(false)
+  const [label, setLabel] = useState("");
+  const [color, setColor] = useState("#3b5bdb");
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     if (open) {
-      setLabel(initialData?.name ?? "")
-      setColor(initialData?.color ?? "#3b5bdb")
-      setTimeout(() => inputRef.current?.focus(), 50)
+      setLabel(initialData?.name ?? "");
+      setColor(initialData?.color ?? "#3b5bdb");
+      setTimeout(() => inputRef.current?.focus(), 50);
     }
-  }, [open, initialData])
+  }, [open, initialData]);
 
   const handleClickAway = (event: MouseEvent | TouchEvent) => {
     if (!anchorEl?.contains(event.target as Node)) {
-      onClose()
+      onClose();
     }
-  }
+  };
 
   const handleSave = async () => {
-    if (!label.trim()) return
-    setLoading(true)
+    if (!label.trim()) return;
+    setLoading(true);
     try {
       if (mode === EditorMode.ADD) {
-        const created = await addCategory({ name: label.trim(), color })
-        await reloadCategories()
-        setSelectedCategory(created.id)
+        const created = await addCategory({ name: label.trim(), color });
+        await reloadCategories();
+        setSelectedCategory(created.id);
       } else if (mode === EditorMode.EDIT && initialData?.id) {
-        await updateCategory(initialData.id, { name: label.trim(), color })
-        await reloadCategories()
+        await updateCategory(initialData.id, { name: label.trim(), color });
+        await reloadCategories();
       }
-      onClose()
+      onClose();
     } catch (e) {
-      console.error("Failed to save category", e)
+      console.error("Failed to save category", e);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleDelete = async () => {
-    if (!initialData?.id) return
-    setLoading(true)
+    if (!initialData?.id) return;
+    setLoading(true);
     try {
-      await deleteCategory(initialData.id)
-      await reloadCategories()
+      await deleteCategory(initialData.id);
+      await reloadCategories();
       if (selectedCategory === initialData.id) {
-        setSelectedCategory("all")
+        setSelectedCategory("all");
       }
-      onClose()
+      onClose();
     } catch (e) {
-      console.error("Failed to delete category", e)
+      console.error("Failed to delete category", e);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   return (
     <Popover
@@ -163,7 +159,7 @@ const CategoryEditor = ({
         </Paper>
       </ClickAwayListener>
     </Popover>
-  )
-}
+  );
+};
 
-export default CategoryEditor
+export default CategoryEditor;

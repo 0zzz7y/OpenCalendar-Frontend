@@ -1,26 +1,30 @@
-import type Note from "@/model/domain/note"
-import type NoteDto from "@/model/dto/note.dto"
-import type Calendar from "@/model/domain/calendar"
-import type Category from "@/model/domain/category"
+import type Note from "@/model/domain/note";
+import type NoteDto from "@/model/dto/note.dto";
+import type Calendar from "@/model/domain/calendar";
+import type Category from "@/model/domain/category";
 
-export const dtoToNote = (
+export function dtoToNote(
   dto: NoteDto,
   calendars: Calendar[],
   categories: Category[]
-): Note => ({
-  id: dto.id || "",
-  name: dto.name || "",
-  description: dto.description || "",
-  positionX: Math.floor(Math.random() * 100),
-  positionY: Math.floor(Math.random() * 100),
-  calendar: calendars.find((c) => c.id === dto.calendarId)! || "",
-  category: categories.find((c) => c.id === dto.categoryId)! || ""
-})
+): Note {
+  return {
+    id: dto.id ?? "",
+    name: dto.name,
+    description: dto.description,
+    calendar: calendars.find(c => c.id === dto.calendarId)!,
+    category: categories.find(c => c.id === dto.categoryId),
+    positionX: Math.floor(Math.random() * 100),
+    positionY: Math.floor(Math.random() * 100),
+  };
+}
 
-export const noteToDto = (note: Partial<Note>): NoteDto => ({
-  id: note.id || "",
-  name: note.name || "",
-  description: note.description || "",
-  calendarId: note.calendar?.id || "",
-  categoryId: note.category?.id || ""
-})
+export function noteToDto(note: Partial<Note>): NoteDto {
+  return {
+    id: note.id,
+    name: note.name,
+    description: note.description!,
+    calendarId: note.calendar!.id,
+    categoryId: note.category?.id,
+  };
+}

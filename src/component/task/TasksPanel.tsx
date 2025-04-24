@@ -1,28 +1,28 @@
-import MESSAGES from "@/constant/ui/messages"
-import useTask from "@/hook//useTask"
-import RecurringPattern from "@/model/domain/recurringPattern"
-import Task from "@/model/domain/task"
-import TaskStatus from "@/model/domain/taskStatus"
+import MESSAGES from "@/constant/ui/messages";
+import useTask from "@/repository/task.repository";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import Task from "@/model/domain/task";
+import TaskStatus from "@/model/domain/taskStatus";
 
-import { useState } from "react"
+import { useState } from "react";
 
-import { AddCircleOutline } from "@mui/icons-material"
-import { Box, TextField } from "@mui/material"
+import { AddCircleOutline } from "@mui/icons-material";
+import { Box, TextField } from "@mui/material";
 
-import TaskBoard from "./TasksBoard"
-import useAppStore from "@/store/useAppStore"
+import TaskBoard from "./TasksBoard";
+import useAppStore from "@/store/useAppStore";
 
 const TasksPanel = () => {
-  const { tasks, categories, calendars } = useAppStore()
-  const { addTask, updateTask, deleteTask, reloadTasks } = useTask()
+  const { tasks, categories, calendars } = useAppStore();
+  const { addTask, updateTask, deleteTask, reloadTasks } = useTask();
 
-  const [newTitle, setNewTitle] = useState("")
+  const [newTitle, setNewTitle] = useState("");
 
   const handleCreate = async () => {
-    if (!newTitle.trim()) return
+    if (!newTitle.trim()) return;
 
-    const defaultCalendar = calendars[0] || null
-    const defaultCategory = categories[0] || null
+    const defaultCalendar = calendars[0] || null;
+    const defaultCategory = categories[0] || null;
 
     const newTask: Partial<Task> = {
       name: newTitle,
@@ -32,24 +32,24 @@ const TasksPanel = () => {
       status: TaskStatus.TODO,
       recurringPattern: RecurringPattern.NONE,
       startDate: "",
-      endDate: ""
-    }
+      endDate: "",
+    };
 
-    await addTask(newTask)
-    await reloadTasks()
+    await addTask(newTask);
+    await reloadTasks();
 
-    setNewTitle("")
-  }
+    setNewTitle("");
+  };
 
   const handleUpdate = async (updated: Task) => {
-    await updateTask(updated.id, updated)
-    await reloadTasks()
-  }
+    await updateTask(updated.id, updated);
+    await reloadTasks();
+  };
 
   const handleDelete = async (id: string) => {
-    await deleteTask(id)
-    await reloadTasks()
-  }
+    await deleteTask(id);
+    await reloadTasks();
+  };
 
   return (
     <Box
@@ -59,7 +59,7 @@ const TasksPanel = () => {
         height: "100vh",
         overflow: "hidden",
         p: 2,
-        boxSizing: "border-box"
+        boxSizing: "border-box",
       }}
     >
       <TextField
@@ -74,7 +74,7 @@ const TasksPanel = () => {
               sx={{ cursor: "pointer" }}
               onClick={handleCreate}
             />
-          )
+          ),
         }}
         sx={{ marginBottom: 2 }}
       />
@@ -89,7 +89,7 @@ const TasksPanel = () => {
         />
       </Box>
     </Box>
-  )
-}
+  );
+};
 
-export default TasksPanel
+export default TasksPanel;

@@ -1,27 +1,27 @@
-import BUTTONS from "@/constant/ui/buttons"
-import MESSAGES from "@/constant/ui/messages"
-import useEvent from "@/hook/useEvent"
-import Schedulable from "@/model/domain/schedulable"
+import BUTTONS from "@/constant/ui/buttons";
+import MESSAGES from "@/constant/ui/messages";
+import useEvent from "@/repository/event.repository";
+import Schedulable from "@/model/domain/schedulable";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 
-import { Edit, Delete } from "@mui/icons-material"
+import { Edit, Delete } from "@mui/icons-material";
 import {
   Box,
   Typography,
   IconButton,
   Stack,
   Popover,
-  Button
-} from "@mui/material"
-import useAppStore from "@/store/useAppStore"
+  Button,
+} from "@mui/material";
+import useAppStore from "@/store/useAppStore";
 
 interface EventInformationPopoverProperties {
-  anchorElement: HTMLElement | null
-  event: Schedulable | null
-  onClose: () => void
-  onEdit: () => void
-  onDelete: (eventId: string) => void
+  anchorElement: HTMLElement | null;
+  event: Schedulable | null;
+  onClose: () => void;
+  onEdit: () => void;
+  onDelete: (eventId: string) => void;
 }
 
 const EventInformationPopover = ({
@@ -29,35 +29,35 @@ const EventInformationPopover = ({
   event,
   onClose,
   onEdit,
-  onDelete
+  onDelete,
 }: EventInformationPopoverProperties) => {
-  const open = Boolean(anchorElement && event)
-  const { events } = useAppStore()
-  const { reloadEvents } = useEvent()
+  const open = Boolean(anchorElement && event);
+  const { events } = useAppStore();
+  const { reloadEvents } = useEvent();
 
-  const [currentEvent, setCurrentEvent] = useState<Schedulable | null>(event)
-  const [confirmingDelete, setConfirmingDelete] = useState(false)
+  const [currentEvent, setCurrentEvent] = useState<Schedulable | null>(event);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
-  const handleDeleteClick = () => setConfirmingDelete(true)
+  const handleDeleteClick = () => setConfirmingDelete(true);
 
   const handleConfirmDelete = () => {
-    if (event) onDelete(event.id)
-    setConfirmingDelete(false)
-    onClose()
-  }
+    if (event) onDelete(event.id);
+    setConfirmingDelete(false);
+    onClose();
+  };
 
-  const handleCancelDelete = () => setConfirmingDelete(false)
+  const handleCancelDelete = () => setConfirmingDelete(false);
 
   useEffect(() => {
     const refresh = async () => {
-      await reloadEvents()
+      await reloadEvents();
       if (event?.id) {
-        const updated = events.find((e) => e.id === event.id)
-        if (updated) setCurrentEvent(updated)
+        const updated = events.find((e) => e.id === event.id);
+        if (updated) setCurrentEvent(updated);
       }
-    }
-    if (event?.id) refresh()
-  }, [event?.id, events])
+    };
+    if (event?.id) refresh();
+  }, [event?.id, events]);
 
   return (
     <Popover
@@ -93,7 +93,11 @@ const EventInformationPopover = ({
             <>
               <Typography variant="body2" color="text.secondary">
                 {currentEvent.startDate && currentEvent.endDate
-                  ? `${new Date(currentEvent.startDate).toLocaleString()} – ${new Date(currentEvent.endDate).toLocaleString()}`
+                  ? `${new Date(
+                      currentEvent.startDate
+                    ).toLocaleString()} – ${new Date(
+                      currentEvent.endDate
+                    ).toLocaleString()}`
                   : "No date available"}
               </Typography>
 
@@ -128,7 +132,7 @@ const EventInformationPopover = ({
         </Stack>
       )}
     </Popover>
-  )
-}
+  );
+};
 
-export default EventInformationPopover
+export default EventInformationPopover;

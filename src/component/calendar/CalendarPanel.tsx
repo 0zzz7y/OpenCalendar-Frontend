@@ -1,90 +1,90 @@
-import useEvent from "@/hook/useEvent"
-import useTask from "@/hook/useTask"
+import useEvent from "@/repository/event.repository";
+import useTask from "@/repository/task.repository";
 
-import EventPopover from "@/component/event/EventCreationPopover"
-import EventInformationPopover from "@/component/event/EventInformationPopover"
-import CalendarViewSwitcher from "@/component/calendar/CalendarViewSwitcher"
-import DayView from "@/component/calendar/DayView"
-import WeekView from "@/component/calendar/WeekView"
-import MonthView from "@/component/calendar/MonthView"
+import EventPopover from "@/component/event/EventCreationPopover";
+import EventInformationPopover from "@/component/event/EventInformationPopover";
+import CalendarViewSwitcher from "@/component/calendar/CalendarViewSwitcher";
+import DayView from "@/component/calendar/DayView";
+import WeekView from "@/component/calendar/WeekView";
+import MonthView from "@/component/calendar/MonthView";
 
-import RecurringPattern from "@/model/domain/recurringPattern"
-import type Event from "@/model/domain/event"
-import type Schedulable from "@/model/domain/schedulable"
+import RecurringPattern from "@/model/domain/recurringPattern";
+import type Event from "@/model/domain/event";
+import type Schedulable from "@/model/domain/schedulable";
 
-import { Box, Typography, Button } from "@mui/material"
-import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
-import ChevronRightIcon from "@mui/icons-material/ChevronRight"
+import { Box, Typography, Button } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
 
-import dayjs, { ManipulateType } from "dayjs"
-import { useEffect, useState } from "react"
-import Task from "@/model/domain/task"
-import useAppStore from "@/store/useAppStore"
-import useCalendar from "@/hook/useCalendar"
-import useNote from "@/hook/useNote"
-import useCategory from "@/hook/useCategory"
-import ViewType from "@/model/utility/viewType"
-import viewType from "@/model/utility/viewType"
-import YearView from "./YearView"
+import dayjs, { ManipulateType } from "dayjs";
+import { useEffect, useState } from "react";
+import Task from "@/model/domain/task";
+import useAppStore from "@/store/useAppStore";
+import useCalendar from "@/repository/calendar.repository";
+import useNote from "@/repository/note.repository";
+import useCategory from "@/repository/category.repository";
+import ViewType from "@/model/utility/viewType";
+import viewType from "@/model/utility/viewType";
+import YearView from "./YearView";
 
 const CalendarPanel = () => {
-  const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent()
-  const { reloadTasks } = useTask()
-  const { reloadCalendars } = useCalendar()
-  const { reloadNotes } = useNote()
-  const { reloadCategories } = useCategory()
-  const { events, tasks, calendars, categories } = useAppStore()
-  const { selectedCalendar, selectedCategory } = useAppStore()
+  const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent();
+  const { reloadTasks } = useTask();
+  const { reloadCalendars } = useCalendar();
+  const { reloadNotes } = useNote();
+  const { reloadCategories } = useCategory();
+  const { events, tasks, calendars, categories } = useAppStore();
+  const { selectedCalendar, selectedCategory } = useAppStore();
 
-  const [view, setView] = useState<ViewType>(ViewType.WEEK)
-  const [selectedDate, setSelectedDate] = useState(new Date())
-  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
-  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null)
-  const [infoEvent, setInfoEvent] = useState<Event | null>(null)
-  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
+  const [view, setView] = useState<ViewType>(ViewType.WEEK);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null);
+  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
 
-  const safeEvents: Event[] = Array.isArray(events) ? events : []
-  const safeTasks: Task[] = Array.isArray(tasks) ? tasks : []
+  const safeEvents: Event[] = Array.isArray(events) ? events : [];
+  const safeTasks: Task[] = Array.isArray(tasks) ? tasks : [];
 
   const schedulables: Schedulable[] = [
     ...safeEvents,
-    ...safeTasks.filter((task) => task.startDate && task.endDate)
+    ...safeTasks.filter((task) => task.startDate && task.endDate),
   ].filter((item) => {
     const calendarMatch =
-      selectedCalendar === "all" || item.calendar.id === selectedCalendar
+      selectedCalendar === "all" || item.calendar.id === selectedCalendar;
     const categoryMatch =
-      selectedCategory === "all" || item.category?.id === selectedCategory
-    return calendarMatch && categoryMatch
-  })
+      selectedCategory === "all" || item.category?.id === selectedCategory;
+    return calendarMatch && categoryMatch;
+  });
 
   const handleSlotClick = (el: HTMLElement, date: Date) => {
-    setSelectedSlot(el)
-    setSelectedDatetime(date)
-    setEditingEvent(null)
-    setInfoEvent(null)
-  }
+    setSelectedSlot(el);
+    setSelectedDatetime(date);
+    setEditingEvent(null);
+    setInfoEvent(null);
+  };
 
   const handleEventClick = (event: Event) => {
-    const element = document.querySelector(`#event-${event.id}`) as HTMLElement
+    const element = document.querySelector(`#event-${event.id}`) as HTMLElement;
     if (element) {
-      setInfoAnchor(element)
-      setInfoEvent(event)
+      setInfoAnchor(element);
+      setInfoEvent(event);
     }
-  }
+  };
 
   const handleClosePopover = () => {
-    setSelectedSlot(null)
-    setSelectedDatetime(null)
-    setEditingEvent(null)
-  }
+    setSelectedSlot(null);
+    setSelectedDatetime(null);
+    setEditingEvent(null);
+  };
 
   const handleSave = async (data: Partial<Event>) => {
-    if (!data.startDate || !data.calendar) return
+    if (!data.startDate || !data.calendar) return;
 
-    const exists = events.find((e) => e.id === data.id)
+    const exists = events.find((e) => e.id === data.id);
     if (exists && data.id) {
-      await updateEvent(data.id, data)
+      await updateEvent(data.id, data);
     } else {
       const newEvent: Omit<Event, "id"> = {
         name: data.name ?? "New event",
@@ -93,42 +93,65 @@ const CalendarPanel = () => {
         endDate: data.endDate ?? data.startDate,
         calendar: data.calendar,
         category: data.category,
-        recurringPattern: RecurringPattern.NONE
-      }
-      await addEvent(newEvent)
+        recurringPattern: RecurringPattern.NONE,
+      };
+      await addEvent(newEvent);
     }
 
-    handleClosePopover()
-  }
+    handleClosePopover();
+  };
 
   const handleEditEvent = () => {
-    if (!infoEvent) return
-    setEditingEvent(infoEvent)
-    setSelectedDatetime(new Date(infoEvent.startDate))
-    setSelectedSlot(infoAnchor)
-    setInfoEvent(null)
-  }
+    if (!infoEvent) return;
+    setEditingEvent(infoEvent);
+    setSelectedDatetime(new Date(infoEvent.startDate));
+    setSelectedSlot(infoAnchor);
+    setInfoEvent(null);
+  };
 
   const handleDeleteEvent = async (id: string) => {
-    await deleteEvent(id)
-    setInfoEvent(null)
-  }
+    await deleteEvent(id);
+    setInfoEvent(null);
+  };
 
   const navigate = (dir: "previous" | "next") => {
-    const unit = view === ViewType.MONTH ? ViewType.MONTH : view === ViewType.WEEK ? ViewType.WEEK : ViewType.DAY
-    const delta = dir === "next" ? 1 : -1
-    setSelectedDate(dayjs(selectedDate).add(delta, view.toLowerCase() as ManipulateType).toDate())
-  }
+    const unit =
+      view === ViewType.MONTH
+        ? ViewType.MONTH
+        : view === ViewType.WEEK
+        ? ViewType.WEEK
+        : ViewType.DAY;
+    const delta = dir === "next" ? 1 : -1;
+    setSelectedDate(
+      dayjs(selectedDate)
+        .add(delta, view.toLowerCase() as ManipulateType)
+        .toDate()
+    );
+  };
 
   return (
     <>
-      <Box display="flex" justifyContent="space-between" alignItems="center" px={2} py={1}>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={2}
+        py={1}
+      >
         <Box display="flex" alignItems="center" gap={1}>
-          <Button onClick={() => navigate("previous")}> <ChevronLeftIcon /> </Button>
+          <Button onClick={() => navigate("previous")}>
+            {" "}
+            <ChevronLeftIcon />{" "}
+          </Button>
           <Typography variant="h6">
-            {dayjs(selectedDate).format(view === ViewType.MONTH ? "MMMM YYYY" : "DD MMM YYYY")}
+            {dayjs(selectedDate).format(
+              view === ViewType.MONTH ? "MMMM YYYY" : "DD MMM YYYY"
+            )}
           </Typography>
-          <Button onClick={() => navigate("next")}> <ChevronRightIcon /> </Button>
+          <Button onClick={() => navigate("next")}>
+            {" "}
+            <ChevronRightIcon />{" "}
+          </Button>
         </Box>
         <CalendarViewSwitcher view={view} onChange={setView} />
       </Box>
@@ -190,7 +213,7 @@ const CalendarPanel = () => {
               endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
               calendar: calendars[0],
               category: undefined,
-              recurringPattern: RecurringPattern.NONE
+              recurringPattern: RecurringPattern.NONE,
             }
           }
         />
@@ -206,7 +229,7 @@ const CalendarPanel = () => {
         />
       )}
     </>
-  )
-}
+  );
+};
 
-export default CalendarPanel
+export default CalendarPanel;
