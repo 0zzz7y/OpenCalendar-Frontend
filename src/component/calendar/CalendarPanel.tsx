@@ -44,14 +44,6 @@ const CalendarPanel = () => {
   const [infoEvent, setInfoEvent] = useState<Event | null>(null)
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
-  useEffect(() => {
-    reloadCalendars()
-    reloadCategories()
-    reloadEvents()
-    reloadTasks()
-    reloadNotes()
-  }, [])
-
   const safeEvents: Event[] = Array.isArray(events) ? events : []
   const safeTasks: Task[] = Array.isArray(tasks) ? tasks : []
 

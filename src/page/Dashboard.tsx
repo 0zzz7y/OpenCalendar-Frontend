@@ -1,14 +1,18 @@
-import CalendarEditor from "@/component/calendar/CalendarEditor"
 import CalendarPanel from "@/component/calendar/CalendarPanel"
 import CalendarSelector from "@/component/calendar/CalendarSelector"
 import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
-import CategoryEditor from "@/component/category/CategoryEditor"
 import CategorySelector from "@/component/category/CategorySelector"
 import NotesPanel from "@/component/note/NotesPanel"
 import TasksPanel from "@/component/task/TasksPanel"
+import useCalendar from "@/hook/useCalendar"
+import useCategory from "@/hook/useCategory"
+import useEvent from "@/hook/useEvent"
+import useNote from "@/hook/useNote"
+import useTask from "@/hook/useTask"
 import ThemeToggleButton from "@/theme/ThemeToggleButton"
 
 import { Box } from "@mui/material"
+import { useEffect } from "react"
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
 
 const panelStyle = {
@@ -19,6 +23,20 @@ const panelStyle = {
 }
 
 const Dashboard = () => {
+  const { reloadEvents } = useEvent()
+  const { reloadTasks } = useTask()
+  const { reloadNotes } = useNote()
+  const { reloadCalendars } = useCalendar()
+  const { reloadCategories } = useCategory()
+
+  useEffect(() => {
+    reloadCalendars()
+    reloadCategories()
+    reloadEvents()
+    reloadTasks()
+    reloadNotes()
+  }, [])
+
   return (
     <PanelGroup direction="horizontal" style={{ height: "100vh", width: "100%" }}>
       {/* Left Panel */}

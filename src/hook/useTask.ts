@@ -1,11 +1,15 @@
-// hook/useTask.ts
 import { useCallback } from "react"
-import { getTasks, createTask, updateTask, deleteTask } from "@/service/task.service"
+import {
+  getTasks,
+  createTask,
+  updateTask as serviceUpdateTask,
+  deleteTask as serviceDeleteTask
+} from "@/service/task.service"
 import useAppStore from "@/store/useAppStore"
 import type Task from "@/model/domain/task"
 
 const useTask = () => {
-  const setTasks = useAppStore((state: { setTasks: (tasks: Task[]) => void }) => state.setTasks)
+  const setTasks = useAppStore((state) => state.setTasks)
 
   const reloadTasks = useCallback(async () => {
     const data = await getTasks()
@@ -13,22 +17,27 @@ const useTask = () => {
   }, [setTasks])
 
   const addTask = useCallback(async (task: Partial<Task>) => {
-    return await createTask(task)
-  }, [])
+    const created = await createTask(task)
+    setTasks((prev: Task[]) => [...prev, created])
+    return created
+  }, [setTasks])
 
-  const updateTaskById = useCallback(async (id: string, updates: Partial<Task>) => {
-    return await updateTask(id, updates)
-  }, [])
+  const updateTask = useCallback(async (id: string, updates: Partial<Task>) => {
+    const updated = await serviceUpdateTask(id, updates)
+    setTasks((prev: Task[]) => prev.map((t) => (t.id === id ? updated : t)))
+    return updated
+  }, [setTasks])
 
-  const deleteTaskById = useCallback(async (id: string) => {
-    return await deleteTask(id)
-  }, [])
+  const deleteTask = useCallback(async (id: string) => {
+    await serviceDeleteTask(id)
+    setTasks((prev: Task[]) => prev.filter((t) => t.id !== id))
+  }, [setTasks])
 
   return {
     reloadTasks,
     addTask,
-    updateTask: updateTaskById,
-    deleteTask: deleteTaskById
+    updateTask,
+    deleteTask
   }
 }
 

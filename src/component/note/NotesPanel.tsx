@@ -12,18 +12,10 @@ import NoteCard from "./NoteCard"
 import useAppStore from "@/store/useAppStore"
 
 const NotesPanel = () => {
-  const { addNote, updateNote, deleteNote, reloadNotes } = useNotes()
+  const { addNote, updateNote, deleteNote } = useNotes()
   const { notes, categories, calendars } = useAppStore()
 
-  const didFetchRef = useRef(false)
   const [localNotes, setLocalNotes] = useState<Note[]>([])
-
-  useEffect(() => {
-    if (!didFetchRef.current) {
-      reloadNotes()
-      didFetchRef.current = true
-    }
-  }, [])
 
   useEffect(() => {
     if (Array.isArray(notes)) {

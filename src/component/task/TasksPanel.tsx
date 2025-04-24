@@ -14,19 +14,12 @@ import useAppStore from "@/store/useAppStore"
 
 const TasksPanel = () => {
   const { tasks, categories, calendars } = useAppStore()
-  const { addTask, updateTask, deleteTask, reloadTasks } = useTask()
+  const { addTask, updateTask, deleteTask } = useTask()
 
   const [newTitle, setNewTitle] = useState("")
   const [localTasks, setLocalTasks] = useState<Task[]>([])
 
   const didFetchRef = useRef(false)
-
-  useEffect(() => {
-    if (!didFetchRef.current) {
-      reloadTasks()
-      didFetchRef.current = true
-    }
-  }, [])
 
   useEffect(() => {
     setLocalTasks(tasks)
