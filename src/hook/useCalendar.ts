@@ -1,34 +1,43 @@
-// hook/useCalendar.ts
 import { useCallback } from "react"
-import { getCalendars, createCalendar, updateCalendar, deleteCalendar } from "@/service/calendar.service"
+import {
+  getCalendars,
+  createCalendar,
+  updateCalendar as serviceUpdate,
+  deleteCalendar as serviceDelete
+} from "@/service/calendar.service"
 import useAppStore from "@/store/useAppStore"
 import type Calendar from "@/model/domain/calendar"
 
 const useCalendar = () => {
-  const setCalendars = useAppStore((state: { setCalendars: (calendars: Calendar[]) => void }) => state.setCalendars)
+  const { calendars, setCalendars } = useAppStore()
 
   const reloadCalendars = useCallback(async () => {
     const data = await getCalendars()
     setCalendars(data)
   }, [setCalendars])
 
-  const addCalendar = useCallback(async (calendar: { name: string; emoji?: string }) => {
-    return await createCalendar(calendar)
-  }, [])
+  const addCalendar = useCallback(async (calendar: Partial<Calendar>) => {
+    const created = await createCalendar(calendar as Calendar)
+    setCalendars([...calendars, created])
+    return created
+  }, [calendars, setCalendars])
 
-  const updateCalendarById = useCallback(async (id: string, updates: Partial<Calendar>) => {
-    return await updateCalendar(id, updates)
-  }, [])
+  const updateCalendar = useCallback(async (id: string, updates: Partial<Calendar>) => {
+    const updated = await serviceUpdate(id, updates)
+    setCalendars(calendars.map((c) => (c.id === id ? updated : c)))
+    return updated
+  }, [calendars, setCalendars])
 
-  const deleteCalendarById = useCallback(async (id: string) => {
-    return await deleteCalendar(id)
-  }, [])
+  const deleteCalendar = useCallback(async (id: string) => {
+    await serviceDelete(id)
+    setCalendars(calendars.filter((c) => c.id !== id))
+  }, [calendars, setCalendars])
 
   return {
     reloadCalendars,
     addCalendar,
-    updateCalendar: updateCalendarById,
-    deleteCalendar: deleteCalendarById
+    updateCalendar,
+    deleteCalendar
   }
 }
 

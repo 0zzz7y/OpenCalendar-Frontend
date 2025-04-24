@@ -1,9 +1,9 @@
-import Calendar from "../domain/calendar"
-import Category from "../domain/category"
-import RecurringPattern from "../domain/recurringPattern"
-import Task from "../domain/task"
-import TaskStatus from "../domain/taskStatus"
-import TaskDto from "../dto/taskDto"
+import Calendar from "@/model/domain/calendar"
+import Category from "@/model/domain/category"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import Task from "@/model/domain/task"
+import TaskStatus from "@/model/domain/taskStatus"
+import TaskDto from "@/model/dto/task.dto"
 
 export const toTaskDto = (task: Partial<Task>): TaskDto => ({
   id: task.id,

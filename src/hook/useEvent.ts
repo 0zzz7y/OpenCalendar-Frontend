@@ -1,11 +1,15 @@
-// hook/useEvent.ts
 import { useCallback } from "react"
-import { getEvents, createEvent, updateEvent, deleteEvent } from "@/service/event.service"
+import {
+  getEvents,
+  createEvent,
+  updateEvent as serviceUpdate,
+  deleteEvent as serviceDelete
+} from "@/service/event.service"
 import useAppStore from "@/store/useAppStore"
 import type Event from "@/model/domain/event"
 
 const useEvent = () => {
-  const setEvents = useAppStore((state: { setEvents: (events: Event[]) => void }) => state.setEvents)
+  const { events, setEvents } = useAppStore()
 
   const reloadEvents = useCallback(async () => {
     const data = await getEvents()
@@ -13,22 +17,27 @@ const useEvent = () => {
   }, [setEvents])
 
   const addEvent = useCallback(async (event: Partial<Event>) => {
-    return await createEvent(event)
-  }, [])
+    const created = await createEvent(event)
+    setEvents([...events, created])
+    return created
+  }, [events, setEvents])
 
-  const updateEventById = useCallback(async (id: string, updates: Partial<Event>) => {
-    return await updateEvent(id, updates)
-  }, [])
+  const updateEvent = useCallback(async (id: string, updates: Partial<Event>) => {
+    const updated = await serviceUpdate(id, updates)
+    setEvents(events.map((e) => (e.id === id ? updated : e)))
+    return updated
+  }, [events, setEvents])
 
-  const deleteEventById = useCallback(async (id: string) => {
-    return await deleteEvent(id)
-  }, [])
+  const deleteEvent = useCallback(async (id: string) => {
+    await serviceDelete(id)
+    setEvents(events.filter((e) => e.id !== id))
+  }, [events, setEvents])
 
   return {
     reloadEvents,
     addEvent,
-    updateEvent: updateEventById,
-    deleteEvent: deleteEventById
+    updateEvent,
+    deleteEvent
   }
 }
 

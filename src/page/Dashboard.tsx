@@ -40,10 +40,10 @@ const Dashboard = () => {
   return (
     <PanelGroup direction="horizontal" style={{ height: "100vh", width: "100%" }}>
       {/* Left Panel */}
-      <Panel defaultSize={16}>
+      <Panel defaultSize={18}>
         <PanelGroup direction="vertical" style={{ height: "100%", width: "100%" }}>
           {/* Calendar and Category Section */}
-          <Panel style={panelStyle}>
+          <Panel style={panelStyle} defaultSize={12}>
             <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
               <Box display="flex" flexDirection="column" gap={2}>
                 <CalendarSelector />
@@ -55,8 +55,8 @@ const Dashboard = () => {
           <PanelResizeHandle />
 
           {/* Monthly Calendar */}
-          <Panel defaultSize={30} style={{ ...panelStyle, minHeight: "150px", position: "relative", margin: "5px 5px" }}>
-            <Box sx={{ alignSelf: "flex-start", mt: "-16px", ml: "-24px" }}>
+          <Panel defaultSize={30} style={{ ...panelStyle, minHeight: "290px", minWidth: "320px", position: "relative", margin: "5px 5px" }}>
+            <Box sx={{ alignSelf: "left", mt: "-16px", ml: "-24px" }}>
               <MonthlyCalendar />
             </Box>
           </Panel>
@@ -64,7 +64,7 @@ const Dashboard = () => {
           <PanelResizeHandle />
 
           {/* Notes Section */}
-          <Panel defaultSize={58.5} style={{ ...panelStyle, margin: "10px 5px", padding: 0 }}>
+          <Panel style={{ ...panelStyle, margin: "10px 5px", padding: 0 }}>
             <Box display="flex" flexDirection="column" height="100%" position="relative">
               <Box flexGrow={1} overflow="auto">
                 <NotesPanel />
@@ -87,7 +87,7 @@ const Dashboard = () => {
       <PanelResizeHandle />
 
       {/* Right Panel */}
-      <Panel defaultSize={26}>
+      <Panel defaultSize={20}>
         <Box display="flex" flexDirection="column" height="100%" sx={{ ...panelStyle, m: "10px 10px 5px 5px" }}>
           <Box flexGrow={1} overflow="auto">
             <TasksPanel />

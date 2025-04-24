@@ -6,7 +6,7 @@ interface EventDto {
   description?: string
   startDate: string
   endDate: string
-  recurringPattern?: RecurringPattern
+  recurringPattern: RecurringPattern
   calendarId: string
   categoryId?: string
 }

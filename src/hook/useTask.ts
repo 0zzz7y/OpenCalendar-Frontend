@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { getTasks, createTask, updateTask as serviceUpdate, deleteTask as serviceDelete } from "@/service/task.service"
 import useAppStore from "@/store/useAppStore"
-import { toTaskDto, fromTaskDto } from "@/model/mapper/taskMapper"
+import { toTaskDto, fromTaskDto } from "@/model/mapper/task.mapper"
 import type Task from "@/model/domain/task"
 
 const useTask = () => {
@@ -11,9 +11,8 @@ const useTask = () => {
   const categoryMap = new Map(categories.map(c => [c.id, c]))
 
   const reloadTasks = useCallback(async () => {
-    const dtos = await getTasks()
-    const domainTasks = dtos.map(dto => fromTaskDto(dto, calendarMap, categoryMap))
-    setTasks(domainTasks)
+    const data = await getTasks()
+    setTasks(data)
   }, [calendars, categories, setTasks])
 
   const addTask = useCallback(async (task: Partial<Task>) => {
