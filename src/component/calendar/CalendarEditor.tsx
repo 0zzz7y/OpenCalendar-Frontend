@@ -14,7 +14,6 @@ import {
 import EmojiPicker, {
   type EmojiClickData,
   EmojiStyle,
-  SkinTones,
   Theme
 } from "emoji-picker-react"
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"

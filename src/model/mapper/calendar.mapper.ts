@@ -1,7 +1,7 @@
 import type Calendar from "@/model/domain/calendar"
 import type CalendarDto from "@/model/dto/calendar.dto"
 
-export const calendarToDomain = (dto: CalendarDto): Calendar => ({
+export const dtoToCalendar = (dto: CalendarDto): Calendar => ({
   id: dto.id || "",
   name: dto.name || "",
   emoji: dto.emoji || "",

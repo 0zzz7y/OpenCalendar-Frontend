@@ -4,7 +4,7 @@ import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"
 import RecurringPattern from "../domain/recurringPattern"
 
-export const eventToDomain = (
+export const dtoToEvent = (
   dto: EventDto,
   calendars: Calendar[],
   categories: Category[]
@@ -15,8 +15,8 @@ export const eventToDomain = (
   startDate: dto.startDate || "",
   endDate: dto.endDate || "",
   recurringPattern: dto.recurringPattern || RecurringPattern.NONE,
-  calendar: calendars.find((c) => c.id === dto.calendarId)!,
-  category: categories.find((c) => c.id === dto.categoryId)
+  calendar: calendars.find((c) => c.id === dto.calendarId)! || "",
+  category: categories.find((c) => c.id === dto.categoryId)! || ""
 })
 
 export const eventToDto = (event: Partial<Event>): EventDto => ({
