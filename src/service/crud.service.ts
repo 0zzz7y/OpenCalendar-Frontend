@@ -1,11 +1,6 @@
 import PaginatedResponse from "@/model/communication/paginatedResponse";
 
-/**
- * Generic CRUD service factory.
- * @template TDto - DTO type for this resource
- */
 export function createCrudService<TDto>(
-  /** Base endpoint path, e.g. "tasks" maps to "/api/tasks" */
   resource: string
 ) {
   const baseUrl = `${resource}`;
