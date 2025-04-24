@@ -1,7 +1,7 @@
 import type Event from "@/model/domain/event"
 import axios from "axios"
 
-const base = "/event"
+const base = `${import.meta.env.VITE_BASE_URL}/events`
 
 export const getEvents = async (): Promise<Event[]> => {
   const result = await axios.get(base)

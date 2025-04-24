@@ -1,7 +1,7 @@
 import type Calendar from "@/model/domain/calendar"
 import axios from "axios"
 
-const base = "/calendar"
+const base = `${import.meta.env.VITE_BASE_URL}/calendars`
 
 export const getCalendars = async (): Promise<Calendar[]> => {
   const result = await axios.get(base)

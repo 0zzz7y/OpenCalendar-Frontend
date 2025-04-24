@@ -1,7 +1,7 @@
 import type Note from "@/model/domain/note"
 import axios from "axios"
 
-const base = "/note"
+const base = `${import.meta.env.VITE_BASE_URL}/notes`
 
 export const getNotes = async (): Promise<Note[]> => {
   const result = await axios.get(base)

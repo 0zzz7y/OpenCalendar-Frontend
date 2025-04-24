@@ -29,9 +29,7 @@ const Dashboard = () => {
             <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
               <Box display="flex" flexDirection="column" gap={2}>
                 <CalendarSelector />
-                <CalendarEditor />
                 <CategorySelector />
-                <CategoryEditor />
               </Box>
             </Box>
           </Panel>

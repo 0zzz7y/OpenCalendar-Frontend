@@ -85,10 +85,12 @@ const TaskBoard = ({
   }
 
   useEffect(() => {
+    const safeTasks = Array.isArray(tasks) ? tasks : []
+  
     setLocalOrder({
-      TODO: tasks.filter((t) => t.status === "TODO"),
-      IN_PROGRESS: tasks.filter((t) => t.status === "IN_PROGRESS"),
-      DONE: tasks.filter((t) => t.status === "DONE")
+      TODO: safeTasks.filter((t) => t.status === "TODO"),
+      IN_PROGRESS: safeTasks.filter((t) => t.status === "IN_PROGRESS"),
+      DONE: safeTasks.filter((t) => t.status === "DONE")
     })
   }, [tasks])
 

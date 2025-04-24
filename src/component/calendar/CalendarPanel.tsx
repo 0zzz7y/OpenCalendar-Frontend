@@ -1,33 +1,35 @@
 import useCalendar from "@/hook/useCalendar"
 import useCategory from "@/hook/useCategory"
 import useEvent from "@/hook/useEvent"
-import useFilters from "@/hook/useFilter"
 import useTask from "@/hook/useTask"
-import Event from "@/model/domain/event"
+import useFilter from "@/hook/useFilter"
+
+import EventPopover from "@/component/event/EventCreationPopover"
+import EventInformationPopover from "@/component/event/EventInformationPopover"
+import CalendarViewSwitcher from "@/component/calendar/CalendarViewSwitcher"
+import DayView from "@/component/calendar/DayView"
+import WeekView from "@/component/calendar/WeekView"
+import MonthView from "@/component/calendar/MonthView"
+
 import RecurringPattern from "@/model/domain/recurringPattern"
-import Schedulable from "@/model/domain/schedulable"
+import type Event from "@/model/domain/event"
+import type Schedulable from "@/model/domain/schedulable"
 
-import { useEffect, useState } from "react"
-
+import { Box, Typography, Button } from "@mui/material"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
-import { Box, Typography, Button } from "@mui/material"
-import dayjs from "dayjs"
 
-import CalendarViewSwitcher from "../calendar/CalendarViewSwitcher"
-import EventPopover from "../event/EventCreationPopover"
-import EventInformationPopover from "../event/EventInformationPopover"
-import DayView from "./DayView"
-import MonthView from "./MonthView"
-import WeekView from "./WeekView"
+import dayjs from "dayjs"
+import { useEffect, useState } from "react"
+import Task from "@/model/domain/task"
+import useAppStore from "@/store/useAppStore"
 
 const CalendarPanel = () => {
-  const { events, addEvent, updateEvent, deleteEvent, reloadEvents } =
-    useEvent()
-  const { tasks, reloadTasks } = useTask()
-  const { calendars } = useCalendar()
-  const { categories } = useCategory()
-  const { selectedCalendar, selectedCategory } = useFilters()
+  const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent()
+  const { reloadTasks } = useTask()
+  const { events, tasks, calendars, categories } = useAppStore()
+  const {  } = useCategory()
+  const { selectedCalendar, selectedCategory } = useFilter()
 
   const [view, setView] = useState<"day" | "week" | "month">("week")
   const [selectedDate, setSelectedDate] = useState(new Date())
@@ -42,9 +44,13 @@ const CalendarPanel = () => {
     reloadTasks()
   }, [])
 
+  const safeEvents: Event[] = Array.isArray(events) ? events : []
+
+  const safeTasks: Task[] = Array.isArray(tasks) ? tasks : []
+
   const schedulables: Schedulable[] = [
-    ...events,
-    ...tasks.filter((task) => task.startDate && task.endDate)
+    ...safeEvents,
+    ...safeTasks.filter((task) => task.startDate && task.endDate)
   ].filter((item) => {
     const calendarMatch =
       selectedCalendar === "all" || item.calendar.id === selectedCalendar
@@ -53,9 +59,9 @@ const CalendarPanel = () => {
     return calendarMatch && categoryMatch
   })
 
-  const handleSlotClick = (element: HTMLElement, datetime: Date) => {
-    setSelectedSlot(element)
-    setSelectedDatetime(datetime)
+  const handleSlotClick = (el: HTMLElement, date: Date) => {
+    setSelectedSlot(el)
+    setSelectedDatetime(date)
     setEditingEvent(null)
     setInfoEvent(null)
   }
@@ -78,7 +84,6 @@ const CalendarPanel = () => {
     if (!data.startDate || !data.calendar) return
 
     const exists = events.find((e) => e.id === data.id)
-
     if (exists && data.id) {
       await updateEvent(data.id, data)
     } else {
@@ -91,7 +96,6 @@ const CalendarPanel = () => {
         category: data.category,
         recurringPattern: RecurringPattern.NONE
       }
-
       await addEvent(newEvent)
     }
 
@@ -99,8 +103,9 @@ const CalendarPanel = () => {
   }
 
   const handleEditEvent = () => {
+    if (!infoEvent) return
     setEditingEvent(infoEvent)
-    setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null)
+    setSelectedDatetime(new Date(infoEvent.startDate))
     setSelectedSlot(infoAnchor)
     setInfoEvent(null)
   }
@@ -110,35 +115,26 @@ const CalendarPanel = () => {
     setInfoEvent(null)
   }
 
-  const navigate = (direction: "prev" | "next") => {
+  const navigate = (dir: "prev" | "next") => {
     const unit = view === "month" ? "month" : view === "week" ? "week" : "day"
-    const delta = direction === "next" ? 1 : -1
+    const delta = dir === "next" ? 1 : -1
     setSelectedDate(dayjs(selectedDate).add(delta, unit).toDate())
   }
 
   return (
     <>
-      <Box
-        display="flex"
-        justifyContent="space-between"
-        alignItems="center"
-        px={2}
-        py={1}
-      >
+      <Box display="flex" justifyContent="space-between" alignItems="center" px={2} py={1}>
         <Box display="flex" alignItems="center" gap={1}>
-          <Button onClick={() => navigate("prev")} size="large">
-            <ChevronLeftIcon fontSize="medium" />
+          <Button onClick={() => navigate("prev")}>
+            <ChevronLeftIcon />
           </Button>
           <Typography variant="h6">
-            {dayjs(selectedDate).format(
-              view === "month" ? "MMMM YYYY" : "DD MMM YYYY"
-            )}
+            {dayjs(selectedDate).format(view === "month" ? "MMMM YYYY" : "DD MMM YYYY")}
           </Typography>
-          <Button onClick={() => navigate("next")} size="large">
-            <ChevronRightIcon fontSize="medium" />
+          <Button onClick={() => navigate("next")}>
+            <ChevronRightIcon />
           </Button>
         </Box>
-
         <CalendarViewSwitcher view={view} onChange={setView} />
       </Box>
 
@@ -146,9 +142,9 @@ const CalendarPanel = () => {
         <DayView
           date={selectedDate}
           events={schedulables}
-          onEventClick={handleEventClick}
           calendars={calendars}
           categories={categories}
+          onEventClick={handleEventClick}
         />
       )}
 
@@ -156,9 +152,9 @@ const CalendarPanel = () => {
         <WeekView
           date={selectedDate}
           events={schedulables}
-          onEventClick={handleEventClick}
           calendars={calendars}
           categories={categories}
+          onEventClick={handleEventClick}
         />
       )}
 
@@ -166,11 +162,11 @@ const CalendarPanel = () => {
         <MonthView
           date={selectedDate}
           events={schedulables}
+          calendars={calendars}
+          categories={categories}
           onSlotClick={handleSlotClick}
           onSave={handleSave}
           onEventClick={handleEventClick}
-          calendars={calendars}
-          categories={categories}
         />
       )}
 
@@ -186,9 +182,7 @@ const CalendarPanel = () => {
               name: "",
               description: "",
               startDate: selectedDatetime.toISOString(),
-              endDate: new Date(
-                selectedDatetime.getTime() + 60 * 60 * 1000
-              ).toISOString(),
+              endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
               calendar: calendars[0],
               category: undefined,
               recurringPattern: RecurringPattern.NONE
@@ -197,13 +191,15 @@ const CalendarPanel = () => {
         />
       )}
 
-      <EventInformationPopover
-        anchorElement={infoAnchor}
-        event={infoEvent}
-        onClose={() => setInfoEvent(null)}
-        onEdit={handleEditEvent}
-        onDelete={() => infoEvent && handleDeleteEvent(infoEvent.id)}
-      />
+      {infoEvent && infoAnchor && (
+        <EventInformationPopover
+          anchorElement={infoAnchor}
+          event={infoEvent}
+          onClose={() => setInfoEvent(null)}
+          onEdit={handleEditEvent}
+          onDelete={() => handleDeleteEvent(infoEvent.id)}
+        />
+      )}
     </>
   )
 }

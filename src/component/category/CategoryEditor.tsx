@@ -1,61 +1,61 @@
-import BUTTONS from "@/constant/ui/buttons"
-import PLACEHOLDERS from "@/constant/ui/labels"
-import MESSAGES from "@/constant/ui/messages"
-import useCategory from "@/hook/useCategory"
-import useEditor from "@/hook/editor/useEditor"
-import EditorType from "@/type/editor/editorType"
-
 import { useEffect, useRef, useState } from "react"
-
 import {
   Box,
   Button,
   ClickAwayListener,
+  Input,
   Paper,
+  Popover,
   TextField,
-  Typography,
-  Input
+  Typography
 } from "@mui/material"
-import { createPortal } from "react-dom"
+import type Category from "@/model/domain/category"
+import useCategory from "@/hook/useCategory"
+import useAppStore from "@/store/useAppStore"
+import MESSAGES from "@/constant/ui/messages"
+import BUTTONS from "@/constant/ui/buttons"
+import PLACEHOLDERS from "@/constant/ui/labels"
 
-const CategoryEditor = () => {
+interface CategoryEditorProperties {
+  open: boolean
+  anchorEl: HTMLElement | null
+  mode: "add" | "edit" | "delete"
+  initialData?: Partial<Category>
+  onClose: () => void
+}
+
+const CategoryEditor = ({
+  open,
+  anchorEl,
+  mode,
+  initialData,
+  onClose
+}: CategoryEditorProperties) => {
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const containerRef = useRef<HTMLDivElement | null>(null)
-
-  const { reloadCategories, addCategory, updateCategory, deleteCategory } =
-    useCategory()
-
   const {
-    editorOpen,
-    editorType,
-    editorMode,
-    editorData,
-    closeEditor,
-    selectedCategory,
-    setSelectedCategory
-  } = useEditor()
+    addCategory,
+    updateCategory,
+    deleteCategory,
+    reloadCategories
+  } = useCategory()
+  const selectedCategory = useAppStore((s) => s.selectedCategory)
+  const setSelectedCategory = useAppStore((s) => s.setSelectedCategory)
 
   const [label, setLabel] = useState("")
   const [color, setColor] = useState("#3b5bdb")
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (editorOpen && editorType === EditorType.CATEGORY) {
-      setLabel(editorData.label || "")
-      setColor(editorData.color || "#3b5bdb")
-
-      setTimeout(() => {
-        inputRef.current?.focus()
-      }, 50)
+    if (open) {
+      setLabel(initialData?.name ?? "")
+      setColor(initialData?.color ?? "#3b5bdb")
+      setTimeout(() => inputRef.current?.focus(), 50)
     }
-  }, [editorOpen, editorData, editorType])
+  }, [open, initialData])
 
   const handleClickAway = (event: MouseEvent | TouchEvent) => {
-    if (
-      containerRef.current &&
-      !containerRef.current.contains(event.target as Node)
-    ) {
-      closeEditor()
+    if (!anchorEl?.contains(event.target as Node)) {
+      onClose()
     }
   }
 
@@ -66,7 +66,7 @@ const CategoryEditor = () => {
       const created = await addCategory({ name: label.trim(), color })
       await reloadCategories()
       setSelectedCategory(created.id)
-      closeEditor()
+      onClose()
     } catch (e) {
       console.error("Failed to add category", e)
     } finally {
@@ -75,12 +75,12 @@ const CategoryEditor = () => {
   }
 
   const handleEdit = async () => {
-    if (!label.trim() || !editorData.id) return
+    if (!label.trim() || !initialData?.id) return
     setLoading(true)
     try {
-      await updateCategory(editorData.id, { name: label.trim(), color })
+      await updateCategory(initialData.id, { name: label.trim(), color })
       await reloadCategories()
-      closeEditor()
+      onClose()
     } catch (e) {
       console.error("Failed to update category", e)
     } finally {
@@ -89,15 +89,15 @@ const CategoryEditor = () => {
   }
 
   const handleDelete = async () => {
-    if (!editorData.id) return
+    if (!initialData?.id) return
     setLoading(true)
     try {
-      await deleteCategory(editorData.id)
+      await deleteCategory(initialData.id)
       await reloadCategories()
-      if (selectedCategory === editorData.id) {
+      if (selectedCategory === initialData.id) {
         setSelectedCategory("all")
       }
-      closeEditor()
+      onClose()
     } catch (e) {
       console.error("Failed to delete category", e)
     } finally {
@@ -105,35 +105,21 @@ const CategoryEditor = () => {
     }
   }
 
-  if (!editorOpen || editorType !== EditorType.CATEGORY) return null
-
-  return createPortal(
-    <>
+  return (
+    <Popover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
+    >
       <ClickAwayListener onClickAway={handleClickAway}>
-        <Paper
-          ref={containerRef}
-          sx={{
-            p: 2,
-            width: 280,
-            boxShadow: 3,
-            borderRadius: 2,
-            position: "fixed",
-            top: 140,
-            left: 120,
-            zIndex: 2000
-          }}
-        >
-          {(editorMode === "add" || editorMode === "edit") && (
+        <Paper sx={{ p: 2, width: 280 }}>
+          {(mode === "add" || mode === "edit") && (
             <>
-              <Typography
-                variant="subtitle2"
-                color="primary"
-                fontWeight={500}
-                gutterBottom
-              >
-                {editorMode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
+              <Typography variant="subtitle2" gutterBottom>
+                {mode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
               </Typography>
-
               <TextField
                 inputRef={inputRef}
                 placeholder={PLACEHOLDERS.NAME}
@@ -143,7 +129,6 @@ const CategoryEditor = () => {
                 size="small"
                 margin="dense"
               />
-
               <Box display="flex" alignItems="center" gap={1} mt={2}>
                 <Input
                   type="color"
@@ -154,23 +139,21 @@ const CategoryEditor = () => {
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={editorMode === "add" ? handleAdd : handleEdit}
+                  onClick={mode === "add" ? handleAdd : handleEdit}
                   disabled={loading}
                 >
-                  {editorMode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
+                  {mode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
                 </Button>
               </Box>
             </>
           )}
-
-          {editorMode === "delete" && (
+          {mode === "delete" && (
             <>
               <Typography variant="body2">
                 {MESSAGES.CONFIRM_DELETE_CATEGORY}
               </Typography>
-
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
-                <Button variant="text" size="small" onClick={closeEditor}>
+                <Button variant="text" size="small" onClick={onClose}>
                   {BUTTONS.CANCEL}
                 </Button>
                 <Button
@@ -187,8 +170,7 @@ const CategoryEditor = () => {
           )}
         </Paper>
       </ClickAwayListener>
-    </>,
-    document.body
+    </Popover>
   )
 }
 

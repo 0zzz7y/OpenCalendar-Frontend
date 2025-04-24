@@ -3,13 +3,11 @@ import PLACEHOLDERS from "@/constant/ui/labels"
 import MESSAGES from "@/constant/ui/messages"
 import useCalendar from "@/hook/useCalendar"
 
-import { useEffect, useRef, useState } from "react"
-
 import {
   Box,
   Button,
-  ClickAwayListener,
-  Paper,
+  IconButton,
+  Popover,
   TextField,
   Typography
 } from "@mui/material"
@@ -19,92 +17,65 @@ import EmojiPicker, {
   SkinTones,
   Theme
 } from "emoji-picker-react"
-import { createPortal } from "react-dom"
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"
+import { useEffect, useRef, useState } from "react"
 
-const CalendarEditor = () => {
+interface CalendarEditorProperties {
+  open: boolean
+  anchorEl: HTMLElement | null
+  mode: "add" | "edit" | "delete"
+  initialData?: { id?: string; label?: string; emoji?: string }
+  onClose: () => void
+}
+
+const CalendarEditor = ({
+  open,
+  anchorEl,
+  mode,
+  initialData = {},
+  onClose
+}: CalendarEditorProperties) => {
   const inputRef = useRef<HTMLInputElement | null>(null)
-  const containerRef = useRef<HTMLDivElement | null>(null)
-  const emojiPickerRef = useRef<HTMLDivElement | null>(null)
+  const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } = useCalendar()
 
-  const {
-    editorOpen,
-    editorType,
-    editorMode,
-    editorData,
-    closeEditor,
-    selectedCalendar,
-    setSelectedCalendar
-  } = useEditor()
-
-  const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } =
-    useCalendar()
-
-  const [label, setLabel] = useState("")
-  const [emoji, setEmoji] = useState("📅")
+  const [label, setLabel] = useState(initialData.label || "")
+  const [emoji, setEmoji] = useState(initialData.emoji || "📅")
+  const [pickerOpen, setPickerOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   useEffect(() => {
-    if (editorOpen) {
-      setLabel(editorData.label || "")
-      setEmoji(editorData.emoji || "📅")
-      if (inputRef.current) {
-        setTimeout(() => {
-          inputRef.current?.focus()
-        }, 50)
-      }
+    if (open) {
+      setLabel(initialData.label || "")
+      setEmoji(initialData.emoji || "📅")
+      setTimeout(() => inputRef.current?.focus(), 100)
     }
-  }, [editorOpen, editorData])
+  }, [open, initialData])
 
-  const handleClickAway = (event: MouseEvent | TouchEvent) => {
-    if (
-      containerRef.current &&
-      !containerRef.current.contains(event.target as Node) &&
-      emojiPickerRef.current &&
-      !emojiPickerRef.current.contains(event.target as Node)
-    ) {
-      closeEditor()
-    }
-  }
-
-  const handleAdd = async () => {
+  const handleSave = async () => {
     if (!label.trim()) return
     setLoading(true)
     try {
-      const created = await addCalendar({ name: label.trim(), emoji })
+      if (mode === "add") {
+        await addCalendar({ name: label.trim(), emoji })
+      } else if (mode === "edit" && initialData.id) {
+        await updateCalendar(initialData.id, { name: label.trim(), emoji })
+      }
       await reloadCalendars()
-      setSelectedCalendar(created.id)
-      closeEditor()
+      onClose()
     } catch (e) {
-      console.error("Failed to add calendar", e)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleEdit = async () => {
-    if (!label.trim() || !editorData.id) return
-    setLoading(true)
-    try {
-      await updateCalendar(editorData.id, { name: label.trim(), emoji })
-      await reloadCalendars()
-      closeEditor()
-    } catch (e) {
-      console.error("Failed to update calendar", e)
+      console.error("Failed to save calendar", e)
     } finally {
       setLoading(false)
     }
   }
 
   const handleDelete = async () => {
-    if (!editorData.id) return
+    if (!initialData.id) return
     setLoading(true)
     try {
-      await deleteCalendar(editorData.id)
+      await deleteCalendar(initialData.id)
       await reloadCalendars()
-      if (selectedCalendar === editorData.id) {
-        setSelectedCalendar("all")
-      }
-      closeEditor()
+      onClose()
     } catch (e) {
       console.error("Failed to delete calendar", e)
     } finally {
@@ -112,111 +83,83 @@ const CalendarEditor = () => {
     }
   }
 
-  if (!editorOpen || editorType !== EditorType.CALENDAR) return null
+  return (
+    <Popover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
+    >
+      <Box sx={{ p: 2, width: 280 }}>
+        {mode !== "delete" ? (
+          <>
+            <Typography variant="subtitle2" color="primary" fontWeight={500}>
+              {mode === "add" ? MESSAGES.ADD_EVENT : MESSAGES.EDIT_EVENT}
+            </Typography>
 
-  return createPortal(
-    <>
-      <ClickAwayListener onClickAway={handleClickAway}>
-        <Paper
-          ref={containerRef}
-          sx={{
-            p: 2,
-            width: 280,
-            boxShadow: 3,
-            borderRadius: 2,
-            position: "fixed",
-            top: 100,
-            left: 100,
-            zIndex: 2000
-          }}
-        >
-          {(editorMode === "add" || editorMode === "edit") && (
-            <>
-              <Typography
-                variant="subtitle2"
-                color="primary"
-                fontWeight={500}
-                gutterBottom
-              >
-                {editorMode === "add" ? MESSAGES.ADD_EVENT : MESSAGES.EDIT_EVENT}
-              </Typography>
+            <TextField
+              inputRef={inputRef}
+              placeholder={PLACEHOLDERS.NAME}
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              fullWidth
+              size="small"
+              margin="dense"
+            />
 
-              <TextField
-                inputRef={inputRef}
-                placeholder={PLACEHOLDERS.NAME}
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
-                fullWidth
-                size="small"
-                margin="dense"
+            <Box display="flex" alignItems="center" justifyContent="space-between" mt={2} mb={1}>
+              <Typography fontSize={24}>{emoji}</Typography>
+              <IconButton onClick={() => setPickerOpen((prev) => !prev)}>
+                <EmojiEmotionsIcon fontSize="small" />
+              </IconButton>
+            </Box>
+
+            {pickerOpen && (
+              <EmojiPicker
+                width="100%"
+                height={300}
+                onEmojiClick={(e: EmojiClickData) => {
+                  setEmoji(e.emoji)
+                  setPickerOpen(false)
+                }}
+                searchDisabled
+                skinTonesDisabled
+                lazyLoadEmojis
+                emojiStyle={EmojiStyle.NATIVE}
+                theme={Theme.LIGHT}
               />
+            )}
 
-              <Box
-                mt={2}
-                mb={1}
-                display="flex"
-                alignItems="center"
-                justifyContent="space-between"
-              >
-                <Typography fontSize={24}>{emoji}</Typography>
-              </Box>
-
-              <div ref={emojiPickerRef}>
-                <EmojiPicker
-                  width="100%"
-                  height={300}
-                  searchDisabled
-                  previewConfig={{ showPreview: false }}
-                  onEmojiClick={(emojiData: EmojiClickData) =>
-                    setEmoji(emojiData.emoji)
-                  }
-                  emojiStyle={EmojiStyle.NATIVE}
-                  skinTonesDisabled
-                  lazyLoadEmojis
-                  defaultSkinTone={SkinTones.NEUTRAL}
-                  theme={Theme.LIGHT}
-                  autoFocusSearch={false}
-                />
-              </div>
-
+            <Button
+              variant="contained"
+              fullWidth
+              sx={{ mt: 2 }}
+              onClick={handleSave}
+              disabled={loading}
+            >
+              {mode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Typography variant="body2">{MESSAGES.CONFIRM_DELETE_CALENDAR}</Typography>
+            <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
+              <Button onClick={onClose} size="small">{BUTTONS.CANCEL}</Button>
               <Button
+                onClick={handleDelete}
+                size="small"
                 variant="contained"
-                fullWidth
-                sx={{ mt: 2 }}
-                onClick={editorMode === "add" ? handleAdd : handleEdit}
+                color="error"
                 disabled={loading}
               >
-                {editorMode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
+                {BUTTONS.DELETE}
               </Button>
-            </>
-          )}
-
-          {editorMode === "delete" && (
-            <>
-              <Typography variant="body2">
-                {MESSAGES.CONFIRM_DELETE_CALENDAR}
-              </Typography>
-
-              <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
-                <Button variant="text" size="small" onClick={closeEditor}>
-                  {BUTTONS.CANCEL}
-                </Button>
-                <Button
-                  variant="contained"
-                  color="error"
-                  size="small"
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  {BUTTONS.DELETE}
-                </Button>
-              </Box>
-            </>
-          )}
-        </Paper>
-      </ClickAwayListener>
-    </>,
-    document.body
+            </Box>
+          </>
+        )}
+      </Box>
+    </Popover>
   )
 }
 

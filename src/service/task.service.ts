@@ -1,7 +1,7 @@
 import type Task from "@/model/domain/task"
 import axios from "axios"
 
-const base = "/task"
+const base = `${import.meta.env.VITE_BASE_URL}/tasks`
 
 export const getTasks = async (): Promise<Task[]> => {
   const result = await axios.get(base)

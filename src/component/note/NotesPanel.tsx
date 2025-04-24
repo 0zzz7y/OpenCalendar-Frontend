@@ -27,7 +27,7 @@ const NotesPanel = () => {
   }, [])
 
   useEffect(() => {
-    setLocalNotes(notes)
+    setLocalNotes(Array.isArray(notes) ? notes : [])
   }, [notes])
 
   const handleUpdate = (updatedNote: Note) => {
@@ -82,7 +82,8 @@ const NotesPanel = () => {
   return (
     <>
       <Box position="absolute" top={0} left={0} width="0vh" height="0vh">
-        {localNotes.map((note) => (
+      {Array.isArray(localNotes) &&
+  localNotes.map((note) => (
           <NoteCard
             key={note.id}
             id={note.id}

@@ -12,6 +12,9 @@ interface AppStore {
   tasks: Task[]
   notes: Note[]
 
+  selectedCalendar: string | null
+  setSelectedCalendar: (id: string | null) => void
+
   selectedCategory: string | null
   setSelectedCategory: (id: string | null) => void
 
@@ -28,8 +31,11 @@ const useAppStore = create<AppStore>((set) => ({
   events: [],
   tasks: [],
   notes: [],
-  selectedCategory: "all",
 
+  selectedCalendar: "all",
+  setSelectedCalendar: (id) => set({ selectedCalendar: id }),
+
+  selectedCategory: "all",
   setSelectedCategory: (id) => set({ selectedCategory: id }),
 
   setCalendars: (calendars) => set({ calendars: calendars ?? [] }),

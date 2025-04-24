@@ -1,7 +1,7 @@
 import type Category from "@/model/domain/category"
 import axios from "axios"
 
-const base = "/category"
+const base = `${import.meta.env.VITE_BASE_URL}/categories`
 
 export const getCategories = async (): Promise<Category[]> => {
   const result = await axios.get(base)
