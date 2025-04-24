@@ -17,9 +17,7 @@ enum LABELS {
   RECURRING_DAILY = "Daily",
   RECURRING_WEEKLY = "Weekly",
   RECURRING_MONTHLY = "Monthly",
-  RECURRING_YEARLY = "Yearly",
-
-  NONE = "None"
+  RECURRING_YEARLY = "Yearly"
 }
 
 export default LABELS

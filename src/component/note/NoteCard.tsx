@@ -1,12 +1,19 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Box, Typography, IconButton, Stack, Popover, Button } from "@mui/material";
+import {
+  Box,
+  Typography,
+  IconButton,
+  Stack,
+  Popover,
+  Button,
+} from "@mui/material";
 import { Edit, Delete } from "@mui/icons-material";
 import dayjs from "dayjs";
 import useAppStore from "@/store/useAppStore";
 import useEvent from "@/repository/event.repository";
 import type Schedulable from "@/model/domain/schedulable";
-import BUTTONS from "@/constant/ui/buttons";
-import MESSAGES from "@/constant/ui/messages";
+import BUTTONS from "@/constant/ui/button";
+import MESSAGES from "@/constant/ui/message";
 
 export interface EventInformationPopoverProps {
   anchorEl: HTMLElement | null;
@@ -67,8 +74,14 @@ export default function EventInformationPopover({
     >
       {current && (
         <Stack spacing={2}>
-          <Stack direction="row" justifyContent="space-between" alignItems="center">
-            <Typography variant="h6">{current.name || MESSAGES.UNTITLED}</Typography>
+          <Stack
+            direction="row"
+            justifyContent="space-between"
+            alignItems="center"
+          >
+            <Typography variant="h6">
+              {current.name || MESSAGES.TITLE_REQUIRED}
+            </Typography>
             {!confirmDelete && (
               <Box>
                 <IconButton size="small" onClick={onEdit}>
@@ -82,22 +95,37 @@ export default function EventInformationPopover({
           </Stack>
 
           {!confirmDelete ? (
-            <> 
+            <>
               <Typography variant="body2" color="text.secondary">
                 {current.startDate && current.endDate
-                  ? `${dayjs(current.startDate).format("LLL")} – ${dayjs(current.endDate).format("LLL")}`
-                  : MESSAGES.NO_DATE_AVAILABLE}
+                  ? `${dayjs(current.startDate).format("LLL")} – ${dayjs(
+                      current.endDate
+                    ).format("LLL")}`
+                  : MESSAGES.END_AFTER_START}
               </Typography>
-              {current.description && <Typography>{current.description}</Typography>}
+              {current.description && (
+                <Typography>{current.description}</Typography>
+              )}
             </>
           ) : (
             <Stack spacing={1}>
-              <Typography variant="body2">{MESSAGES.CONFIRM_DELETE_EVENT}</Typography>
+              <Typography variant="body2">
+                {MESSAGES.CONFIRM_DELETE_EVENT}
+              </Typography>
               <Stack direction="row" spacing={1} justifyContent="flex-end">
-                <Button size="small" color="inherit" onClick={handleCancelDelete}>
+                <Button
+                  size="small"
+                  color="inherit"
+                  onClick={handleCancelDelete}
+                >
                   {BUTTONS.CANCEL}
                 </Button>
-                <Button size="small" color="error" variant="contained" onClick={handleConfirmDelete}>
+                <Button
+                  size="small"
+                  color="error"
+                  variant="contained"
+                  onClick={handleConfirmDelete}
+                >
                   {BUTTONS.DELETE}
                 </Button>
               </Stack>

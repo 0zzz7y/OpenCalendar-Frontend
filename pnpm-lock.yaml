@@ -29,6 +29,9 @@ importers:
       axios:
         specifier: ^1.8.4
         version: 1.8.4
+      client@^18:
+        specifier: link:react-dom/client@^18
+        version: link:react-dom/client@^18
       date-fns:
         specifier: ^2.29.3
         version: 2.30.0
@@ -39,7 +42,7 @@ importers:
         specifier: ^4.12.2
         version: 4.12.2(react@18.3.1)
       react:
-        specifier: ^18.0.0
+        specifier: ^18.3.1
         version: 18.3.1
       react-dnd:
         specifier: ^16.0.1
@@ -48,7 +51,7 @@ importers:
         specifier: ^16.0.1
         version: 16.0.1
       react-dom:
-        specifier: ^18.0.0
+        specifier: ^18
         version: 18.3.1(react@18.3.1)
       react-resizable-panels:
         specifier: ^2.1.7

@@ -78,7 +78,8 @@ const Dashboard = () => {
                   bottom: 0,
                   left: 0,
                   p: 1.5,
-                  width: "100%"
+                  width: "100%",
+                  zIndex: 2
                 }}
               >
                 <ThemeToggleButton />

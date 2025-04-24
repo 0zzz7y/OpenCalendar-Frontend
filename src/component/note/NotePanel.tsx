@@ -5,7 +5,7 @@ import AddIcon from "@mui/icons-material/Add";
 import useNotes from "@/repository/note.repository";
 import useAppStore from "@/store/useAppStore";
 import NoteCard from "./NoteCard";
-import MESSAGES from "@/constant/ui/messages";
+import MESSAGES from "@/constant/ui/message";
 import type Note from "@/model/domain/note";
 
 /**
@@ -25,7 +25,10 @@ export default function NotesPanel() {
   }, [notes]);
 
   const defaultCalendar = useMemo(() => calendars[0] || null, [calendars]);
-  const defaultCategory = useMemo(() => categories[0] || undefined, [categories]);
+  const defaultCategory = useMemo(
+    () => categories[0] || undefined,
+    [categories]
+  );
 
   const handleUpdate = useCallback(
     (updated: Note) => {
@@ -73,7 +76,9 @@ export default function NotesPanel() {
       });
       if (saved) {
         setLocalNotes((prev) =>
-          prev.map((n) => (n.id === tempId ? { ...saved, id: saved.id } as Note : n))
+          prev.map((n) =>
+            n.id === tempId ? ({ ...saved, id: saved.id } as Note) : n
+          )
         );
       }
     } catch {
@@ -83,7 +88,14 @@ export default function NotesPanel() {
   }, [addNote, defaultCalendar, defaultCategory]);
 
   return (
-    <Box position="absolute" top={0} left={0} width="100vw" height="100vh" zIndex={1}>
+    <Box
+      position="absolute"
+      top={0}
+      left={0}
+      width="100vw"
+      height="100vh"
+      zIndex={1}
+    > 
       {localNotes.map((note) => (
         <NoteCard
           key={note.id}
@@ -107,7 +119,7 @@ export default function NotesPanel() {
           bgcolor: "primary.main",
           color: "white",
           zIndex: 1300,
-          '&:hover': { bgcolor: 'primary.dark' },
+          "&:hover": { bgcolor: "primary.dark" },
         }}
       >
         <AddIcon />

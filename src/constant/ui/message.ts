@@ -1,7 +1,4 @@
 enum MESSAGES {
-  ALL = "All",
-  NONE = "None",
-
   NEW_EVENT = "New event",
   NEW_TASK = "New task",
   NEW_NOTE = "New note",

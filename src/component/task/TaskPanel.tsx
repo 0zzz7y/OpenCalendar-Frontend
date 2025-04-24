@@ -8,7 +8,7 @@ import TaskBoard from "./TaskBoard";
 import RecurringPattern from "@/model/domain/recurringPattern";
 import type Task from "@/model/domain/task";
 import TaskStatus from "@/model/domain/taskStatus";
-import MESSAGES from "@/constant/ui/messages";
+import MESSAGES from "@/constant/ui/message";
 
 /**
  * Panel for creating new tasks and displaying them in a board.
@@ -78,7 +78,10 @@ export default function TasksPanel() {
         InputProps={{
           endAdornment: (
             <InputAdornment position="end">
-              <AddCircleOutline sx={{ cursor: "pointer" }} onClick={handleCreate} />
+              <AddCircleOutline
+                sx={{ cursor: "pointer" }}
+                onClick={handleCreate}
+              />
             </InputAdornment>
           ),
         }}

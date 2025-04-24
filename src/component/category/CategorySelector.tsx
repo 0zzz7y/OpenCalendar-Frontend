@@ -1,12 +1,19 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material";
+import {
+  Box,
+  MenuItem,
+  TextField,
+  Typography,
+  IconButton,
+} from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useAppStore from "@/store/useAppStore";
 import CategoryEditor from "./CategoryEditor";
 import EditorMode from "@/model/utility/editorMode";
-import PLACEHOLDERS from "@/constant/ui/labels";
+import PLACEHOLDERS from "@/constant/ui/label";
+import FILTER from "@/constant/utility/filter";
 
 export default function CategorySelector() {
   const categories = useAppStore((s) => s.categories);
@@ -17,13 +24,21 @@ export default function CategorySelector() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null);
   const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD);
-  const [editorData, setEditorData] = useState<{ id?: string; name?: string; color?: string }>({});
+  const [editorData, setEditorData] = useState<{
+    id?: string;
+    name?: string;
+    color?: string;
+  }>({});
 
   // Memoized options
   const categoryOptions = useMemo(
     () => [
       { label: "All", value: "all", color: "#ffffff" },
-      ...categories.map((cat) => ({ label: cat.name, value: cat.id, color: cat.color })),
+      ...categories.map((cat) => ({
+        label: cat.name,
+        value: cat.id,
+        color: cat.color,
+      })),
     ],
     [categories]
   );
@@ -49,9 +64,7 @@ export default function CategorySelector() {
   }, []);
 
   const handleSelectChange = useCallback(
-    (value: string) => {
-      setSelectedCategory(value === "all" ? null : value);
-    },
+    (value: string) => setSelectedCategory(value),
     [setSelectedCategory]
   );
 
@@ -60,7 +73,7 @@ export default function CategorySelector() {
       <TextField
         select
         label={PLACEHOLDERS.CATEGORY}
-        value={selectedCategory || "all"}
+        value={selectedCategory || FILTER.ALL}
         onChange={(e) => handleSelectChange(e.target.value)}
         fullWidth
         size="small"
@@ -69,7 +82,14 @@ export default function CategorySelector() {
             const opt = categoryOptions.find((o) => o.value === selected);
             return (
               <Box display="flex" alignItems="center" gap={1}>
-                {opt?.color && <Box width={10} height={10} borderRadius="50%" bgcolor={opt.color} />}
+                {opt?.color && (
+                  <Box
+                    width={10}
+                    height={10}
+                    borderRadius="50%"
+                    bgcolor={opt.color}
+                  />
+                )}
                 <Typography variant="body2">{opt?.label}</Typography>
               </Box>
             );
@@ -78,9 +98,21 @@ export default function CategorySelector() {
       >
         {categoryOptions.map((opt) => (
           <MenuItem key={opt.value} value={opt.value}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              width="100%"
+            >
               <Box display="flex" alignItems="center" gap={1}>
-                {opt.color && <Box width={10} height={10} borderRadius="50%" bgcolor={opt.color} />}
+                {opt.color && (
+                  <Box
+                    width={10}
+                    height={10}
+                    borderRadius="50%"
+                    bgcolor={opt.color}
+                  />
+                )}
                 <Typography variant="body2">{opt.label}</Typography>
               </Box>
               {opt.value !== "all" && (
@@ -121,7 +153,10 @@ export default function CategorySelector() {
 
       <IconButton
         onClick={(e) =>
-          openEditor(EditorMode.ADD, e.currentTarget, { name: "", color: "#3b5bdb" })
+          openEditor(EditorMode.ADD, e.currentTarget, {
+            name: "",
+            color: "#3b5bdb",
+          })
         }
       >
         <AddCircleOutlineIcon fontSize="small" />

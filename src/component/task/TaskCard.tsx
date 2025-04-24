@@ -1,7 +1,19 @@
 import type React from "react";
 import { useState, useEffect, useCallback } from "react";
-import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography } from "@mui/material";
-import { Delete as DeleteIcon, ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
+import {
+  Box,
+  Card,
+  Collapse,
+  IconButton,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  Delete as DeleteIcon,
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+} from "@mui/icons-material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
 
@@ -9,7 +21,8 @@ import type Calendar from "@/model/domain/calendar";
 import type Category from "@/model/domain/category";
 import type Task from "@/model/domain/task";
 import RecurringPattern from "@/model/domain/recurringPattern";
-import LABELS from "@/constant/ui/labels";
+import LABELS from "@/constant/ui/label";
+import FILTER from "@/constant/utility/filter";
 
 export interface TaskCardProps {
   task: Task;
@@ -22,18 +35,27 @@ export interface TaskCardProps {
 /**
  * Card representing a single task, editable and collapsible.
  */
-const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpdate, onDelete }) => {
+const TaskCard: React.FC<TaskCardProps> = ({
+  task,
+  calendars,
+  categories,
+  onUpdate,
+  onDelete,
+}) => {
   const [expanded, setExpanded] = useState(true);
   const [local, setLocal] = useState<Task>(task);
 
   // Sync props -> state
   useEffect(() => setLocal(task), [task]);
 
-  const handleChange = useCallback(<K extends keyof Task>(field: K, value: Task[K]) => {
-    const updated = { ...local, [field]: value } as Task;
-    setLocal(updated);
-    onUpdate(updated);
-  }, [local, onUpdate]);
+  const handleChange = useCallback(
+    <K extends keyof Task>(field: K, value: Task[K]) => {
+      const updated = { ...local, [field]: value } as Task;
+      setLocal(updated);
+      onUpdate(updated);
+    },
+    [local, onUpdate]
+  );
 
   const cardColor = local.category?.color ?? "#f5f5f5";
 
@@ -45,8 +67,22 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
   };
 
   return (
-    <Card sx={{ backgroundColor: cardColor, p: 1.5, mb: 2, boxShadow: 3, borderRadius: 2, minWidth: 220 }}>
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+    <Card
+      sx={{
+        backgroundColor: cardColor,
+        p: 1.5,
+        mb: 2,
+        boxShadow: 3,
+        borderRadius: 2,
+        minWidth: 220,
+      }}
+    >
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={1}
+      >
         <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
           <IconButton size="small" onClick={() => setExpanded((e) => !e)}>
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -97,7 +133,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
               label={LABELS.RECURRING}
               select
               value={local.recurringPattern}
-              onChange={(e) => handleChange("recurringPattern", e.target.value as RecurringPattern)}
+              onChange={(e) =>
+                handleChange(
+                  "recurringPattern",
+                  e.target.value as RecurringPattern
+                )
+              }
               size="small"
               fullWidth
               sx={textFieldSx}
@@ -137,18 +178,29 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             select
             value={local.category?.id || ""}
             onChange={(e) => {
-              const cat = categories.find((c) => c.id === e.target.value) || null;
-              handleChange("category", cat!);
+              const cat =
+                categories.find((c) => c.id === e.target.value) || null;
+              handleChange(
+                "category",
+                cat ? { ...cat, color: cat.color } : undefined
+              );
             }}
             size="small"
             fullWidth
             sx={textFieldSx}
           >
-            <MenuItem value="">{LABELS.NONE}</MenuItem>
+            <MenuItem value="">{FILTER.NONE}</MenuItem>
             {categories.map((cat) => (
               <MenuItem key={cat.id} value={cat.id}>
                 <Box display="flex" alignItems="center" gap={1}>
-                  <Box sx={{ width: 12, height: 12, borderRadius: "50%", bgcolor: cat.color }} />
+                  <Box
+                    sx={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      bgcolor: cat.color,
+                    }}
+                  />
                   <Typography>{cat.name}</Typography>
                 </Box>
               </MenuItem>

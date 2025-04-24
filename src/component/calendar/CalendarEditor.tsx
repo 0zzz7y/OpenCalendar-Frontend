@@ -1,12 +1,23 @@
 import { useState, useEffect, useRef, useCallback } from "react";
-import { Box, Button, IconButton, Popover, TextField, Typography } from "@mui/material";
-import EmojiPicker, { type EmojiClickData, EmojiStyle, Theme } from "emoji-picker-react";
+import {
+  Box,
+  Button,
+  IconButton,
+  Popover,
+  TextField,
+  Typography,
+} from "@mui/material";
+import EmojiPicker, {
+  type EmojiClickData,
+  EmojiStyle,
+  Theme,
+} from "emoji-picker-react";
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import useCalendar from "@/repository/calendar.repository";
 import EditorMode from "@/model/utility/editorMode";
-import BUTTONS from "@/constant/ui/buttons";
-import PLACEHOLDERS from "@/constant/ui/labels";
-import MESSAGES from "@/constant/ui/messages";
+import BUTTONS from "@/constant/ui/button";
+import PLACEHOLDERS from "@/constant/ui/label";
+import MESSAGES from "@/constant/ui/message";
 
 export interface CalendarEditorProps {
   open: boolean;
@@ -23,7 +34,8 @@ export default function CalendarEditor({
   initialData = {},
   onClose,
 }: CalendarEditorProps) {
-  const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } = useCalendar();
+  const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } =
+    useCalendar();
 
   const [form, setForm] = useState({ label: "", emoji: "📅" });
   const [pickerOpen, setPickerOpen] = useState(false);
@@ -54,7 +66,11 @@ export default function CalendarEditor({
       if (mode === EditorMode.ADD) {
         await addCalendar({ name: form.label, emoji: form.emoji });
       } else if (mode === EditorMode.EDIT && initialData.id) {
-        await updateCalendar({ id: initialData.id, name: form.label, emoji: form.emoji });
+        await updateCalendar({
+          id: initialData.id,
+          name: form.label,
+          emoji: form.emoji,
+        });
       }
       await reloadCalendars();
       onClose();
@@ -63,7 +79,15 @@ export default function CalendarEditor({
     } finally {
       setLoading(false);
     }
-  }, [mode, form, initialData.id, addCalendar, updateCalendar, reloadCalendars, onClose]);
+  }, [
+    mode,
+    form,
+    initialData.id,
+    addCalendar,
+    updateCalendar,
+    reloadCalendars,
+    onClose,
+  ]);
 
   const handleDelete = useCallback(async () => {
     if (!initialData.id) return;
@@ -91,7 +115,9 @@ export default function CalendarEditor({
         {mode !== EditorMode.DELETE ? (
           <>
             <Typography variant="subtitle2" color="primary" fontWeight={500}>
-              {mode === EditorMode.ADD ? MESSAGES.ADD_CALENDAR : MESSAGES.EDIT_CALENDAR}
+              {mode === EditorMode.ADD
+                ? MESSAGES.ADD_CALENDAR
+                : MESSAGES.EDIT_CALENDAR}
             </Typography>
             <TextField
               inputRef={inputRef}
@@ -102,7 +128,13 @@ export default function CalendarEditor({
               size="small"
               margin="dense"
             />
-            <Box display="flex" alignItems="center" justifyContent="space-between" mt={2} mb={1}>
+            <Box
+              display="flex"
+              alignItems="center"
+              justifyContent="space-between"
+              mt={2}
+              mb={1}
+            >
               <Typography fontSize={24}>{form.emoji}</Typography>
               <IconButton onClick={() => setPickerOpen((prev) => !prev)}>
                 <EmojiEmotionsIcon fontSize="small" />
@@ -135,7 +167,9 @@ export default function CalendarEditor({
           </>
         ) : (
           <>
-            <Typography variant="body2">{MESSAGES.CONFIRM_DELETE_CALENDAR}</Typography>
+            <Typography variant="body2">
+              {MESSAGES.CONFIRM_DELETE_CALENDAR}
+            </Typography>
             <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
               <Button onClick={onClose} size="small">
                 {BUTTONS.CANCEL}

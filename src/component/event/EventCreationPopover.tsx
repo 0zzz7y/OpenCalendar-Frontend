@@ -16,9 +16,10 @@ import { toast } from "react-toastify";
 import useEvent from "@/repository/event.repository";
 import RecurringPattern from "@/model/domain/recurringPattern";
 import type Schedulable from "@/model/domain/schedulable";
-import BUTTONS from "@/constant/ui/buttons";
-import LABELS from "@/constant/ui/labels";
-import MESSAGES from "@/constant/ui/messages";
+import BUTTONS from "@/constant/ui/button";
+import LABELS from "@/constant/ui/label";
+import MESSAGES from "@/constant/ui/message";
+import FILTER from "@/constant/utility/filter";
 
 export interface EventCreationPopoverProps {
   anchorEl: HTMLElement | null;
@@ -90,7 +91,9 @@ export default function EventCreationPopover({
   const handleChange = useCallback(
     <K extends keyof FormState>(field: K, value: FormState[K]) => {
       setForm((prev) => ({ ...prev, [field]: value }));
-    }, []);
+    },
+    []
+  );
 
   const handleSave = useCallback(async () => {
     // Validation
@@ -133,7 +136,17 @@ export default function EventCreationPopover({
     } catch {
       toast.error(MESSAGES.EVENT_SAVE_FAILED);
     }
-  }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose]);
+  }, [
+    form,
+    calendars,
+    categories,
+    isEdit,
+    initialEvent,
+    updateEvent,
+    addEvent,
+    reloadEvents,
+    onClose,
+  ]);
 
   const handleDelete = useCallback(async () => {
     if (isEdit && initialEvent?.id) {
@@ -155,7 +168,9 @@ export default function EventCreationPopover({
       onClose={onClose}
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "left" }}
-      PaperProps={{ sx: { p: 2, width: 340, maxHeight: "90vh", overflowY: "auto" } }}
+      PaperProps={{
+        sx: { p: 2, width: 340, maxHeight: "90vh", overflowY: "auto" },
+      }}
     >
       <Stack spacing={2}>
         <Typography variant="h6">
@@ -190,10 +205,17 @@ export default function EventCreationPopover({
           onChange={(e) => handleChange("categoryId", e.target.value)}
           fullWidth
         >
-          <MenuItem value="">{LABELS.NONE}</MenuItem>
+          <MenuItem value="">{FILTER.NONE}</MenuItem>
           {categories.map((c) => (
             <MenuItem key={c.id} value={c.id}>
-              <Box display="inline-block" width={12} height={12} borderRadius={6} bgcolor={c.color} mr={1} />
+              <Box
+                display="inline-block"
+                width={12}
+                height={12}
+                borderRadius={6}
+                bgcolor={c.color}
+                mr={1}
+              />
               {c.name}
             </MenuItem>
           ))}
@@ -202,7 +224,10 @@ export default function EventCreationPopover({
         <Divider />
 
         <Typography variant="body2">{LABELS.START_DATE}</Typography>
-        <DateCalendar value={form.start} onChange={(d) => d && handleChange("start", d)} />
+        <DateCalendar
+          value={form.start}
+          onChange={(d) => d && handleChange("start", d)}
+        />
         <TimePicker
           label={LABELS.START_TIME}
           value={form.start}

@@ -1,13 +1,18 @@
 import type React from "react";
 import { useState, useEffect, useCallback, useMemo } from "react";
-import { DragDropContext, Droppable, Draggable, type DropResult } from "@hello-pangea/dnd";
+import {
+  DragDropContext,
+  Droppable,
+  Draggable,
+  type DropResult,
+} from "@hello-pangea/dnd";
 import { Box } from "@mui/material";
 import { HourglassEmpty, Pending, Done } from "@mui/icons-material";
 
 import TaskCard from "./TaskCard";
 import TaskColumn from "./TaskColumn";
-import LABELS from "@/constant/ui/labels";
-import MESSAGES from "@/constant/ui/messages";
+import LABELS from "@/constant/ui/label";
+import MESSAGES from "@/constant/ui/message";
 import type Calendar from "@/model/domain/calendar";
 import type Category from "@/model/domain/category";
 import type Task from "@/model/domain/task";
@@ -24,13 +29,20 @@ export interface TaskBoardProps {
 /**
  * Kanban-style board for tasks, supporting drag-and-drop status changes.
  */
-const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, calendars, categories, onUpdate, onDelete }) => {
+const TaskBoard: React.FC<TaskBoardProps> = ({
+  tasks,
+  calendars,
+  categories,
+  onUpdate,
+  onDelete,
+}) => {
   const columns = useMemo(
-    () => ({
-      TODO: { title: LABELS.TODO, icon: <HourglassEmpty /> },
-      IN_PROGRESS: { title: LABELS.IN_PROGRESS, icon: <Pending /> },
-      DONE: { title: LABELS.DONE, icon: <Done /> },
-    } as Record<TaskStatus, { title: string; icon: JSX.Element }>),
+    () =>
+      ({
+        TODO: { title: LABELS.TODO, icon: <HourglassEmpty /> },
+        IN_PROGRESS: { title: LABELS.IN_PROGRESS, icon: <Pending /> },
+        DONE: { title: LABELS.DONE, icon: <Done /> },
+      } as Record<TaskStatus, { title: string; icon: JSX.Element }>),
     []
   );
 
@@ -88,13 +100,19 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, calendars, categories, onU
                 sx={{
                   flex: 1,
                   minWidth: 240,
-                  backgroundColor: snapshot.isDraggingOver ? "#f0f0f0" : "transparent",
+                  backgroundColor: snapshot.isDraggingOver
+                    ? "#f0f0f0"
+                    : "transparent",
                   transition: "background-color 0.2s",
                 }}
               >
                 <TaskColumn title={title} icon={icon}>
                   {order[status as TaskStatus].map((task, index) => (
-                    <Draggable draggableId={task.id} index={index} key={task.id}>
+                    <Draggable
+                      draggableId={task.id}
+                      index={index}
+                      key={task.id}
+                    >
                       {(prov, snap) => (
                         <Box
                           ref={prov.innerRef}

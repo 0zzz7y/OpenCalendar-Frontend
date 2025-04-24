@@ -10,9 +10,9 @@ import {
   Typography,
 } from "@mui/material";
 import EditorMode from "@/model/utility/editorMode";
-import PLACEHOLDERS from "@/constant/ui/labels";
-import BUTTONS from "@/constant/ui/buttons";
-import MESSAGES from "@/constant/ui/messages";
+import PLACEHOLDERS from "@/constant/ui/label";
+import BUTTONS from "@/constant/ui/button";
+import MESSAGES from "@/constant/ui/message";
 
 export interface CategoryEditorProps {
   open: boolean;

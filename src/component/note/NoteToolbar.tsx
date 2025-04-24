@@ -1,18 +1,29 @@
 import type React from "react";
 import { useState, useCallback } from "react";
-import { Box, IconButton, Popover, Typography, Button, TextField } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  Popover,
+  Typography,
+  Button,
+  TextField,
+} from "@mui/material";
 import {
   ChevronRight as ChevronRightIcon,
   ExpandMore as ExpandMoreIcon,
   Clear as ClearIcon,
   Delete as DeleteIcon,
 } from "@mui/icons-material";
-import { FormatBold as FormatBoldIcon, FormatItalic as FormatItalicIcon, FormatUnderlined as FormatUnderlinedIcon } from "@mui/icons-material";
+import {
+  FormatBold as FormatBoldIcon,
+  FormatItalic as FormatItalicIcon,
+  FormatUnderlined as FormatUnderlinedIcon,
+} from "@mui/icons-material";
 
 import TOOLBAR from "@/constant/utility/toolbar";
-import MESSAGES from "@/constant/ui/messages";
+import MESSAGES from "@/constant/ui/message";
 import type FormatCommand from "@/model/utility/formatCommand";
-import BUTTONS from "@/constant/ui/buttons";
+import BUTTONS from "@/constant/buttons";
 
 export interface NoteToolbarProps {
   isCollapsed: boolean;
@@ -71,9 +82,16 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
       onMouseDown={(e) => e.stopPropagation()}
     >
       <Box display="flex" alignItems="center">
-        <IconButton size="small" onClick={onToggleCollapse} onMouseDown={(e) => e.stopPropagation()}>
+        <IconButton
+          size="small"
+          onClick={onToggleCollapse}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           {isCollapsed ? (
-            <ChevronRightIcon fontSize="small" sx={{ transform: "rotate(270deg)" }} />
+            <ChevronRightIcon
+              fontSize="small"
+              sx={{ transform: "rotate(270deg)" }}
+            />
           ) : (
             <ExpandMoreIcon fontSize="small" />
           )}
@@ -86,18 +104,26 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           onBlur={onNameBlur}
           variant="outlined"
           size="small"
-          sx={{ ml: 1, width: 140, "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500 } }}
+          sx={{
+            ml: 1,
+            width: 140,
+            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500 },
+          }}
           onMouseDown={(e) => e.stopPropagation()}
         />
       </Box>
 
       {!isCollapsed && (
         <Box display="flex" gap={0.5} alignItems="center">
-          {([TOOLBAR.BOLD, TOOLBAR.ITALIC, TOOLBAR.UNDERLINE] as FormatCommand[]).map((cmd) => {
+          {(
+            [TOOLBAR.BOLD, TOOLBAR.ITALIC, TOOLBAR.UNDERLINE] as FormatCommand[]
+          ).map((cmd) => {
             const Icon =
-              cmd === TOOLBAR.BOLD ? FormatBoldIcon :
-              cmd === TOOLBAR.ITALIC ? FormatItalicIcon :
-              FormatUnderlinedIcon;
+              cmd === TOOLBAR.BOLD
+                ? FormatBoldIcon
+                : cmd === TOOLBAR.ITALIC
+                ? FormatItalicIcon
+                : FormatUnderlinedIcon;
             return (
               <IconButton
                 key={cmd}
@@ -111,11 +137,23 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
             );
           })}
 
-          <IconButton size="small" onClick={(e) => { e.stopPropagation(); onClearText(); }}>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClearText();
+            }}
+          >
             <ClearIcon fontSize="small" />
           </IconButton>
 
-          <IconButton size="small" onClick={(e) => { e.stopPropagation(); onCategoryMenuOpen(e.currentTarget); }}>
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onCategoryMenuOpen(e.currentTarget);
+            }}
+          >
             <Box
               width={14}
               height={14}
@@ -146,11 +184,16 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           <Button size="small" onClick={handleCancelDelete}>
             {BUTTONS.CANCEL}
           </Button>
-          <Button size="small" variant="contained" color="error" onClick={handleConfirmDelete}>
+          <Button
+            size="small"
+            variant="contained"
+            color="error"
+            onClick={handleConfirmDelete}
+          >
             {BUTTONS.DELETE}
           </Button>
         </Box>
       </Popover>
     </Box>
   );
-}
+};

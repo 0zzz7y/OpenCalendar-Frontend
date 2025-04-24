@@ -1,11 +1,11 @@
-import type React from "react";
-import type { ReactNode } from "react";
-import { Paper, Typography, Box } from "@mui/material";
+import type React from "react"
+import type { ReactNode } from "react"
+import { Paper, Typography, Box } from "@mui/material"
 
 export interface TaskColumnProps {
-  title: string;
-  icon: ReactNode;
-  children: ReactNode;
+  title: string
+  icon: ReactNode
+  children: ReactNode
 }
 
 /**
@@ -14,20 +14,22 @@ export interface TaskColumnProps {
 const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
   <Paper
     sx={{
-      minHeight: 500,
-      width: "100%",
-      maxHeight: "80vh",
-      backgroundColor: "#fefefe",
-      borderRadius: 2,
       display: "flex",
       flexDirection: "column",
+      minHeight: 500,
+      maxHeight: "80vh",
+      width: "100%",
+      backgroundColor: "#fefefe",
+      borderRadius: 2,
       boxShadow: 3,
       overflow: "hidden",
     }}
   >
     <Box
       sx={{
-        height: 64,
+        /* Lock the header to exactly 64px tall */
+        flex: "0 0 64px",
+        width: "100%",
         display: "flex",
         justifyContent: "center",
         alignItems: "center",
@@ -53,14 +55,19 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
         {icon}
       </Box>
 
-      <Typography variant="h6" fontWeight="bold" sx={{ color: "#000", textAlign: "center" }}>
+      <Typography
+        variant="h6"
+        fontWeight="bold"
+        sx={{ color: "#000", textAlign: "center" }}
+      >
         {title}
       </Typography>
     </Box>
 
     <Box
       sx={{
-        flexGrow: 1,
+        /* Let the task list grow/shrink and scroll */
+        flex: "1 1 auto",
         overflowY: "auto",
         p: 2,
         display: "flex",
@@ -71,6 +78,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
       {children}
     </Box>
   </Paper>
-);
+)
 
-export default TaskColumn;
+
+export default TaskColumn

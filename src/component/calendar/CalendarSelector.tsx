@@ -1,12 +1,19 @@
 import React, { useState, useMemo, useCallback } from "react";
-import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material";
+import {
+  Box,
+  MenuItem,
+  TextField,
+  Typography,
+  IconButton,
+} from "@mui/material";
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import useAppStore from "@/store/useAppStore";
 import CalendarEditor from "./CalendarEditor";
 import EditorMode from "@/model/utility/editorMode";
-import PLACEHOLDERS from "@/constant/ui/labels";
+import PLACEHOLDERS from "@/constant/ui/label";
+import FILTER from "@/constant/utility/filter";
 
 export default function CalendarSelector() {
   const calendars = useAppStore((s) => s.calendars);
@@ -16,12 +23,20 @@ export default function CalendarSelector() {
   const [editorOpen, setEditorOpen] = useState(false);
   const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null);
   const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD);
-  const [editorData, setEditorData] = useState<{ id?: string; label?: string; emoji?: string }>({});
+  const [editorData, setEditorData] = useState<{
+    id?: string;
+    label?: string;
+    emoji?: string;
+  }>({});
 
   const calendarOptions = useMemo(
     () => [
       { label: "All", value: "all", emoji: "📅" },
-      ...calendars.map((cal) => ({ label: cal.name, value: cal.id, emoji: cal.emoji })),
+      ...calendars.map((cal) => ({
+        label: cal.name,
+        value: cal.id,
+        emoji: cal.emoji,
+      })),
     ],
     [calendars]
   );
@@ -47,7 +62,7 @@ export default function CalendarSelector() {
   }, []);
 
   const handleChange = useCallback(
-    (value: string) => setSelectedCalendar(value === "all" ? null : value),
+    (value: string) => setSelectedCalendar(value),
     [setSelectedCalendar]
   );
 
@@ -56,7 +71,7 @@ export default function CalendarSelector() {
       <TextField
         select
         label={PLACEHOLDERS.CALENDAR}
-        value={selectedCalendar || "all"}
+        value={selectedCalendar || FILTER.ALL}
         onChange={(e) => handleChange(e.target.value)}
         fullWidth
         size="small"
@@ -74,7 +89,12 @@ export default function CalendarSelector() {
       >
         {calendarOptions.map((opt) => (
           <MenuItem key={opt.value} value={opt.value}>
-            <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              width="100%"
+            >
               <Box display="flex" alignItems="center" gap={1}>
                 <span>{opt.emoji}</span>
                 <Typography variant="body2">{opt.label}</Typography>
@@ -117,7 +137,10 @@ export default function CalendarSelector() {
 
       <IconButton
         onClick={(e) =>
-          openEditor(EditorMode.ADD, e.currentTarget, { label: "", emoji: "📅" })
+          openEditor(EditorMode.ADD, e.currentTarget, {
+            label: "",
+            emoji: "📅",
+          })
         }
       >
         <AddCircleOutlineIcon fontSize="small" />
