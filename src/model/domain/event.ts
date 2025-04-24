@@ -1,4 +1,4 @@
-import Schedulable from "./schedulable"
+import type Schedulable from "./schedulable"
 
 interface Event extends Schedulable {
   id: string

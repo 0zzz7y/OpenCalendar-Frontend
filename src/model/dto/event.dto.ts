@@ -1,4 +1,4 @@
-import RecurringPattern from "@/model/domain/recurringPattern"
+import type RecurringPattern from "@/model/domain/recurringPattern"
 
 interface EventDto {
   id?: string

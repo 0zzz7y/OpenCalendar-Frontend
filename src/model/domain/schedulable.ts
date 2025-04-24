@@ -1,6 +1,6 @@
-import Calendar from "./calendar"
-import Category from "./category"
-import RecurringPattern from "./recurringPattern"
+import type Calendar from "./calendar"
+import type Category from "./category"
+import type RecurringPattern from "./recurringPattern"
 
 interface Schedulable {
   id: string

@@ -9,7 +9,6 @@ import type Event from "@/model/domain/event";
 import type EventDto from "@/model/dto/event.dto";
 import { createUseCrud } from "@/repository/crud.repository";
 import useAppStore from "@/store/useAppStore";
-import { de } from "date-fns/locale";
 
 const useCrudEvent = createUseCrud<Event, EventDto, EventDto>(
   "events",

@@ -1,16 +1,12 @@
 import { useCallback } from "react";
 import useAppStore from "@/store/useAppStore";
+import capitalize from "@/utilities/capitalize";
 
-/** Helpers */
-function capitalize(s: string) {
-  return s.charAt(0).toUpperCase() + s.slice(1);
-}
-
-function getId(obj: any): string {
-  return obj.id;
-}
-
-export function createUseCrud<Domain, CreateDto, RawDto>(
+export function createUseCrud<
+  Domain extends { id: string },
+  CreateDto,
+  RawDto
+>(
   resourceKey: string,
   service: {
     getAll: () => Promise<RawDto[]>;
@@ -18,38 +14,65 @@ export function createUseCrud<Domain, CreateDto, RawDto>(
     update: (id: string, dto: CreateDto) => Promise<RawDto>;
     delete: (id: string) => Promise<void>;
   },
-  toDto: (obj: CreateDto) => CreateDto,
-  fromDto: (obj: RawDto) => Domain
+  toDto: (domain: Partial<Domain>) => CreateDto,
+  fromDto: (raw: RawDto) => Domain
 ) {
   return () => {
+    const {
+      getAll,
+      create: createService,
+      update: updateService,
+      delete: deleteService,
+    } = service;
+
     const store = useAppStore();
-    const items: Domain[] = (store as any)[resourceKey] || [];
+    const typedStore = store as unknown as Record<string, unknown>;
+
+    const items =
+      (typedStore[resourceKey] as Domain[] | undefined) ?? ([] as Domain[]);
     const setterName = `set${capitalize(resourceKey)}`;
-    const setItems: (list: Domain[]) => void = (store as any)[setterName];
+    const setItems =
+      typedStore[setterName] as ((list: Domain[]) => void);
 
-    const reload = useCallback(async () => {
-      const raw = await service.getAll();
-      setItems(raw.map(fromDto));
-    }, [service, setItems]);
+    const reload = useCallback(async (): Promise<void> => {
+      const rawList = await getAll();
+      setItems(rawList.map(fromDto));
+    }, [getAll, setItems, fromDto]);
 
-    const add = useCallback(async (dto: CreateDto) => {
-      const raw = await service.create(dto);
-      const domain = fromDto(raw);
-      setItems([...items, domain]);
-      return domain;
-    }, [service, items, setItems]);
+    const add = useCallback(
+      async (domainObj: Partial<Domain>): Promise<Domain> => {
+        const dto = toDto(domainObj);
+        const raw = await createService(dto);
+        const newDomain = fromDto(raw);
+        setItems([...items, newDomain]);
+        return newDomain;
+      },
+      [createService, toDto, fromDto, items, setItems]
+    );
 
-    const update = useCallback(async (id: string, dto: CreateDto) => {
-      const raw = await service.update(id, dto);
-      const domain = fromDto(raw);
-      setItems(items.map(item => (getId(item) === id ? domain : item)));
-      return domain;
-    }, [service, items, setItems]);
+    const update = useCallback(
+      async (domainObj: Domain): Promise<Domain> => {
+        const dto = toDto(domainObj);
+        const raw = await updateService(domainObj.id, dto);
+        const updatedDomain = fromDto(raw);
+        setItems(
+          items.map(item =>
+            item.id === domainObj.id ? updatedDomain : item
+          )
+        );
+        return updatedDomain;
+      },
+      [updateService, toDto, fromDto, items, setItems]
+    );
 
-    const remove = useCallback(async (id: string) => {
-      await service.delete(id);
-      setItems(items.filter(item => getId(item) !== id));
-    }, [service, items, setItems]);
+    /** Remove an item by its id */
+    const remove = useCallback(
+      async (id: string): Promise<void> => {
+        await deleteService(id);
+        setItems(items.filter(item => item.id !== id));
+      },
+      [deleteService, items, setItems]
+    );
 
     return { reload, add, update, remove };
   };

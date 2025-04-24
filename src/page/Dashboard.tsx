@@ -9,11 +9,6 @@ import { loadCategories } from "@/controller/category.controller";
 import { loadEvents } from "@/controller/event.controller";
 import { loadNotes } from "@/controller/note.controller";
 import { loadTasks } from "@/controller/task.controller";
-import useCalendar from "@/repository/calendar.repository";
-import useCategory from "@/repository/category.repository";
-import useEvent from "@/repository/event.repository";
-import useNote from "@/repository/note.repository";
-import useTask from "@/repository/task.repository";
 import ThemeToggleButton from "@/theme/ThemeToggleButton";
 
 import { Box } from "@mui/material";

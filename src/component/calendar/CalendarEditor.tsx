@@ -59,7 +59,7 @@ const CalendarEditor = ({
       if (mode === EditorMode.ADD) {
         await addCalendar({ name: label.trim(), emoji });
       } else if (mode === EditorMode.EDIT && initialData.id) {
-        await updateCalendar(initialData.id, { name: label.trim(), emoji });
+        await updateCalendar({ name: label.trim()});
       }
       await reloadCalendars();
       onClose();

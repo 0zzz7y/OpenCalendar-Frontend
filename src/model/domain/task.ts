@@ -1,5 +1,5 @@
-import Schedulable from "./schedulable"
-import TaskStatus from "./taskStatus"
+import type Schedulable from "./schedulable"
+import type TaskStatus from "./taskStatus"
 
 interface Task extends Schedulable {
   id: string

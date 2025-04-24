@@ -1,5 +1,5 @@
-import Calendar from "./calendar"
-import Category from "./category"
+import type Calendar from "./calendar"
+import type Category from "./category"
 
 interface Note {
   id: string
