@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import {
   Box,
   Button,
@@ -9,89 +9,71 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import type Category from "@/model/domain/category";
-import useCategory from "@/repository/category.repository";
-import useAppStore from "@/store/useAppStore";
-import MESSAGES from "@/constant/ui/messages";
-import BUTTONS from "@/constant/ui/buttons";
-import PLACEHOLDERS from "@/constant/ui/labels";
 import EditorMode from "@/model/utility/editorMode";
+import PLACEHOLDERS from "@/constant/ui/labels";
+import BUTTONS from "@/constant/ui/buttons";
+import MESSAGES from "@/constant/ui/messages";
 
-interface CategoryEditorProperties {
+export interface CategoryEditorProps {
   open: boolean;
   anchorEl: HTMLElement | null;
   mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE;
-  initialData?: Partial<Category>;
+  initialData: { id?: string; name?: string; color?: string };
+  loading: boolean;
   onClose: () => void;
+  onSave: (payload: { id?: string; name: string; color: string }) => void;
+  onDelete: (id: string) => void;
 }
 
-const CategoryEditor = ({
+export default function CategoryEditor({
   open,
   anchorEl,
   mode,
   initialData,
+  loading,
   onClose,
-}: CategoryEditorProperties) => {
-  const inputRef = useRef<HTMLInputElement | null>(null);
-  const { addCategory, updateCategory, deleteCategory, reloadCategories } =
-    useCategory();
-  const selectedCategory = useAppStore((s) => s.selectedCategory);
-  const setSelectedCategory = useAppStore((s) => s.setSelectedCategory);
+  onSave,
+  onDelete,
+}: CategoryEditorProps) {
+  const inputRef = useRef<HTMLInputElement>(null);
+  const [form, setForm] = useState({ name: "", color: "#3b5bdb" });
 
-  const [label, setLabel] = useState("");
-  const [color, setColor] = useState("#3b5bdb");
-  const [loading, setLoading] = useState(false);
-
+  // Sync initial data when opening
   useEffect(() => {
     if (open) {
-      setLabel(initialData?.name ?? "");
-      setColor(initialData?.color ?? "#3b5bdb");
-      setTimeout(() => inputRef.current?.focus(), 50);
+      setForm({
+        name: initialData.name?.trim() || "",
+        color: initialData.color || "#3b5bdb",
+      });
+      setTimeout(() => {
+        inputRef.current?.focus();
+      }, 50);
     }
   }, [open, initialData]);
 
-  const handleClickAway = (event: MouseEvent | TouchEvent) => {
-    if (!anchorEl?.contains(event.target as Node)) {
-      onClose();
-    }
-  };
+  const handleChange = useCallback(
+    (field: "name" | "color", value: string) =>
+      setForm((prev) => ({ ...prev, [field]: value })),
+    []
+  );
 
-  const handleSave = async () => {
-    if (!label.trim()) return;
-    setLoading(true);
-    try {
-      if (mode === EditorMode.ADD) {
-        const created = await addCategory({ name: label.trim(), color });
-        await reloadCategories();
-        setSelectedCategory(created.id);
-      } else if (mode === EditorMode.EDIT && initialData?.id) {
-        await updateCategory(initialData.id, { name: label.trim(), color });
-        await reloadCategories();
-      }
-      onClose();
-    } catch (e) {
-      console.error("Failed to save category", e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  const handleSave = useCallback(() => {
+    if (!form.name) return;
+    onSave({ id: initialData.id, name: form.name, color: form.color });
+  }, [form, initialData.id, onSave]);
 
-  const handleDelete = async () => {
-    if (!initialData?.id) return;
-    setLoading(true);
-    try {
-      await deleteCategory(initialData.id);
-      await reloadCategories();
-      if (selectedCategory === initialData.id) {
-        setSelectedCategory("all");
+  const handleDelete = useCallback(() => {
+    if (initialData.id) onDelete(initialData.id);
+  }, [initialData.id, onDelete]);
+
+  const handleClickAway = useCallback(
+    (event: MouseEvent | TouchEvent) => {
+      if (!anchorEl?.contains(event.target as Node)) {
+        onClose();
       }
-      onClose();
-    } catch (e) {
-      console.error("Failed to delete category", e);
-    } finally {
-      setLoading(false);
-    }
-  };
+    },
+    [anchorEl, onClose]
+  );
 
   return (
     <Popover
@@ -106,13 +88,15 @@ const CategoryEditor = ({
           {(mode === EditorMode.ADD || mode === EditorMode.EDIT) && (
             <>
               <Typography variant="subtitle2" gutterBottom>
-                {mode === EditorMode.ADD ? BUTTONS.ADD : BUTTONS.SAVE}
+                {mode === EditorMode.ADD
+                  ? MESSAGES.ADD_CATEGORY
+                  : MESSAGES.EDIT_CATEGORY}
               </Typography>
               <TextField
                 inputRef={inputRef}
                 placeholder={PLACEHOLDERS.NAME}
-                value={label}
-                onChange={(e) => setLabel(e.target.value)}
+                value={form.name}
+                onChange={(e) => handleChange("name", e.target.value)}
                 fullWidth
                 size="small"
                 margin="dense"
@@ -120,9 +104,9 @@ const CategoryEditor = ({
               <Box display="flex" alignItems="center" gap={1} mt={2}>
                 <Input
                   type="color"
-                  value={color}
-                  onChange={(e) => setColor(e.target.value)}
-                  sx={{ minWidth: 40, flex: 1 }}
+                  value={form.color}
+                  onChange={(e) => handleChange("color", e.target.value)}
+                  sx={{ minWidth: 40 }}
                 />
                 <Button
                   variant="contained"
@@ -135,19 +119,20 @@ const CategoryEditor = ({
               </Box>
             </>
           )}
+
           {mode === EditorMode.DELETE && (
             <>
               <Typography variant="body2">
                 {MESSAGES.CONFIRM_DELETE_CATEGORY}
               </Typography>
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
-                <Button variant="text" size="small" onClick={onClose}>
+                <Button size="small" onClick={onClose}>
                   {BUTTONS.CANCEL}
                 </Button>
                 <Button
+                  size="small"
                   variant="contained"
                   color="error"
-                  size="small"
                   onClick={handleDelete}
                   disabled={loading}
                 >
@@ -160,6 +145,4 @@ const CategoryEditor = ({
       </ClickAwayListener>
     </Popover>
   );
-};
-
-export default CategoryEditor;
+}

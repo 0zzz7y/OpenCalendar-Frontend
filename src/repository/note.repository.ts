@@ -3,12 +3,12 @@ import {
   createNote,
   updateNote as serviceUpdateNote,
   deleteNote as serviceDeleteNote
-} from "@/service/note.service";
-import { noteToDto, dtoToNote } from "@/model/mapper/note.mapper";
-import type Note from "@/model/domain/note";
-import type NoteDto from "@/model/dto/note.dto";
-import { createUseCrud } from "@/repository/crud.repository";
-import useAppStore from "@/store/useAppStore";
+} from "@/service/note.service"
+import { noteToDto, dtoToNote } from "@/model/mapper/note.mapper"
+import type Note from "@/model/domain/note"
+import type NoteDto from "@/model/dto/note.dto"
+import { createUseCrud } from "@/repository/crud.repository"
+import useAppStore from "@/store/useAppStore"
 
 const useCrudNote = createUseCrud<Note, NoteDto, NoteDto>(
   "notes",
@@ -19,17 +19,17 @@ const useCrudNote = createUseCrud<Note, NoteDto, NoteDto>(
     delete: serviceDeleteNote
   },
   noteToDto,
-  dto => dtoToNote(dto, useAppStore().calendars, useAppStore().categories)
-);
+  (dto) => dtoToNote(dto, useAppStore().calendars, useAppStore().categories)
+)
 
 export function useNote() {
-  const { reload, add, update, remove } = useCrudNote();
+  const { reload, add, update, remove } = useCrudNote()
   return {
     reloadNotes: reload,
     addNote: add,
     updateNote: update,
     deleteNote: remove
-  };
+  }
 }
 
 export default useNote

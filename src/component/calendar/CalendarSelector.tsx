@@ -1,120 +1,109 @@
-import useAppStore from "@/store/useAppStore"
+import React, { useState, useMemo, useCallback } from "react";
+import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import useAppStore from "@/store/useAppStore";
+import CalendarEditor from "./CalendarEditor";
+import EditorMode from "@/model/utility/editorMode";
+import PLACEHOLDERS from "@/constant/ui/labels";
 
-import { useMemo, useState } from "react"
+export default function CalendarSelector() {
+  const calendars = useAppStore((s) => s.calendars);
+  const selectedCalendar = useAppStore((s) => s.selectedCalendar);
+  const setSelectedCalendar = useAppStore((s) => s.setSelectedCalendar);
 
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditIcon from "@mui/icons-material/Edit"
-import {
-  Box,
-  MenuItem,
-  TextField,
-  Typography,
-  IconButton
-} from "@mui/material"
-import CalendarEditor from "./CalendarEditor"
-import EditorMode from "@/model/utility/editorMode"
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null);
+  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD);
+  const [editorData, setEditorData] = useState<{ id?: string; label?: string; emoji?: string }>({});
 
-const CalendarSelector = () => {
-  const { calendars } = useAppStore()
-  const selectedCalendar = useAppStore((s) => s.selectedCalendar)
-  const setSelectedCalendar = useAppStore((s) => s.setSelectedCalendar)
-
-  const [editorOpen, setEditorOpen] = useState(false)
-  const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null)
-  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
-  const [editorData, setEditorData] = useState<{
-    id?: string
-    label?: string
-    emoji?: string
-  }>({})
-
-  const calendarOptions = useMemo(() => {
-    return [
+  const calendarOptions = useMemo(
+    () => [
       { label: "All", value: "all", emoji: "📅" },
-      ...calendars.map((calendar) => ({
-        label: calendar.name,
-        value: calendar.id,
-        emoji: calendar.emoji
-      }))
-    ]
-  }, [calendars])
+      ...calendars.map((cal) => ({ label: cal.name, value: cal.id, emoji: cal.emoji })),
+    ],
+    [calendars]
+  );
 
-  const openEditor = (
-    mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE,
-    anchor: HTMLElement,
-    data: { id?: string; label?: string; emoji?: string } = {}
-  ) => {
-    setEditorMode(mode)
-    setEditorData(data)
-    setEditorAnchor(anchor)
-    setEditorOpen(true)
-  }
+  const openEditor = useCallback(
+    (
+      mode: EditorMode,
+      anchor: HTMLElement,
+      data: { id?: string; label?: string; emoji?: string } = {}
+    ) => {
+      setEditorMode(mode);
+      setEditorData(data);
+      setEditorAnchor(anchor);
+      setEditorOpen(true);
+    },
+    []
+  );
 
-  const closeEditor = () => {
-    setEditorOpen(false)
-    setEditorAnchor(null)
-    setEditorData({})
-  }
+  const closeEditor = useCallback(() => {
+    setEditorOpen(false);
+    setEditorAnchor(null);
+    setEditorData({});
+  }, []);
+
+  const handleChange = useCallback(
+    (value: string) => setSelectedCalendar(value === "all" ? null : value),
+    [setSelectedCalendar]
+  );
 
   return (
     <Box display="flex" alignItems="center" gap={1} width="100%">
       <TextField
         select
-        label="Calendar"
+        label={PLACEHOLDERS.CALENDAR}
         value={selectedCalendar || "all"}
-        onChange={(e) => setSelectedCalendar(e.target.value || null)}
+        onChange={(e) => handleChange(e.target.value)}
         fullWidth
         size="small"
         SelectProps={{
-          renderValue: (selected) => {
-            const item = calendarOptions.find((d) => d.value === selected)
+          renderValue: (val) => {
+            const opt = calendarOptions.find((o) => o.value === val);
             return (
               <Box display="flex" alignItems="center" gap={1}>
-                <span>{item?.emoji || "📅"}</span>
-                <Typography variant="body2">{item?.label}</Typography>
+                <span>{opt?.emoji || "📅"}</span>
+                <Typography variant="body2">{opt?.label}</Typography>
               </Box>
-            )
-          }
+            );
+          },
         }}
       >
-        {calendarOptions.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              width="100%"
-            >
+        {calendarOptions.map((opt) => (
+          <MenuItem key={opt.value} value={opt.value}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
               <Box display="flex" alignItems="center" gap={1}>
-                <span>{option.emoji}</span>
-                <Typography variant="body2">{option.label}</Typography>
+                <span>{opt.emoji}</span>
+                <Typography variant="body2">{opt.label}</Typography>
               </Box>
-              {option.value !== "all" && (
+              {opt.value !== "all" && (
                 <Box display="flex" gap={1}>
                   <IconButton
                     size="small"
                     onClick={(e) => {
-                      e.stopPropagation()
+                      e.stopPropagation();
                       openEditor(EditorMode.EDIT, e.currentTarget, {
-                        id: option.value,
-                        label: option.label,
-                        emoji: option.emoji
-                      })
+                        id: opt.value,
+                        label: opt.label,
+                        emoji: opt.emoji,
+                      });
                     }}
                   >
                     <EditIcon fontSize="small" />
                   </IconButton>
                   <IconButton
                     size="small"
-                    disabled={option.value === selectedCalendar}
+                    disabled={opt.value === selectedCalendar}
                     onClick={(e) => {
-                      e.stopPropagation()
+                      e.stopPropagation();
                       openEditor(EditorMode.DELETE, e.currentTarget, {
-                        id: option.value,
-                        label: option.label,
-                        emoji: option.emoji
-                      })
+                        id: opt.value,
+                        label: opt.label,
+                        emoji: opt.emoji,
+                      });
                     }}
                   >
                     <DeleteIcon fontSize="small" />
@@ -128,10 +117,7 @@ const CalendarSelector = () => {
 
       <IconButton
         onClick={(e) =>
-          openEditor(EditorMode.ADD, e.currentTarget, {
-            label: "",
-            emoji: "📅"
-          })
+          openEditor(EditorMode.ADD, e.currentTarget, { label: "", emoji: "📅" })
         }
       >
         <AddCircleOutlineIcon fontSize="small" />
@@ -141,11 +127,9 @@ const CalendarSelector = () => {
         open={editorOpen}
         anchorEl={editorAnchor}
         mode={editorMode}
-        onClose={closeEditor}
         initialData={editorData}
+        onClose={closeEditor}
       />
     </Box>
-  )
+  );
 }
-
-export default CalendarSelector

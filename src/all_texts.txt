@@ -1,0 +1,4987 @@
+=== Begin: ./vite-env.d.ts ===
+/// <reference types="vite/client" />
+
+=== End:   ./vite-env.d.ts ===
+
+=== Begin: ./main.tsx ===
+import { StrictMode } from "react"
+
+import ReactDOM from "react-dom/client"
+
+import Application from "@/Application"
+
+const root = document.getElementById("root")!
+
+ReactDOM.createRoot(root).render(
+  <>
+    <StrictMode>
+      <Application />
+    </StrictMode>
+  </>
+)
+
+=== End:   ./main.tsx ===
+
+=== Begin: ./provider/ApplicationProvider.tsx ===
+import { CssBaseline } from "@mui/material"
+import { LocalizationProvider } from "@mui/x-date-pickers"
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
+import { DndProvider } from "react-dnd"
+import { HTML5Backend } from "react-dnd-html5-backend"
+import { ToastContainer } from "react-toastify"
+
+import ThemeProvider from "@/theme/ThemeProvider"
+
+const Application = ({ children }: { children: React.ReactNode }) => {
+  return (
+    <>
+      <ThemeProvider>
+        <LocalizationProvider dateAdapter={AdapterDateFns}>
+          <DndProvider backend={HTML5Backend}>
+            <ToastContainer />
+            <CssBaseline />
+            {children}
+          </DndProvider>
+        </LocalizationProvider>
+      </ThemeProvider>
+    </>
+  )
+}
+
+export default Application
+
+=== End:   ./provider/ApplicationProvider.tsx ===
+
+=== Begin: ./Application.tsx ===
+import Dashboard from "@/page/Dashboard"
+import ApplicationProvider from "@/provider/ApplicationProvider"
+
+const Application = () => {
+  return (
+    <>
+      <ApplicationProvider>
+        <Dashboard />
+      </ApplicationProvider>
+    </>
+  )
+}
+
+export default Application
+
+=== End:   ./Application.tsx ===
+
+=== Begin: ./page/Dashboard.tsx ===
+import CalendarPanel from "@/component/calendar/CalendarPanel"
+import CalendarSelector from "@/component/calendar/CalendarSelector"
+import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
+import CategorySelector from "@/component/category/CategorySelector"
+import NotesPanel from "@/component/note/NotePanel"
+import TasksPanel from "@/component/task/TaskPanel"
+import { loadCalendars } from "@/controller/calendar.controller"
+import { loadCategories } from "@/controller/category.controller"
+import { loadEvents } from "@/controller/event.controller"
+import { loadNotes } from "@/controller/note.controller"
+import { loadTasks } from "@/controller/task.controller"
+import ThemeToggleButton from "@/theme/ThemeToggleButton"
+
+import { Box } from "@mui/material"
+import { useEffect } from "react"
+import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
+
+const panelStyle = {
+  border: "2px solid #ccc",
+  borderRadius: "8px",
+  padding: "10px",
+  margin: "10px 5px"
+}
+
+const Dashboard = () => {
+  useEffect(() => {
+    loadCalendars()
+    loadCategories()
+    loadEvents()
+    loadTasks()
+    loadNotes()
+  }, [])
+
+  return (
+    <PanelGroup direction="horizontal" style={{ height: "100vh", width: "100%" }}>
+      {/* Left Panel */}
+      <Panel defaultSize={18}>
+        <PanelGroup direction="vertical" style={{ height: "100%", width: "100%" }}>
+          {/* Calendar and Category Section */}
+          <Panel style={panelStyle} defaultSize={12}>
+            <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
+              <Box display="flex" flexDirection="column" gap={2}>
+                <CalendarSelector />
+                <CategorySelector />
+              </Box>
+            </Box>
+          </Panel>
+
+          <PanelResizeHandle />
+
+          {/* Monthly Calendar */}
+          <Panel
+            defaultSize={30}
+            style={{
+              ...panelStyle,
+              minHeight: "290px",
+              minWidth: "320px",
+              position: "relative",
+              margin: "5px 5px"
+            }}
+          >
+            <Box sx={{ alignSelf: "left", mt: "-16px", ml: "-24px" }}>
+              <MonthlyCalendar />
+            </Box>
+          </Panel>
+
+          <PanelResizeHandle />
+
+          {/* Notes Section */}
+          <Panel style={{ ...panelStyle, margin: "10px 5px", padding: 0 }}>
+            <Box display="flex" flexDirection="column" height="100%" position="relative">
+              <Box flexGrow={1} overflow="auto">
+                <NotesPanel />
+              </Box>
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  p: 1.5,
+                  width: "100%"
+                }}
+              >
+                <ThemeToggleButton />
+              </Box>
+            </Box>
+          </Panel>
+        </PanelGroup>
+      </Panel>
+
+      <PanelResizeHandle />
+
+      {/* Center Panel */}
+      <Panel style={{ ...panelStyle, margin: "10px 5px" }}>
+        <CalendarPanel />
+      </Panel>
+
+      <PanelResizeHandle />
+
+      {/* Right Panel */}
+      <Panel defaultSize={20}>
+        <Box display="flex" flexDirection="column" height="100%" sx={{ ...panelStyle, m: "10px 10px 5px 5px" }}>
+          <Box flexGrow={1} overflow="auto">
+            <TasksPanel />
+          </Box>
+        </Box>
+      </Panel>
+    </PanelGroup>
+  )
+}
+
+export default Dashboard
+
+=== End:   ./page/Dashboard.tsx ===
+
+=== Begin: ./component/calendar/MonthlyCalendar.tsx ===
+import { DateCalendar } from "@mui/x-date-pickers/DateCalendar"
+
+function MonthlyCalendar() {
+  return (
+    <>
+      <DateCalendar />
+    </>
+  )
+}
+
+export default MonthlyCalendar
+
+=== End:   ./component/calendar/MonthlyCalendar.tsx ===
+
+=== Begin: ./component/calendar/CalendarEditor.tsx ===
+import BUTTONS from "@/constant/ui/buttons"
+import PLACEHOLDERS from "@/constant/ui/labels"
+import MESSAGES from "@/constant/ui/messages"
+import useCalendar from "@/repository/calendar.repository"
+
+import { Box, Button, IconButton, Popover, TextField, Typography } from "@mui/material"
+import EmojiPicker, { type EmojiClickData, EmojiStyle, Theme } from "emoji-picker-react"
+import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"
+import { useEffect, useRef, useState } from "react"
+import EditorMode from "@/model/utility/editorMode"
+
+interface CalendarEditorProperties {
+  open: boolean
+  anchorEl: HTMLElement | null
+  mode: EditorMode
+  initialData?: { id?: string; label?: string; emoji?: string }
+  onClose: () => void
+}
+
+const CalendarEditor = ({ open, anchorEl, mode, initialData = {}, onClose }: CalendarEditorProperties) => {
+  const inputRef = useRef<HTMLInputElement | null>(null)
+  const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } = useCalendar()
+
+  const [label, setLabel] = useState(initialData.label || "")
+  const [emoji, setEmoji] = useState(initialData.emoji || "📅")
+  const [pickerOpen, setPickerOpen] = useState(false)
+  const [loading, setLoading] = useState(false)
+
+  useEffect(() => {
+    if (open) {
+      setLabel(initialData.label || "")
+      setEmoji(initialData.emoji || "📅")
+      setTimeout(() => inputRef.current?.focus(), 100)
+    }
+  }, [open, initialData])
+
+  const handleSave = async () => {
+    if (!label.trim()) return
+    setLoading(true)
+    try {
+      if (mode === EditorMode.ADD) {
+        await addCalendar({ name: label.trim(), emoji })
+      } else if (mode === EditorMode.EDIT && initialData.id) {
+        await updateCalendar({
+          id: initialData.id,
+          name: label.trim(),
+          emoji
+        })
+      }
+      await reloadCalendars()
+      onClose()
+    } catch (e) {
+      console.error("Failed to save calendar", e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleDelete = async () => {
+    if (!initialData.id) return
+    setLoading(true)
+    try {
+      await deleteCalendar(initialData.id)
+      await reloadCalendars()
+      onClose()
+    } catch (e) {
+      console.error("Failed to delete calendar", e)
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return (
+    <Popover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
+    >
+      <Box sx={{ p: 2, width: 280 }}>
+        {mode !== EditorMode.DELETE ? (
+          <>
+            <Typography variant="subtitle2" color="primary" fontWeight={500}>
+              {mode === EditorMode.ADD ? MESSAGES.ADD_EVENT : MESSAGES.EDIT_EVENT}
+            </Typography>
+
+            <TextField
+              inputRef={inputRef}
+              placeholder={PLACEHOLDERS.NAME}
+              value={label}
+              onChange={(e) => setLabel(e.target.value)}
+              fullWidth
+              size="small"
+              margin="dense"
+            />
+
+            <Box display="flex" alignItems="center" justifyContent="space-between" mt={2} mb={1}>
+              <Typography fontSize={24}>{emoji}</Typography>
+              <IconButton onClick={() => setPickerOpen((prev) => !prev)}>
+                <EmojiEmotionsIcon fontSize="small" />
+              </IconButton>
+            </Box>
+
+            {pickerOpen && (
+              <EmojiPicker
+                width="100%"
+                height={300}
+                onEmojiClick={(e: EmojiClickData) => {
+                  setEmoji(e.emoji)
+                  setPickerOpen(false)
+                }}
+                searchDisabled
+                skinTonesDisabled
+                lazyLoadEmojis
+                emojiStyle={EmojiStyle.NATIVE}
+                theme={Theme.LIGHT}
+              />
+            )}
+
+            <Button variant="contained" fullWidth sx={{ mt: 2 }} onClick={handleSave} disabled={loading}>
+              {mode === EditorMode.ADD ? BUTTONS.ADD : BUTTONS.SAVE}
+            </Button>
+          </>
+        ) : (
+          <>
+            <Typography variant="body2">{MESSAGES.CONFIRM_DELETE_CALENDAR}</Typography>
+            <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
+              <Button onClick={onClose} size="small">
+                {BUTTONS.CANCEL}
+              </Button>
+              <Button onClick={handleDelete} size="small" variant="contained" color="error" disabled={loading}>
+                {BUTTONS.DELETE}
+              </Button>
+            </Box>
+          </>
+        )}
+      </Box>
+    </Popover>
+  )
+}
+
+export default CalendarEditor
+
+=== End:   ./component/calendar/CalendarEditor.tsx ===
+
+=== Begin: ./component/calendar/CalendarPanel.tsx ===
+import useEvent from "@/repository/event.repository";
+import useTask from "@/repository/task.repository";
+
+import EventPopover from "@/component/event/EventCreationPopover";
+import EventInformationPopover from "@/component/event/EventInformationPopover";
+import CalendarViewSwitcher from "@/component/calendar/CalendarViewSwitcher";
+import DayView from "@/component/calendar/view/DayView";
+import WeekView from "@/component/calendar/view/WeekView";
+import MonthView from "@/component/calendar/view/MonthView";
+
+import RecurringPattern from "@/model/domain/recurringPattern";
+import type Event from "@/model/domain/event";
+import type Schedulable from "@/model/domain/schedulable";
+
+import { Box, Typography, Button } from "@mui/material";
+import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
+import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+
+import dayjs, { type ManipulateType } from "dayjs";
+import { useState } from "react";
+import type Task from "@/model/domain/task";
+import useAppStore from "@/store/useAppStore";
+import useCalendar from "@/repository/calendar.repository";
+import useNote from "@/repository/note.repository";
+import useCategory from "@/repository/category.repository";
+import ViewType from "@/model/utility/viewType";
+import YearView from "./view/YearView";
+
+const CalendarPanel = () => {
+  const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent();
+  const { reloadTasks } = useTask();
+  const { reloadCalendars } = useCalendar();
+  const { reloadNotes } = useNote();
+  const { reloadCategories } = useCategory();
+  const { events, tasks, calendars, categories } = useAppStore();
+  const { selectedCalendar, selectedCategory } = useAppStore();
+
+  const [view, setView] = useState<ViewType>(ViewType.WEEK);
+  const [selectedDate, setSelectedDate] = useState(new Date());
+  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null);
+  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
+
+  const safeEvents: Event[] = Array.isArray(events) ? events : [];
+  const safeTasks: Task[] = Array.isArray(tasks) ? tasks : [];
+
+  const schedulables: Schedulable[] = [
+    ...safeEvents,
+    ...safeTasks.filter((task) => task.startDate && task.endDate),
+  ].filter((item) => {
+    const calendarMatch =
+      selectedCalendar === "all" || item.calendar.id === selectedCalendar;
+    const categoryMatch =
+      selectedCategory === "all" || item.category?.id === selectedCategory;
+    return calendarMatch && categoryMatch;
+  });
+
+  const handleSlotClick = (el: HTMLElement, date: Date) => {
+    setSelectedSlot(el);
+    setSelectedDatetime(date);
+    setEditingEvent(null);
+    setInfoEvent(null);
+  };
+
+  const handleEventClick = (event: Event) => {
+    const element = document.querySelector(`#event-${event.id}`) as HTMLElement;
+    if (element) {
+      setInfoAnchor(element);
+      setInfoEvent(event);
+    }
+  };
+
+  const handleClosePopover = () => {
+    setSelectedSlot(null);
+    setSelectedDatetime(null);
+    setEditingEvent(null);
+  };
+
+  const handleSave = async (data: Partial<Event>) => {
+    if (!data.startDate || !data.calendar) return;
+
+    const exists = events.find((e) => e.id === data.id);
+    if (exists && data.id) {
+      await updateEvent(data as Event);
+    } else {
+      const newEvent: Omit<Event, "id"> = {
+        name: data.name ?? "New event",
+        description: data.description ?? "",
+        startDate: data.startDate,
+        endDate: data.endDate ?? data.startDate,
+        calendar: data.calendar,
+        category: data.category,
+        recurringPattern: RecurringPattern.NONE,
+      };
+      await addEvent(newEvent);
+    }
+
+    handleClosePopover();
+  };
+
+  const handleEditEvent = () => {
+    if (!infoEvent) return;
+    setEditingEvent(infoEvent);
+    setSelectedDatetime(new Date(infoEvent.startDate));
+    setSelectedSlot(infoAnchor);
+    setInfoEvent(null);
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    await deleteEvent(id);
+    setInfoEvent(null);
+  };
+
+  const navigate = (dir: "previous" | "next") => {
+    const unit =
+      view === ViewType.MONTH
+        ? ViewType.MONTH
+        : view === ViewType.WEEK
+        ? ViewType.WEEK
+        : ViewType.DAY;
+    const delta = dir === "next" ? 1 : -1;
+    setSelectedDate(
+      dayjs(selectedDate)
+        .add(delta, view.toLowerCase() as ManipulateType)
+        .toDate()
+    );
+  };
+
+  return (
+    <>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        px={2}
+        py={1}
+      >
+        <Box display="flex" alignItems="center" gap={1}>
+          <Button onClick={() => navigate("previous")}>
+            {" "}
+            <ChevronLeftIcon />{" "}
+          </Button>
+          <Typography variant="h6">
+            {dayjs(selectedDate).format(
+              view === ViewType.MONTH ? "MMMM YYYY" : "DD MMM YYYY"
+            )}
+          </Typography>
+          <Button onClick={() => navigate("next")}>
+            {" "}
+            <ChevronRightIcon />{" "}
+          </Button>
+        </Box>
+        <CalendarViewSwitcher view={view} onChange={setView} />
+      </Box>
+
+      {view === ViewType.DAY && (
+        <DayView
+          date={selectedDate}
+          events={schedulables}
+          calendars={calendars}
+          categories={categories}
+          onEventClick={handleEventClick}
+        />
+      )}
+
+      {view === ViewType.WEEK && (
+        <WeekView
+          date={selectedDate}
+          events={schedulables}
+          calendars={calendars}
+          categories={categories}
+          onEventClick={handleEventClick}
+        />
+      )}
+
+      {view === ViewType.MONTH && (
+        <MonthView
+          date={selectedDate}
+          events={schedulables}
+          calendars={calendars}
+          categories={categories}
+          onSlotClick={handleSlotClick}
+          onSave={handleSave}
+          onEventClick={handleEventClick}
+        />
+      )}
+
+      {view === ViewType.YEAR && (
+        <YearView
+          date={selectedDate}
+          events={schedulables}
+          calendars={calendars}
+          categories={categories}
+          onEventClick={handleEventClick}
+        />
+      )}
+
+      {selectedSlot && selectedDatetime && (
+        <EventPopover
+          anchorEl={selectedSlot}
+          onClose={handleClosePopover}
+          calendars={calendars}
+          categories={categories}
+          initialEvent={
+            editingEvent ?? {
+              id: "",
+              name: "",
+              description: "",
+              startDate: selectedDatetime.toISOString(),
+              endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
+              calendar: calendars[0],
+              category: undefined,
+              recurringPattern: RecurringPattern.NONE,
+            }
+          }
+        />
+      )}
+
+      {infoEvent && infoAnchor && (
+        <EventInformationPopover
+          anchorElement={infoAnchor}
+          event={infoEvent}
+          onClose={() => setInfoEvent(null)}
+          onEdit={handleEditEvent}
+          onDelete={() => handleDeleteEvent(infoEvent.id)}
+        />
+      )}
+    </>
+  );
+};
+
+export default CalendarPanel;
+
+=== End:   ./component/calendar/CalendarPanel.tsx ===
+
+=== Begin: ./component/calendar/CalendarSelector.tsx ===
+import useAppStore from "@/store/useAppStore"
+
+import { useMemo, useState } from "react"
+
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+import DeleteIcon from "@mui/icons-material/Delete"
+import EditIcon from "@mui/icons-material/Edit"
+import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material"
+import CalendarEditor from "./CalendarEditor"
+import EditorMode from "@/model/utility/editorMode"
+
+const CalendarSelector = () => {
+  const { calendars } = useAppStore()
+  const selectedCalendar = useAppStore((s) => s.selectedCalendar)
+  const setSelectedCalendar = useAppStore((s) => s.setSelectedCalendar)
+
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null)
+  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
+  const [editorData, setEditorData] = useState<{
+    id?: string
+    label?: string
+    emoji?: string
+  }>({})
+
+  const calendarOptions = useMemo(() => {
+    return [
+      { label: "All", value: "all", emoji: "📅" },
+      ...calendars.map((calendar) => ({
+        label: calendar.name,
+        value: calendar.id,
+        emoji: calendar.emoji
+      }))
+    ]
+  }, [calendars])
+
+  const openEditor = (
+    mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE,
+    anchor: HTMLElement,
+    data: { id?: string; label?: string; emoji?: string } = {}
+  ) => {
+    setEditorMode(mode)
+    setEditorData(data)
+    setEditorAnchor(anchor)
+    setEditorOpen(true)
+  }
+
+  const closeEditor = () => {
+    setEditorOpen(false)
+    setEditorAnchor(null)
+    setEditorData({})
+  }
+
+  return (
+    <Box display="flex" alignItems="center" gap={1} width="100%">
+      <TextField
+        select
+        label="Calendar"
+        value={selectedCalendar || "all"}
+        onChange={(e) => setSelectedCalendar(e.target.value || null)}
+        fullWidth
+        size="small"
+        SelectProps={{
+          renderValue: (selected) => {
+            const item = calendarOptions.find((d) => d.value === selected)
+            return (
+              <Box display="flex" alignItems="center" gap={1}>
+                <span>{item?.emoji || "📅"}</span>
+                <Typography variant="body2">{item?.label}</Typography>
+              </Box>
+            )
+          }
+        }}
+      >
+        {calendarOptions.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+              <Box display="flex" alignItems="center" gap={1}>
+                <span>{option.emoji}</span>
+                <Typography variant="body2">{option.label}</Typography>
+              </Box>
+              {option.value !== "all" && (
+                <Box display="flex" gap={1}>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openEditor(EditorMode.EDIT, e.currentTarget, {
+                        id: option.value,
+                        label: option.label,
+                        emoji: option.emoji
+                      })
+                    }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    disabled={option.value === selectedCalendar}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openEditor(EditorMode.DELETE, e.currentTarget, {
+                        id: option.value,
+                        label: option.label,
+                        emoji: option.emoji
+                      })
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              )}
+            </Box>
+          </MenuItem>
+        ))}
+      </TextField>
+
+      <IconButton
+        onClick={(e) =>
+          openEditor(EditorMode.ADD, e.currentTarget, {
+            label: "",
+            emoji: "📅"
+          })
+        }
+      >
+        <AddCircleOutlineIcon fontSize="small" />
+      </IconButton>
+
+      <CalendarEditor
+        open={editorOpen}
+        anchorEl={editorAnchor}
+        mode={editorMode}
+        onClose={closeEditor}
+        initialData={editorData}
+      />
+    </Box>
+  )
+}
+
+export default CalendarSelector
+
+=== End:   ./component/calendar/CalendarSelector.tsx ===
+
+=== Begin: ./component/calendar/CalendarViewSwitcher.tsx ===
+import ViewType from "@/model/utility/viewType"
+import { MenuItem, Select, type SelectChangeEvent, FormControl, InputLabel } from "@mui/material"
+
+interface CalendarViewSwitcherProperties {
+  view: ViewType
+  onChange: (view: ViewType) => void
+}
+
+const CalendarViewSwitcher = ({ view, onChange }: CalendarViewSwitcherProperties) => {
+  const handleChange = (event: SelectChangeEvent) => {
+    const value = event.target.value as ViewType
+    onChange(value)
+  }
+
+  return (
+    <FormControl size="small" sx={{ mb: 2, minWidth: 120 }}>
+      <InputLabel id="calendar-view-label">View</InputLabel>
+      <Select labelId="calendar-view-label" value={view} onChange={handleChange} label="View">
+        <MenuItem value={ViewType.DAY}>{ViewType.DAY}</MenuItem>
+        <MenuItem value={ViewType.WEEK}>{ViewType.WEEK}</MenuItem>
+        <MenuItem value={ViewType.MONTH}>{ViewType.MONTH}</MenuItem>
+        <MenuItem value={ViewType.YEAR}>{ViewType.YEAR}</MenuItem>
+      </Select>
+    </FormControl>
+  )
+}
+
+export default CalendarViewSwitcher
+
+=== End:   ./component/calendar/CalendarViewSwitcher.tsx ===
+
+=== Begin: ./component/calendar/DayColumn.tsx ===
+import React, { useMemo, useCallback } from "react"
+import type { CSSProperties, FC } from "react"
+
+import EventBox from "@/component/event/EventBox"
+import type Event from "@/model/domain/event"
+import type Schedulable from "@/model/domain/schedulable"
+
+import { Box } from "@mui/material"
+
+import CalendarGridCell from "./grid/CalendarGridCell"
+
+interface DayColumnProps {
+  date: Date
+  events: Schedulable[]
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  onSave: (event: Partial<Event> & { startDate: string }) => void
+  onSlotClick?: (slot: HTMLElement, datetime: Date) => void
+  showPopoverLine?: boolean
+  dragTargetId?: string | null
+  onEventClick?: (event: Event) => void
+}
+
+const GAP = 4 // px gap between events
+const SLOT_HEIGHT = 32 // px for 30-minute slot
+
+const DayColumn: FC<DayColumnProps> = ({ date, events, onSave, onSlotClick, dragTargetId, onEventClick }) => {
+  // Generate time slots for 24h in 30-min intervals
+  const slots = useMemo(
+    () =>
+      Array.from({ length: 48 }, (_, i) => {
+        const slot: Date = new Date(date)
+        slot.setHours(Math.floor(i / 2), (i % 2) * 30, 0, 0)
+        return slot
+      }),
+    [date]
+  )
+
+  // Stable helper to check if two events overlap
+  const eventsOverlap = useCallback((a: Schedulable, b: Schedulable): boolean => {
+    if (!a.startDate || !a.endDate || !b.startDate || !b.endDate) return false
+    const startA = new Date(a.startDate).valueOf()
+    const endA = new Date(a.endDate).valueOf()
+    const startB = new Date(b.startDate).valueOf()
+    const endB = new Date(b.endDate).valueOf()
+    return startA < endB && startB < endA
+  }, [])
+
+  // Group overlapping events together
+  const groupedEvents = useMemo(() => {
+    const groups: Schedulable[][] = []
+    for (const evt of events) {
+      let placed = false
+      for (const group of groups) {
+        for (const g of group) {
+          if (eventsOverlap(g, evt)) {
+            group.push(evt)
+            placed = true
+            break
+          }
+        }
+        if (placed) break
+      }
+      if (!placed) {
+        groups.push([evt])
+      }
+    }
+    return groups
+  }, [events, eventsOverlap])
+
+  // Layout events for absolute positioning
+  const layoutedEvents = useMemo(() => {
+    const laidOut: (Schedulable & { style: CSSProperties })[] = []
+
+    for (const group of groupedEvents) {
+      const sorted = [...group].sort(
+        (a, b) => new Date(a.startDate ?? "").valueOf() - new Date(b.startDate ?? "").valueOf()
+      )
+      const widthPct = 100 / sorted.length
+
+      for (const [index, evt] of sorted.entries()) {
+        const start: Date = new Date(evt.startDate ?? "")
+        const end: Date = new Date(evt.endDate ?? "")
+        const startMins = start.getHours() * 60 + start.getMinutes()
+        const endMins = end.getHours() * 60 + end.getMinutes()
+
+        const top = (startMins * SLOT_HEIGHT) / 30
+        const height = Math.max(SLOT_HEIGHT / 2, ((endMins - startMins) * SLOT_HEIGHT) / 30)
+
+        const style: CSSProperties = {
+          position: "absolute",
+          top,
+          height,
+          width: `calc(${widthPct}% - ${GAP}px)`,
+          left: `calc(${index * widthPct}% + ${index * GAP}px)`,
+          zIndex: 20,
+          opacity: dragTargetId ? 0.6 : 1,
+          pointerEvents: dragTargetId && evt.id !== dragTargetId ? "none" : "auto"
+        }
+
+        laidOut.push({ ...evt, style })
+      }
+    }
+
+    return laidOut
+  }, [groupedEvents, dragTargetId])
+
+  return (
+    <Box flex={1} position="relative" borderLeft="1px solid #ddd" minHeight={48 * SLOT_HEIGHT}>
+      {slots.map((slot, idx) => (
+        <CalendarGridCell
+          key={idx}
+          datetime={slot}
+          allEvents={events.filter((e) => e.startDate && e.endDate)}
+          onSave={onSave}
+          onClick={(el) => onSlotClick?.(el, slot)}
+        />
+      ))}
+
+      {layoutedEvents.map((evt) => (
+        <EventBox
+          key={evt.id}
+          event={evt as Event}
+          dragTargetId={dragTargetId}
+          customStyle={evt.style}
+          onClick={() => onEventClick?.(evt as Event)}
+        />
+      ))}
+    </Box>
+  )
+}
+
+export default React.memo(DayColumn)
+
+=== End:   ./component/calendar/DayColumn.tsx ===
+
+=== Begin: ./component/calendar/index.ts ===
+
+=== End:   ./component/calendar/index.ts ===
+
+=== Begin: ./component/calendar/view/YearView.tsx ===
+import { useState } from "react"
+import { Box, Typography, Paper, useTheme } from "@mui/material"
+import dayjs from "dayjs"
+import EventInformationPopover from "@/component/event/EventInformationPopover"
+import DayEventsPopover from "@/component/event/DayEventsPopover"
+import type Event from "@/model/domain/event"
+import type Schedulable from "@/model/domain/schedulable"
+
+interface YearViewProperties {
+  date: Date
+  events: Schedulable[]
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  onEventClick?: (event: Event) => void
+}
+
+const YearView = ({ date, events, calendars, categories, onEventClick }: YearViewProperties) => {
+  const theme = useTheme()
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null)
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
+  const [dayPopoverAnchor, setDayPopoverAnchor] = useState<HTMLElement | null>(null)
+  const [dayPopoverDate, setDayPopoverDate] = useState<Date | null>(null)
+
+  const handleOpenInfo = (event: Schedulable, anchor: HTMLElement) => {
+    if ("id" in event && "name" in event && "calendar" in event) {
+      setInfoEvent(event as Event)
+      setInfoAnchor(anchor)
+      onEventClick?.(event as Event)
+    }
+  }
+
+  const handleCloseInfo = () => {
+    setInfoEvent(null)
+    setInfoAnchor(null)
+  }
+
+  const handleOpenDayPopover = (anchor: HTMLElement, date: Date) => {
+    setDayPopoverAnchor(anchor)
+    setDayPopoverDate(date)
+  }
+
+  const handleCloseDayPopover = () => {
+    setDayPopoverAnchor(null)
+    setDayPopoverDate(null)
+  }
+
+  const year = date.getFullYear()
+  const months = Array.from({ length: 12 }, (_, i) => dayjs(new Date(year, i, 1)))
+
+  return (
+    <Box sx={{ height: "100%", overflow: "auto", p: 2 }}>
+      <Box sx={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))", gap: 2 }}>
+        {months.map((month) => {
+          const daysInMonth = month.daysInMonth()
+          const firstDayOfWeek = month.startOf("month").day()
+          const days: Date[] = []
+
+          for (let i = 0; i < firstDayOfWeek; i++) {
+            days.push(new Date(NaN))
+          }
+          for (let i = 1; i <= daysInMonth; i++) {
+            days.push(new Date(year, month.month(), i))
+          }
+
+          return (
+            <Paper key={month.month()} sx={{ p: 1 }}>
+              <Typography variant="subtitle2" fontWeight={600} gutterBottom>
+                {month.format("MMMM YYYY")}
+              </Typography>
+              <Box sx={{ display: "grid", gridTemplateColumns: "repeat(7, 1fr)", gap: 0.5 }}>
+                {days.map((day, idx) => {
+                  const isValid = !isNaN(day.getTime())
+                  const dayEvents = isValid
+                    ? events.filter(
+                        (e): e is Event =>
+                          !!e.startDate && dayjs(e.startDate).isSame(day, "day") && typeof e.name === "string"
+                      )
+                    : []
+
+                  return (
+                    <Box
+                      key={idx}
+                      onClick={(e) => {
+                        if (isValid) {
+                          handleOpenDayPopover(e.currentTarget, day)
+                        }
+                      }}
+                      sx={{
+                        height: 60,
+                        px: 1,
+                        py: 0.5,
+                        cursor: isValid ? "pointer" : "default",
+                        backgroundColor:
+                          isValid && dayjs(day).isSame(dayjs(), "day") ? theme.palette.primary.light : "transparent",
+                        borderRadius: 1,
+                        overflow: "hidden"
+                      }}
+                    >
+                      <Typography variant="caption" color="text.secondary">
+                        {isValid ? day.getDate() : ""}
+                      </Typography>
+                      {dayEvents.length > 0 && (
+                        <Typography variant="caption" noWrap sx={{ fontSize: 10 }}>
+                          {dayEvents[0].name}
+                        </Typography>
+                      )}
+                    </Box>
+                  )
+                })}
+              </Box>
+            </Paper>
+          )
+        })}
+      </Box>
+
+      {infoEvent && infoAnchor && (
+        <EventInformationPopover
+          anchorElement={infoAnchor}
+          event={infoEvent}
+          onClose={handleCloseInfo}
+          onEdit={() => {}}
+          onDelete={() => {}}
+        />
+      )}
+
+      {dayPopoverAnchor && dayPopoverDate && (
+        <DayEventsPopover
+          anchorEl={dayPopoverAnchor}
+          date={dayPopoverDate}
+          events={events.filter(
+            (e): e is Event =>
+              !!e.startDate && dayjs(e.startDate).isSame(dayPopoverDate, "day") && typeof e.name === "string"
+          )}
+          onClose={handleCloseDayPopover}
+        />
+      )}
+    </Box>
+  )
+}
+
+export default YearView
+
+=== End:   ./component/calendar/view/YearView.tsx ===
+
+=== Begin: ./component/calendar/view/WeekView.tsx ===
+import EventPopover from "@/component/event/EventCreationPopover";
+import EventInformationPopover from "@/component/event/EventInformationPopover";
+import useEvent from "@/repository/event.repository";
+import Event from "@/model/domain/event";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import Schedulable from "@/model/domain/schedulable";
+
+import { useState } from "react";
+
+import { Box, Typography } from "@mui/material";
+import dayjs from "dayjs";
+
+import DayColumn from "../DayColumn";
+
+interface WeekViewProperties {
+  date: Date;
+  events: Schedulable[];
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
+  onEventClick?: (event: Event) => void;
+}
+
+const getStartOfWeek = (date: Date) => {
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  d.setDate(diff);
+  d.setHours(0, 0, 0, 0);
+  return d;
+};
+
+const WeekView = ({
+  date,
+  events,
+  calendars,
+  categories,
+  onEventClick,
+}: WeekViewProperties) => {
+  const { updateEvent, reloadEvents } = useEvent();
+
+  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null);
+  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
+
+  const weekStart = getStartOfWeek(date);
+  const days = Array.from({ length: 7 }, (_, i) =>
+    dayjs(weekStart).add(i, "day").toDate()
+  );
+
+  const handleSlotClick = (element: HTMLElement, datetime: Date) => {
+    setSelectedSlot(element);
+    setSelectedDatetime(datetime);
+    setEditingEvent(null);
+    setInfoEvent(null);
+  };
+
+  const handleEventClick = (event: Schedulable) => {
+    if ("id" in event && "name" in event && "calendar" in event) {
+      const element = document.querySelector(
+        `#event-${event.id}`
+      ) as HTMLElement;
+      if (element) {
+        setInfoAnchor(element);
+        setInfoEvent(event as Event);
+        onEventClick?.(event as Event);
+      }
+    }
+  };
+
+  const handleClosePopover = () => {
+    setSelectedSlot(null);
+    setSelectedDatetime(null);
+    setEditingEvent(null);
+  };
+
+  const handleEditEvent = () => {
+    setEditingEvent(infoEvent);
+    setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null);
+    setSelectedSlot(infoAnchor);
+    setInfoEvent(null);
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    await updateEvent(id, { name: "" });
+  };
+
+  return (
+    <>
+      <Box
+        display="flex"
+        height="100%"
+        sx={{ p: 2, height: "100vh", overflow: "auto" }}
+      >
+        {days.map((day, index) => {
+          const isToday = dayjs(day).isSame(dayjs(), "day");
+
+          return (
+            <Box
+              key={index}
+              width="100%"
+              display="flex"
+              flexDirection="column"
+              borderRight="1px solid #ccc"
+              minHeight={`${48 * 32}px`}
+            >
+              <Box
+                px={1}
+                py={1}
+                textAlign="center"
+                borderBottom="1px solid #ddd"
+                height={50}
+              >
+                <Box
+                  sx={{
+                    backgroundColor: isToday ? "#1976d2" : "transparent",
+                    color: isToday ? "#fff" : "inherit",
+                    borderRadius: isToday ? "50%" : "0",
+                    width: 32,
+                    height: 32,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    margin: "0 auto",
+                    fontWeight: isToday ? 700 : 500,
+                    fontSize: 14,
+                  }}
+                >
+                  {day.getDate()}
+                </Box>
+
+                <Typography variant="caption" sx={{ mt: 0.5 }}>
+                  {day.toLocaleDateString("en-US", {
+                    weekday: "short",
+                  })}
+                </Typography>
+              </Box>
+
+              <DayColumn
+                date={day}
+                events={events.filter((e) =>
+                  dayjs(e.startDate).isSame(day, "day")
+                )}
+                allEvents={events}
+                calendars={calendars}
+                categories={categories}
+                onSave={async (data) => {
+                  if (data.id) {
+                    await updateEvent(data.id, data);
+                    await reloadEvents();
+                  }
+                }}
+                onSlotClick={handleSlotClick}
+                onEventClick={handleEventClick}
+              />
+            </Box>
+          );
+        })}
+      </Box>
+
+      {selectedSlot && selectedDatetime && (
+        <EventPopover
+          anchorEl={selectedSlot}
+          onClose={handleClosePopover}
+          calendars={calendars}
+          categories={categories}
+          initialEvent={
+            editingEvent ?? {
+              id: "",
+              name: "",
+              description: "",
+              startDate: dayjs(selectedDatetime).toISOString(),
+              endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
+              recurringPattern: RecurringPattern.NONE,
+              calendar: calendars[0],
+              category: { id: "", name: "", color: "" },
+            }
+          }
+        />
+      )}
+
+      {infoEvent && infoAnchor && (
+        <EventInformationPopover
+          anchorElement={infoAnchor}
+          event={infoEvent}
+          onClose={() => setInfoEvent(null)}
+          onEdit={handleEditEvent}
+          onDelete={handleDeleteEvent}
+        />
+      )}
+    </>
+  );
+};
+
+export default WeekView;
+
+=== End:   ./component/calendar/view/WeekView.tsx ===
+
+=== Begin: ./component/calendar/view/MonthView.tsx ===
+import EventInformationPopover from "@/component/event/EventInformationPopover";
+import Event from "@/model/domain/event";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import Schedulable from "@/model/domain/schedulable";
+
+import { useState } from "react";
+
+import { Box, Typography, Paper, useTheme } from "@mui/material";
+import dayjs from "dayjs";
+
+import EventCreationPopover from "../../event/EventCreationPopover";
+
+interface MonthViewProperties {
+  date: Date;
+  events: Schedulable[];
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
+  onSave: (data: Partial<Event>) => void;
+  onSlotClick?: (element: HTMLElement, datetime: Date) => void;
+  onEventClick?: (event: Event) => void;
+}
+
+const MonthView = ({
+  date,
+  events,
+  calendars,
+  categories,
+  onSave,
+  onSlotClick,
+  onEventClick,
+}: MonthViewProperties) => {
+  const theme = useTheme();
+
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
+  const [createAnchor, setCreateAnchor] = useState<HTMLElement | null>(null);
+  const [createDate, setCreateDate] = useState<Date | null>(null);
+
+  const startOfMonth = dayjs(date).startOf("month");
+  const startDay = startOfMonth.startOf("week");
+  const today = dayjs();
+
+  const openInfoPopover = (event: Schedulable, anchor: HTMLElement) => {
+    if ("id" in event && "name" in event && "calendar" in event) {
+      setInfoEvent(event as Event);
+      setInfoAnchor(anchor);
+      onEventClick?.(event as Event);
+    }
+  };
+
+  const closeInfoPopover = () => {
+    setInfoEvent(null);
+    setInfoAnchor(null);
+  };
+
+  const deleteEvent = (id: string) => {
+    onSave({ id });
+    closeInfoPopover();
+  };
+
+  const editEvent = () => {
+    if (!infoEvent || !infoAnchor) return;
+    closeInfoPopover();
+    setCreateDate(new Date(infoEvent.startDate));
+    setCreateAnchor(infoAnchor);
+  };
+
+  const openCreatePopover = (anchor: HTMLElement, date: Date) => {
+    setCreateAnchor(anchor);
+    setCreateDate(date);
+    onSlotClick?.(anchor, date);
+  };
+
+  const closeCreatePopover = () => {
+    setCreateAnchor(null);
+    setCreateDate(null);
+  };
+
+  const handleSave = (data: Partial<Event>) => {
+    onSave(data);
+    closeCreatePopover();
+  };
+
+  const cells: React.ReactNode[] = [];
+  for (let i = 0; i < 42; i++) {
+    const day = startDay.add(i, "day");
+    const dayEvents = events.filter((e) =>
+      dayjs(e.startDate).isSame(day, "day")
+    );
+
+    cells.push(
+      <Paper
+        key={day.format("YYYY-MM-DD")}
+        elevation={0}
+        onClick={(e) =>
+          openCreatePopover(e.currentTarget as HTMLElement, day.toDate())
+        }
+        sx={{
+          minHeight: 100,
+          p: 1,
+          border: "1px solid",
+          borderColor: "divider",
+          cursor: "pointer",
+          transition: "background-color 0.15s ease-in-out",
+          "&:hover": {
+            backgroundColor: (theme) =>
+              theme.palette.mode === "dark" ? "#3d3d3d" : "#e0e0e0",
+          },
+        }}
+      >
+        <Typography
+          variant="body2"
+          fontWeight="bold"
+          color={
+            day.isSame(today, "day") ? theme.palette.primary.main : "inherit"
+          }
+        >
+          {day.format("D")}
+        </Typography>
+
+        <Box sx={{ mt: 0.5 }}>
+          {dayEvents.slice(0, 3).map((ev) => (
+            <Box
+              key={ev.id}
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                cursor: "pointer",
+                gap: 0.5,
+                mb: 0.5,
+                "&:hover": { bgcolor: theme.palette.action.hover },
+              }}
+              onClick={(e) => {
+                e.stopPropagation();
+                openInfoPopover(ev, e.currentTarget as HTMLElement);
+              }}
+            >
+              <Box
+                sx={{
+                  width: 8,
+                  height: 8,
+                  bgcolor: ev.category?.color,
+                  borderRadius: "50%",
+                }}
+              />
+              <Typography variant="caption" noWrap>
+                {dayjs(ev.startDate).format("H:mm")} {ev.name}{" "}
+                {ev.calendar?.emoji}
+              </Typography>
+            </Box>
+          ))}
+
+          {dayEvents.length > 3 && (
+            <Typography variant="caption" color="text.secondary">
+              jeszcze {dayEvents.length - 3}
+            </Typography>
+          )}
+        </Box>
+      </Paper>
+    );
+  }
+
+  return (
+    <Box sx={{ overflow: "auto", height: "100%", p: 2 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: "repeat(7, 1fr)",
+          gap: 0.5,
+        }}
+      >
+        {cells}
+      </Box>
+
+      {infoEvent && infoAnchor && (
+        <EventInformationPopover
+          anchorElement={infoAnchor}
+          event={infoEvent}
+          onClose={closeInfoPopover}
+          onEdit={editEvent}
+          onDelete={deleteEvent}
+        />
+      )}
+
+      {createAnchor && createDate && (
+        <EventCreationPopover
+          anchorEl={createAnchor}
+          onClose={closeCreatePopover}
+          calendars={calendars}
+          categories={categories}
+          initialEvent={{
+            id: "",
+            name: "",
+            description: "",
+            startDate: dayjs(createDate).toISOString(),
+            endDate: dayjs(createDate).add(1, "hour").toISOString(),
+            calendar: { id: "", name: "", emoji: "" },
+            category: undefined,
+            recurringPattern: RecurringPattern.NONE,
+          }}
+        />
+      )}
+    </Box>
+  );
+};
+
+export default MonthView;
+
+=== End:   ./component/calendar/view/MonthView.tsx ===
+
+=== Begin: ./component/calendar/view/DayView.tsx ===
+import EventPopover from "@/component/event/EventCreationPopover";
+import EventInformationPopover from "@/component/event/EventInformationPopover";
+import useEvent from "@/repository/event.repository";
+import type Event from "@/model/domain/event";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import type Schedulable from "@/model/domain/schedulable";
+
+import { useState } from "react";
+
+import { Box } from "@mui/material";
+import dayjs from "dayjs";
+
+import DayColumn from "../DayColumn";
+
+interface DayViewProperties {
+  date: Date;
+  events: Schedulable[];
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
+  onEventClick?: (event: Event) => void;
+}
+
+const DayView = ({
+  date,
+  events,
+  calendars,
+  categories,
+  onEventClick,
+}: DayViewProperties) => {
+  const { updateEvent } = useEvent();
+
+  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null);
+  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null);
+  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
+  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
+  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
+
+  const dayEvents = events.filter(
+    (e) => e.startDate && dayjs(e.startDate).isSame(date, "day")
+  );
+
+  const handleSlotClick = (slot: HTMLElement, datetime: Date) => {
+    setSelectedSlot(slot);
+    setSelectedDatetime(datetime);
+    setEditingEvent(null);
+    setInfoEvent(null);
+  };
+
+  const handleEventClick = (event: Schedulable) => {
+    if ("id" in event && "name" in event && "calendar" in event) {
+      const element = document.querySelector(
+        `#event-${event.id}`
+      ) as HTMLElement;
+      if (element) {
+        setInfoAnchor(element);
+        setInfoEvent(event as Event);
+        onEventClick?.(event as Event);
+      }
+    }
+  };
+
+  const handleClosePopover = () => {
+    setSelectedSlot(null);
+    setSelectedDatetime(null);
+    setEditingEvent(null);
+  };
+
+  const handleEditEvent = () => {
+    setEditingEvent(infoEvent);
+    setSelectedDatetime(infoEvent ? new Date(infoEvent.startDate) : null);
+    setSelectedSlot(infoAnchor);
+    setInfoEvent(null);
+  };
+
+  const handleDeleteEvent = async (id: string) => {
+    await updateEvent({ id: id, name: "" });
+  };
+
+  return (
+    <>
+      <Box
+        display="flex"
+        height="100%"
+        sx={{ p: 2, height: "100vh", overflow: "auto" }}
+      >
+        <DayColumn
+          date={date}
+          events={dayEvents}
+          allEvents={events}
+          calendars={calendars}
+          categories={categories}
+          onSave={(data) => {
+            if (data.id) updateEvent(data as Event);
+          }}
+          onSlotClick={handleSlotClick}
+          onEventClick={handleEventClick}
+        />
+      </Box>
+
+      {selectedSlot && selectedDatetime && (
+        <EventPopover
+          anchorEl={selectedSlot}
+          onClose={handleClosePopover}
+          calendars={calendars}
+          categories={categories}
+          initialEvent={
+            editingEvent ?? {
+              id: "",
+              name: "",
+              description: "",
+              startDate: dayjs(selectedDatetime).toISOString(),
+              endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
+              recurringPattern: RecurringPattern.NONE,
+              calendar: calendars[0],
+              category: undefined,
+            }
+          }
+        />
+      )}
+
+      {infoEvent && infoAnchor && (
+        <EventInformationPopover
+          anchorElement={infoAnchor}
+          event={infoEvent}
+          onClose={() => setInfoEvent(null)}
+          onEdit={handleEditEvent}
+          onDelete={handleDeleteEvent}
+        />
+      )}
+    </>
+  );
+};
+
+export default DayView;
+
+=== End:   ./component/calendar/view/DayView.tsx ===
+
+=== Begin: ./component/calendar/grid/CalendarGridCell.tsx ===
+import type Event from "@/model/domain/event"
+import type Schedulable from "@/model/domain/schedulable"
+
+import { useRef, useEffect, useMemo } from "react"
+
+import { Box } from "@mui/material"
+import { useDrop } from "react-dnd"
+
+interface CalendarGridCellProperties {
+  datetime: Date
+  allEvents: Schedulable[]
+  onSave: (event: Partial<Event> & { startDate: string }) => void
+  onClick?: (element: HTMLElement) => void
+}
+
+const CalendarGridCell = ({ datetime, allEvents, onSave, onClick }: CalendarGridCellProperties) => {
+  const ref = useRef<HTMLDivElement>(null)
+
+  const [{ isOver, canDrop, item }, drop] = useDrop(() => ({
+    accept: "event",
+    drop: (item: { id: string }) => {
+      const moved = allEvents.find((e) => e.id === item.id)
+      if (!moved) return
+
+      const newStart = new Date(datetime)
+      const startTime = new Date(moved.startDate ?? "")
+      newStart.setSeconds(0, 0)
+
+      const duration = new Date(moved.endDate ?? "").getTime() - startTime.getTime()
+      const newEnd = new Date(newStart.getTime() + duration)
+
+      onSave({
+        id: moved.id,
+        name: moved.name,
+        description: moved.description ?? "",
+        calendar: moved.calendar,
+        category: moved.category,
+        startDate: newStart.toISOString(),
+        endDate: newEnd.toISOString()
+      })
+    },
+    collect: (monitor) => ({
+      isOver: monitor.isOver(),
+      canDrop: monitor.canDrop(),
+      item: monitor.getItem()
+    })
+  }))
+
+  useEffect(() => {
+    if (ref.current) {
+      drop(ref.current)
+    }
+  }, [drop])
+
+  const handleClick = (e: React.MouseEvent<HTMLElement>) => {
+    onClick?.(e.currentTarget)
+  }
+
+  const previewEvent = allEvents.find((e) => e.id === item?.id)
+  const previewHeight = previewEvent
+    ? Math.max(
+        32,
+        ((new Date(previewEvent.endDate ?? "").getTime() - new Date(previewEvent.startDate ?? "").getTime()) /
+          (1000 * 60)) *
+          (32 / 30)
+      )
+    : 32
+
+  const isFullHour = datetime.getMinutes() === 0
+
+  const use12Hour = useMemo(() => Intl.DateTimeFormat().resolvedOptions().hour12, [])
+
+  const formattedHour = useMemo(
+    () =>
+      new Intl.DateTimeFormat(undefined, {
+        hour: "numeric",
+        minute: "2-digit",
+        hour12: use12Hour
+      }).format(datetime),
+    [datetime, use12Hour]
+  )
+
+  return (
+    <>
+      <Box
+        ref={ref}
+        onClick={handleClick}
+        sx={{
+          display: "flex",
+          alignItems: "center",
+          borderBottom: (theme) => (theme.palette.mode === "dark" ? "1px solid #333" : "1px solid #eee"),
+          padding: "6px",
+          minHeight: 32,
+          position: "relative",
+          cursor: "pointer",
+          zIndex: 10,
+          bgcolor: isOver && canDrop ? "#e3f2fd" : "transparent",
+          fontSize: "0.75rem",
+          border: isOver && canDrop ? "2px dashed #1976d2" : undefined,
+          "&:hover": {
+            backgroundColor: (theme) => (theme.palette.mode === "dark" ? "#3d3d3d" : "#e0e0e0")
+          }
+        }}
+      >
+        {isFullHour && (
+          <Box
+            sx={{
+              width: 50,
+              color: "#999",
+              fontSize: "0.75rem",
+              pr: 1,
+              whiteSpace: "nowrap",
+              flexShrink: 0
+            }}
+          >
+            {formattedHour}
+          </Box>
+        )}
+
+        {isOver && canDrop && (
+          <Box
+            sx={{
+              position: "absolute",
+              top: 0,
+              left: 0,
+              right: 0,
+              height: previewHeight,
+              borderRadius: 1,
+              zIndex: 1
+            }}
+          />
+        )}
+      </Box>
+    </>
+  )
+}
+
+export default CalendarGridCell
+
+=== End:   ./component/calendar/grid/CalendarGridCell.tsx ===
+
+=== Begin: ./component/calendar/grid/DayGrid.tsx ===
+import { Box, Typography, useTheme } from "@mui/material"
+
+interface DayGridProperties {
+  date: Date
+  onSlotClick: (datetime: Date, element: HTMLElement) => void
+}
+
+const DayGrid = ({ date, onSlotClick }: DayGridProperties) => {
+  const theme = useTheme()
+
+  const slots = Array.from({ length: 48 }, (_, i) => {
+    const hour = Math.floor(i / 2)
+    const minute = i % 2 === 0 ? 0 : 30
+    return { hour, minute }
+  })
+
+  const formatTime = (hour: number, minute: number) => {
+    const d = new Date()
+    d.setHours(hour, minute, 0, 0)
+    return Intl.DateTimeFormat(undefined, {
+      hour: "numeric",
+      minute: "2-digit"
+    }).format(d)
+  }
+
+  return (
+    <>
+      <Box
+        display="flex"
+        flexDirection="column"
+        flexGrow={1}
+        sx={{
+          height: `${48 * 24}px`,
+          border: `1px solid ${theme.palette.divider}`,
+          overflow: "visible"
+        }}
+      >
+        {slots.map(({ hour, minute }, i) => (
+          <Box
+            key={i}
+            onClick={(e) => {
+              const slotDate = new Date(date.getFullYear(), date.getMonth(), date.getDate(), hour, minute, 0, 0)
+              onSlotClick(slotDate, e.currentTarget)
+            }}
+            sx={{
+              borderBottom: `1px solid ${theme.palette.divider}`,
+              padding: "6px 12px",
+              height: 32,
+              cursor: "pointer",
+              display: "flex",
+              alignItems: "center",
+              flexShrink: 0,
+              position: "relative",
+              zIndex: 1,
+              "&:hover": {
+                backgroundColor: theme.palette.action.hover
+              }
+            }}
+          >
+            <Typography variant="caption">{formatTime(hour, minute)}</Typography>
+          </Box>
+        ))}
+      </Box>
+    </>
+  )
+}
+
+export default DayGrid
+
+=== End:   ./component/calendar/grid/DayGrid.tsx ===
+
+=== Begin: ./component/category/CategoryEditor.tsx ===
+// src/components/CategoryEditor.tsx
+import { Box, Button, ClickAwayListener, Input, Paper, Popover, TextField, Typography } from "@mui/material"
+import { useEffect, useRef, useState } from "react"
+import EditorMode from "@/model/utility/editorMode"
+
+interface CategoryEditorProps {
+  open: boolean
+  anchorEl: HTMLElement | null
+  mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE
+  initialData: { id?: string; name?: string; color?: string }
+  loading: boolean
+  onClose: () => void
+  onSave: (payload: {
+    id?: string
+    name: string
+    color: string
+  }) => void
+  onDelete: (id: string) => void
+}
+
+export default function CategoryEditor({
+  open,
+  anchorEl,
+  mode,
+  initialData,
+  loading,
+  onClose,
+  onSave,
+  onDelete
+}: CategoryEditorProps) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [name, setName] = useState(initialData.name ?? "")
+  const [color, setColor] = useState(initialData.color ?? "#3b5bdb")
+
+  // reset form when opening
+  useEffect(() => {
+    if (open) {
+      setName(initialData.name ?? "")
+      setColor(initialData.color ?? "#3b5bdb")
+      setTimeout(() => inputRef.current?.focus(), 50)
+    }
+  }, [open, initialData])
+
+  const handleClickAway = (e: MouseEvent | TouchEvent) => {
+    // click outside both the popover *and* the anchor
+    if (!anchorEl?.contains(e.target as Node)) {
+      onClose()
+    }
+  }
+
+  const handleSaveClick = () => {
+    if (!name.trim()) return
+    onSave({ id: initialData.id, name: name.trim(), color })
+  }
+
+  const handleDeleteClick = () => {
+    if (initialData.id) {
+      onDelete(initialData.id)
+    }
+  }
+
+  return (
+    <Popover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
+    >
+      <ClickAwayListener onClickAway={handleClickAway}>
+        <Paper sx={{ p: 2, width: 280 }}>
+          {(mode === EditorMode.ADD || mode === EditorMode.EDIT) && (
+            <>
+              <Typography variant="subtitle2" gutterBottom>
+                {mode === EditorMode.ADD ? "Add Category" : "Edit Category"}
+              </Typography>
+              <TextField
+                inputRef={inputRef}
+                placeholder="Name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                fullWidth
+                size="small"
+                margin="dense"
+              />
+              <Box display="flex" alignItems="center" gap={1} mt={2}>
+                <Input type="color" value={color} onChange={(e) => setColor(e.target.value)} sx={{ minWidth: 40 }} />
+                <Button variant="contained" fullWidth onClick={handleSaveClick} disabled={loading}>
+                  {mode === EditorMode.ADD ? "Add" : "Save"}
+                </Button>
+              </Box>
+            </>
+          )}
+
+          {mode === EditorMode.DELETE && (
+            <>
+              <Typography variant="body2">Are you sure you want to delete this category?</Typography>
+              <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
+                <Button size="small" onClick={onClose}>
+                  Cancel
+                </Button>
+                <Button variant="contained" color="error" size="small" onClick={handleDeleteClick} disabled={loading}>
+                  Delete
+                </Button>
+              </Box>
+            </>
+          )}
+        </Paper>
+      </ClickAwayListener>
+    </Popover>
+  )
+}
+
+=== End:   ./component/category/CategoryEditor.tsx ===
+
+=== Begin: ./component/category/CategorySelector.tsx ===
+import PLACEHOLDERS from "@/constant/ui/labels"
+import useAppStore from "@/store/useAppStore"
+import CategoryEditor from "./CategoryEditor"
+
+import { useMemo, useState } from "react"
+import {
+  Box,
+  MenuItem,
+  TextField,
+  Typography,
+  IconButton
+} from "@mui/material"
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
+import EditIcon from "@mui/icons-material/Edit"
+import DeleteIcon from "@mui/icons-material/Delete"
+import EditorMode from "@/model/utility/editorMode"
+
+const CategorySelector = () => {
+  const { categories } = useAppStore()
+  const selectedCategory = useAppStore((s) => s.selectedCategory)
+  const setSelectedCategory = useAppStore((s) => s.setSelectedCategory)
+
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null)
+  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
+  const [editorData, setEditorData] = useState<{
+    id?: string
+    label?: string
+    color?: string
+  }>({})
+
+  const openEditor = (
+    mode: EditorMode,
+    anchor: HTMLElement,
+    data: { id?: string; label?: string; color?: string } = {}
+  ) => {
+    setEditorMode(mode)
+    setEditorData(data)
+    setEditorAnchor(anchor)
+    setEditorOpen(true)
+  }
+
+  const closeEditor = () => {
+    setEditorOpen(false)
+    setEditorAnchor(null)
+    setEditorData({})
+  }
+
+  const categoryOptions = useMemo(() => {
+    return [
+      { label: "All", value: "all", color: "#ffffff" },
+      ...categories.map((category) => ({
+        label: category.name,
+        value: category.id,
+        color: category.color
+      }))
+    ]
+  }, [categories])
+
+  return (
+    <Box display="flex" alignItems="center" gap={1} width="100%">
+      <TextField
+        select
+        label={PLACEHOLDERS.CATEGORY}
+        value={selectedCategory || "all"}
+        onChange={(e) => setSelectedCategory(e.target.value || null)}
+        fullWidth
+        size="small"
+        SelectProps={{
+          renderValue: (selected: unknown) => {
+            const selectedValue = selected as string
+            const item = categoryOptions.find((d) => d.value === selectedValue)
+            return (
+              <Box display="flex" alignItems="center" gap={1}>
+                {item?.color && (
+                  <Box
+                    width={10}
+                    height={10}
+                    borderRadius="50%"
+                    bgcolor={item.color}
+                  />
+                )}
+                <Typography variant="body2">{item?.label}</Typography>
+              </Box>
+            )
+          }
+        }}
+      >
+        {categoryOptions.map((option) => (
+          <MenuItem key={option.value} value={option.value}>
+            <Box
+              display="flex"
+              justifyContent="space-between"
+              alignItems="center"
+              width="100%"
+            >
+              <Box display="flex" alignItems="center" gap={1}>
+                {option.color && (
+                  <Box
+                    width={10}
+                    height={10}
+                    borderRadius="50%"
+                    bgcolor={option.color}
+                  />
+                )}
+                <Typography variant="body2">{option.label}</Typography>
+              </Box>
+              {option.value !== "all" && (
+                <Box display="flex" gap={1}>
+                  <IconButton
+                    size="small"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openEditor(EditorMode.EDIT, e.currentTarget, {
+                        id: option.value,
+                        label: option.label,
+                        color: option.color ?? "#000000"
+                      })
+                    }}
+                  >
+                    <EditIcon fontSize="small" />
+                  </IconButton>
+                  <IconButton
+                    size="small"
+                    disabled={option.value === selectedCategory}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      openEditor(EditorMode.DELETE, e.currentTarget, {
+                        id: option.value,
+                        label: option.label,
+                        color: option.color ?? "#000000"
+                      })
+                    }}
+                  >
+                    <DeleteIcon fontSize="small" />
+                  </IconButton>
+                </Box>
+              )}
+            </Box>
+          </MenuItem>
+        ))}
+      </TextField>
+
+      <IconButton
+        onClick={(e) =>
+          openEditor(EditorMode.ADD, e.currentTarget, {
+            label: "",
+            color: "#3b5bdb"
+          })
+        }
+      >
+        <AddCircleOutlineIcon fontSize="small" />
+      </IconButton>
+
+      <CategoryEditor
+        open={editorOpen}
+        anchorEl={editorAnchor}
+        mode={editorMode}
+        initialData={editorData}
+        onClose={closeEditor}
+      />
+    </Box>
+  )
+}
+
+export default CategorySelector
+
+=== End:   ./component/category/CategorySelector.tsx ===
+
+=== Begin: ./component/category/index.ts ===
+
+=== End:   ./component/category/index.ts ===
+
+=== Begin: ./component/category/CategoryPanel.tsx ===
+
+=== End:   ./component/category/CategoryPanel.tsx ===
+
+=== Begin: ./component/event/EventBox.tsx ===
+import Schedulable from "@/model/domain/schedulable"
+import { Box, Typography } from "@mui/material"
+import { useRef, useState, useEffect } from "react"
+import { useDrag } from "react-dnd"
+
+interface EventBoxProperties {
+  event: Schedulable
+  dragTargetId?: string | null
+  customStyle?: React.CSSProperties
+  onClick?: () => void
+}
+
+const EventBox = ({ event, dragTargetId, customStyle, onClick }: EventBoxProperties) => {
+  const eventReference = useRef<HTMLDivElement>(null)
+  const timeoutReference = useRef<number | null>(null)
+
+  const start = new Date(event.startDate || Date.now())
+  const end = new Date(event.endDate || Date.now())
+
+  const minutesFromStart = start.getHours() * 60 + start.getMinutes()
+  const minutesToEnd = end.getHours() * 60 + end.getMinutes()
+  const duration = Math.max(15, minutesToEnd - minutesFromStart)
+
+  const top = (minutesFromStart / 15) * 32
+  const height = (duration / 15) * 32
+
+  const emoji = "calendar" in event ? event.calendar?.emoji : ""
+  const backgroundColor = "category" in event ? (event.category?.color ?? "#1976d2") : "#1976d2"
+
+  const [enableDrag, setEnableDrag] = useState(false)
+
+  const [{ isDragging }, drag] = useDrag(
+    () => ({
+      type: "event",
+      item: { id: event.id },
+      canDrag: () => enableDrag,
+      collect: (monitor) => ({
+        isDragging: monitor.isDragging()
+      })
+    }),
+    [enableDrag]
+  )
+
+  const handlePointerDown = () => {
+    timeoutReference.current = window.setTimeout(() => setEnableDrag(true), 200)
+  }
+
+  const handlePointerUp = () => {
+    if (timeoutReference.current !== null) {
+      clearTimeout(timeoutReference.current)
+      timeoutReference.current = null
+    }
+    if (!enableDrag) onClick?.()
+    setEnableDrag(false)
+  }
+
+  useEffect(() => {
+    if (eventReference.current) {
+      drag(eventReference.current)
+    }
+  }, [drag])
+
+  return (
+    <Box
+      id={`event-${event.id}`}
+      ref={eventReference}
+      onPointerDown={handlePointerDown}
+      onPointerUp={handlePointerUp}
+      sx={{
+        position: "absolute",
+        top,
+        height,
+        backgroundColor,
+        color: "#fff",
+        borderRadius: 1,
+        padding: "2px 4px",
+        fontSize: "0.75rem",
+        opacity: dragTargetId && dragTargetId !== event.id ? 0.5 : 1,
+        pointerEvents: dragTargetId && dragTargetId !== event.id ? "none" : "auto",
+        cursor: enableDrag ? "move" : "pointer",
+        overflow: "hidden",
+        zIndex: dragTargetId === event.id ? 1500 : 10,
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "flex-start",
+        ...customStyle
+      }}
+    >
+      <Typography
+        variant="caption"
+        fontWeight={500}
+        noWrap
+        flexGrow={1}
+        sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+      >
+        {("name" in event && event.name) || "Untitled"}
+      </Typography>
+      {emoji && (
+        <Typography variant="caption" ml={1}>
+          {emoji}
+        </Typography>
+      )}
+    </Box>
+  )
+}
+
+export default EventBox
+
+=== End:   ./component/event/EventBox.tsx ===
+
+=== Begin: ./component/event/EventCreationPopover.tsx ===
+import BUTTONS from "@/constant/ui/buttons"
+import LABELS from "@/constant/ui/labels"
+import MESSAGES from "@/constant/ui/messages"
+import useEvent from "@/repository/event.repository"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import Schedulable from "@/model/domain/schedulable"
+
+import { useEffect, useState } from "react"
+
+import { Popover, TextField, MenuItem, Button, Stack, Divider, Typography, Box } from "@mui/material"
+import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
+import dayjs from "dayjs"
+import { toast } from "react-toastify"
+
+interface EventCreationPopoverProperties {
+  anchorEl: HTMLElement | null
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  initialEvent?: Schedulable
+  onClose: () => void
+}
+
+const EventCreationPopover = ({
+  anchorEl,
+  calendars,
+  categories,
+  initialEvent,
+  onClose
+}: EventCreationPopoverProperties) => {
+  const { reloadEvents, updateEvent, addEvent, deleteEvent } = useEvent()
+
+  const isEditMode = Boolean(initialEvent?.id)
+  const [title, setTitle] = useState("")
+  const [description, setDescription] = useState("")
+  const [start, setStart] = useState<Date>(new Date())
+  const [end, setEnd] = useState<Date>(new Date(Date.now() + 60 * 60 * 1000))
+  const [calendarId, setCalendarId] = useState("")
+  const [categoryId, setCategoryId] = useState("")
+
+  const isValidAnchor = anchorEl && document.body.contains(anchorEl)
+
+  useEffect(() => {
+    if (isEditMode && initialEvent) {
+      setTitle(initialEvent.name || "")
+      setDescription(initialEvent.description || "")
+      setStart(new Date(initialEvent.startDate || new Date()))
+      setEnd(new Date(initialEvent.endDate || new Date()))
+      setCalendarId(initialEvent.calendar?.id || "")
+      setCategoryId(initialEvent.category?.id || "")
+    } else {
+      const now = new Date()
+      setTitle("")
+      setDescription("")
+      setStart(now)
+      setEnd(new Date(now.getTime() + 60 * 60 * 1000))
+      setCalendarId(calendars[0]?.id || "")
+      setCategoryId("")
+    }
+  }, [initialEvent, anchorEl, isEditMode])
+
+  const handleSave = async () => {
+    if (!title.trim()) return toast.error("Title is required")
+    if (!start || !end || end <= start) return toast.error("End must be after start")
+
+    const calendar = calendars.find((c) => c.id === calendarId)
+    if (!calendar) return toast.error("Calendar is required")
+
+    const category = categories.find((c) => c.id === categoryId)
+
+    const payload = {
+      name: title,
+      description,
+      startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
+      recurringPattern: RecurringPattern.NONE,
+      calendar,
+      category
+    }
+
+    try {
+      if (isEditMode && initialEvent?.id) {
+        await updateEvent(initialEvent.id, payload)
+      } else {
+        await addEvent(payload)
+      }
+      toast.success("Event saved successfully")
+      reloadEvents()
+      onClose()
+    } catch (error) {
+      toast.error("Failed to save event")
+    }
+  }
+
+  const handleDelete = async () => {
+    if (isEditMode && initialEvent?.id) {
+      try {
+        await deleteEvent(initialEvent.id)
+        toast.success("Event deleted successfully")
+        reloadEvents()
+        onClose()
+      } catch (error) {
+        toast.error("Failed to delete event")
+      }
+    }
+  }
+
+  return (
+    <Popover
+      open={Boolean(isValidAnchor)}
+      anchorEl={isValidAnchor ? anchorEl : null}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
+      PaperProps={{
+        sx: {
+          p: 2,
+          width: 340,
+          maxHeight: "90vh",
+          overflowY: "auto"
+        }
+      }}
+    >
+      <Stack spacing={2}>
+        <Typography variant="h6">{isEditMode ? MESSAGES.EDIT_EVENT : MESSAGES.ADD_EVENT}</Typography>
+
+        <TextField label="Title" value={title} onChange={(e) => setTitle(e.target.value)} fullWidth />
+
+        <TextField label="Calendar" value={calendarId} onChange={(e) => setCalendarId(e.target.value)} select fullWidth>
+          {calendars.map((cal) => (
+            <MenuItem key={cal.id} value={cal.id}>
+              {cal.emoji} {cal.name}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <TextField label="Category" value={categoryId} onChange={(e) => setCategoryId(e.target.value)} select fullWidth>
+          <MenuItem value="">None</MenuItem>
+          {categories.map((cat) => (
+            <MenuItem key={cat.id} value={cat.id}>
+              <Box display="inline-block" width={12} height={12} borderRadius={6} bgcolor={cat.color} mr={1} />
+              {cat.name}
+            </MenuItem>
+          ))}
+        </TextField>
+
+        <Divider />
+
+        <Typography variant="body2">{LABELS.START_DATE}</Typography>
+
+        <DateCalendar value={start} onChange={(v) => v && setStart(v)} />
+
+        <TimePicker label={LABELS.START_TIME} value={start} onChange={(v) => v && setStart(v)} />
+
+        <TimePicker label={LABELS.END_TIME} value={end} onChange={(v) => v && setEnd(v)} />
+
+        <TextField
+          label={LABELS.DESCRIPTION}
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          fullWidth
+          multiline
+          minRows={2}
+        />
+
+        <Stack direction="row" spacing={1} justifyContent="flex-end">
+          <Button onClick={onClose} color="inherit">
+            {BUTTONS.CANCEL}
+          </Button>
+
+          <Button onClick={handleSave} variant="contained">
+            {BUTTONS.SAVE}
+          </Button>
+        </Stack>
+      </Stack>
+    </Popover>
+  )
+}
+
+export default EventCreationPopover
+
+=== End:   ./component/event/EventCreationPopover.tsx ===
+
+=== Begin: ./component/event/EventInformationPopover.tsx ===
+import BUTTONS from "@/constant/ui/buttons"
+import MESSAGES from "@/constant/ui/messages"
+import useEvent from "@/repository/event.repository"
+import Schedulable from "@/model/domain/schedulable"
+
+import { useEffect, useState } from "react"
+
+import { Edit, Delete } from "@mui/icons-material"
+import { Box, Typography, IconButton, Stack, Popover, Button } from "@mui/material"
+import useAppStore from "@/store/useAppStore"
+
+interface EventInformationPopoverProperties {
+  anchorElement: HTMLElement | null
+  event: Schedulable | null
+  onClose: () => void
+  onEdit: () => void
+  onDelete: (eventId: string) => void
+}
+
+const EventInformationPopover = ({
+  anchorElement,
+  event,
+  onClose,
+  onEdit,
+  onDelete
+}: EventInformationPopoverProperties) => {
+  const open = Boolean(anchorElement && event)
+  const { events } = useAppStore()
+  const { reloadEvents } = useEvent()
+
+  const [currentEvent, setCurrentEvent] = useState<Schedulable | null>(event)
+  const [confirmingDelete, setConfirmingDelete] = useState(false)
+
+  const handleDeleteClick = () => setConfirmingDelete(true)
+
+  const handleConfirmDelete = () => {
+    if (event) onDelete(event.id)
+    setConfirmingDelete(false)
+    onClose()
+  }
+
+  const handleCancelDelete = () => setConfirmingDelete(false)
+
+  useEffect(() => {
+    const refresh = async () => {
+      await reloadEvents()
+      if (event?.id) {
+        const updated = events.find((e) => e.id === event.id)
+        if (updated) setCurrentEvent(updated)
+      }
+    }
+    if (event?.id) refresh()
+  }, [event?.id, events])
+
+  return (
+    <Popover
+      open={open}
+      anchorEl={anchorElement}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
+      PaperProps={{ sx: { p: 2, width: 300 } }}
+    >
+      {currentEvent && (
+        <Stack spacing={2}>
+          <Stack direction="row" justifyContent="space-between">
+            <Typography variant="h6">{currentEvent.name || "Untitled"}</Typography>
+            <Box>
+              {!confirmingDelete && (
+                <>
+                  <IconButton size="small" onClick={onEdit}>
+                    <Edit fontSize="small" />
+                  </IconButton>
+
+                  <IconButton size="small" onClick={handleDeleteClick}>
+                    <Delete fontSize="small" />
+                  </IconButton>
+                </>
+              )}
+            </Box>
+          </Stack>
+
+          {!confirmingDelete ? (
+            <>
+              <Typography variant="body2" color="text.secondary">
+                {currentEvent.startDate && currentEvent.endDate
+                  ? `${new Date(currentEvent.startDate).toLocaleString()} – ${new Date(
+                      currentEvent.endDate
+                    ).toLocaleString()}`
+                  : "No date available"}
+              </Typography>
+
+              {currentEvent.description && <Typography>{currentEvent.description}</Typography>}
+            </>
+          ) : (
+            <Stack spacing={1}>
+              <Typography variant="body2">{MESSAGES.CONFIRM_DELETE_EVENT}</Typography>
+
+              <Stack direction="row" spacing={1} justifyContent="flex-end">
+                <Button onClick={handleCancelDelete} size="small" color="inherit">
+                  {BUTTONS.CANCEL}
+                </Button>
+                <Button onClick={handleConfirmDelete} size="small" color="error">
+                  {BUTTONS.DELETE}
+                </Button>
+              </Stack>
+            </Stack>
+          )}
+        </Stack>
+      )}
+    </Popover>
+  )
+}
+
+export default EventInformationPopover
+
+=== End:   ./component/event/EventInformationPopover.tsx ===
+
+=== Begin: ./component/event/DayEventsPopover.tsx ===
+import { Box, Typography, Popover, IconButton } from "@mui/material"
+import CloseIcon from "@mui/icons-material/Close"
+import dayjs from "dayjs"
+import type Event from "@/model/domain/event"
+
+interface DayEventsPopoverProperties {
+  anchorEl: HTMLElement | null
+  date: Date
+  events: Event[]
+  onClose: () => void
+}
+
+const DayEventsPopover = ({ anchorEl, date, events, onClose }: DayEventsPopoverProperties) => {
+  const open = Boolean(anchorEl)
+
+  const sortedEvents = [...events].sort((a, b) => {
+    return new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+  })
+
+  return (
+    <Popover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "top", horizontal: "center" }}
+      transformOrigin={{ vertical: "top", horizontal: "center" }}
+      PaperProps={{ sx: { p: 2, borderRadius: 3, minWidth: 220 } }}
+    >
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+        <Typography fontWeight={600} fontSize={18}>
+          {dayjs(date).format("D MMMM YYYY")}
+          <br />
+          {dayjs(date).format("dddd")}
+        </Typography>
+        <IconButton size="small" onClick={onClose} sx={{ color: "white" }}>
+          <CloseIcon fontSize="small" />
+        </IconButton>
+      </Box>
+
+      {sortedEvents.map((event) => (
+        <Box key={event.id} display="flex" alignItems="center" gap={1} mb={0.75}>
+          <Box width={8} height={8} borderRadius="50%" flexShrink={0} />
+          <Typography variant="body2" noWrap>
+            {dayjs(event.startDate).format("H:mm")} {event.name}
+          </Typography>
+        </Box>
+      ))}
+    </Popover>
+  )
+}
+
+export default DayEventsPopover
+
+=== End:   ./component/event/DayEventsPopover.tsx ===
+
+=== Begin: ./component/event/index.ts ===
+
+=== End:   ./component/event/index.ts ===
+
+=== Begin: ./component/note/NoteCard.tsx ===
+import MESSAGES from "@/constant/ui/messages"
+import Calendar from "@/model/domain/calendar"
+import Category from "@/model/domain/category"
+import Note from "@/model/domain/note"
+
+import { useEffect, useRef, useState } from "react"
+
+import { Box, Paper, Collapse, Menu, MenuItem, Popover, Typography, Button } from "@mui/material"
+
+import NoteToolbar from "./NoteToolbar"
+import FormatCommand from "@/model/utility/formatCommand"
+
+export interface NoteCardProperties {
+  id: string
+  content: string
+  initialX?: number
+  initialY?: number
+  color?: string
+  categories: Category[]
+  onDelete?: (id: string) => void
+  onUpdate?: (note: Note) => void
+  calendar: Calendar
+  name?: string
+}
+
+const NoteCard = ({
+  id,
+  initialX = 0,
+  initialY = 0,
+  color = "#fff59d",
+  content = "",
+  categories,
+  onDelete,
+  onUpdate,
+  calendar,
+  name = MESSAGES.NEW_NOTE
+}: NoteCardProperties) => {
+  const contentRef = useRef<HTMLDivElement | null>(null)
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const toolbarRef = useRef<HTMLDivElement | null>(null)
+  const positionRef = useRef({ x: initialX, y: initialY })
+  const lastMousePos = useRef<{ x: number; y: number } | null>(null)
+  const animationFrameRef = useRef<number | null>(null)
+  const dragReady = useRef(false)
+
+  const [dimensions, setDimensions] = useState({ width: 380, height: 200 })
+  const [position, setPosition] = useState(positionRef.current)
+  const [dragging, setDragging] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined)
+  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(null)
+  const [confirmAction, setConfirmAction] = useState<() => void>(() => {})
+  const [confirmOpen, setConfirmOpen] = useState(false)
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
+  const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
+    bold: false,
+    italic: false,
+    underline: false
+  })
+  const [noteName, setNoteName] = useState(name)
+
+  useEffect(() => {
+    if (content && !contentRef.current?.innerHTML) {
+      contentRef.current!.innerHTML = content
+    }
+  }, [])
+
+  const getCategoryColor = (category: Category | undefined) => category?.color || color
+
+  const clearText = () => {
+    if (contentRef.current) contentRef.current.innerHTML = ""
+  }
+
+  const formatText = (command: FormatCommand) => {
+    contentRef.current?.focus()
+    setTimeout(() => {
+      document.execCommand(command, false)
+      setActiveFormats((prev) => ({
+        ...prev,
+        [command]: !prev[command]
+      }))
+    }, 0)
+  }
+
+  const handleMouseDown = (e: React.MouseEvent) => {
+    if (toolbarRef.current && toolbarRef.current.contains(e.target as Node)) {
+      dragReady.current = true
+      lastMousePos.current = { x: e.clientX, y: e.clientY }
+      setDragging(true)
+    }
+  }
+
+  const handleMouseUp = () => {
+    setDragging(false)
+    dragReady.current = false
+    lastMousePos.current = null
+  }
+
+  const handleDrag = (e: MouseEvent) => {
+    if (!dragging || !lastMousePos.current) return
+    const dx = e.clientX - lastMousePos.current.x
+    const dy = e.clientY - lastMousePos.current.y
+    lastMousePos.current = { x: e.clientX, y: e.clientY }
+    positionRef.current = {
+      x: Math.max(0, positionRef.current.x + dx),
+      y: Math.max(0, positionRef.current.y + dy)
+    }
+    if (animationFrameRef.current === null) {
+      animationFrameRef.current = requestAnimationFrame(() => {
+        setPosition({ ...positionRef.current })
+        animationFrameRef.current = null
+      })
+    }
+  }
+
+  const handleResize = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    const startX = e.clientX
+    const startY = e.clientY
+    const startWidth = dimensions.width
+    const startHeight = dimensions.height
+
+    const onMouseMove = (moveEvent: MouseEvent) => {
+      const newWidth = Math.max(150, startWidth + (moveEvent.clientX - startX))
+      const newHeight = Math.max(100, startHeight + (moveEvent.clientY - startY))
+      setDimensions({ width: newWidth, height: newHeight })
+    }
+
+    const onMouseUp = () => {
+      window.removeEventListener("mousemove", onMouseMove)
+      window.removeEventListener("mouseup", onMouseUp)
+    }
+
+    window.addEventListener("mousemove", onMouseMove)
+    window.addEventListener("mouseup", onMouseUp)
+  }
+
+  const handleConfirm = (message: string, action: () => void) => {
+    setConfirmAction(() => action)
+    setConfirmOpen(true)
+    setConfirmAnchorEl(wrapperRef.current)
+  }
+
+  const handleConfirmClose = () => {
+    setConfirmOpen(false)
+    setConfirmAnchorEl(null)
+  }
+
+  const handleBlur = () => {
+    if (onUpdate) {
+      onUpdate({
+        id,
+        name: noteName,
+        description: contentRef.current?.innerHTML || "",
+        category: selectedCategory,
+        calendar,
+        positionX: positionRef.current.x,
+        positionY: positionRef.current.y
+      })
+    }
+  }
+
+  useEffect(() => {
+    if (dragging) {
+      window.addEventListener("mousemove", handleDrag)
+      window.addEventListener("mouseup", handleMouseUp)
+      return () => {
+        window.removeEventListener("mousemove", handleDrag)
+        window.removeEventListener("mouseup", handleMouseUp)
+      }
+    }
+  }, [dragging])
+
+  useEffect(() => {
+    if (onUpdate) {
+      onUpdate({
+        id,
+        name: noteName,
+        description: contentRef.current?.innerHTML || "",
+        category: selectedCategory,
+        calendar,
+        positionX: positionRef.current.x,
+        positionY: positionRef.current.y
+      })
+    }
+  }, [selectedCategory])
+
+  return (
+    <Box
+      ref={wrapperRef}
+      sx={{
+        position: "absolute",
+        top: position.y,
+        left: position.x,
+        width: dimensions.width,
+        userSelect: "none",
+        zIndex: dragging ? 1000 : 100,
+        pointerEvents: "auto",
+        transition: "all 0.15s ease",
+        transform: dragging ? "scale(1.02)" : "none"
+      }}
+      onMouseDown={handleMouseDown}
+      onMouseUp={handleMouseUp}
+    >
+      <Paper
+        sx={{
+          color: "#000",
+          width: "100%",
+          backgroundColor: getCategoryColor(selectedCategory),
+          borderRadius: 2,
+          boxShadow: dragging ? "0 0 10px #2196f3" : 3,
+          overflow: "hidden",
+          cursor: "default",
+          position: "relative"
+        }}
+      >
+        <Box
+          ref={toolbarRef}
+          sx={{
+            cursor: dragging ? "grabbing" : "grab",
+            transition: "cursor 0.15s ease"
+          }}
+        >
+          <NoteToolbar
+            isCollapsed={collapsed}
+            onToggleCollapse={() => setCollapsed((c) => !c)}
+            onClearText={clearText}
+            onDelete={() =>
+              contentRef.current?.innerText.trim()
+                ? handleConfirm(MESSAGES.CONFIRM_CLEAR_CONTENTS, () => onDelete?.(id))
+                : onDelete?.(id)
+            }
+            onFormatText={formatText}
+            activeFormats={activeFormats}
+            selectedCategory={selectedCategory?.id || null}
+            onCategoryMenuOpen={(e: any) => setMenuAnchorEl(e)}
+            noteName={noteName}
+            onNameChange={setNoteName}
+            onNameBlur={handleBlur}
+          />
+        </Box>
+
+        <Collapse in={!collapsed}>
+          <Box
+            ref={contentRef}
+            contentEditable
+            suppressContentEditableWarning
+            onBlur={handleBlur}
+            sx={{
+              height: dimensions.height,
+              p: 1,
+              pr: "8px",
+              fontSize: 14,
+              outline: "none",
+              overflowY: "auto",
+              whiteSpace: "pre-wrap",
+              wordBreak: "break-word",
+              color: "#000"
+            }}
+          />
+        </Collapse>
+
+        <Box
+          onMouseDown={handleResize}
+          sx={{
+            width: 20,
+            height: 20,
+            position: "absolute",
+            bottom: 0,
+            right: 0,
+            cursor: "nwse-resize",
+            zIndex: 10
+          }}
+        />
+      </Paper>
+
+      <Popover
+        open={confirmOpen}
+        anchorEl={confirmAnchorEl}
+        onClose={handleConfirmClose}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        PaperProps={{ sx: { p: 2 } }}
+      >
+        <Typography variant="body2" gutterBottom>
+          {MESSAGES.CONFIRM_CLEAR_CONTENTS}
+        </Typography>
+        <Box display="flex" gap={1} justifyContent="flex-end">
+          <Button size="small" onClick={handleConfirmClose}>
+            Cancel
+          </Button>
+          <Button
+            size="small"
+            color="error"
+            variant="contained"
+            onClick={() => {
+              confirmAction()
+              handleConfirmClose()
+            }}
+          >
+            Delete
+          </Button>
+        </Box>
+      </Popover>
+
+      <Menu
+        anchorEl={menuAnchorEl}
+        open={Boolean(menuAnchorEl)}
+        onClose={() => setMenuAnchorEl(null)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        MenuListProps={{ dense: true }}
+      >
+        {categories.map((cat) => (
+          <MenuItem
+            key={cat.id}
+            selected={selectedCategory?.id === cat.id}
+            onClick={() => {
+              setSelectedCategory(cat)
+              setMenuAnchorEl(null)
+            }}
+            sx={{ display: "flex", alignItems: "center", gap: 1 }}
+          >
+            <Box
+              component="span"
+              sx={{
+                width: 12,
+                height: 12,
+                borderRadius: "50%",
+                backgroundColor: cat.color,
+                mr: 1
+              }}
+            />
+            {cat.name}
+          </MenuItem>
+        ))}
+      </Menu>
+    </Box>
+  )
+}
+
+export default NoteCard
+
+=== End:   ./component/note/NoteCard.tsx ===
+
+=== Begin: ./component/note/NoteToolbar.tsx ===
+import TOOLBAR from "@/constant/utility/toolbar"
+import MESSAGES from "@/constant/ui/messages"
+import FormatCommand from "@/model/utility/formatCommand"
+
+import { useState } from "react"
+
+import ChevronRightIcon from "@mui/icons-material/ChevronRight"
+import ClearIcon from "@mui/icons-material/Clear"
+import DeleteIcon from "@mui/icons-material/Delete"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import FormatBoldIcon from "@mui/icons-material/FormatBold"
+import FormatItalicIcon from "@mui/icons-material/FormatItalic"
+import FormatUnderlinedIcon from "@mui/icons-material/FormatUnderlined"
+import { Box, IconButton, Popover, Typography, Button, TextField } from "@mui/material"
+
+interface NoteToolbarProperties {
+  isCollapsed: boolean
+  onToggleCollapse: () => void
+  onClearText: () => void
+  onDelete: () => void
+  onFormatText: (command: FormatCommand) => void
+  activeFormats: Record<FormatCommand, boolean>
+  selectedCategory: string | null
+  onCategoryMenuOpen: (anchor: HTMLElement) => void
+  noteName: string
+  onNameChange: (newName: string) => void
+  onNameBlur?: () => void
+}
+
+const NoteToolbar = ({
+  isCollapsed,
+  onToggleCollapse,
+  onClearText,
+  onDelete,
+  onFormatText,
+  activeFormats,
+  selectedCategory,
+  onCategoryMenuOpen,
+  noteName,
+  onNameChange,
+  onNameBlur
+}: NoteToolbarProperties) => {
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
+
+  const handleDeleteClick = (e: React.MouseEvent<HTMLElement>) => {
+    setAnchorEl(e.currentTarget)
+  }
+
+  const handleConfirmDelete = () => {
+    onDelete()
+    setAnchorEl(null)
+  }
+
+  const handleCancelDelete = () => {
+    setAnchorEl(null)
+  }
+
+  return (
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      bgcolor="rgba(255,255,255,0.4)"
+      p={0.5}
+      sx={{ cursor: "move", userSelect: "none" }}
+    >
+      <Box display="flex" alignItems="center">
+        <IconButton size="small" onClick={onToggleCollapse} onMouseDown={(e) => e.stopPropagation()}>
+          {isCollapsed ? (
+            <ChevronRightIcon fontSize="small" sx={{ color: "#000", transform: "rotate(270deg)" }} />
+          ) : (
+            <ExpandMoreIcon fontSize="small" sx={{ color: "#000" }} />
+          )}
+        </IconButton>
+
+        <TextField
+          placeholder="Name"
+          value={noteName}
+          onChange={(e) => onNameChange(e.target.value)}
+          onBlur={onNameBlur}
+          variant="outlined"
+          size="small"
+          onMouseDown={(e) => e.stopPropagation()}
+          sx={{
+            ml: 1,
+            width: 140,
+            input: {
+              fontSize: 14,
+              fontWeight: 500,
+              color: "#333"
+            }
+          }}
+        />
+      </Box>
+
+      {!isCollapsed && (
+        <Box display="flex" gap={0.5} alignItems="center">
+          {[TOOLBAR.BOLD, TOOLBAR.ITALIC, TOOLBAR.UNDERLINE].map((cmd) => {
+            const Icon =
+              cmd === TOOLBAR.BOLD ? FormatBoldIcon : cmd === TOOLBAR.ITALIC ? FormatItalicIcon : FormatUnderlinedIcon
+
+            return (
+              <IconButton
+                key={cmd}
+                size="small"
+                onClick={() => onFormatText(cmd)}
+                onMouseDown={(e) => e.stopPropagation()}
+                sx={{ bgcolor: activeFormats[cmd] ? "#ddd" : "transparent" }}
+              >
+                <Icon fontSize="small" sx={{ color: "#000" }} />
+              </IconButton>
+            )
+          })}
+
+          <IconButton size="small" onClick={onClearText} onMouseDown={(e) => e.stopPropagation()}>
+            <ClearIcon fontSize="small" sx={{ color: "#000" }} />
+          </IconButton>
+
+          <IconButton
+            size="small"
+            onClick={(e) => onCategoryMenuOpen(e.currentTarget)}
+            onMouseDown={(e) => e.stopPropagation()}
+          >
+            <Box
+              sx={{
+                width: 14,
+                height: 14,
+                borderRadius: "50%",
+                bgcolor: selectedCategory || "#fff59d",
+                border: "1px solid #333"
+              }}
+            />
+          </IconButton>
+
+          <IconButton size="small" onClick={handleDeleteClick} onMouseDown={(e) => e.stopPropagation()}>
+            <DeleteIcon fontSize="small" sx={{ color: "#000" }} />
+          </IconButton>
+        </Box>
+      )}
+
+      <Popover
+        open={Boolean(anchorEl)}
+        anchorEl={anchorEl}
+        onClose={handleCancelDelete}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        PaperProps={{ sx: { p: 2 } }}
+      >
+        <Typography variant="body2" gutterBottom>
+          {MESSAGES.CONFIRM_DELETE_NOTE}
+        </Typography>
+        <Box display="flex" gap={1} justifyContent="flex-end">
+          <Button size="small" onClick={handleCancelDelete}>
+            Cancel
+          </Button>
+          <Button size="small" color="error" variant="contained" onClick={handleConfirmDelete}>
+            Delete
+          </Button>
+        </Box>
+      </Popover>
+    </Box>
+  )
+}
+
+export default NoteToolbar
+
+=== End:   ./component/note/NoteToolbar.tsx ===
+
+=== Begin: ./component/note/NotePanel.tsx ===
+import MESSAGES from "@/constant/ui/messages"
+import useNotes from "@/repository/note.repository"
+import Note from "@/model/domain/note"
+
+import { useEffect, useRef, useState } from "react"
+
+import AddIcon from "@mui/icons-material/Add"
+import Box from "@mui/material/Box"
+import IconButton from "@mui/material/IconButton"
+
+import NoteCard from "./NoteCard"
+import useAppStore from "@/store/useAppStore"
+
+const NotesPanel = () => {
+  const { addNote, updateNote, deleteNote } = useNotes()
+  const { notes, categories, calendars } = useAppStore()
+
+  const [localNotes, setLocalNotes] = useState<Note[]>([])
+
+  useEffect(() => {
+    if (Array.isArray(notes)) {
+      setLocalNotes(notes)
+    }
+  }, [notes])
+
+  const handleUpdate = (updatedNote: Note) => {
+    setLocalNotes((prev) => prev.map((note) => (note.id === updatedNote.id ? updatedNote : note)))
+    updateNote(updatedNote.id, updatedNote)
+  }
+
+  const handleDelete = async (id: string) => {
+    setLocalNotes((prev) => prev.filter((note) => note.id !== id))
+    await deleteNote(id)
+  }
+
+  const handleAddNote = async () => {
+    const defaultCalendar = calendars[0]
+    const defaultCategory = categories[0]
+
+    if (!defaultCalendar) return
+
+    const tempNote: Note = {
+      id: "", // temporary ID
+      name: MESSAGES.NEW_NOTE,
+      description: "",
+      calendar: defaultCalendar,
+      category: defaultCategory,
+      positionX: Math.floor(Math.random() * 300),
+      positionY: Math.floor(Math.random() * 200)
+    }
+
+    setLocalNotes((prev) => [...prev, tempNote])
+
+    const savedNote = await addNote({
+      name: tempNote.name,
+      description: tempNote.description,
+      calendar: tempNote.calendar,
+      category: tempNote.category,
+      positionX: tempNote.positionX,
+      positionY: tempNote.positionY
+    })
+
+    if (savedNote) {
+      setLocalNotes((prev) => prev.map((note) => (note.id === "" ? { ...savedNote, ...note, id: savedNote.id } : note)))
+    }
+  }
+
+  return (
+    <Box position="absolute" top={0} left={0} width="100vw" height="100vh" zIndex={1}>
+      {localNotes.map((note) => (
+        <NoteCard
+          key={note.id}
+          id={note.id}
+          name={note.name}
+          content={note.description || ""}
+          calendar={note.calendar}
+          categories={categories}
+          initialX={note.positionX}
+          initialY={note.positionY}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+        />
+      ))}
+
+      <IconButton
+        onClick={handleAddNote}
+        sx={{
+          position: "fixed",
+          bottom: 16,
+          right: 16,
+          backgroundColor: "primary.main",
+          color: "white",
+          zIndex: 1300,
+          "&:hover": {
+            backgroundColor: "primary.dark"
+          }
+        }}
+      >
+        <AddIcon />
+      </IconButton>
+    </Box>
+  )
+}
+
+export default NotesPanel
+
+=== End:   ./component/note/NotePanel.tsx ===
+
+=== Begin: ./component/note/index.ts ===
+
+=== End:   ./component/note/index.ts ===
+
+=== Begin: ./component/task/TaskCard.tsx ===
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import type Task from "@/model/domain/task"
+import RecurringPattern from "@/model/domain/recurringPattern"
+
+import { useEffect, useState } from "react"
+
+import { Delete, ExpandLess, ExpandMore } from "@mui/icons-material"
+import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography } from "@mui/material"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import dayjs from "dayjs"
+import LABELS from "@/constant/ui/labels"
+
+interface Properties {
+  task: Task
+  calendars: Calendar[]
+  categories: Category[]
+  onUpdate: (task: Task) => void
+  onDelete: (id: string) => void
+}
+
+const TaskCard = ({ task, calendars, categories, onUpdate, onDelete }: Properties) => {
+  const [expanded, setExpanded] = useState(true)
+  const [localTask, setLocalTask] = useState<Task>(task)
+
+  useEffect(() => {
+    setLocalTask(task)
+  }, [task])
+
+  const currentCategory = localTask.category
+  const cardColor = currentCategory?.color || "#f5f5f5"
+
+  const handleFieldChange = (field: keyof Task, value: any) => {
+    const updatedTask = { ...localTask, [field]: value }
+    setLocalTask(updatedTask)
+    onUpdate?.(updatedTask)
+  }
+
+  const fieldStyle = {
+    "& .MuiOutlinedInput-root": {
+      backgroundColor: "#fff",
+      borderRadius: 1,
+      color: "#000"
+    },
+    "& .MuiInputBase-input": {
+      color: "#000"
+    },
+    "& .MuiInputLabel-root": {
+      color: "#000"
+    },
+    "& .MuiSelect-icon": {
+      color: "#000"
+    }
+  }
+
+  return (
+    <Card
+      sx={{
+        backgroundColor: cardColor,
+        p: 1.5,
+        mb: 2,
+        boxShadow: 3,
+        borderRadius: 2,
+        minWidth: 220
+      }}
+    >
+      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+        <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
+          <IconButton onClick={() => setExpanded((prev) => !prev)} size="small">
+            {expanded ? <ExpandLess /> : <ExpandMore />}
+          </IconButton>
+          <TextField
+            placeholder={LABELS.NAME}
+            value={localTask.name}
+            onChange={(e) => handleFieldChange("name", e.target.value)}
+            size="small"
+            variant="outlined"
+            fullWidth
+            sx={fieldStyle}
+          />
+        </Box>
+
+        <IconButton onClick={() => onDelete(task.id)} size="small">
+          <Delete />
+        </IconButton>
+      </Box>
+
+      <Collapse in={expanded}>
+        <Box display="flex" flexDirection="column" gap={1.5}>
+          <TextField
+            placeholder={LABELS.DESCRIPTION}
+            value={localTask.description || ""}
+            onChange={(e) => handleFieldChange("description", e.target.value)}
+            size="small"
+            variant="outlined"
+            fullWidth
+            multiline
+            minRows={2}
+            sx={fieldStyle}
+          />
+
+          <DateTimePicker
+            label={LABELS.START_DATE}
+            value={localTask.startDate ? dayjs(localTask.startDate).toDate() : null}
+            onChange={(date) => handleFieldChange("startDate", date ? date.toISOString() : "")}
+            slotProps={{
+              textField: { size: "small", sx: fieldStyle }
+            }}
+          />
+
+          <DateTimePicker
+            label={LABELS.END_DATE}
+            value={localTask.endDate ? dayjs(localTask.endDate).toDate() : null}
+            onChange={(date) => handleFieldChange("endDate", date ? date.toISOString() : "")}
+            slotProps={{
+              textField: { size: "small", sx: fieldStyle }
+            }}
+          />
+
+          {localTask.startDate && (
+            <TextField
+              label={LABELS.RECURRING}
+              select
+              value={localTask.recurringPattern || "NONE"}
+              onChange={(e) => handleFieldChange("recurringPattern", e.target.value)}
+              size="small"
+              variant="outlined"
+              fullWidth
+              sx={fieldStyle}
+            >
+              {Object.entries(RecurringPattern).map(([key, val]) => (
+                <MenuItem key={key} value={val}>
+                  {val}
+                </MenuItem>
+              ))}
+            </TextField>
+          )}
+
+          <TextField
+            label={LABELS.CALENDAR}
+            select
+            value={localTask.calendar?.id || ""}
+            onChange={(e) => handleFieldChange("calendar", calendars.find((c) => c.id === e.target.value) || null)}
+            size="small"
+            variant="outlined"
+            fullWidth
+            sx={fieldStyle}
+          >
+            {calendars.map((cal) => (
+              <MenuItem key={cal.id} value={cal.id}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Typography sx={{ minWidth: 24 }}>{cal.emoji}</Typography>
+                  <Typography>{cal.name}</Typography>
+                </Box>
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
+            label={LABELS.CATEGORY}
+            select
+            value={localTask.category?.id || ""}
+            onChange={(e) => handleFieldChange("category", categories.find((c) => c.id === e.target.value) || null)}
+            size="small"
+            variant="outlined"
+            fullWidth
+            sx={fieldStyle}
+          >
+            <MenuItem value="">{LABELS.NONE}</MenuItem>
+            {categories.map((cat) => (
+              <MenuItem key={cat.id} value={cat.id}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Box
+                    sx={{
+                      width: 12,
+                      height: 12,
+                      borderRadius: "50%",
+                      backgroundColor: cat.color
+                    }}
+                  />
+                  <Typography>{cat.name}</Typography>
+                </Box>
+              </MenuItem>
+            ))}
+          </TextField>
+        </Box>
+      </Collapse>
+    </Card>
+  )
+}
+
+export default TaskCard
+
+=== End:   ./component/task/TaskCard.tsx ===
+
+=== Begin: ./component/task/TaskColumn.tsx ===
+import { ReactNode } from "react"
+import { Paper, Typography, Box } from "@mui/material"
+
+interface Properties {
+  title: string
+  icon: ReactNode
+  children: ReactNode
+}
+
+const TaskColumn = ({ title, icon, children }: Properties) => {
+  return (
+    <Paper
+      sx={{
+        minHeight: 500,
+        width: "100%",
+        maxHeight: "80vh",
+        backgroundColor: "#fefefe",
+        borderRadius: 2,
+        display: "flex",
+        flexDirection: "column",
+        boxShadow: 3,
+        overflow: "hidden"
+      }}
+    >
+      <Box
+        sx={{
+          height: 64,
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          position: "relative",
+          borderBottom: "1px solid #ddd",
+          backgroundColor: "#f5f5f5"
+        }}
+      >
+        <Box
+          sx={{
+            position: "absolute",
+            left: 16,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 32,
+            height: 32,
+            borderRadius: "50%",
+            backgroundColor: "#fff",
+            boxShadow: 1
+          }}
+        >
+          {icon}
+        </Box>
+
+        <Typography variant="h6" fontWeight="bold" sx={{ color: "#000", textAlign: "center" }}>
+          {title}
+        </Typography>
+      </Box>
+
+      <Box
+        sx={{
+          flexGrow: 1,
+          overflowY: "auto",
+          p: 2,
+          display: "flex",
+          flexDirection: "column",
+          gap: 2
+        }}
+      >
+        {children}
+      </Box>
+    </Paper>
+  )
+}
+
+export default TaskColumn
+
+=== End:   ./component/task/TaskColumn.tsx ===
+
+=== Begin: ./component/task/TaskBoard.tsx ===
+import MESSAGES from "@/constant/ui/messages"
+import Calendar from "@/model/domain/calendar"
+import Category from "@/model/domain/category"
+import Task from "@/model/domain/task"
+import TaskStatus from "@/model/domain/taskStatus"
+
+import { useEffect, useState } from "react"
+
+import { DragDropContext, Droppable, Draggable, DropResult } from "@hello-pangea/dnd"
+import { HourglassEmpty, Done, Pending } from "@mui/icons-material"
+import { Box } from "@mui/material"
+
+import TaskCard from "./TaskCard"
+import TaskColumn from "./TaskColumn"
+import LABELS from "@/constant/ui/labels"
+
+interface Properties {
+  tasks: Task[]
+  calendars: Calendar[]
+  categories: Category[]
+  onUpdate: (task: Task) => void
+  onDelete: (id: string) => void
+}
+
+const TaskBoard = ({ tasks, calendars, categories, onUpdate, onDelete }: Properties) => {
+  const columns: { [key in TaskStatus]: { title: string; icon: JSX.Element } } = {
+    TODO: { title: LABELS.TODO, icon: <HourglassEmpty /> },
+    IN_PROGRESS: { title: LABELS.IN_PROGRESS, icon: <Pending /> },
+    DONE: { title: LABELS.DONE, icon: <Done /> }
+  }
+
+  const [localOrder, setLocalOrder] = useState<Record<TaskStatus, Task[]>>({
+    TODO: [],
+    IN_PROGRESS: [],
+    DONE: []
+  })
+
+  const onDragEnd = (result: DropResult) => {
+    const { source, destination } = result
+    if (!destination) return
+
+    const sourceColumn = source.droppableId as TaskStatus
+    const destColumn = destination.droppableId as TaskStatus
+
+    const sourceTasks = Array.from(localOrder[sourceColumn])
+    const destTasks = Array.from(localOrder[destColumn])
+
+    const draggedTaskIndex = source.index
+    const draggedTask = sourceTasks[draggedTaskIndex]
+    if (!draggedTask) return
+
+    if (sourceColumn === destColumn) {
+      sourceTasks.splice(draggedTaskIndex, 1)
+      sourceTasks.splice(destination.index, 0, draggedTask)
+
+      setLocalOrder((prev) => ({
+        ...prev,
+        [sourceColumn]: sourceTasks
+      }))
+    } else {
+      sourceTasks.splice(draggedTaskIndex, 1)
+      const updatedTask = { ...draggedTask, status: destColumn }
+      destTasks.splice(destination.index, 0, updatedTask)
+
+      setLocalOrder((prev) => ({
+        ...prev,
+        [sourceColumn]: sourceTasks,
+        [destColumn]: destTasks
+      }))
+
+      onUpdate(updatedTask)
+    }
+  }
+
+  useEffect(() => {
+    const safeTasks = Array.isArray(tasks) ? tasks : []
+
+    setLocalOrder({
+      TODO: safeTasks.filter((t) => t.status === "TODO"),
+      IN_PROGRESS: safeTasks.filter((t) => t.status === "IN_PROGRESS"),
+      DONE: safeTasks.filter((t) => t.status === "DONE")
+    })
+  }, [tasks])
+
+  return (
+    <>
+      <DragDropContext onDragEnd={onDragEnd}>
+        <Box display="flex" flexWrap="wrap" gap={2} alignItems="flex-start" justifyContent="center">
+          {Object.entries(columns).map(([status, { title, icon }]) => (
+            <Droppable droppableId={status} key={status}>
+              {(provided, snapshot) => (
+                <Box
+                  ref={provided.innerRef}
+                  {...provided.droppableProps}
+                  sx={{
+                    flex: 1,
+                    minWidth: 250,
+                    transition: "background-color 0.2s ease",
+                    backgroundColor: snapshot.isDraggingOver ? "#f0f0f0" : "transparent"
+                  }}
+                >
+                  <TaskColumn title={title} icon={icon}>
+                    {localOrder[status as TaskStatus]?.map((task, index) => (
+                      <Draggable draggableId={task.id} index={index} key={task.id}>
+                        {(provided, snapshot) => (
+                          <Box
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            sx={{
+                              opacity: snapshot.isDragging ? 0.85 : 1,
+                              transform: snapshot.isDragging ? "scale(1.02)" : "none",
+                              transition: "all 0.15s ease",
+                              cursor: snapshot.isDragging ? "grabbing" : "grab"
+                            }}
+                          >
+                            <TaskCard
+                              task={task}
+                              calendars={calendars}
+                              categories={categories}
+                              onUpdate={onUpdate}
+                              onDelete={onDelete}
+                            />
+                          </Box>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </TaskColumn>
+                </Box>
+              )}
+            </Droppable>
+          ))}
+        </Box>
+      </DragDropContext>
+    </>
+  )
+}
+
+export default TaskBoard
+
+=== End:   ./component/task/TaskBoard.tsx ===
+
+=== Begin: ./component/task/TaskPanel.tsx ===
+import MESSAGES from "@/constant/ui/messages"
+import useTask from "@/repository/task.repository"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import Task from "@/model/domain/task"
+import TaskStatus from "@/model/domain/taskStatus"
+
+import { useState } from "react"
+
+import { AddCircleOutline } from "@mui/icons-material"
+import { Box, TextField } from "@mui/material"
+
+import TaskBoard from "./TaskBoard"
+import useAppStore from "@/store/useAppStore"
+
+const TasksPanel = () => {
+  const { tasks, categories, calendars } = useAppStore()
+  const { addTask, updateTask, deleteTask, reloadTasks } = useTask()
+
+  const [newTitle, setNewTitle] = useState("")
+
+  const handleCreate = async () => {
+    if (!newTitle.trim()) return
+
+    const defaultCalendar = calendars[0] || null
+    const defaultCategory = categories[0] || null
+
+    const newTask: Partial<Task> = {
+      name: newTitle,
+      description: "",
+      calendar: defaultCalendar,
+      category: defaultCategory,
+      status: TaskStatus.TODO,
+      recurringPattern: RecurringPattern.NONE,
+      startDate: "",
+      endDate: ""
+    }
+
+    await addTask(newTask)
+    await reloadTasks()
+
+    setNewTitle("")
+  }
+
+  const handleUpdate = async (updated: Task) => {
+    await updateTask(updated.id, updated)
+    await reloadTasks()
+  }
+
+  const handleDelete = async (id: string) => {
+    await deleteTask(id)
+    await reloadTasks()
+  }
+
+  return (
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        height: "100vh",
+        overflow: "hidden",
+        p: 2,
+        boxSizing: "border-box"
+      }}
+    >
+      <TextField
+        label={MESSAGES.NEW_TASK}
+        value={newTitle}
+        onChange={(e) => setNewTitle(e.target.value)}
+        onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+        fullWidth
+        InputProps={{
+          endAdornment: <AddCircleOutline sx={{ cursor: "pointer" }} onClick={handleCreate} />
+        }}
+        sx={{ marginBottom: 2 }}
+      />
+
+      <Box sx={{ flex: 1 }}>
+        <TaskBoard
+          tasks={tasks}
+          calendars={calendars}
+          categories={categories}
+          onUpdate={handleUpdate}
+          onDelete={handleDelete}
+        />
+      </Box>
+    </Box>
+  )
+}
+
+export default TasksPanel
+
+=== End:   ./component/task/TaskPanel.tsx ===
+
+=== Begin: ./component/task/index.ts ===
+
+=== End:   ./component/task/index.ts ===
+
+=== Begin: ./theme/ThemeProvider.tsx ===
+import THEME from "@/constant/utility/theme"
+
+import type React from "react"
+import { useMemo, useState, createContext, useContext } from "react"
+
+import { ThemeProvider as MuiThemeProvider } from "@mui/material"
+import type { Theme } from "@mui/material/styles"
+
+import darkTheme from "./darkTheme"
+import lightTheme from "./lightTheme"
+
+const ThemeModeContext = createContext({
+  mode: THEME.LIGHT,
+  toggle: () => {}
+})
+
+export const useThemeMode = () => useContext(ThemeModeContext)
+
+const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
+  const [mode, setMode] = useState<THEME.LIGHT | THEME.DARK>(THEME.LIGHT)
+
+  const toggle = () => {
+    setMode((prev) => (prev === THEME.LIGHT ? THEME.DARK : THEME.LIGHT))
+  }
+
+  const theme: Theme = useMemo(() => (mode === THEME.LIGHT ? lightTheme : darkTheme), [mode])
+
+  return (
+    <>
+      <ThemeModeContext.Provider value={{ mode, toggle }}>
+        <MuiThemeProvider theme={theme}>{children}</MuiThemeProvider>
+      </ThemeModeContext.Provider>
+    </>
+  )
+}
+
+export default ThemeProvider
+
+=== End:   ./theme/ThemeProvider.tsx ===
+
+=== Begin: ./theme/darkTheme.ts ===
+import { createTheme } from "@mui/material/styles"
+
+const darkTheme = createTheme({
+  palette: {
+    mode: "dark",
+
+    primary: {
+      main: "#90caf9"
+    },
+
+    background: {
+      default: "#2a2a2a",
+      paper: "#3a3a3a"
+    },
+
+    divider: "#555",
+
+    text: {
+      primary: "#e0e0e0",
+      secondary: "#bbb"
+    }
+  }
+})
+
+export default darkTheme
+
+=== End:   ./theme/darkTheme.ts ===
+
+=== Begin: ./theme/lightTheme.ts ===
+import { createTheme } from "@mui/material/styles"
+
+const lightTheme = createTheme({
+  palette: {
+    mode: "light",
+
+    primary: {
+      main: "#1976d2"
+    },
+
+    background: {
+      default: "#f3f3f3",
+      paper: "#ffffff"
+    },
+
+    divider: "#ddd",
+
+    text: {
+      primary: "#222",
+      secondary: "#555"
+    }
+  }
+})
+
+export default lightTheme
+
+=== End:   ./theme/lightTheme.ts ===
+
+=== Begin: ./theme/ThemeToggleButton.tsx ===
+import THEME from "@/constant/utility/theme"
+import { useThemeMode } from "./ThemeProvider"
+
+import DarkModeIcon from "@mui/icons-material/DarkMode"
+import LightModeIcon from "@mui/icons-material/LightMode"
+import IconButton from "@mui/material/IconButton"
+
+const ThemeToggleButton = () => {
+  const { mode, toggle } = useThemeMode()
+
+  return (
+    <>
+      <IconButton onClick={toggle} color="inherit">
+        {mode === THEME.DARK ? <LightModeIcon /> : <DarkModeIcon />}
+      </IconButton>
+    </>
+  )
+}
+
+export default ThemeToggleButton
+
+=== End:   ./theme/ThemeToggleButton.tsx ===
+
+=== Begin: ./constant/ui/messages.ts ===
+enum MESSAGES {
+  ALL = "All",
+  NONE = "None",
+
+  NEW_EVENT = "New event",
+  NEW_TASK = "New task",
+  NEW_NOTE = "New note",
+
+  ADD_EVENT = "Add event",
+  ADD_TASK = "Add task",
+  ADD_NOTE = "Add note",
+  ADD_CATEGORY = "Add category",
+  ADD_CALENDAR = "Add calendar",
+
+  EDIT_EVENT = "Edit event",
+  EDIT_TASK = "Edit task",
+  EDIT_NOTE = "Edit note",
+  EDIT_CATEGORY = "Edit category",
+  EDIT_CALENDAR = "Edit calendar",
+
+  CONFIRM_CLEAR_CONTENTS = "Are you sure you want to clear contents?",
+  CONFIRM_CLEAR_TEXT = "Are you sure you want to clear text?",
+
+  CONFIRM_DELETE_CALENDAR = "Are you sure you want to delete this calendar?",
+  CONFIRM_DELETE_CATEGORY = "Are you sure you want to delete this category?",
+  CONFIRM_DELETE_EVENT = "Are you sure you want to delete this event?",
+  CONFIRM_DELETE_TASK = "Are you sure you want to delete this task?",
+  CONFIRM_DELETE_NOTE = "Are you sure you want to delete this note?"
+}
+
+export default MESSAGES
+
+=== End:   ./constant/ui/messages.ts ===
+
+=== Begin: ./constant/ui/buttons.ts ===
+enum BUTTONS {
+  ADD = "ADD",
+  EDIT = "EDIT",
+  SAVE = "SAVE",
+  CANCEL = "CANCEL",
+  DELETE = "DELETE"
+}
+
+export default BUTTONS
+
+=== End:   ./constant/ui/buttons.ts ===
+
+=== Begin: ./constant/ui/labels.ts ===
+enum LABELS {
+  NAME = "Name",
+  DESCRIPTION = "Description",
+  START_DATE = "Start date",
+  START_TIME = "Start time",
+  END_DATE = "End date",
+  END_TIME = "End time",
+  RECURRING = "Recurring",
+  STATUS = "Status",
+  CALENDAR = "Calendar",
+  CATEGORY = "Category",
+
+  TODO = "To-Do",
+  IN_PROGRESS = "In progress",
+  DONE = "Done",
+
+  RECURRING_DAILY = "Daily",
+  RECURRING_WEEKLY = "Weekly",
+  RECURRING_MONTHLY = "Monthly",
+  RECURRING_YEARLY = "Yearly",
+
+  NONE = "None"
+}
+
+export default LABELS
+
+=== End:   ./constant/ui/labels.ts ===
+
+=== Begin: ./constant/utility/toolbar.ts ===
+enum TOOLBAR {
+  BOLD = "bold",
+  ITALIC = "italic",
+  UNDERLINE = "underline"
+}
+
+export default TOOLBAR
+
+=== End:   ./constant/utility/toolbar.ts ===
+
+=== Begin: ./constant/utility/theme.ts ===
+enum THEME {
+  LIGHT = "light",
+  DARK = "dark"
+}
+
+export default THEME
+
+=== End:   ./constant/utility/theme.ts ===
+
+=== Begin: ./model/communication/paginatedResponse.ts ===
+interface PaginatedResponse<T> {
+  content: T[]
+  totalPages: number
+  totalElements: number
+  number: number
+  size: number
+  first: boolean
+  last: boolean
+  numberOfElements: number
+  empty: boolean
+}
+
+export default PaginatedResponse
+
+=== End:   ./model/communication/paginatedResponse.ts ===
+
+=== Begin: ./model/domain/calendar.ts ===
+interface Calendar {
+  id: string
+  name: string
+  emoji: string
+}
+
+export default Calendar
+
+=== End:   ./model/domain/calendar.ts ===
+
+=== Begin: ./model/domain/category.ts ===
+interface Category {
+  id: string
+  name: string
+  color: string
+}
+
+export default Category
+
+=== End:   ./model/domain/category.ts ===
+
+=== Begin: ./model/domain/event.ts ===
+import type Schedulable from "./schedulable"
+
+interface Event extends Schedulable {
+  id: string
+  name: string
+  description?: string
+  startDate: string
+  endDate: string
+}
+
+export default Event
+
+=== End:   ./model/domain/event.ts ===
+
+=== Begin: ./model/domain/note.ts ===
+import type Calendar from "./calendar"
+import type Category from "./category"
+
+interface Note {
+  id: string
+  name?: string
+  description: string
+  calendar: Calendar
+  category?: Category
+  positionX: number
+  positionY: number
+}
+
+export default Note
+
+=== End:   ./model/domain/note.ts ===
+
+=== Begin: ./model/domain/recurringPattern.ts ===
+enum RecurringPattern {
+  NONE = "NONE",
+  DAILY = "DAILY",
+  WEEKLY = "WEEKLY",
+  MONTHLY = "MONTHLY",
+  YEARLY = "YEARLY"
+}
+
+export default RecurringPattern
+
+=== End:   ./model/domain/recurringPattern.ts ===
+
+=== Begin: ./model/domain/schedulable.ts ===
+import type Calendar from "./calendar"
+import type Category from "./category"
+import type RecurringPattern from "./recurringPattern"
+
+interface Schedulable {
+  id: string
+  name?: string
+  description?: string
+  startDate?: string
+  endDate?: string
+  recurringPattern: RecurringPattern
+  calendar: Calendar
+  category?: Category
+}
+
+export default Schedulable
+
+=== End:   ./model/domain/schedulable.ts ===
+
+=== Begin: ./model/domain/task.ts ===
+import type Schedulable from "./schedulable"
+import type TaskStatus from "./taskStatus"
+
+interface Task extends Schedulable {
+  id: string
+  name: string
+  description?: string
+  startDate?: string
+  endDate?: string
+  status: TaskStatus
+}
+
+export default Task
+
+=== End:   ./model/domain/task.ts ===
+
+=== Begin: ./model/domain/taskStatus.ts ===
+enum TaskStatus {
+  TODO = "TODO",
+  IN_PROGRESS = "IN_PROGRESS",
+  DONE = "DONE"
+}
+
+export default TaskStatus
+
+=== End:   ./model/domain/taskStatus.ts ===
+
+=== Begin: ./model/dto/calendar.dto.ts ===
+interface CalendarDto {
+  id?: string
+  name: string
+  emoji: string
+}
+
+export default CalendarDto
+
+=== End:   ./model/dto/calendar.dto.ts ===
+
+=== Begin: ./model/dto/category.dto.ts ===
+interface CategoryDto {
+  id?: string
+  name: string
+  color: string
+}
+
+export default CategoryDto
+
+=== End:   ./model/dto/category.dto.ts ===
+
+=== Begin: ./model/dto/event.dto.ts ===
+import type RecurringPattern from "@/model/domain/recurringPattern"
+
+interface EventDto {
+  id?: string
+  name: string
+  description?: string
+  startDate: string
+  endDate: string
+  recurringPattern: RecurringPattern
+  calendarId: string
+  categoryId?: string
+}
+
+export default EventDto
+
+=== End:   ./model/dto/event.dto.ts ===
+
+=== Begin: ./model/dto/note.dto.ts ===
+interface NoteDto {
+  id?: string
+  name?: string
+  description: string
+  calendarId: string
+  categoryId?: string
+}
+
+export default NoteDto
+
+=== End:   ./model/dto/note.dto.ts ===
+
+=== Begin: ./model/dto/task.dto.ts ===
+import type RecurringPattern from "@/model/domain/recurringPattern"
+import type TaskStatus from "@/model/domain/taskStatus"
+
+interface TaskDto {
+  id?: string
+  name: string
+  description?: string
+  startDate?: string
+  endDate?: string
+  recurringPattern?: RecurringPattern
+  status: TaskStatus
+  calendarId?: string
+  categoryId?: string
+}
+
+export default TaskDto
+
+=== End:   ./model/dto/task.dto.ts ===
+
+=== Begin: ./model/mapper/calendar.mapper.ts ===
+import type Calendar from "@/model/domain/calendar"
+import type CalendarDto from "@/model/dto/calendar.dto"
+
+export function dtoToCalendar(dto: CalendarDto): Calendar {
+  return {
+    id: dto.id ?? "",
+    name: dto.name,
+    emoji: dto.emoji
+  }
+}
+
+export function calendarToDto(calendar: Partial<Calendar>): CalendarDto {
+  return {
+    id: calendar.id,
+    name: calendar.name ?? "",
+    emoji: calendar.emoji ?? ""
+  }
+}
+
+=== End:   ./model/mapper/calendar.mapper.ts ===
+
+=== Begin: ./model/mapper/category.mapper.ts ===
+import type Category from "@/model/domain/category"
+import type CategoryDto from "@/model/dto/category.dto"
+
+export function dtoToCategory(dto: CategoryDto): Category {
+  return {
+    id: dto.id ?? "",
+    name: dto.name,
+    color: dto.color
+  }
+}
+
+export function categoryToDto(category: Partial<Category>): CategoryDto {
+  return {
+    id: category.id,
+    name: category.name ?? "",
+    color: category.color ?? ""
+  }
+}
+
+=== End:   ./model/mapper/category.mapper.ts ===
+
+=== Begin: ./model/mapper/event.mapper.ts ===
+import type Event from "@/model/domain/event"
+import type EventDto from "@/model/dto/event.dto"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import RecurringPattern from "../domain/recurringPattern"
+
+export function dtoToEvent(dto: EventDto, calendars: Calendar[], categories: Category[]): Event {
+  return {
+    id: dto.id ?? "",
+    name: dto.name,
+    description: dto.description,
+    startDate: dto.startDate,
+    endDate: dto.endDate,
+    recurringPattern: dto.recurringPattern,
+    calendar: calendars.find((c) => c.id === dto.calendarId) as Calendar,
+    category: categories.find((c) => c.id === dto.categoryId) as Category
+  }
+}
+
+export function eventToDto(event: Partial<Event>): EventDto {
+  return {
+    id: event.id,
+    name: event.name ?? "",
+    description: event.description,
+    startDate: event.startDate ?? "",
+    endDate: event.endDate ?? "",
+    recurringPattern: event.recurringPattern ?? RecurringPattern.NONE,
+    calendarId: event.calendar?.id ?? "",
+    categoryId: event.category?.id
+  }
+}
+
+=== End:   ./model/mapper/event.mapper.ts ===
+
+=== Begin: ./model/mapper/note.mapper.ts ===
+import type Note from "@/model/domain/note"
+import type NoteDto from "@/model/dto/note.dto"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+
+export function dtoToNote(dto: NoteDto, calendars: Calendar[], categories: Category[]): Note {
+  return {
+    id: dto.id ?? "",
+    name: dto.name,
+    description: dto.description,
+    calendar: calendars.find((c) => c.id === dto.calendarId) as Calendar,
+    category: categories.find((c) => c.id === dto.categoryId) as Category,
+    positionX: Math.floor(Math.random() * 100),
+    positionY: Math.floor(Math.random() * 100)
+  }
+}
+
+export function noteToDto(note: Partial<Note>): NoteDto {
+  return {
+    id: note.id,
+    name: note.name,
+    description: note.description ?? "",
+    calendarId: note.calendar?.id ?? "",
+    categoryId: note.category?.id
+  }
+}
+
+=== End:   ./model/mapper/note.mapper.ts ===
+
+=== Begin: ./model/mapper/task.mapper.ts ===
+import type Task from "@/model/domain/task"
+import type TaskDto from "@/model/dto/task.dto"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import TaskStatus from "../domain/taskStatus"
+
+export function dtoToTask(dto: TaskDto, calendars: Calendar[], categories: Category[]): Task {
+  return {
+    id: dto.id ?? "",
+    name: dto.name,
+    description: dto.description,
+    startDate: dto.startDate,
+    endDate: dto.endDate,
+    recurringPattern: dto.recurringPattern ?? RecurringPattern.NONE,
+    status: dto.status,
+    calendar: calendars.find((c) => c.id === dto.calendarId) as Calendar,
+    category: categories.find((c) => c.id === dto.categoryId)
+  }
+}
+
+export function taskToDto(task: Partial<Task>): TaskDto {
+  return {
+    id: task.id,
+    name: task.name ?? "",
+    description: task.description,
+    startDate: task.startDate,
+    endDate: task.endDate,
+    recurringPattern: task.recurringPattern,
+    status: task.status ?? TaskStatus.TODO,
+    calendarId: task.calendar?.id,
+    categoryId: task.category?.id
+  }
+}
+
+=== End:   ./model/mapper/task.mapper.ts ===
+
+=== Begin: ./model/utility/editorMode.ts ===
+enum EditorMode {
+  ADD = "add",
+  EDIT = "edit",
+  DELETE = "delete"
+}
+
+export default EditorMode
+
+=== End:   ./model/utility/editorMode.ts ===
+
+=== Begin: ./model/utility/viewType.ts ===
+export enum ViewType {
+  DAY = "Day",
+  WEEK = "Week",
+  MONTH = "Month",
+  YEAR = "Year"
+}
+
+export default ViewType
+
+=== End:   ./model/utility/viewType.ts ===
+
+=== Begin: ./model/utility/formatCommand.ts ===
+import TOOLBAR from "@/constant/utility/toolbar"
+
+type FormatCommand = TOOLBAR.BOLD | TOOLBAR.ITALIC | TOOLBAR.UNDERLINE
+
+export default FormatCommand
+
+=== End:   ./model/utility/formatCommand.ts ===
+
+=== Begin: ./service/task.service.ts ===
+import type TaskDto from "@/model/dto/task.dto"
+import { createCrudService } from "./crud.service"
+
+export const {
+  getAll: getTasks,
+  create: createTask,
+  update: updateTask,
+  delete: deleteTask
+} = createCrudService<TaskDto>(`${import.meta.env.VITE_BASE_URL}/tasks`)
+
+=== End:   ./service/task.service.ts ===
+
+=== Begin: ./service/event.service.ts ===
+import type EventDto from "@/model/dto/event.dto"
+import { createCrudService } from "./crud.service"
+
+export const {
+  getAll: getEvents,
+  create: createEvent,
+  update: updateEvent,
+  delete: deleteEvent
+} = createCrudService<EventDto>(`${import.meta.env.VITE_BASE_URL}/events`)
+
+=== End:   ./service/event.service.ts ===
+
+=== Begin: ./service/note.service.ts ===
+import type NoteDto from "@/model/dto/note.dto"
+import { createCrudService } from "./crud.service"
+
+export const {
+  getAll: getNotes,
+  create: createNote,
+  update: updateNote,
+  delete: deleteNote
+} = createCrudService<NoteDto>(`${import.meta.env.VITE_BASE_URL}/notes`)
+
+=== End:   ./service/note.service.ts ===
+
+=== Begin: ./service/category.service.ts ===
+import type CategoryDto from "@/model/dto/category.dto"
+import { createCrudService } from "./crud.service"
+
+export const {
+  getAll: getCategories,
+  create: createCategory,
+  update: updateCategory,
+  delete: deleteCategory
+} = createCrudService<CategoryDto>(`${import.meta.env.VITE_BASE_URL}/categories`)
+
+=== End:   ./service/category.service.ts ===
+
+=== Begin: ./service/calendar.service.ts ===
+import type CalendarDto from "@/model/dto/calendar.dto"
+import { createCrudService } from "./crud.service"
+
+export const {
+  getAll: getCalendars,
+  create: createCalendar,
+  update: updateCalendar,
+  delete: deleteCalendar
+} = createCrudService<CalendarDto>(`${import.meta.env.VITE_BASE_URL}/calendars`)
+
+=== End:   ./service/calendar.service.ts ===
+
+=== Begin: ./service/crud.service.ts ===
+import type PaginatedResponse from "@/model/communication/paginatedResponse"
+
+export interface CrudService<TDto> {
+  getAll: () => Promise<TDto[]>
+  create: (dto: TDto) => Promise<TDto>
+  update: (id: string, dto: TDto) => Promise<TDto>
+  delete: (id: string) => Promise<void>
+}
+
+export function createCrudService<TDto>(resource: string): CrudService<TDto> {
+  const baseUrl = `${resource}`
+
+  async function getAll(): Promise<TDto[]> {
+    const res = await fetch(baseUrl)
+    if (!res.ok) throw new Error(`Failed to fetch ${resource}: ${res.statusText}`)
+    const page = (await res.json()) as PaginatedResponse<TDto>
+    return page.content
+  }
+
+  async function create(dto: TDto): Promise<TDto> {
+    const res = await fetch(baseUrl, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dto)
+    })
+    if (!res.ok) throw new Error(`Failed to create ${resource}: ${res.statusText}`)
+    return (await res.json()) as TDto
+  }
+
+  async function update(id: string, dto: TDto): Promise<TDto> {
+    const res = await fetch(`${baseUrl}/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dto)
+    })
+    if (!res.ok) throw new Error(`Failed to update ${resource}/${id}: ${res.statusText}`)
+    return (await res.json()) as TDto
+  }
+
+  async function remove(id: string): Promise<void> {
+    const res = await fetch(`${baseUrl}/${id}`, { method: "DELETE" })
+    if (!res.ok) throw new Error(`Failed to delete ${resource}/${id}: ${res.statusText}`)
+  }
+
+  return { getAll, create, update, delete: remove }
+}
+
+=== End:   ./service/crud.service.ts ===
+
+=== Begin: ./store/useAppStore.ts ===
+import { create } from "zustand"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import type Event from "@/model/domain/event"
+import type Task from "@/model/domain/task"
+import type Note from "@/model/domain/note"
+
+interface AppStore {
+  calendars: Calendar[]
+  categories: Category[]
+  events: Event[]
+  tasks: Task[]
+  notes: Note[]
+
+  selectedCalendar: string | null
+  setSelectedCalendar: (id: string | null) => void
+
+  selectedCategory: string | null
+  setSelectedCategory: (id: string | null) => void
+
+  setCalendars: (calendars: unknown) => void
+  setCategories: (categories: unknown) => void
+  setEvents: (events: unknown) => void
+  setTasks: (tasks: unknown) => void
+  setNotes: (notes: unknown) => void
+}
+
+const ensureArray = <T>(value: unknown): T[] => (Array.isArray(value) ? value : [])
+
+const useAppStore = create<AppStore>((set) => ({
+  calendars: [],
+  categories: [],
+  events: [],
+  tasks: [],
+  notes: [],
+
+  selectedCalendar: "all",
+  setSelectedCalendar: (id) => set({ selectedCalendar: id }),
+
+  selectedCategory: "all",
+  setSelectedCategory: (id) => set({ selectedCategory: id }),
+
+  setCalendars: (calendars) => set({ calendars: ensureArray<Calendar>(calendars) }),
+  setCategories: (categories) => set({ categories: ensureArray<Category>(categories) }),
+  setEvents: (events) => set({ events: ensureArray<Event>(events) }),
+  setTasks: (tasks) => set({ tasks: ensureArray<Task>(tasks) }),
+  setNotes: (notes) => set({ notes: ensureArray<Note>(notes) })
+}))
+
+export default useAppStore
+
+=== End:   ./store/useAppStore.ts ===
+
+=== Begin: ./controller/task.controller.ts ===
+import * as taskService from "@/service/task.service"
+import { dtoToTask, taskToDto } from "@/model/mapper/task.mapper"
+import { createCrudController } from "./crud.controller"
+import useAppStore from "@/store/useAppStore"
+
+export const {
+  load: loadTasks,
+  add: addTask,
+  update: updateTask,
+  remove: deleteTask
+} = createCrudController(
+  "tasks",
+  {
+    getAll: taskService.getTasks,
+    create: taskService.createTask,
+    update: taskService.updateTask,
+    delete: taskService.deleteTask
+  },
+  {
+    toDto: taskToDto,
+    fromDto: (dto) => dtoToTask(dto, useAppStore.getState().calendars, useAppStore.getState().categories)
+  }
+)
+
+=== End:   ./controller/task.controller.ts ===
+
+=== Begin: ./controller/note.controller.ts ===
+import * as noteService from "@/service/note.service"
+import { dtoToNote, noteToDto } from "@/model/mapper/note.mapper"
+import { createCrudController } from "./crud.controller"
+import useAppStore from "@/store/useAppStore"
+
+export const {
+  load: loadNotes,
+  add: addNote,
+  update: updateNote,
+  remove: deleteNote
+} = createCrudController(
+  "notes",
+  {
+    getAll: noteService.getNotes,
+    create: noteService.createNote,
+    update: noteService.updateNote,
+    delete: noteService.deleteNote
+  },
+  {
+    toDto: noteToDto,
+    fromDto: (dto) => dtoToNote(dto, useAppStore.getState().calendars, useAppStore.getState().categories)
+  }
+)
+
+=== End:   ./controller/note.controller.ts ===
+
+=== Begin: ./controller/calendar.controller.ts ===
+import * as calendarService from "@/service/calendar.service"
+import { dtoToCalendar, calendarToDto } from "@/model/mapper/calendar.mapper"
+import { createCrudController } from "./crud.controller"
+
+export const {
+  load: loadCalendars,
+  add: addCalendar,
+  update: updateCalendar,
+  remove: deleteCalendar
+} = createCrudController(
+  "calendars",
+  {
+    getAll: calendarService.getCalendars,
+    create: calendarService.createCalendar,
+    update: calendarService.updateCalendar,
+    delete: calendarService.deleteCalendar
+  },
+  {
+    toDto: calendarToDto,
+    fromDto: dtoToCalendar
+  }
+)
+
+=== End:   ./controller/calendar.controller.ts ===
+
+=== Begin: ./controller/category.controller.ts ===
+import * as categoryService from "@/service/category.service"
+import { dtoToCategory, categoryToDto } from "@/model/mapper/category.mapper"
+import { createCrudController } from "./crud.controller"
+
+export const {
+  load: loadCategories,
+  add: addCategory,
+  update: updateCategory,
+  remove: deleteCategory
+} = createCrudController(
+  "categories",
+  {
+    getAll: categoryService.getCategories,
+    create: categoryService.createCategory,
+    update: categoryService.updateCategory,
+    delete: categoryService.deleteCategory
+  },
+  {
+    toDto: categoryToDto,
+    fromDto: dtoToCategory
+  }
+)
+
+=== End:   ./controller/category.controller.ts ===
+
+=== Begin: ./controller/event.controller.ts ===
+import * as eventService from "@/service/event.service"
+import { dtoToEvent, eventToDto } from "@/model/mapper/event.mapper"
+import { createCrudController } from "./crud.controller"
+import useAppStore from "@/store/useAppStore"
+
+export const {
+  load: loadEvents,
+  add: addEvent,
+  update: updateEvent,
+  remove: deleteEvent
+} = createCrudController(
+  "events",
+  {
+    getAll: eventService.getEvents,
+    create: eventService.createEvent,
+    update: eventService.updateEvent,
+    delete: eventService.deleteEvent
+  },
+  {
+    toDto: eventToDto,
+    fromDto: (dto) => dtoToEvent(dto, useAppStore.getState().calendars, useAppStore.getState().categories)
+  }
+)
+
+=== End:   ./controller/event.controller.ts ===
+
+=== Begin: ./controller/crud.controller.ts ===
+import useAppStore from "@/store/useAppStore"
+import type { CrudService } from "@/service/crud.service"
+import capitalize from "@/utilities/capitalize"
+
+type AppState = ReturnType<typeof useAppStore.getState>
+
+type StateKeysFor<T> = {
+  [K in keyof AppState]: AppState[K] extends Array<T> ? K : never
+}[keyof AppState]
+
+type SetterKey<K extends string> = `set${Capitalize<K>}`
+
+export function createCrudController<TDto, TDomain extends { id: string }, K extends StateKeysFor<TDomain> & string>(
+  resourceKey: K,
+  service: CrudService<TDto>,
+  mapper: {
+    toDto: (domain: Partial<TDomain>) => TDto
+    fromDto: (dto: TDto) => TDomain
+  }
+) {
+  const setterKey = capitalize(resourceKey) as SetterKey<K>
+
+  async function load(): Promise<void> {
+    const dtos = await service.getAll()
+    const items = dtos.map(mapper.fromDto)
+    useAppStore.getState()[`set${capitalize(resourceKey)}` as SetterKey<K>](items)
+  }
+
+  async function add(partial: Partial<TDomain>): Promise<TDomain> {
+    const dto = mapper.toDto(partial)
+    const created = await service.create(dto)
+    const dom = mapper.fromDto(created)
+    const state = useAppStore.getState()
+    state[`set${capitalize(resourceKey)}` as SetterKey<K>]([...state[resourceKey], dom])
+    return dom
+  }
+
+  async function update(item: TDomain): Promise<TDomain> {
+    const dto = mapper.toDto(item)
+    const updated = await service.update(item.id, dto)
+    const dom = mapper.fromDto(updated)
+    const state = useAppStore.getState()
+    state[`set${capitalize(resourceKey)}` as SetterKey<K>](state[resourceKey].map((i) => (i.id === dom.id ? dom : i)))
+    return dom
+  }
+
+  async function remove(id: string): Promise<void> {
+    await service.delete(id)
+    const state = useAppStore.getState()
+    state[`set${capitalize(resourceKey)}` as SetterKey<K>](state[resourceKey].filter((i) => i.id !== id))
+  }
+
+  return { load, add, update, remove }
+}
+
+=== End:   ./controller/crud.controller.ts ===
+
+=== Begin: ./repository/crud.repository.ts ===
+import { useCallback } from "react"
+import useAppStore from "@/store/useAppStore"
+import capitalize from "@/utilities/capitalize"
+
+export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
+  resourceKey: string,
+  service: {
+    getAll: () => Promise<RawDto[]>
+    create: (dto: CreateDto) => Promise<RawDto>
+    update: (id: string, dto: CreateDto) => Promise<RawDto>
+    delete: (id: string) => Promise<void>
+  },
+  toDto: (domain: Partial<Domain>) => CreateDto,
+  fromDto: (raw: RawDto) => Domain
+) {
+  return () => {
+    const { getAll, create: createService, update: updateService, delete: deleteService } = service
+
+    const store = useAppStore()
+    const typedStore = store as unknown as Record<string, unknown>
+
+    const items = (typedStore[resourceKey] as Domain[] | undefined) ?? ([] as Domain[])
+    const setterName = `set${capitalize(resourceKey)}`
+    const setItems = typedStore[setterName] as (list: Domain[]) => void
+
+    const reload = useCallback(async (): Promise<void> => {
+      const rawList = await getAll()
+      setItems(rawList.map(fromDto))
+    }, [getAll, setItems, fromDto])
+
+    const add = useCallback(
+      async (domainObj: Partial<Domain>): Promise<Domain> => {
+        const dto = toDto(domainObj)
+        const raw = await createService(dto)
+        const newDomain = fromDto(raw)
+        setItems([...items, newDomain])
+        return newDomain
+      },
+      [createService, toDto, fromDto, items, setItems]
+    )
+
+    const update = useCallback(
+      async (domainObj: Domain): Promise<Domain> => {
+        const dto = toDto(domainObj)
+        const raw = await updateService(domainObj.id, dto)
+        const updatedDomain = fromDto(raw)
+        setItems(items.map((item) => (item.id === domainObj.id ? updatedDomain : item)))
+        return updatedDomain
+      },
+      [updateService, toDto, fromDto, items, setItems]
+    )
+
+    /** Remove an item by its id */
+    const remove = useCallback(
+      async (id: string): Promise<void> => {
+        await deleteService(id)
+        setItems(items.filter((item) => item.id !== id))
+      },
+      [deleteService, items, setItems]
+    )
+
+    return { reload, add, update, remove }
+  }
+}
+
+=== End:   ./repository/crud.repository.ts ===
+
+=== Begin: ./repository/calendar.repository.ts ===
+import {
+  getCalendars,
+  createCalendar,
+  updateCalendar as serviceUpdateCalendar,
+  deleteCalendar as serviceDeleteCalendar
+} from "@/service/calendar.service"
+import { calendarToDto, dtoToCalendar } from "@/model/mapper/calendar.mapper"
+import type Calendar from "@/model/domain/calendar"
+import type CalendarDto from "@/model/dto/calendar.dto"
+import { createUseCrud } from "@/repository/crud.repository"
+
+const useCrudCalendar = createUseCrud<Calendar, CalendarDto, CalendarDto>(
+  "calendars",
+  {
+    getAll: getCalendars,
+    create: createCalendar,
+    update: serviceUpdateCalendar,
+    delete: serviceDeleteCalendar
+  },
+  calendarToDto,
+  dtoToCalendar
+)
+
+export function useCalendar() {
+  const { reload, add, update, remove } = useCrudCalendar()
+  return {
+    reloadCalendars: reload,
+    addCalendar: add,
+    updateCalendar: update,
+    deleteCalendar: remove
+  }
+}
+
+export default useCalendar
+
+=== End:   ./repository/calendar.repository.ts ===
+
+=== Begin: ./repository/category.repository.ts ===
+import {
+  getCategories,
+  createCategory,
+  updateCategory as serviceUpdateCategory,
+  deleteCategory as serviceDeleteCategory
+} from "@/service/category.service"
+import { categoryToDto, dtoToCategory } from "@/model/mapper/category.mapper"
+import type Category from "@/model/domain/category"
+import type CategoryDto from "@/model/dto/category.dto"
+import { createUseCrud } from "@/repository/crud.repository"
+
+const useCrudCategory = createUseCrud<Category, CategoryDto, CategoryDto>(
+  "categories",
+  {
+    getAll: getCategories,
+    create: createCategory,
+    update: serviceUpdateCategory,
+    delete: serviceDeleteCategory
+  },
+  categoryToDto,
+  dtoToCategory
+)
+
+function useCategory() {
+  const { reload, add, update, remove } = useCrudCategory()
+  return {
+    reloadCategories: reload,
+    addCategory: add,
+    updateCategory: update,
+    deleteCategory: remove
+  }
+}
+
+export default useCategory
+
+=== End:   ./repository/category.repository.ts ===
+
+=== Begin: ./repository/event.repository.ts ===
+import {
+  getEvents,
+  createEvent,
+  updateEvent as serviceUpdateEvent,
+  deleteEvent as serviceDeleteEvent
+} from "@/service/event.service"
+import { eventToDto, dtoToEvent } from "@/model/mapper/event.mapper"
+import type Event from "@/model/domain/event"
+import type EventDto from "@/model/dto/event.dto"
+import { createUseCrud } from "@/repository/crud.repository"
+import useAppStore from "@/store/useAppStore"
+
+const useCrudEvent = createUseCrud<Event, EventDto, EventDto>(
+  "events",
+  {
+    getAll: getEvents,
+    create: createEvent,
+    update: serviceUpdateEvent,
+    delete: serviceDeleteEvent
+  },
+  eventToDto,
+  (dto) => dtoToEvent(dto, useAppStore().calendars, useAppStore().categories)
+)
+
+export function useEvent() {
+  const { reload, add, update, remove } = useCrudEvent()
+  return {
+    reloadEvents: reload,
+    addEvent: add,
+    updateEvent: update,
+    deleteEvent: remove
+  }
+}
+
+export default useEvent
+
+=== End:   ./repository/event.repository.ts ===
+
+=== Begin: ./repository/note.repository.ts ===
+import {
+  getNotes,
+  createNote,
+  updateNote as serviceUpdateNote,
+  deleteNote as serviceDeleteNote
+} from "@/service/note.service"
+import { noteToDto, dtoToNote } from "@/model/mapper/note.mapper"
+import type Note from "@/model/domain/note"
+import type NoteDto from "@/model/dto/note.dto"
+import { createUseCrud } from "@/repository/crud.repository"
+import useAppStore from "@/store/useAppStore"
+
+const useCrudNote = createUseCrud<Note, NoteDto, NoteDto>(
+  "notes",
+  {
+    getAll: getNotes,
+    create: createNote,
+    update: serviceUpdateNote,
+    delete: serviceDeleteNote
+  },
+  noteToDto,
+  (dto) => dtoToNote(dto, useAppStore().calendars, useAppStore().categories)
+)
+
+export function useNote() {
+  const { reload, add, update, remove } = useCrudNote()
+  return {
+    reloadNotes: reload,
+    addNote: add,
+    updateNote: update,
+    deleteNote: remove
+  }
+}
+
+export default useNote
+
+=== End:   ./repository/note.repository.ts ===
+
+=== Begin: ./repository/task.repository.ts ===
+import {
+  getTasks,
+  createTask,
+  updateTask as serviceUpdateTask,
+  deleteTask as serviceDeleteTask
+} from "@/service/task.service"
+import { taskToDto, dtoToTask } from "@/model/mapper/task.mapper"
+import type Task from "@/model/domain/task"
+import type TaskDto from "@/model/dto/task.dto"
+import useAppStore from "@/store/useAppStore"
+import { createUseCrud } from "@/repository/crud.repository"
+
+const useCrudTask = createUseCrud<Task, TaskDto, TaskDto>(
+  "tasks",
+  {
+    getAll: getTasks,
+    create: createTask,
+    update: serviceUpdateTask,
+    delete: serviceDeleteTask
+  },
+  taskToDto,
+  (dto) => dtoToTask(dto, useAppStore().calendars, useAppStore().categories)
+)
+
+export function useTask() {
+  const { reload, add, update, remove } = useCrudTask()
+  return {
+    reloadTasks: reload,
+    addTask: add,
+    updateTask: update,
+    deleteTask: remove
+  }
+}
+
+export default useTask
+
+=== End:   ./repository/task.repository.ts ===
+
+=== Begin: ./utilities/capitalize.ts ===
+function capitalize<S extends string>(s: S): Capitalize<S> {
+  return (s.charAt(0).toUpperCase() + s.slice(1)) as Capitalize<S>
+}
+
+export default capitalize
+
+=== End:   ./utilities/capitalize.ts ===
+
+=== Begin: ./scrapper.sh ===
+#!/usr/bin/env bash
+
+# Usage: ./concat.sh [root_dir] [output_file]
+# e.g. ./concat.sh . all_texts.txt
+
+ROOT="${1:-.}"
+OUTPUT="${2:-all_texts.txt}"
+
+# Truncate (or create) the output file
+: > "$OUTPUT"
+
+# Find every file under ROOT, skip the output itself, and append its contents
+find "$ROOT" -type f ! -path "$(realpath "$OUTPUT")" -print0 | while IFS= read -r -d '' file; do
+  echo "=== Begin: $file ===" >> "$OUTPUT"
+  cat "$file"             >> "$OUTPUT"
+  echo -e "\n=== End:   $file ===\n" >> "$OUTPUT"
+done
+
+=== End:   ./scrapper.sh ===
+
+=== Begin: ./all_texts.txt ===
+
+=== End:   ./all_texts.txt ===
+

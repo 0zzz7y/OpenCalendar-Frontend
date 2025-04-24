@@ -25,7 +25,7 @@ interface AppStore {
   setNotes: (notes: unknown) => void
 }
 
-const ensureArray = <T>(value: unknown): T[] => Array.isArray(value) ? value : []
+const ensureArray = <T>(value: unknown): T[] => (Array.isArray(value) ? value : [])
 
 const useAppStore = create<AppStore>((set) => ({
   calendars: [],

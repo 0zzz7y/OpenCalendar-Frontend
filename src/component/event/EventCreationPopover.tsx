@@ -1,12 +1,4 @@
-import BUTTONS from "@/constant/ui/buttons";
-import LABELS from "@/constant/ui/labels";
-import MESSAGES from "@/constant/ui/messages";
-import useEvent from "@/repository/event.repository";
-import RecurringPattern from "@/model/domain/recurringPattern";
-import Schedulable from "@/model/domain/schedulable";
-
-import { useEffect, useState } from "react";
-
+import React, { useState, useEffect, useCallback } from "react";
 import {
   Popover,
   TextField,
@@ -21,7 +13,14 @@ import { DateCalendar, TimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
 import { toast } from "react-toastify";
 
-interface EventCreationPopoverProperties {
+import useEvent from "@/repository/event.repository";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import type Schedulable from "@/model/domain/schedulable";
+import BUTTONS from "@/constant/ui/buttons";
+import LABELS from "@/constant/ui/labels";
+import MESSAGES from "@/constant/ui/messages";
+
+export interface EventCreationPopoverProps {
   anchorEl: HTMLElement | null;
   calendars: { id: string; name: string; emoji: string }[];
   categories: { id: string; name: string; color: string }[];
@@ -29,152 +28,173 @@ interface EventCreationPopoverProperties {
   onClose: () => void;
 }
 
-const EventCreationPopover = ({
+interface FormState {
+  title: string;
+  description: string;
+  calendarId: string;
+  categoryId: string;
+  start: Date;
+  end: Date;
+}
+
+/**
+ * Popover for creating or editing an event.
+ */
+export default function EventCreationPopover({
   anchorEl,
   calendars,
   categories,
   initialEvent,
   onClose,
-}: EventCreationPopoverProperties) => {
+}: EventCreationPopoverProps) {
   const { reloadEvents, updateEvent, addEvent, deleteEvent } = useEvent();
+  const isEdit = Boolean(initialEvent?.id);
 
-  const isEditMode = Boolean(initialEvent?.id);
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [start, setStart] = useState<Date>(new Date());
-  const [end, setEnd] = useState<Date>(new Date(Date.now() + 60 * 60 * 1000));
-  const [calendarId, setCalendarId] = useState("");
-  const [categoryId, setCategoryId] = useState("");
+  const [form, setForm] = useState<FormState>({
+    title: "",
+    description: "",
+    calendarId: "",
+    categoryId: "",
+    start: new Date(),
+    end: new Date(Date.now() + 3600_000),
+  });
 
-  const isValidAnchor = anchorEl && document.body.contains(anchorEl);
+  const validAnchor = Boolean(anchorEl && document.body.contains(anchorEl));
 
+  // Sync initial data when popover opens
   useEffect(() => {
-    if (isEditMode && initialEvent) {
-      setTitle(initialEvent.name || "");
-      setDescription(initialEvent.description || "");
-      setStart(new Date(initialEvent.startDate || new Date()));
-      setEnd(new Date(initialEvent.endDate || new Date()));
-      setCalendarId(initialEvent.calendar?.id || "");
-      setCategoryId(initialEvent.category?.id || "");
-    } else {
-      const now = new Date();
-      setTitle("");
-      setDescription("");
-      setStart(now);
-      setEnd(new Date(now.getTime() + 60 * 60 * 1000));
-      setCalendarId(calendars[0]?.id || "");
-      setCategoryId("");
+    if (validAnchor) {
+      if (isEdit && initialEvent) {
+        setForm({
+          title: initialEvent.name || "",
+          description: initialEvent.description || "",
+          calendarId: initialEvent.calendar?.id || "",
+          categoryId: initialEvent.category?.id || "",
+          start: new Date(initialEvent.startDate || Date.now()),
+          end: new Date(initialEvent.endDate || Date.now()),
+        });
+      } else if (calendars.length > 0) {
+        const now = new Date();
+        setForm({
+          title: "",
+          description: "",
+          calendarId: calendars[0].id,
+          categoryId: "",
+          start: now,
+          end: new Date(now.getTime() + 3600_000),
+        });
+      }
     }
-  }, [initialEvent, anchorEl, isEditMode]);
+  }, [validAnchor, isEdit, initialEvent, calendars]);
 
-  const handleSave = async () => {
-    if (!title.trim()) return toast.error("Title is required");
-    if (!start || !end || end <= start)
-      return toast.error("End must be after start");
+  const handleChange = useCallback(
+    <K extends keyof FormState>(field: K, value: FormState[K]) => {
+      setForm((prev) => ({ ...prev, [field]: value }));
+    }, []);
 
-    const calendar = calendars.find((c) => c.id === calendarId);
-    if (!calendar) return toast.error("Calendar is required");
-
-    const category = categories.find((c) => c.id === categoryId);
+  const handleSave = useCallback(async () => {
+    // Validation
+    if (!form.title.trim()) {
+      toast.error(MESSAGES.TITLE_REQUIRED);
+      return;
+    }
+    if (form.end <= form.start) {
+      toast.error(MESSAGES.END_AFTER_START);
+      return;
+    }
+    const calendar = calendars.find((c) => c.id === form.calendarId);
+    if (!calendar) {
+      toast.error(MESSAGES.CALENDAR_REQUIRED);
+      return;
+    }
 
     const payload = {
-      name: title,
-      description,
-      startDate: dayjs(start).format("YYYY-MM-DDTHH:mm:ss"),
-      endDate: dayjs(end).format("YYYY-MM-DDTHH:mm:ss"),
+      name: form.title,
+      description: form.description,
+      startDate: dayjs(form.start).format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: dayjs(form.end).format("YYYY-MM-DDTHH:mm:ss"),
       recurringPattern: RecurringPattern.NONE,
       calendar,
-      category,
+      category: categories.find((c) => c.id === form.categoryId) || undefined,
     };
 
     try {
-      if (isEditMode && initialEvent?.id) {
-        await updateEvent(initialEvent.id, payload);
+      if (isEdit && initialEvent?.id) {
+        // Update existing event with id included in payload
+        await updateEvent({ id: initialEvent.id, ...payload });
+        toast.success(MESSAGES.EVENT_UPDATED_SUCCESSFULLY);
       } else {
+        // Create new event
         await addEvent(payload);
+        toast.success(MESSAGES.EVENT_CREATED_SUCCESSFULLY);
       }
-      toast.success("Event saved successfully");
       reloadEvents();
       onClose();
-    } catch (error) {
-      toast.error("Failed to save event");
+    } catch {
+      toast.error(MESSAGES.EVENT_SAVE_FAILED);
     }
-  };
+  }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose]);
 
-  const handleDelete = async () => {
-    if (isEditMode && initialEvent?.id) {
+  const handleDelete = useCallback(async () => {
+    if (isEdit && initialEvent?.id) {
       try {
         await deleteEvent(initialEvent.id);
-        toast.success("Event deleted successfully");
+        toast.success(MESSAGES.EVENT_DELETED_SUCCESSFULLY);
         reloadEvents();
         onClose();
-      } catch (error) {
-        toast.error("Failed to delete event");
+      } catch {
+        toast.error(MESSAGES.EVENT_DELETE_FAILED);
       }
     }
-  };
+  }, [isEdit, initialEvent, deleteEvent, reloadEvents, onClose]);
 
   return (
     <Popover
-      open={Boolean(isValidAnchor)}
-      anchorEl={isValidAnchor ? anchorEl : null}
+      open={validAnchor}
+      anchorEl={validAnchor ? anchorEl : null}
       onClose={onClose}
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "left" }}
-      PaperProps={{
-        sx: {
-          p: 2,
-          width: 340,
-          maxHeight: "90vh",
-          overflowY: "auto",
-        },
-      }}
+      PaperProps={{ sx: { p: 2, width: 340, maxHeight: "90vh", overflowY: "auto" } }}
     >
       <Stack spacing={2}>
         <Typography variant="h6">
-          {isEditMode ? MESSAGES.EDIT_EVENT : MESSAGES.ADD_EVENT}
+          {isEdit ? MESSAGES.EDIT_EVENT : MESSAGES.ADD_EVENT}
         </Typography>
 
         <TextField
-          label="Title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
+          label={LABELS.NAME}
+          value={form.title}
+          onChange={(e) => handleChange("title", e.target.value)}
           fullWidth
         />
 
         <TextField
-          label="Calendar"
-          value={calendarId}
-          onChange={(e) => setCalendarId(e.target.value)}
+          label={LABELS.CALENDAR}
           select
+          value={form.calendarId}
+          onChange={(e) => handleChange("calendarId", e.target.value)}
           fullWidth
         >
-          {calendars.map((cal) => (
-            <MenuItem key={cal.id} value={cal.id}>
-              {cal.emoji} {cal.name}
+          {calendars.map((c) => (
+            <MenuItem key={c.id} value={c.id}>
+              {c.emoji} {c.name}
             </MenuItem>
           ))}
         </TextField>
 
         <TextField
-          label="Category"
-          value={categoryId}
-          onChange={(e) => setCategoryId(e.target.value)}
+          label={LABELS.CATEGORY}
           select
+          value={form.categoryId}
+          onChange={(e) => handleChange("categoryId", e.target.value)}
           fullWidth
         >
-          <MenuItem value="">None</MenuItem>
-          {categories.map((cat) => (
-            <MenuItem key={cat.id} value={cat.id}>
-              <Box
-                display="inline-block"
-                width={12}
-                height={12}
-                borderRadius={6}
-                bgcolor={cat.color}
-                mr={1}
-              />
-              {cat.name}
+          <MenuItem value="">{LABELS.NONE}</MenuItem>
+          {categories.map((c) => (
+            <MenuItem key={c.id} value={c.id}>
+              <Box display="inline-block" width={12} height={12} borderRadius={6} bgcolor={c.color} mr={1} />
+              {c.name}
             </MenuItem>
           ))}
         </TextField>
@@ -182,25 +202,22 @@ const EventCreationPopover = ({
         <Divider />
 
         <Typography variant="body2">{LABELS.START_DATE}</Typography>
-
-        <DateCalendar value={start} onChange={(v) => v && setStart(v)} />
-
+        <DateCalendar value={form.start} onChange={(d) => d && handleChange("start", d)} />
         <TimePicker
           label={LABELS.START_TIME}
-          value={start}
-          onChange={(v) => v && setStart(v)}
+          value={form.start}
+          onChange={(d) => d && handleChange("start", d)}
         />
-
         <TimePicker
           label={LABELS.END_TIME}
-          value={end}
-          onChange={(v) => v && setEnd(v)}
+          value={form.end}
+          onChange={(d) => d && handleChange("end", d)}
         />
 
         <TextField
           label={LABELS.DESCRIPTION}
-          value={description}
-          onChange={(e) => setDescription(e.target.value)}
+          value={form.description}
+          onChange={(e) => handleChange("description", e.target.value)}
           fullWidth
           multiline
           minRows={2}
@@ -210,20 +227,16 @@ const EventCreationPopover = ({
           <Button onClick={onClose} color="inherit">
             {BUTTONS.CANCEL}
           </Button>
-
-          {isEditMode && (
+          {isEdit && (
             <Button onClick={handleDelete} color="error">
               {BUTTONS.DELETE}
             </Button>
           )}
-
-          <Button onClick={handleSave} variant="contained">
+          <Button variant="contained" onClick={handleSave}>
             {BUTTONS.SAVE}
           </Button>
         </Stack>
       </Stack>
     </Popover>
   );
-};
-
-export default EventCreationPopover;
+}

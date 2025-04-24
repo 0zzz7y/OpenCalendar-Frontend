@@ -1,34 +1,32 @@
-import ViewType from "@/model/utility/viewType"
-import {
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  FormControl,
-  InputLabel
-} from "@mui/material"
+import React, { useCallback } from "react";
+import ViewType from "@/model/utility/viewType";
+import { FormControl, InputLabel, Select, MenuItem, type SelectChangeEvent } from "@mui/material";
 
-interface CalendarViewSwitcherProperties {
-  view: ViewType
-  onChange: (view: ViewType) => void
+export interface CalendarViewSwitcherProps {
+  /** Current view mode */
+  view: ViewType;
+  /** Called when the view changes */
+  onChange: (view: ViewType) => void;
 }
 
-const CalendarViewSwitcher = ({
-  view,
-  onChange
-}: CalendarViewSwitcherProperties) => {
-  const handleChange = (event: SelectChangeEvent) => {
-    const value = event.target.value as ViewType
-    onChange(value)
-  }
+/**
+ * Dropdown to select calendar view (Day, Week, Month, Year).
+ */
+export default function CalendarViewSwitcher({ view, onChange }: CalendarViewSwitcherProps) {
+  const handleChange = useCallback(
+    (e: SelectChangeEvent<ViewType>) => onChange(e.target.value as ViewType),
+    [onChange]
+  );
 
   return (
     <FormControl size="small" sx={{ mb: 2, minWidth: 120 }}>
       <InputLabel id="calendar-view-label">View</InputLabel>
       <Select
         labelId="calendar-view-label"
+        id="calendar-view-select"
         value={view}
-        onChange={handleChange}
         label="View"
+        onChange={handleChange}
       >
         <MenuItem value={ViewType.DAY}>{ViewType.DAY}</MenuItem>
         <MenuItem value={ViewType.WEEK}>{ViewType.WEEK}</MenuItem>
@@ -36,7 +34,5 @@ const CalendarViewSwitcher = ({
         <MenuItem value={ViewType.YEAR}>{ViewType.YEAR}</MenuItem>
       </Select>
     </FormControl>
-  )
+  );
 }
-
-export default CalendarViewSwitcher

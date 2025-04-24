@@ -1,152 +1,143 @@
-import EventBox from "@/component/event/EventBox"
-import Event from "@/model/domain/event"
-import Schedulable from "@/model/domain/schedulable"
+import React, { useMemo, useCallback } from "react";
+import type { FC, CSSProperties } from "react";
+import { Box } from "@mui/material";
+import CalendarGridCell from "./grid/CalendarGridCell";
+import EventBox from "@/component/event/EventBox";
+import type Event from "@/model/domain/event";
+import type Schedulable from "@/model/domain/schedulable";
 
-import { Box } from "@mui/material"
+// Constants
+const GAP = 4; // px gap between events
+const SLOT_HEIGHT = 32; // px for 30-minute slot
 
-import CalendarGridCell from "./CalendarGridCell"
-
-interface DayColumnProperties {
-  date: Date
-  events: Schedulable[]
-  allEvents: Schedulable[]
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
-  onSave: (event: Partial<Event> & { startDate: string }) => void
-  onSlotClick?: (slot: HTMLElement, datetime: Date) => void
-  showPopoverLine?: boolean
-  dragTargetId?: string | null
-  onEventClick?: (event: Event) => void
+export interface DayColumnProps {
+  date: Date;
+  events: Schedulable[];
+  onSave: (event: Partial<Event> & { startDate: string }) => void;
+  onSlotClick?: (slot: HTMLElement, datetime: Date) => void;
+  dragTargetId?: string | null;
+  onEventClick?: (event: Event) => void;
 }
 
-const DayColumn = ({
+/**
+ * Renders a single-day column with hourly slots and draggable events.
+ */
+const DayColumn: FC<DayColumnProps> = ({
   date,
   events,
-  allEvents,
-  calendars,
-  categories,
   onSave,
   onSlotClick,
-  showPopoverLine,
   dragTargetId,
-  onEventClick
-}: DayColumnProperties) => {
-  const slots = Array.from({ length: 48 }, (_, i) => {
-    const d = new Date(date)
-    d.setHours(Math.floor(i / 2), i % 2 === 0 ? 0 : 30, 0, 0)
-    return d
-  })
+  onEventClick,
+}) => {
+  // Pre-filter timed events
+  const timedEvents = useMemo(
+    () => events.filter((e) => e.startDate && e.endDate),
+    [events]
+  );
 
-  const handleSlotClick = (datetime: Date, element: HTMLElement) => {
-    onSlotClick?.(element, datetime)
-  }
+  // Generate 48 half-hour slots
+  const slots = useMemo(
+    () =>
+      Array.from({ length: 48 }, (_, i) => {
+        const slot = new Date(date);
+        slot.setHours(Math.floor(i / 2), (i % 2) * 30, 0, 0);
+        return slot;
+      }),
+    [date]
+  );
 
-  const doEventsOverlap = (a: Schedulable, b: Schedulable) => {
-    if (!a.startDate || !a.endDate || !b.startDate || !b.endDate) return false
-    const startA = new Date(a.startDate).getTime()
-    const endA = new Date(a.endDate).getTime()
-    const startB = new Date(b.startDate).getTime()
-    const endB = new Date(b.endDate).getTime()
-    return startA < endB && startB < endA
-  }
+  // Check overlap
+  const eventsOverlap = useCallback(
+    (a: Schedulable, b: Schedulable): boolean => {
+      if (!a.startDate || !a.endDate || !b.startDate || !b.endDate) return false;
+      const startA = new Date(a.startDate).getTime();
+      const endA = new Date(a.endDate).getTime();
+      const startB = new Date(b.startDate).getTime();
+      const endB = new Date(b.endDate).getTime();
+      return startA < endB && startB < endA;
+    },
+    []
+  );
 
-  const groupOverlappingEvents = (events: Schedulable[]) => {
-    const groups: Schedulable[][] = []
-    events.forEach((event) => {
-      let added = false
+  // Group overlapping events
+  const groupedEvents = useMemo(() => {
+    const groups: Schedulable[][] = [];
+    for (const evt of timedEvents) {
+      let placed = false;
       for (const group of groups) {
-        if (group.some((e) => doEventsOverlap(e, event))) {
-          group.push(event)
-          added = true
-          break
+        if (group.some((g) => eventsOverlap(g, evt))) {
+          group.push(evt);
+          placed = true;
+          break;
         }
       }
-      if (!added) groups.push([event])
-    })
-    return groups
-  }
+      if (!placed) groups.push([evt]);
+    }
+    return groups;
+  }, [timedEvents, eventsOverlap]);
 
-  const computeLayout = (events: Schedulable[]) => {
-    const layouted: (Schedulable & { customStyle: React.CSSProperties })[] = []
-    const groups = groupOverlappingEvents(events)
-
-    groups.forEach((group) => {
+  // Layout events for absolute positioning
+  const layoutedEvents = useMemo(() => {
+    const laidOut: (Schedulable & { style: CSSProperties })[] = [];
+    for (const group of groupedEvents) {
       const sorted = [...group].sort(
-        (a, b) =>
-          new Date(a.startDate!).getTime() - new Date(b.startDate!).getTime()
-      )
-      const width = 100 / sorted.length
-      const gap = 4
-
-      sorted.forEach((event, i) => {
-        const start = new Date(event.startDate!)
-        const end = new Date(event.endDate!)
-
-        const startMinutes = start.getHours() * 60 + start.getMinutes()
-        const endMinutes = end.getHours() * 60 + end.getMinutes()
-        const top = (startMinutes * 32) / 30
-        const height = Math.max(16, ((endMinutes - startMinutes) * 32) / 30)
-
-        layouted.push({
-          ...event,
-          customStyle: {
+        (a, b) => new Date(a.startDate?? new Date()).getTime() - new Date(b.startDate ?? new Date()).getTime()
+      );
+      const widthPct = 100 / sorted.length;
+      sorted.forEach((evt, index) => {
+        const start = new Date(evt.startDate?? new Date());
+        const end = new Date(evt.endDate?? new Date());
+        const startMins = start.getHours() * 60 + start.getMinutes();
+        const durationMins = end.getTime() - start.getTime();
+        const top = (startMins * SLOT_HEIGHT) / 30;
+        const height = Math.max(SLOT_HEIGHT / 2, (durationMins * SLOT_HEIGHT) / (30 * 1000 * 60));
+        laidOut.push({
+          ...evt,
+          style: {
             position: "absolute",
             top,
             height,
-            width: `calc(${width}% - ${gap}px)`,
-            left: `calc(${i * width}% + ${i * gap}px)`,
+            width: `calc(${widthPct}% - ${GAP}px)`,
+            left: `calc(${index * widthPct}% + ${index * GAP}px)`,
+            zIndex: 20,
             opacity: dragTargetId ? 0.6 : 1,
-            pointerEvents:
-              dragTargetId && "id" in event && dragTargetId !== event.id
-                ? "none"
-                : "auto"
-          }
-        })
-      })
-    })
-
-    return layouted
-  }
-
-  const layoutedEvents = computeLayout(
-    events.filter((e) => e.startDate && e.endDate)
-  )
+            pointerEvents: dragTargetId && evt.id !== dragTargetId ? "none" : "auto",
+          },
+        });
+      });
+    }
+    return laidOut;
+  }, [groupedEvents, dragTargetId]);
 
   return (
     <Box
       flex={1}
-      borderLeft="1px solid #ddd"
       position="relative"
-      minHeight={48 * 32}
+      borderLeft="1px solid #ddd"
+      minHeight={48 * SLOT_HEIGHT}
     >
-      {slots.map((slot, i) => (
+      {slots.map((slot) => (
         <CalendarGridCell
-          key={i}
+          key={slot.toISOString()}
           datetime={slot}
-          allEvents={allEvents.filter((e) => e.startDate && e.endDate)}
+          allEvents={timedEvents}
           onSave={onSave}
-          onClick={(el) => handleSlotClick(slot, el)}
+          onClick={(el) => onSlotClick?.(el, slot)}
         />
       ))}
 
-      {layoutedEvents.map((event) => (
+      {layoutedEvents.map((evt) => (
         <EventBox
-          key={event.id}
-          event={event as Event}
+          key={evt.id}
+          event={evt as Event}
           dragTargetId={dragTargetId}
-          customStyle={{
-            zIndex: 20,
-            ...event.customStyle
-          }}
-          onClick={() => {
-            if ("id" in event && "name" in event && "calendar" in event) {
-              onEventClick?.(event as Event)
-            }
-          }}
+          customStyle={evt.style}
+          onClick={() => onEventClick?.(evt as Event)}
         />
       ))}
     </Box>
-  )
-}
+  );
+};
 
-export default DayColumn
+export default React.memo(DayColumn);

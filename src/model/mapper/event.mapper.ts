@@ -1,14 +1,10 @@
-import type Event from "@/model/domain/event";
-import type EventDto from "@/model/dto/event.dto";
-import type Calendar from "@/model/domain/calendar";
-import type Category from "@/model/domain/category";
-import RecurringPattern from "../domain/recurringPattern";
+import type Event from "@/model/domain/event"
+import type EventDto from "@/model/dto/event.dto"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import RecurringPattern from "../domain/recurringPattern"
 
-export function dtoToEvent(
-  dto: EventDto,
-  calendars: Calendar[],
-  categories: Category[]
-): Event {
+export function dtoToEvent(dto: EventDto, calendars: Calendar[], categories: Category[]): Event {
   return {
     id: dto.id ?? "",
     name: dto.name,
@@ -16,9 +12,9 @@ export function dtoToEvent(
     startDate: dto.startDate,
     endDate: dto.endDate,
     recurringPattern: dto.recurringPattern,
-    calendar: calendars.find(c => c.id === dto.calendarId) as Calendar,
-    category: categories.find(c => c.id === dto.categoryId) as Category,
-  };
+    calendar: calendars.find((c) => c.id === dto.calendarId) as Calendar,
+    category: categories.find((c) => c.id === dto.categoryId) as Category
+  }
 }
 
 export function eventToDto(event: Partial<Event>): EventDto {
@@ -30,6 +26,6 @@ export function eventToDto(event: Partial<Event>): EventDto {
     endDate: event.endDate ?? "",
     recurringPattern: event.recurringPattern ?? RecurringPattern.NONE,
     calendarId: event.calendar?.id ?? "",
-    categoryId: event.category?.id,
-  };
+    categoryId: event.category?.id
+  }
 }

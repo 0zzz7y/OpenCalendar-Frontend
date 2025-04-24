@@ -1,133 +1,168 @@
-import useEvent from "@/repository/event.repository";
-import useTask from "@/repository/task.repository";
-
-import EventPopover from "@/component/event/EventCreationPopover";
-import EventInformationPopover from "@/component/event/EventInformationPopover";
-import CalendarViewSwitcher from "@/component/calendar/CalendarViewSwitcher";
-import DayView from "@/component/calendar/DayView";
-import WeekView from "@/component/calendar/WeekView";
-import MonthView from "@/component/calendar/MonthView";
-
-import RecurringPattern from "@/model/domain/recurringPattern";
-import type Event from "@/model/domain/event";
-import type Schedulable from "@/model/domain/schedulable";
-
+import React, { useState, useMemo, useCallback } from "react";
 import { Box, Typography, Button } from "@mui/material";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import ChevronRightIcon from "@mui/icons-material/ChevronRight";
+import dayjs, { type ManipulateType } from "dayjs";
 
-import dayjs, { ManipulateType } from "dayjs";
-import { useEffect, useState } from "react";
-import Task from "@/model/domain/task";
+import ViewType from "@/model/utility/viewType";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import type Event from "@/model/domain/event";
+import type Schedulable from "@/model/domain/schedulable";
+import type Task from "@/model/domain/task";
+
 import useAppStore from "@/store/useAppStore";
+import useEvent from "@/repository/event.repository";
+import useTask from "@/repository/task.repository";
 import useCalendar from "@/repository/calendar.repository";
 import useNote from "@/repository/note.repository";
 import useCategory from "@/repository/category.repository";
-import ViewType from "@/model/utility/viewType";
-import viewType from "@/model/utility/viewType";
-import YearView from "./YearView";
 
-const CalendarPanel = () => {
+import CalendarViewSwitcher from "@/component/calendar/CalendarViewSwitcher";
+import DayView from "@/component/calendar/view/DayView";
+import WeekView from "@/component/calendar/view/WeekView";
+import MonthView from "@/component/calendar/view/MonthView";
+import YearView from "@/component/calendar/view/YearView";
+import {
+  EventCreationPopover as EventPopover,
+  EventInformationPopover,
+} from "@/component/event";
+
+export default function CalendarPanel() {
+  // Stores & repositories
+  const {
+    events,
+    tasks,
+    calendars,
+    categories,
+    selectedCalendar,
+    selectedCategory
+  } = useAppStore();
   const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent();
   const { reloadTasks } = useTask();
   const { reloadCalendars } = useCalendar();
   const { reloadNotes } = useNote();
   const { reloadCategories } = useCategory();
-  const { events, tasks, calendars, categories } = useAppStore();
-  const { selectedCalendar, selectedCategory } = useAppStore();
 
+  // View & date navigation
   const [view, setView] = useState<ViewType>(ViewType.WEEK);
   const [selectedDate, setSelectedDate] = useState(new Date());
-  const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null);
-  const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null);
-  const [editingEvent, setEditingEvent] = useState<Event | null>(null);
-  const [infoEvent, setInfoEvent] = useState<Event | null>(null);
-  const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null);
 
-  const safeEvents: Event[] = Array.isArray(events) ? events : [];
-  const safeTasks: Task[] = Array.isArray(tasks) ? tasks : [];
+  const navigate = useCallback(
+    (direction: "previous" | "next") => {
+      const unit: ManipulateType =
+        view === ViewType.MONTH
+          ? "month"
+          : view === ViewType.DAY
+          ? "day"
+          : "week";
+      const delta = direction === "next" ? 1 : -1;
+      setSelectedDate((d) => dayjs(d).add(delta, unit).toDate());
+    },
+    [view]
+  );
 
-  const schedulables: Schedulable[] = [
-    ...safeEvents,
-    ...safeTasks.filter((task) => task.startDate && task.endDate),
-  ].filter((item) => {
-    const calendarMatch =
-      selectedCalendar === "all" || item.calendar.id === selectedCalendar;
-    const categoryMatch =
-      selectedCategory === "all" || item.category?.id === selectedCategory;
-    return calendarMatch && categoryMatch;
-  });
+  // Combined schedulables (events + tasks with dates)
+  const schedulables: Schedulable[] = useMemo(() => {
+    const safeEvents = Array.isArray(events) ? events : [];
+    const safeTasks = Array.isArray(tasks) ? tasks : [];
+    return [
+      ...safeEvents,
+      ...safeTasks.filter((t) => t.startDate && t.endDate)
+    ].filter((item) => {
+      const calMatch =
+        selectedCalendar === "all" || item.calendar.id === selectedCalendar;
+      const catMatch =
+        selectedCategory === "all" || item.category?.id === selectedCategory;
+      return calMatch && catMatch;
+    });
+  }, [events, tasks, selectedCalendar, selectedCategory]);
 
-  const handleSlotClick = (el: HTMLElement, date: Date) => {
-    setSelectedSlot(el);
-    setSelectedDatetime(date);
-    setEditingEvent(null);
-    setInfoEvent(null);
-  };
+  // Popover & editing state
+  const [creation, setCreation] = useState<{
+    anchor?: HTMLElement;
+    datetime?: Date;
+  }>({});
+  const [info, setInfo] = useState<{
+    anchor?: HTMLElement;
+    event?: Event;
+  }>({});
+  const [editingEvent, setEditingEvent] =
+    useState<Event | undefined>(undefined);
 
-  const handleEventClick = (event: Event) => {
-    const element = document.querySelector(`#event-${event.id}`) as HTMLElement;
-    if (element) {
-      setInfoAnchor(element);
-      setInfoEvent(event);
-    }
-  };
+  const handleSlotClick = useCallback(
+    (anchor: HTMLElement, datetime: Date) => {
+      setInfo({});
+      setEditingEvent(undefined);
+      setCreation({ anchor, datetime });
+    },
+    []
+  );
 
-  const handleClosePopover = () => {
-    setSelectedSlot(null);
-    setSelectedDatetime(null);
-    setEditingEvent(null);
-  };
+  const handleEventClick = useCallback(
+    (event: Event) => {
+      const anchor = document.getElementById(`event-${event.id}`);
+      if (!anchor) return;
+      setCreation({});
+      setInfo({ anchor, event });
+    },
+    []
+  );
 
-  const handleSave = async (data: Partial<Event>) => {
-    if (!data.startDate || !data.calendar) return;
+  const closeAll = useCallback(() => {
+    setCreation({});
+    setInfo({});
+    setEditingEvent(undefined);
+  }, []);
 
-    const exists = events.find((e) => e.id === data.id);
-    if (exists && data.id) {
-      await updateEvent(data.id, data);
-    } else {
-      const newEvent: Omit<Event, "id"> = {
-        name: data.name ?? "New event",
-        description: data.description ?? "",
-        startDate: data.startDate,
-        endDate: data.endDate ?? data.startDate,
-        calendar: data.calendar,
-        category: data.category,
-        recurringPattern: RecurringPattern.NONE,
-      };
-      await addEvent(newEvent);
-    }
+  const handleSave = useCallback(
+    async (data: Partial<Event> & { id?: string }) => {
+      // Require startDate and calendar
+      if (!data.startDate || !data.calendar) {
+        return;
+      }
 
-    handleClosePopover();
-  };
+      if (data.id) {
+        // update existing
+        const original = events.find(
+          (e): e is Event => e.id === data.id
+        );
+        if (original) {
+          await updateEvent({ ...original, ...data });
+        }
+      } else {
+        // add new
+        const newEvent: Omit<Event, "id"> = {
+          name: data.name || "New Event",
+          description: data.description || "",
+          startDate: data.startDate,
+          endDate: data.endDate || data.startDate,
+          calendar: data.calendar,
+          category: data.category,
+          recurringPattern: RecurringPattern.NONE,
+        };
+        await addEvent(newEvent);
+      }
+      await reloadEvents();
+      closeAll();
+    },
+    [events, updateEvent, addEvent, reloadEvents, closeAll]
+  );
 
-  const handleEditEvent = () => {
-    if (!infoEvent) return;
-    setEditingEvent(infoEvent);
-    setSelectedDatetime(new Date(infoEvent.startDate));
-    setSelectedSlot(infoAnchor);
-    setInfoEvent(null);
-  };
+  const handleDelete = useCallback(
+    async (id: string) => {
+      await deleteEvent(id);
+      setInfo({});
+    },
+    [deleteEvent]
+  );
 
-  const handleDeleteEvent = async (id: string) => {
-    await deleteEvent(id);
-    setInfoEvent(null);
-  };
-
-  const navigate = (dir: "previous" | "next") => {
-    const unit =
-      view === ViewType.MONTH
-        ? ViewType.MONTH
-        : view === ViewType.WEEK
-        ? ViewType.WEEK
-        : ViewType.DAY;
-    const delta = dir === "next" ? 1 : -1;
-    setSelectedDate(
-      dayjs(selectedDate)
-        .add(delta, view.toLowerCase() as ManipulateType)
-        .toDate()
-    );
-  };
+  const handleEdit = useCallback(() => {
+    if (!info.anchor || !info.event) return;
+    const ev = info.event;
+    setInfo({});
+    setEditingEvent(ev);
+    setCreation({ anchor: info.anchor, datetime: new Date(ev.startDate) });
+  }, [info]);
 
   return (
     <>
@@ -139,18 +174,18 @@ const CalendarPanel = () => {
         py={1}
       >
         <Box display="flex" alignItems="center" gap={1}>
-          <Button onClick={() => navigate("previous")}>
-            {" "}
-            <ChevronLeftIcon />{" "}
+          <Button onClick={() => navigate("previous")}
+          >
+            <ChevronLeftIcon />
           </Button>
           <Typography variant="h6">
             {dayjs(selectedDate).format(
               view === ViewType.MONTH ? "MMMM YYYY" : "DD MMM YYYY"
             )}
           </Typography>
-          <Button onClick={() => navigate("next")}>
-            {" "}
-            <ChevronRightIcon />{" "}
+          <Button onClick={() => navigate("next")}
+          >
+            <ChevronRightIcon />
           </Button>
         </Box>
         <CalendarViewSwitcher view={view} onChange={setView} />
@@ -198,19 +233,19 @@ const CalendarPanel = () => {
         />
       )}
 
-      {selectedSlot && selectedDatetime && (
+      {creation.anchor && creation.datetime && (
         <EventPopover
-          anchorEl={selectedSlot}
-          onClose={handleClosePopover}
+          anchorEl={creation.anchor}
+          onClose={closeAll}
           calendars={calendars}
           categories={categories}
           initialEvent={
-            editingEvent ?? {
+            editingEvent || {
               id: "",
               name: "",
               description: "",
-              startDate: selectedDatetime.toISOString(),
-              endDate: dayjs(selectedDatetime).add(1, "hour").toISOString(),
+              startDate: creation.datetime.toISOString(),
+              endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),
               calendar: calendars[0],
               category: undefined,
               recurringPattern: RecurringPattern.NONE,
@@ -219,17 +254,15 @@ const CalendarPanel = () => {
         />
       )}
 
-      {infoEvent && infoAnchor && (
+      {info.anchor && info.event && (
         <EventInformationPopover
-          anchorElement={infoAnchor}
-          event={infoEvent}
-          onClose={() => setInfoEvent(null)}
-          onEdit={handleEditEvent}
-          onDelete={() => handleDeleteEvent(infoEvent.id)}
+          anchorElement={info.anchor}
+          event={info.event}
+          onClose={() => setInfo({})}
+          onEdit={handleEdit}
+          onDelete={handleDelete}
         />
       )}
     </>
   );
-};
-
-export default CalendarPanel;
+}

@@ -23,10 +23,7 @@ const ThemeProvider = ({ children }: { children: React.ReactNode }) => {
     setMode((prev) => (prev === THEME.LIGHT ? THEME.DARK : THEME.LIGHT))
   }
 
-  const theme: Theme = useMemo(
-    () => (mode === THEME.LIGHT ? lightTheme : darkTheme),
-    [mode]
-  )
+  const theme: Theme = useMemo(() => (mode === THEME.LIGHT ? lightTheme : darkTheme), [mode])
 
   return (
     <>

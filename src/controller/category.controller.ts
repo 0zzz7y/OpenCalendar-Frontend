@@ -1,22 +1,22 @@
-import * as categoryService from "@/service/category.service";
-import { dtoToCategory, categoryToDto } from "@/model/mapper/category.mapper";
-import { createCrudController } from "./crud.controller";
+import * as categoryService from "@/service/category.service"
+import { dtoToCategory, categoryToDto } from "@/model/mapper/category.mapper"
+import { createCrudController } from "./crud.controller"
 
 export const {
-  load:   loadCategories,
-  add:    addCategory,
+  load: loadCategories,
+  add: addCategory,
   update: updateCategory,
-  remove: deleteCategory,
+  remove: deleteCategory
 } = createCrudController(
   "categories",
   {
     getAll: categoryService.getCategories,
     create: categoryService.createCategory,
     update: categoryService.updateCategory,
-    delete: categoryService.deleteCategory,
+    delete: categoryService.deleteCategory
   },
   {
-    toDto:   categoryToDto,
-    fromDto: dtoToCategory,
+    toDto: categoryToDto,
+    fromDto: dtoToCategory
   }
-);
+)

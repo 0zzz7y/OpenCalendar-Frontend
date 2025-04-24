@@ -1,353 +1,110 @@
-import MESSAGES from "@/constant/ui/messages"
-import Calendar from "@/model/domain/calendar"
-import Category from "@/model/domain/category"
-import Note from "@/model/domain/note"
+import React, { useState, useEffect, useCallback } from "react";
+import { Box, Typography, IconButton, Stack, Popover, Button } from "@mui/material";
+import { Edit, Delete } from "@mui/icons-material";
+import dayjs from "dayjs";
+import useAppStore from "@/store/useAppStore";
+import useEvent from "@/repository/event.repository";
+import type Schedulable from "@/model/domain/schedulable";
+import BUTTONS from "@/constant/ui/buttons";
+import MESSAGES from "@/constant/ui/messages";
 
-import { useEffect, useRef, useState } from "react"
-
-import {
-  Box,
-  Paper,
-  Collapse,
-  Menu,
-  MenuItem,
-  Popover,
-  Typography,
-  Button
-} from "@mui/material"
-
-import NoteToolbar from "./NoteToolbar"
-import FormatCommand from "@/model/utility/formatCommand"
-
-export interface NoteCardProperties {
-  id: string
-  content: string
-  initialX?: number
-  initialY?: number
-  color?: string
-  categories: Category[]
-  onDelete?: (id: string) => void
-  onUpdate?: (note: Note) => void
-  calendar: Calendar
-  name?: string
+export interface EventInformationPopoverProps {
+  anchorEl: HTMLElement | null;
+  event: Schedulable | null;
+  onClose: () => void;
+  onEdit: () => void;
+  onDelete: (id: string) => void;
 }
 
-const NoteCard = ({
-  id,
-  initialX = 0,
-  initialY = 0,
-  color = "#fff59d",
-  content = "",
-  categories,
+/**
+ * Popover displaying information about a single event,
+ * with options to edit or delete.
+ */
+export default function EventInformationPopover({
+  anchorEl,
+  event,
+  onClose,
+  onEdit,
   onDelete,
-  onUpdate,
-  calendar,
-  name = MESSAGES.NEW_NOTE
-}: NoteCardProperties) => {
-  const contentRef = useRef<HTMLDivElement | null>(null)
-  const wrapperRef = useRef<HTMLDivElement | null>(null)
-  const toolbarRef = useRef<HTMLDivElement | null>(null)
-  const positionRef = useRef({ x: initialX, y: initialY })
-  const lastMousePos = useRef<{ x: number; y: number } | null>(null)
-  const animationFrameRef = useRef<number | null>(null)
-  const dragReady = useRef(false)
+}: EventInformationPopoverProps) {
+  const open = Boolean(anchorEl && event);
+  const { events: allEvents } = useAppStore();
+  const { reloadEvents } = useEvent();
 
-  const [dimensions, setDimensions] = useState({ width: 380, height: 200 })
-  const [position, setPosition] = useState(positionRef.current)
-  const [dragging, setDragging] = useState(false)
-  const [collapsed, setCollapsed] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined)
-  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(null)
-  const [confirmAction, setConfirmAction] = useState<() => void>(() => {})
-  const [confirmOpen, setConfirmOpen] = useState(false)
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
-  const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
-    bold: false,
-    italic: false,
-    underline: false
-  })
-  const [noteName, setNoteName] = useState(name)
+  const [current, setCurrent] = useState<Schedulable | null>(event);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
+  // Refresh current event after external updates
   useEffect(() => {
-    if (content && !contentRef.current?.innerHTML) {
-      contentRef.current!.innerHTML = content
+    if (event?.id) {
+      (async () => {
+        await reloadEvents();
+        const updated = allEvents.find((e) => e.id === event.id) || null;
+        setCurrent(updated);
+      })();
     }
-  }, [])
+  }, [event?.id, allEvents, reloadEvents]);
 
-  const getCategoryColor = (category: Category | undefined) => category?.color || color
+  const handleRequestDelete = useCallback(() => setConfirmDelete(true), []);
+  const handleCancelDelete = useCallback(() => setConfirmDelete(false), []);
 
-  const clearText = () => {
-    if (contentRef.current) contentRef.current.innerHTML = ""
-  }
-
-  const formatText = (command: FormatCommand) => {
-    contentRef.current?.focus()
-    setTimeout(() => {
-      document.execCommand(command, false)
-      setActiveFormats((prev) => ({
-        ...prev,
-        [command]: !prev[command]
-      }))
-    }, 0)
-  }
-
-  const handleMouseDown = (e: React.MouseEvent) => {
-    if (toolbarRef.current && toolbarRef.current.contains(e.target as Node)) {
-      dragReady.current = true
-      lastMousePos.current = { x: e.clientX, y: e.clientY }
-      setDragging(true)
+  const handleConfirmDelete = useCallback(() => {
+    if (current?.id) {
+      onDelete(current.id);
     }
-  }
-
-  const handleMouseUp = () => {
-    setDragging(false)
-    dragReady.current = false
-    lastMousePos.current = null
-  }
-
-  const handleDrag = (e: MouseEvent) => {
-    if (!dragging || !lastMousePos.current) return
-    const dx = e.clientX - lastMousePos.current.x
-    const dy = e.clientY - lastMousePos.current.y
-    lastMousePos.current = { x: e.clientX, y: e.clientY }
-    positionRef.current = {
-      x: Math.max(0, positionRef.current.x + dx),
-      y: Math.max(0, positionRef.current.y + dy)
-    }
-    if (animationFrameRef.current === null) {
-      animationFrameRef.current = requestAnimationFrame(() => {
-        setPosition({ ...positionRef.current })
-        animationFrameRef.current = null
-      })
-    }
-  }
-
-  const handleResize = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-
-    const startX = e.clientX
-    const startY = e.clientY
-    const startWidth = dimensions.width
-    const startHeight = dimensions.height
-
-    const onMouseMove = (moveEvent: MouseEvent) => {
-      const newWidth = Math.max(150, startWidth + (moveEvent.clientX - startX))
-      const newHeight = Math.max(100, startHeight + (moveEvent.clientY - startY))
-      setDimensions({ width: newWidth, height: newHeight })
-    }
-
-    const onMouseUp = () => {
-      window.removeEventListener("mousemove", onMouseMove)
-      window.removeEventListener("mouseup", onMouseUp)
-    }
-
-    window.addEventListener("mousemove", onMouseMove)
-    window.addEventListener("mouseup", onMouseUp)
-  }
-
-  const handleConfirm = (message: string, action: () => void) => {
-    setConfirmAction(() => action)
-    setConfirmOpen(true)
-    setConfirmAnchorEl(wrapperRef.current)
-  }
-
-  const handleConfirmClose = () => {
-    setConfirmOpen(false)
-    setConfirmAnchorEl(null)
-  }
-
-  const handleBlur = () => {
-    if (onUpdate) {
-      onUpdate({
-        id,
-        name: noteName,
-        description: contentRef.current?.innerHTML || "",
-        category: selectedCategory,
-        calendar,
-        positionX: positionRef.current.x,
-        positionY: positionRef.current.y
-      })
-    }
-  }
-
-  useEffect(() => {
-    if (dragging) {
-      window.addEventListener("mousemove", handleDrag)
-      window.addEventListener("mouseup", handleMouseUp)
-      return () => {
-        window.removeEventListener("mousemove", handleDrag)
-        window.removeEventListener("mouseup", handleMouseUp)
-      }
-    }
-  }, [dragging])
-
-  useEffect(() => {
-    if (onUpdate) {
-      onUpdate({
-        id,
-        name: noteName,
-        description: contentRef.current?.innerHTML || "",
-        category: selectedCategory,
-        calendar,
-        positionX: positionRef.current.x,
-        positionY: positionRef.current.y
-      })
-    }
-  }, [selectedCategory])
+    setConfirmDelete(false);
+    onClose();
+  }, [current?.id, onDelete, onClose]);
 
   return (
-    <Box
-      ref={wrapperRef}
-      sx={{
-        position: "absolute",
-        top: position.y,
-        left: position.x,
-        width: dimensions.width,
-        userSelect: "none",
-        zIndex: dragging ? 1000 : 100,
-        pointerEvents: "auto",
-        transition: "all 0.15s ease",
-        transform: dragging ? "scale(1.02)" : "none"
-      }}
-      onMouseDown={handleMouseDown}
-      onMouseUp={handleMouseUp}
+    <Popover
+      open={open}
+      anchorEl={anchorEl}
+      onClose={onClose}
+      anchorOrigin={{ vertical: "top", horizontal: "right" }}
+      transformOrigin={{ vertical: "top", horizontal: "left" }}
+      PaperProps={{ sx: { p: 2, width: 300 } }}
     >
-      <Paper
-        sx={{
-          color: "#000",
-          width: "100%",
-          backgroundColor: getCategoryColor(selectedCategory),
-          borderRadius: 2,
-          boxShadow: dragging ? "0 0 10px #2196f3" : 3,
-          overflow: "hidden",
-          cursor: "default",
-          position: "relative"
-        }}
-      >
-        <Box
-          ref={toolbarRef}
-          sx={{
-            cursor: dragging ? "grabbing" : "grab",
-            transition: "cursor 0.15s ease"
-          }}
-        >
-          <NoteToolbar
-            isCollapsed={collapsed}
-            onToggleCollapse={() => setCollapsed((c) => !c)}
-            onClearText={clearText}
-            onDelete={() =>
-              contentRef.current?.innerText.trim()
-                ? handleConfirm(MESSAGES.CONFIRM_CLEAR_CONTENTS, () => onDelete?.(id))
-                : onDelete?.(id)
-            }
-            onFormatText={formatText}
-            activeFormats={activeFormats}
-            selectedCategory={selectedCategory?.id || null}
-            onCategoryMenuOpen={(e: any) => setMenuAnchorEl(e)}
-            noteName={noteName}
-            onNameChange={setNoteName}
-            onNameBlur={handleBlur}
-          />
-        </Box>
+      {current && (
+        <Stack spacing={2}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography variant="h6">{current.name || MESSAGES.UNTITLED}</Typography>
+            {!confirmDelete && (
+              <Box>
+                <IconButton size="small" onClick={onEdit}>
+                  <Edit fontSize="small" />
+                </IconButton>
+                <IconButton size="small" onClick={handleRequestDelete}>
+                  <Delete fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
+          </Stack>
 
-        <Collapse in={!collapsed}>
-          <Box
-            ref={contentRef}
-            contentEditable
-            suppressContentEditableWarning
-            onBlur={handleBlur}
-            sx={{
-              height: dimensions.height,
-              p: 1,
-              pr: "8px",
-              fontSize: 14,
-              outline: "none",
-              overflowY: "auto",
-              whiteSpace: "pre-wrap",
-              wordBreak: "break-word",
-              color: "#000"
-            }}
-          />
-        </Collapse>
-
-        <Box
-          onMouseDown={handleResize}
-          sx={{
-            width: 20,
-            height: 20,
-            position: "absolute",
-            bottom: 0,
-            right: 0,
-            cursor: "nwse-resize",
-            zIndex: 10
-          }}
-        />
-      </Paper>
-
-      <Popover
-        open={confirmOpen}
-        anchorEl={confirmAnchorEl}
-        onClose={handleConfirmClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        transformOrigin={{ vertical: "top", horizontal: "center" }}
-        PaperProps={{ sx: { p: 2 } }}
-      >
-        <Typography variant="body2" gutterBottom>
-          {MESSAGES.CONFIRM_CLEAR_CONTENTS}
-        </Typography>
-        <Box display="flex" gap={1} justifyContent="flex-end">
-          <Button size="small" onClick={handleConfirmClose}>
-            Cancel
-          </Button>
-          <Button
-            size="small"
-            color="error"
-            variant="contained"
-            onClick={() => {
-              confirmAction()
-              handleConfirmClose()
-            }}
-          >
-            Delete
-          </Button>
-        </Box>
-      </Popover>
-
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={() => setMenuAnchorEl(null)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-        MenuListProps={{ dense: true }}
-      >
-        {categories.map((cat) => (
-          <MenuItem
-            key={cat.id}
-            selected={selectedCategory?.id === cat.id}
-            onClick={() => {
-              setSelectedCategory(cat)
-              setMenuAnchorEl(null)
-            }}
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
-          >
-            <Box
-              component="span"
-              sx={{
-                width: 12,
-                height: 12,
-                borderRadius: "50%",
-                backgroundColor: cat.color,
-                mr: 1
-              }}
-            />
-            {cat.name}
-          </MenuItem>
-        ))}
-      </Menu>
-    </Box>
-  )
+          {!confirmDelete ? (
+            <> 
+              <Typography variant="body2" color="text.secondary">
+                {current.startDate && current.endDate
+                  ? `${dayjs(current.startDate).format("LLL")} – ${dayjs(current.endDate).format("LLL")}`
+                  : MESSAGES.NO_DATE_AVAILABLE}
+              </Typography>
+              {current.description && <Typography>{current.description}</Typography>}
+            </>
+          ) : (
+            <Stack spacing={1}>
+              <Typography variant="body2">{MESSAGES.CONFIRM_DELETE_EVENT}</Typography>
+              <Stack direction="row" spacing={1} justifyContent="flex-end">
+                <Button size="small" color="inherit" onClick={handleCancelDelete}>
+                  {BUTTONS.CANCEL}
+                </Button>
+                <Button size="small" color="error" variant="contained" onClick={handleConfirmDelete}>
+                  {BUTTONS.DELETE}
+                </Button>
+              </Stack>
+            </Stack>
+          )}
+        </Stack>
+      )}
+    </Popover>
+  );
 }
-
-export default NoteCard

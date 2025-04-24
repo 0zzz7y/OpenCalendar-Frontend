@@ -1,61 +1,59 @@
-import PLACEHOLDERS from "@/constant/ui/labels"
-import useAppStore from "@/store/useAppStore"
-import CategoryEditor from "./CategoryEditor"
+import React, { useState, useMemo, useCallback } from "react";
+import { Box, MenuItem, TextField, Typography, IconButton } from "@mui/material";
+import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
+import EditIcon from "@mui/icons-material/Edit";
+import DeleteIcon from "@mui/icons-material/Delete";
+import useAppStore from "@/store/useAppStore";
+import CategoryEditor from "./CategoryEditor";
+import EditorMode from "@/model/utility/editorMode";
+import PLACEHOLDERS from "@/constant/ui/labels";
 
-import { useMemo, useState } from "react"
-import {
-  Box,
-  MenuItem,
-  TextField,
-  Typography,
-  IconButton
-} from "@mui/material"
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import EditIcon from "@mui/icons-material/Edit"
-import DeleteIcon from "@mui/icons-material/Delete"
-import EditorMode from "@/model/utility/editorMode"
+export default function CategorySelector() {
+  const categories = useAppStore((s) => s.categories);
+  const selectedCategory = useAppStore((s) => s.selectedCategory);
+  const setSelectedCategory = useAppStore((s) => s.setSelectedCategory);
 
-const CategorySelector = () => {
-  const { categories } = useAppStore()
-  const selectedCategory = useAppStore((s) => s.selectedCategory)
-  const setSelectedCategory = useAppStore((s) => s.setSelectedCategory)
+  // Editor popover state
+  const [editorOpen, setEditorOpen] = useState(false);
+  const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null);
+  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD);
+  const [editorData, setEditorData] = useState<{ id?: string; name?: string; color?: string }>({});
 
-  const [editorOpen, setEditorOpen] = useState(false)
-  const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null)
-  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
-  const [editorData, setEditorData] = useState<{
-    id?: string
-    label?: string
-    color?: string
-  }>({})
-
-  const openEditor = (
-    mode: EditorMode,
-    anchor: HTMLElement,
-    data: { id?: string; label?: string; color?: string } = {}
-  ) => {
-    setEditorMode(mode)
-    setEditorData(data)
-    setEditorAnchor(anchor)
-    setEditorOpen(true)
-  }
-
-  const closeEditor = () => {
-    setEditorOpen(false)
-    setEditorAnchor(null)
-    setEditorData({})
-  }
-
-  const categoryOptions = useMemo(() => {
-    return [
+  // Memoized options
+  const categoryOptions = useMemo(
+    () => [
       { label: "All", value: "all", color: "#ffffff" },
-      ...categories.map((category) => ({
-        label: category.name,
-        value: category.id,
-        color: category.color
-      }))
-    ]
-  }, [categories])
+      ...categories.map((cat) => ({ label: cat.name, value: cat.id, color: cat.color })),
+    ],
+    [categories]
+  );
+
+  const openEditor = useCallback(
+    (
+      mode: EditorMode,
+      anchor: HTMLElement,
+      data: { id?: string; name?: string; color?: string } = {}
+    ) => {
+      setEditorMode(mode);
+      setEditorData(data);
+      setEditorAnchor(anchor);
+      setEditorOpen(true);
+    },
+    []
+  );
+
+  const closeEditor = useCallback(() => {
+    setEditorOpen(false);
+    setEditorAnchor(null);
+    setEditorData({});
+  }, []);
+
+  const handleSelectChange = useCallback(
+    (value: string) => {
+      setSelectedCategory(value === "all" ? null : value);
+    },
+    [setSelectedCategory]
+  );
 
   return (
     <Box display="flex" alignItems="center" gap={1} width="100%">
@@ -63,73 +61,53 @@ const CategorySelector = () => {
         select
         label={PLACEHOLDERS.CATEGORY}
         value={selectedCategory || "all"}
-        onChange={(e) => setSelectedCategory(e.target.value || null)}
+        onChange={(e) => handleSelectChange(e.target.value)}
         fullWidth
         size="small"
         SelectProps={{
-          renderValue: (selected: unknown) => {
-            const selectedValue = selected as string
-            const item = categoryOptions.find((d) => d.value === selectedValue)
+          renderValue: (selected) => {
+            const opt = categoryOptions.find((o) => o.value === selected);
             return (
               <Box display="flex" alignItems="center" gap={1}>
-                {item?.color && (
-                  <Box
-                    width={10}
-                    height={10}
-                    borderRadius="50%"
-                    bgcolor={item.color}
-                  />
-                )}
-                <Typography variant="body2">{item?.label}</Typography>
+                {opt?.color && <Box width={10} height={10} borderRadius="50%" bgcolor={opt.color} />}
+                <Typography variant="body2">{opt?.label}</Typography>
               </Box>
-            )
-          }
+            );
+          },
         }}
       >
-        {categoryOptions.map((option) => (
-          <MenuItem key={option.value} value={option.value}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              width="100%"
-            >
+        {categoryOptions.map((opt) => (
+          <MenuItem key={opt.value} value={opt.value}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
               <Box display="flex" alignItems="center" gap={1}>
-                {option.color && (
-                  <Box
-                    width={10}
-                    height={10}
-                    borderRadius="50%"
-                    bgcolor={option.color}
-                  />
-                )}
-                <Typography variant="body2">{option.label}</Typography>
+                {opt.color && <Box width={10} height={10} borderRadius="50%" bgcolor={opt.color} />}
+                <Typography variant="body2">{opt.label}</Typography>
               </Box>
-              {option.value !== "all" && (
+              {opt.value !== "all" && (
                 <Box display="flex" gap={1}>
                   <IconButton
                     size="small"
                     onClick={(e) => {
-                      e.stopPropagation()
+                      e.stopPropagation();
                       openEditor(EditorMode.EDIT, e.currentTarget, {
-                        id: option.value,
-                        label: option.label,
-                        color: option.color ?? "#000000"
-                      })
+                        id: opt.value,
+                        name: opt.label,
+                        color: opt.color,
+                      });
                     }}
                   >
                     <EditIcon fontSize="small" />
                   </IconButton>
                   <IconButton
                     size="small"
-                    disabled={option.value === selectedCategory}
+                    disabled={opt.value === selectedCategory}
                     onClick={(e) => {
-                      e.stopPropagation()
+                      e.stopPropagation();
                       openEditor(EditorMode.DELETE, e.currentTarget, {
-                        id: option.value,
-                        label: option.label,
-                        color: option.color ?? "#000000"
-                      })
+                        id: opt.value,
+                        name: opt.label,
+                        color: opt.color,
+                      });
                     }}
                   >
                     <DeleteIcon fontSize="small" />
@@ -143,10 +121,7 @@ const CategorySelector = () => {
 
       <IconButton
         onClick={(e) =>
-          openEditor(EditorMode.ADD, e.currentTarget, {
-            label: "",
-            color: "#3b5bdb"
-          })
+          openEditor(EditorMode.ADD, e.currentTarget, { name: "", color: "#3b5bdb" })
         }
       >
         <AddCircleOutlineIcon fontSize="small" />
@@ -157,10 +132,11 @@ const CategorySelector = () => {
         anchorEl={editorAnchor}
         mode={editorMode}
         initialData={editorData}
+        loading={false}
         onClose={closeEditor}
+        onSave={() => {}}
+        onDelete={() => {}}
       />
     </Box>
-  )
+  );
 }
-
-export default CategorySelector

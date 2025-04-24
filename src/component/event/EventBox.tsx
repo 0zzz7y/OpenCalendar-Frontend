@@ -1,74 +1,86 @@
-import Schedulable from "@/model/domain/schedulable"
-import { Box, Typography } from "@mui/material"
-import { useRef, useState, useEffect } from "react"
-import { useDrag } from "react-dnd"
+import type React from "react";
+import { useRef, useState, useEffect, useMemo, useCallback } from "react";
+import { Box, Typography } from "@mui/material";
+import { useDrag } from "react-dnd";
+import type Schedulable from "@/model/domain/schedulable";
+import type Event from "@/model/domain/event";
 
-interface EventBoxProperties {
-  event: Schedulable
-  dragTargetId?: string | null
-  customStyle?: React.CSSProperties
-  onClick?: () => void
+export interface EventBoxProps {
+  event: Schedulable;
+  dragTargetId?: string | null;
+  customStyle?: React.CSSProperties;
+  onClick?: () => void;
 }
 
-const EventBox = ({
+/**
+ * Draggable event box rendered within DayColumn.
+ */
+export default function EventBox({
   event,
   dragTargetId,
   customStyle,
-  onClick
-}: EventBoxProperties) => {
-  const eventReference = useRef<HTMLDivElement>(null)
-  const timeoutReference = useRef<number | null>(null)
+  onClick,
+}: EventBoxProps) {
+  const ref = useRef<HTMLDivElement>(null);
+  const timeoutRef = useRef<number>();
+  const [enableDrag, setEnableDrag] = useState(false);
 
-  const start = new Date(event.startDate || Date.now())
-  const end = new Date(event.endDate || Date.now())
-  
-  const minutesFromStart = start.getHours() * 60 + start.getMinutes()
-  const minutesToEnd = end.getHours() * 60 + end.getMinutes()
-  const duration = Math.max(15, minutesToEnd - minutesFromStart)
+  // Parse start/end and compute layout values
+  const { top, height } = useMemo(() => {
+    const startDate = new Date(event.startDate || Date.now());
+    const endDate = new Date(event.endDate || Date.now());
+    const startMins = startDate.getHours() * 60 + startDate.getMinutes();
+    const duration = Math.max(15, (endDate.getHours() * 60 + endDate.getMinutes()) - startMins);
+    return {
+      top: (startMins / 15) * 32,
+      height: (duration / 15) * 32,
+    };
+  }, [event.startDate, event.endDate]);
 
-  const top = (minutesFromStart / 15) * 32
-  const height = (duration / 15) * 32
+  const emoji = useMemo(
+    () => ("calendar" in event ? event.calendar?.emoji : ""),
+    [event]
+  );
 
-  const emoji = "calendar" in event ? event.calendar?.emoji : ""
-  const backgroundColor = "category" in event ? event.category?.color ?? "#1976d2" : "#1976d2"
+  const backgroundColor = useMemo(
+    () => ("category" in event ? event.category?.color ?? "#1976d2" : "#1976d2"),
+    [event]
+  );
 
-  const [enableDrag, setEnableDrag] = useState(false)
-
+  // DnD setup
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: "event",
       item: { id: event.id },
       canDrag: () => enableDrag,
-      collect: (monitor) => ({
-        isDragging: monitor.isDragging()
-      })
+      collect: (monitor) => ({ isDragging: monitor.isDragging() }),
     }),
-    [enableDrag]
-  )
+    [enableDrag, event.id]
+  );
 
-  const handlePointerDown = () => {
-    timeoutReference.current = window.setTimeout(() => setEnableDrag(true), 200)
-  }
+  // Handlers
+  const handlePointerDown = useCallback(() => {
+    timeoutRef.current = window.setTimeout(() => setEnableDrag(true), 200);
+  }, []);
 
-  const handlePointerUp = () => {
-    if (timeoutReference.current !== null) {
-      clearTimeout(timeoutReference.current)
-      timeoutReference.current = null
+  const handlePointerUp = useCallback(() => {
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+      timeoutRef.current = undefined;
     }
-    if (!enableDrag) onClick?.()
-    setEnableDrag(false)
-  }
+    if (!enableDrag) onClick?.();
+    setEnableDrag(false);
+  }, [enableDrag, onClick]);
 
+  // Attach drag ref
   useEffect(() => {
-    if (eventReference.current) {
-      drag(eventReference.current)
-    }
-  }, [drag])
+    if (ref.current) drag(ref.current);
+  }, [drag]);
 
   return (
     <Box
       id={`event-${event.id}`}
-      ref={eventReference}
+      ref={ref}
       onPointerDown={handlePointerDown}
       onPointerUp={handlePointerUp}
       sx={{
@@ -81,27 +93,26 @@ const EventBox = ({
         padding: "2px 4px",
         fontSize: "0.75rem",
         opacity: dragTargetId && dragTargetId !== event.id ? 0.5 : 1,
-        pointerEvents:
-          dragTargetId && dragTargetId !== event.id ? "none" : "auto",
+        pointerEvents: dragTargetId && dragTargetId !== event.id ? "none" : "auto",
         cursor: enableDrag ? "move" : "pointer",
         overflow: "hidden",
         zIndex: dragTargetId === event.id ? 1500 : 10,
         display: "flex",
         justifyContent: "space-between",
         alignItems: "flex-start",
-        ...customStyle
+        ...customStyle,
       }}
     >
-      <Typography variant="caption" fontWeight={500} noWrap flexGrow={1} sx={{ overflow: "hidden", textOverflow: "ellipsis" }}>
-        {("name" in event && event.name) || "Untitled"}
+      <Typography
+        variant="caption"
+        fontWeight={500}
+        noWrap
+        flexGrow={1}
+        sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+      >
+        {event.name || "Untitled"}
       </Typography>
-      {emoji && (
-        <Typography variant="caption" ml={1}>
-          {emoji}
-        </Typography>
-      )}
+      {emoji && <Typography variant="caption" ml={1}>{emoji}</Typography>}
     </Box>
-  )
+  );
 }
-
-export default EventBox
