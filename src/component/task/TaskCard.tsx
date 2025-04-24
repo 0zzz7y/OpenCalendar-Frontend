@@ -21,6 +21,7 @@ import {
 } from "@mui/material"
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import dayjs from "dayjs"
+import LABELS from "@/constant/ui/labels"
 
 interface Properties {
   task: Task
@@ -87,7 +88,7 @@ const TaskCard = ({
             {expanded ? <ExpandLess /> : <ExpandMore />}
           </IconButton>
           <TextField
-            placeholder="Tytuł"
+            placeholder={LABELS.NAME}
             value={localTask.name}
             onChange={(e) => handleFieldChange("name", e.target.value)}
             size="small"
@@ -105,7 +106,7 @@ const TaskCard = ({
       <Collapse in={expanded}>
         <Box display="flex" flexDirection="column" gap={1.5}>
           <TextField
-            placeholder="Opis"
+            placeholder={LABELS.DESCRIPTION}
             value={localTask.description || ""}
             onChange={(e) => handleFieldChange("description", e.target.value)}
             size="small"
@@ -117,7 +118,7 @@ const TaskCard = ({
           />
 
           <DateTimePicker
-            label="Start"
+            label={LABELS.START_DATE}
             value={localTask.startDate ? dayjs(localTask.startDate).toDate() : null}
             onChange={(date) =>
               handleFieldChange("startDate", date ? date.toISOString() : "")
@@ -128,7 +129,7 @@ const TaskCard = ({
           />
 
           <DateTimePicker
-            label="End"
+            label={LABELS.END_DATE}
             value={localTask.endDate ? dayjs(localTask.endDate).toDate() : null}
             onChange={(date) =>
               handleFieldChange("endDate", date ? date.toISOString() : "")
@@ -140,7 +141,7 @@ const TaskCard = ({
 
           {localTask.startDate && (
             <TextField
-              label="Powtarzalność"
+              label={LABELS.RECURRING}
               select
               value={localTask.recurringPattern || "NONE"}
               onChange={(e) => handleFieldChange("recurringPattern", e.target.value)}
@@ -158,7 +159,7 @@ const TaskCard = ({
           )}
 
           <TextField
-            label="Kalendarz"
+            label={LABELS.CALENDAR}
             select
             value={localTask.calendar?.id || ""}
             onChange={(e) =>
@@ -183,7 +184,7 @@ const TaskCard = ({
           </TextField>
 
           <TextField
-            label="Kategoria"
+            label={LABELS.CATEGORY}
             select
             value={localTask.category?.id || ""}
             onChange={(e) =>
@@ -197,7 +198,7 @@ const TaskCard = ({
             fullWidth
             sx={fieldStyle}
           >
-            <MenuItem value="">Brak</MenuItem>
+            <MenuItem value="">{LABELS.NONE}</MenuItem>
             {categories.map((cat) => (
               <MenuItem key={cat.id} value={cat.id}>
                 <Box display="flex" alignItems="center" gap={1}>

@@ -12,7 +12,9 @@ enum LABELS {
 
   TODO = "To-Do",
   IN_PROGRESS = "In progress",
-  DONE = "Done"
+  DONE = "Done",
+
+  NONE = "None"
 }
 
 export default LABELS

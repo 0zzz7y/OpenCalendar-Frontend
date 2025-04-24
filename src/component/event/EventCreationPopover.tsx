@@ -190,7 +190,6 @@ const EventCreationPopover = ({
           onChange={(v) => v && setStart(v)}
         />
 
-        <Typography variant="body2">End</Typography>
         <TimePicker
           label={LABELS.END_TIME}
           value={end}
