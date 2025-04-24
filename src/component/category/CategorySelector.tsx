@@ -13,6 +13,7 @@ import {
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
+import EditorMode from "@/model/utility/editorMode"
 
 const CategorySelector = () => {
   const { categories } = useAppStore()
@@ -21,7 +22,7 @@ const CategorySelector = () => {
 
   const [editorOpen, setEditorOpen] = useState(false)
   const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null)
-  const [editorMode, setEditorMode] = useState<"add" | "edit" | "delete">("add")
+  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
   const [editorData, setEditorData] = useState<{
     id?: string
     label?: string
@@ -29,7 +30,7 @@ const CategorySelector = () => {
   }>({})
 
   const openEditor = (
-    mode: "add" | "edit" | "delete",
+    mode: EditorMode,
     anchor: HTMLElement,
     data: { id?: string; label?: string; color?: string } = {}
   ) => {
@@ -55,7 +56,7 @@ const CategorySelector = () => {
       }))
     ]
   }, [categories])
-  
+
   return (
     <Box display="flex" alignItems="center" gap={1} width="100%">
       <TextField
@@ -110,7 +111,7 @@ const CategorySelector = () => {
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation()
-                      openEditor("edit", e.currentTarget, {
+                      openEditor(EditorMode.EDIT, e.currentTarget, {
                         id: option.value,
                         label: option.label,
                         color: option.color ?? "#000000"
@@ -124,7 +125,7 @@ const CategorySelector = () => {
                     disabled={option.value === selectedCategory}
                     onClick={(e) => {
                       e.stopPropagation()
-                      openEditor("delete", e.currentTarget, {
+                      openEditor(EditorMode.DELETE, e.currentTarget, {
                         id: option.value,
                         label: option.label,
                         color: option.color ?? "#000000"
@@ -142,7 +143,7 @@ const CategorySelector = () => {
 
       <IconButton
         onClick={(e) =>
-          openEditor("add", e.currentTarget, {
+          openEditor(EditorMode.ADD, e.currentTarget, {
             label: "",
             color: "#3b5bdb"
           })

@@ -11,7 +11,6 @@ import { Box } from "@mui/material"
 import dayjs from "dayjs"
 
 import DayColumn from "./DayColumn"
-import DayGrid from "./DayGrid"
 
 interface DayViewProperties {
   date: Date

@@ -19,11 +19,12 @@ import EmojiPicker, {
 } from "emoji-picker-react"
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"
 import { useEffect, useRef, useState } from "react"
+import EditorMode from "@/model/utility/editorMode"
 
 interface CalendarEditorProperties {
   open: boolean
   anchorEl: HTMLElement | null
-  mode: "add" | "edit" | "delete"
+  mode: EditorMode
   initialData?: { id?: string; label?: string; emoji?: string }
   onClose: () => void
 }
@@ -55,9 +56,9 @@ const CalendarEditor = ({
     if (!label.trim()) return
     setLoading(true)
     try {
-      if (mode === "add") {
+      if (mode === EditorMode.ADD) {
         await addCalendar({ name: label.trim(), emoji })
-      } else if (mode === "edit" && initialData.id) {
+      } else if (mode === EditorMode.EDIT && initialData.id) {
         await updateCalendar(initialData.id, { name: label.trim(), emoji })
       }
       await reloadCalendars()
@@ -92,10 +93,10 @@ const CalendarEditor = ({
       transformOrigin={{ vertical: "top", horizontal: "left" }}
     >
       <Box sx={{ p: 2, width: 280 }}>
-        {mode !== "delete" ? (
+        {mode !== EditorMode.DELETE ? (
           <>
             <Typography variant="subtitle2" color="primary" fontWeight={500}>
-              {mode === "add" ? MESSAGES.ADD_EVENT : MESSAGES.EDIT_EVENT}
+              {mode === EditorMode.ADD ? MESSAGES.ADD_EVENT : MESSAGES.EDIT_EVENT}
             </Typography>
 
             <TextField
@@ -138,7 +139,7 @@ const CalendarEditor = ({
               onClick={handleSave}
               disabled={loading}
             >
-              {mode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
+              {mode === EditorMode.ADD ? BUTTONS.ADD : BUTTONS.SAVE}
             </Button>
           </>
         ) : (

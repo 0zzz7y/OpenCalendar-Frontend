@@ -123,7 +123,7 @@ const DayColumn = ({
         <CalendarGridCell
           key={i}
           datetime={slot}
-          allEvents={allEvents.filter((e) => e.startDate && e.endDate)} // Filter for events with startDate and endDate
+          allEvents={allEvents.filter((e) => e.startDate && e.endDate)}
           onSave={onSave}
           onClick={(el) => handleSlotClick(slot, el)}
         />
@@ -131,6 +131,7 @@ const DayColumn = ({
 
       {layoutedEvents.map((event) => (
         <EventBox
+          key={event.id}
           event={event as Event}
           dragTargetId={dragTargetId}
           customStyle={{
@@ -139,7 +140,7 @@ const DayColumn = ({
           }}
           onClick={() => {
             if ("id" in event && "name" in event && "calendar" in event) {
-              onEventClick?.(event as Event) // Cast to Event when passing to onEventClick
+              onEventClick?.(event as Event)
             }
           }}
         />

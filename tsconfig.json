@@ -20,5 +20,6 @@
       "@test-utils": ["./test-utils"]
     }
   },
+
   "include": ["src", "test"]
 }

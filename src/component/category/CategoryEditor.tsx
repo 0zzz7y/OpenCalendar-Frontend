@@ -15,11 +15,12 @@ import useAppStore from "@/store/useAppStore"
 import MESSAGES from "@/constant/ui/messages"
 import BUTTONS from "@/constant/ui/buttons"
 import PLACEHOLDERS from "@/constant/ui/labels"
+import EditorMode from "@/model/utility/editorMode"
 
 interface CategoryEditorProperties {
   open: boolean
   anchorEl: HTMLElement | null
-  mode: "add" | "edit" | "delete"
+  mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE
   initialData?: Partial<Category>
   onClose: () => void
 }
@@ -59,30 +60,21 @@ const CategoryEditor = ({
     }
   }
 
-  const handleAdd = async () => {
+  const handleSave = async () => {
     if (!label.trim()) return
     setLoading(true)
     try {
-      const created = await addCategory({ name: label.trim(), color })
-      await reloadCategories()
-      setSelectedCategory(created.id)
+      if (mode === EditorMode.ADD) {
+        const created = await addCategory({ name: label.trim(), color })
+        await reloadCategories()
+        setSelectedCategory(created.id)
+      } else if (mode === EditorMode.EDIT && initialData?.id) {
+        await updateCategory(initialData.id, { name: label.trim(), color })
+        await reloadCategories()
+      }
       onClose()
     } catch (e) {
-      console.error("Failed to add category", e)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const handleEdit = async () => {
-    if (!label.trim() || !initialData?.id) return
-    setLoading(true)
-    try {
-      await updateCategory(initialData.id, { name: label.trim(), color })
-      await reloadCategories()
-      onClose()
-    } catch (e) {
-      console.error("Failed to update category", e)
+      console.error("Failed to save category", e)
     } finally {
       setLoading(false)
     }
@@ -115,10 +107,10 @@ const CategoryEditor = ({
     >
       <ClickAwayListener onClickAway={handleClickAway}>
         <Paper sx={{ p: 2, width: 280 }}>
-          {(mode === "add" || mode === "edit") && (
+          {(mode === EditorMode.ADD || mode === EditorMode.EDIT) && (
             <>
               <Typography variant="subtitle2" gutterBottom>
-                {mode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
+                {mode === EditorMode.ADD ? BUTTONS.ADD : BUTTONS.SAVE}
               </Typography>
               <TextField
                 inputRef={inputRef}
@@ -139,15 +131,15 @@ const CategoryEditor = ({
                 <Button
                   variant="contained"
                   fullWidth
-                  onClick={mode === "add" ? handleAdd : handleEdit}
+                  onClick={handleSave}
                   disabled={loading}
                 >
-                  {mode === "add" ? BUTTONS.ADD : BUTTONS.SAVE}
+                  {mode === EditorMode.ADD ? BUTTONS.ADD : BUTTONS.SAVE}
                 </Button>
               </Box>
             </>
           )}
-          {mode === "delete" && (
+          {mode === EditorMode.DELETE && (
             <>
               <Typography variant="body2">
                 {MESSAGES.CONFIRM_DELETE_CATEGORY}

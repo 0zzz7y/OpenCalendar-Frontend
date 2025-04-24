@@ -14,7 +14,7 @@ import DayColumn from "./DayColumn"
 
 interface WeekViewProperties {
   date: Date
-  events: Schedulable[] // Zmienione na Schedulable[], aby obsługiwać Event i Task
+  events: Schedulable[]
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
   onEventClick?: (event: Event) => void
@@ -45,11 +45,7 @@ const WeekView = ({
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
   const weekStart = getStartOfWeek(date)
-  const days = Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(weekStart)
-    d.setDate(d.getDate() + i)
-    return d
-  })
+  const days = Array.from({ length: 7 }, (_, i) => dayjs(weekStart).add(i, "day").toDate())
 
   const handleSlotClick = (element: HTMLElement, datetime: Date) => {
     setSelectedSlot(element)
@@ -60,13 +56,11 @@ const WeekView = ({
 
   const handleEventClick = (event: Schedulable) => {
     if ("id" in event && "name" in event && "calendar" in event) {
-      const element = document.querySelector(
-        `#event-${event.id}`
-      ) as HTMLElement
+      const element = document.querySelector(`#event-${event.id}`) as HTMLElement
       if (element) {
         setInfoAnchor(element)
-        setInfoEvent(event as Event) // Cast to Event
-        onEventClick?.(event as Event) // Cast to Event
+        setInfoEvent(event as Event)
+        onEventClick?.(event as Event)
       }
     }
   }
@@ -85,18 +79,14 @@ const WeekView = ({
   }
 
   const handleDeleteEvent = async (id: string) => {
-    await updateEvent(id, { name: "" }) // implement real delete logic if needed
+    await updateEvent(id, { name: "" })
   }
 
   return (
     <>
-      <Box
-        display="flex"
-        height="100%"
-        sx={{ p: 2, height: "100vh", overflow: "auto" }}
-      >
+      <Box display="flex" height="100%" sx={{ p: 2, height: "100vh", overflow: "auto" }}>
         {days.map((day, index) => {
-          const isToday = day.toDateString() === new Date().toDateString()
+          const isToday = dayjs(day).isSame(dayjs(), "day")
 
           return (
             <Box
@@ -133,7 +123,7 @@ const WeekView = ({
                 </Box>
 
                 <Typography variant="caption" sx={{ mt: 0.5 }}>
-                  {day.toLocaleDateString("pl-PL", {
+                  {day.toLocaleDateString("en-US", {
                     weekday: "short"
                   })}
                 </Typography>
@@ -141,9 +131,7 @@ const WeekView = ({
 
               <DayColumn
                 date={day}
-                events={(events ?? []).filter((e) =>
-                  dayjs(e.startDate).isSame(day, "day")
-                )}
+                events={events.filter((e) => dayjs(e.startDate).isSame(day, "day"))}
                 allEvents={events}
                 calendars={calendars}
                 categories={categories}

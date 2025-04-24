@@ -1,4 +1,3 @@
-import useFilter from "@/hook/useFilter"
 import useAppStore from "@/store/useAppStore"
 
 import { useMemo, useState } from "react"
@@ -14,15 +13,21 @@ import {
   IconButton
 } from "@mui/material"
 import CalendarEditor from "./CalendarEditor"
+import EditorMode from "@/model/utility/editorMode"
 
 const CalendarSelector = () => {
   const { calendars } = useAppStore()
   const selectedCalendar = useAppStore((s) => s.selectedCalendar)
   const setSelectedCalendar = useAppStore((s) => s.setSelectedCalendar)
+
   const [editorOpen, setEditorOpen] = useState(false)
   const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null)
-  const [editorMode, setEditorMode] = useState<"add" | "edit" | "delete">("add")
-  const [editorData, setEditorData] = useState<{ id?: string; label?: string; emoji?: string }>({})
+  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
+  const [editorData, setEditorData] = useState<{
+    id?: string
+    label?: string
+    emoji?: string
+  }>({})
 
   const calendarOptions = useMemo(() => {
     return [
@@ -36,7 +41,7 @@ const CalendarSelector = () => {
   }, [calendars])
 
   const openEditor = (
-    mode: "add" | "edit" | "delete",
+    mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE,
     anchor: HTMLElement,
     data: { id?: string; label?: string; emoji?: string } = {}
   ) => {
@@ -91,7 +96,7 @@ const CalendarSelector = () => {
                     size="small"
                     onClick={(e) => {
                       e.stopPropagation()
-                      openEditor("edit", e.currentTarget, {
+                      openEditor(EditorMode.EDIT, e.currentTarget, {
                         id: option.value,
                         label: option.label,
                         emoji: option.emoji
@@ -105,7 +110,7 @@ const CalendarSelector = () => {
                     disabled={option.value === selectedCalendar}
                     onClick={(e) => {
                       e.stopPropagation()
-                      openEditor("delete", e.currentTarget, {
+                      openEditor(EditorMode.DELETE, e.currentTarget, {
                         id: option.value,
                         label: option.label,
                         emoji: option.emoji
@@ -123,7 +128,7 @@ const CalendarSelector = () => {
 
       <IconButton
         onClick={(e) =>
-          openEditor("add", e.currentTarget, {
+          openEditor(EditorMode.ADD, e.currentTarget, {
             label: "",
             emoji: "📅"
           })

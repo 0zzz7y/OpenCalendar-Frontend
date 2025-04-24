@@ -12,7 +12,7 @@ import EventCreationPopover from "../event/EventCreationPopover"
 
 interface MonthViewProperties {
   date: Date
-  events: Schedulable[] // Zmienione na Schedulable[], aby obsługiwało Event i Task
+  events: Schedulable[]
   calendars: { id: string; name: string; emoji: string }[]
   categories: { id: string; name: string; color: string }[]
   onSave: (data: Partial<Event>) => void
@@ -42,9 +42,9 @@ const MonthView = ({
 
   const openInfoPopover = (event: Schedulable, anchor: HTMLElement) => {
     if ("id" in event && "name" in event && "calendar" in event) {
-      setInfoEvent(event as Event) // Cast to Event
+      setInfoEvent(event as Event)
       setInfoAnchor(anchor)
-      onEventClick?.(event as Event) // Cast to Event
+      onEventClick?.(event as Event)
     }
   }
 
@@ -84,17 +84,13 @@ const MonthView = ({
   const cells: React.ReactNode[] = []
   for (let i = 0; i < 42; i++) {
     const day = startDay.add(i, "day")
-    const dayEvents = events.filter((e) =>
-      dayjs(e.startDate).isSame(day, "day")
-    )
+    const dayEvents = events.filter((e) => dayjs(e.startDate).isSame(day, "day"))
 
     cells.push(
       <Paper
         key={day.format("YYYY-MM-DD")}
         elevation={0}
-        onClick={(e) =>
-          openCreatePopover(e.currentTarget as HTMLElement, day.toDate())
-        }
+        onClick={(e) => openCreatePopover(e.currentTarget as HTMLElement, day.toDate())}
         sx={{
           minHeight: 100,
           p: 1,
@@ -111,9 +107,7 @@ const MonthView = ({
         <Typography
           variant="body2"
           fontWeight="bold"
-          color={
-            day.isSame(today, "day") ? theme.palette.primary.main : "inherit"
-          }
+          color={day.isSame(today, "day") ? theme.palette.primary.main : "inherit"}
         >
           {day.format("D")}
         </Typography>
@@ -144,8 +138,7 @@ const MonthView = ({
                 }}
               />
               <Typography variant="caption" noWrap>
-                {dayjs(ev.startDate).format("H:mm")} {ev.name}{" "}
-                {ev.calendar?.emoji}
+                {dayjs(ev.startDate).format("H:mm")} {ev.name} {ev.calendar?.emoji}
               </Typography>
             </Box>
           ))}

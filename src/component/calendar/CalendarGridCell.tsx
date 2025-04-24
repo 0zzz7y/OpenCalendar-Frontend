@@ -8,7 +8,7 @@ import { useDrop } from "react-dnd"
 
 interface CalendarGridCellProperties {
   datetime: Date
-  allEvents: Schedulable[] // Zmienione na Schedulable[], aby obsługiwało zarówno Event jak i Task
+  allEvents: Schedulable[]
   onSave: (event: Partial<Event> & { startDate: string }) => void
   onClick?: (element: HTMLElement) => void
 }

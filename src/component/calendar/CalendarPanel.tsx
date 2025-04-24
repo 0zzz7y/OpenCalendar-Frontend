@@ -1,8 +1,5 @@
-import useCalendar from "@/hook/useCalendar"
-import useCategory from "@/hook/useCategory"
 import useEvent from "@/hook/useEvent"
 import useTask from "@/hook/useTask"
-import useFilter from "@/hook/useFilter"
 
 import EventPopover from "@/component/event/EventCreationPopover"
 import EventInformationPopover from "@/component/event/EventInformationPopover"
@@ -19,19 +16,27 @@ import { Box, Typography, Button } from "@mui/material"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
 
-import dayjs from "dayjs"
+import dayjs, { ManipulateType } from "dayjs"
 import { useEffect, useState } from "react"
 import Task from "@/model/domain/task"
 import useAppStore from "@/store/useAppStore"
+import useCalendar from "@/hook/useCalendar"
+import useNote from "@/hook/useNote"
+import useCategory from "@/hook/useCategory"
+import ViewType from "@/model/utility/viewType"
+import viewType from "@/model/utility/viewType"
+import YearView from "./YearView"
 
 const CalendarPanel = () => {
   const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent()
   const { reloadTasks } = useTask()
+  const { reloadCalendars } = useCalendar()
+  const { reloadNotes } = useNote()
+  const { reloadCategories } = useCategory()
   const { events, tasks, calendars, categories } = useAppStore()
-  const {  } = useCategory()
-  const { selectedCalendar, selectedCategory } = useFilter()
+  const { selectedCalendar, selectedCategory } = useAppStore()
 
-  const [view, setView] = useState<"day" | "week" | "month">("week")
+  const [view, setView] = useState<ViewType>(ViewType.WEEK)
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [selectedSlot, setSelectedSlot] = useState<HTMLElement | null>(null)
   const [selectedDatetime, setSelectedDatetime] = useState<Date | null>(null)
@@ -40,12 +45,14 @@ const CalendarPanel = () => {
   const [infoAnchor, setInfoAnchor] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
+    reloadCalendars()
+    reloadCategories()
     reloadEvents()
     reloadTasks()
+    reloadNotes()
   }, [])
 
   const safeEvents: Event[] = Array.isArray(events) ? events : []
-
   const safeTasks: Task[] = Array.isArray(tasks) ? tasks : []
 
   const schedulables: Schedulable[] = [
@@ -115,30 +122,26 @@ const CalendarPanel = () => {
     setInfoEvent(null)
   }
 
-  const navigate = (dir: "prev" | "next") => {
-    const unit = view === "month" ? "month" : view === "week" ? "week" : "day"
+  const navigate = (dir: "previous" | "next") => {
+    const unit = view === ViewType.MONTH ? ViewType.MONTH : view === ViewType.WEEK ? ViewType.WEEK : ViewType.DAY
     const delta = dir === "next" ? 1 : -1
-    setSelectedDate(dayjs(selectedDate).add(delta, unit).toDate())
+    setSelectedDate(dayjs(selectedDate).add(delta, view.toLowerCase() as ManipulateType).toDate())
   }
 
   return (
     <>
       <Box display="flex" justifyContent="space-between" alignItems="center" px={2} py={1}>
         <Box display="flex" alignItems="center" gap={1}>
-          <Button onClick={() => navigate("prev")}>
-            <ChevronLeftIcon />
-          </Button>
+          <Button onClick={() => navigate("previous")}> <ChevronLeftIcon /> </Button>
           <Typography variant="h6">
-            {dayjs(selectedDate).format(view === "month" ? "MMMM YYYY" : "DD MMM YYYY")}
+            {dayjs(selectedDate).format(view === ViewType.MONTH ? "MMMM YYYY" : "DD MMM YYYY")}
           </Typography>
-          <Button onClick={() => navigate("next")}>
-            <ChevronRightIcon />
-          </Button>
+          <Button onClick={() => navigate("next")}> <ChevronRightIcon /> </Button>
         </Box>
         <CalendarViewSwitcher view={view} onChange={setView} />
       </Box>
 
-      {view === "day" && (
+      {view === ViewType.DAY && (
         <DayView
           date={selectedDate}
           events={schedulables}
@@ -148,7 +151,7 @@ const CalendarPanel = () => {
         />
       )}
 
-      {view === "week" && (
+      {view === ViewType.WEEK && (
         <WeekView
           date={selectedDate}
           events={schedulables}
@@ -158,7 +161,7 @@ const CalendarPanel = () => {
         />
       )}
 
-      {view === "month" && (
+      {view === ViewType.MONTH && (
         <MonthView
           date={selectedDate}
           events={schedulables}
@@ -166,6 +169,16 @@ const CalendarPanel = () => {
           categories={categories}
           onSlotClick={handleSlotClick}
           onSave={handleSave}
+          onEventClick={handleEventClick}
+        />
+      )}
+
+      {view === ViewType.YEAR && (
+        <YearView
+          date={selectedDate}
+          events={schedulables}
+          calendars={calendars}
+          categories={categories}
           onEventClick={handleEventClick}
         />
       )}

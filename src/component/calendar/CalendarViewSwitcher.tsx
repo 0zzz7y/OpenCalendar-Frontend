@@ -1,3 +1,4 @@
+import ViewType from "@/model/utility/viewType"
 import {
   MenuItem,
   Select,
@@ -7,8 +8,8 @@ import {
 } from "@mui/material"
 
 interface CalendarViewSwitcherProperties {
-  view: "day" | "week" | "month"
-  onChange: (view: "day" | "week" | "month") => void
+  view: ViewType
+  onChange: (view: ViewType) => void
 }
 
 const CalendarViewSwitcher = ({
@@ -16,26 +17,25 @@ const CalendarViewSwitcher = ({
   onChange
 }: CalendarViewSwitcherProperties) => {
   const handleChange = (event: SelectChangeEvent) => {
-    const value = event.target.value as "day" | "week" | "month"
+    const value = event.target.value as ViewType
     onChange(value)
   }
 
   return (
-    <>
-      <FormControl size="small" sx={{ mb: 2, minWidth: 120 }}>
-        <InputLabel id="calendar-view-label">View</InputLabel>
-        <Select
-          labelId="calendar-view-label"
-          value={view}
-          onChange={handleChange}
-          label="View"
-        >
-          <MenuItem value="day">Day</MenuItem>
-          <MenuItem value="week">Week</MenuItem>
-          <MenuItem value="month">Month</MenuItem>
-        </Select>
-      </FormControl>
-    </>
+    <FormControl size="small" sx={{ mb: 2, minWidth: 120 }}>
+      <InputLabel id="calendar-view-label">View</InputLabel>
+      <Select
+        labelId="calendar-view-label"
+        value={view}
+        onChange={handleChange}
+        label="View"
+      >
+        <MenuItem value={ViewType.DAY}>{ViewType.DAY}</MenuItem>
+        <MenuItem value={ViewType.WEEK}>{ViewType.WEEK}</MenuItem>
+        <MenuItem value={ViewType.MONTH}>{ViewType.MONTH}</MenuItem>
+        <MenuItem value={ViewType.YEAR}>{ViewType.YEAR}</MenuItem>
+      </Select>
+    </FormControl>
   )
 }
 

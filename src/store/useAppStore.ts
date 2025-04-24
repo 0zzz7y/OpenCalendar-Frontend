@@ -18,12 +18,14 @@ interface AppStore {
   selectedCategory: string | null
   setSelectedCategory: (id: string | null) => void
 
-  setCalendars: (calendars: Calendar[]) => void
-  setCategories: (categories: Category[]) => void
-  setEvents: (events: Event[]) => void
-  setTasks: (tasks: Task[]) => void
-  setNotes: (notes: Note[]) => void
+  setCalendars: (calendars: unknown) => void
+  setCategories: (categories: unknown) => void
+  setEvents: (events: unknown) => void
+  setTasks: (tasks: unknown) => void
+  setNotes: (notes: unknown) => void
 }
+
+const ensureArray = <T>(value: unknown): T[] => Array.isArray(value) ? value : []
 
 const useAppStore = create<AppStore>((set) => ({
   calendars: [],
@@ -38,11 +40,11 @@ const useAppStore = create<AppStore>((set) => ({
   selectedCategory: "all",
   setSelectedCategory: (id) => set({ selectedCategory: id }),
 
-  setCalendars: (calendars) => set({ calendars: calendars ?? [] }),
-  setCategories: (categories) => set({ categories: categories ?? [] }),
-  setEvents: (events) => set({ events: events ?? [] }),
-  setTasks: (tasks) => set({ tasks: tasks ?? [] }),
-  setNotes: (notes) => set({ notes: notes ?? [] })
+  setCalendars: (calendars) => set({ calendars: ensureArray<Calendar>(calendars) }),
+  setCategories: (categories) => set({ categories: ensureArray<Category>(categories) }),
+  setEvents: (events) => set({ events: ensureArray<Event>(events) }),
+  setTasks: (tasks) => set({ tasks: ensureArray<Task>(tasks) }),
+  setNotes: (notes) => set({ notes: ensureArray<Note>(notes) })
 }))
 
 export default useAppStore
