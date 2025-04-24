@@ -20,7 +20,7 @@ const useCrudEvent = createUseCrud<Event, EventDto, EventDto>(
     delete: serviceDeleteEvent
   },
   eventToDto,
-  dto => dtoToEvent(dto, useAppStore().calendars, useAppStore().categories)
+  (dto) => dtoToEvent(dto, useAppStore().calendars, useAppStore().categories)
 );
 
 export function useEvent() {

@@ -19,7 +19,7 @@ const useCrudTask = createUseCrud<Task, TaskDto, TaskDto>(
     delete: serviceDeleteTask
   },
   taskToDto,
-  dto => dtoToTask(dto, useAppStore().calendars, useAppStore().categories)
+  (dto) => dtoToTask(dto, useAppStore().calendars, useAppStore().categories)
 );
 
 export function useTask() {

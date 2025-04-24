@@ -12,8 +12,8 @@ export function dtoToNote(
     id: dto.id ?? "",
     name: dto.name,
     description: dto.description,
-    calendar: calendars.find(c => c.id === dto.calendarId)!,
-    category: categories.find(c => c.id === dto.categoryId),
+    calendar: calendars.find(c => c.id === dto.calendarId) as Calendar,
+    category: categories.find(c => c.id === dto.categoryId) as Category,
     positionX: Math.floor(Math.random() * 100),
     positionY: Math.floor(Math.random() * 100),
   };
@@ -23,8 +23,8 @@ export function noteToDto(note: Partial<Note>): NoteDto {
   return {
     id: note.id,
     name: note.name,
-    description: note.description!,
-    calendarId: note.calendar!.id,
+    description: note.description ?? "",
+    calendarId: note.calendar?.id ?? "",
     categoryId: note.category?.id,
   };
 }

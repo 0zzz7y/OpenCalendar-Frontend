@@ -12,7 +12,7 @@ export function dtoToCalendar(dto: CalendarDto): Calendar {
 export function calendarToDto(calendar: Partial<Calendar>): CalendarDto {
   return {
     id: calendar.id,
-    name: calendar.name!,
-    emoji: calendar.emoji!,
+    name: calendar.name ?? "",
+    emoji: calendar.emoji ?? "",
   };
 }

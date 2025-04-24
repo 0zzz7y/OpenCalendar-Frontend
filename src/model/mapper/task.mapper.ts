@@ -3,6 +3,7 @@ import type TaskDto from "@/model/dto/task.dto";
 import type Calendar from "@/model/domain/calendar";
 import type Category from "@/model/domain/category";
 import RecurringPattern from "@/model/domain/recurringPattern";
+import TaskStatus from "../domain/taskStatus";
 
 export function dtoToTask(
   dto: TaskDto,
@@ -17,7 +18,7 @@ export function dtoToTask(
     endDate: dto.endDate,
     recurringPattern: dto.recurringPattern ?? RecurringPattern.NONE,
     status: dto.status,
-    calendar: calendars.find(c => c.id === dto.calendarId)!,
+    calendar: calendars.find(c => c.id === dto.calendarId) as Calendar,
     category: categories.find(c => c.id === dto.categoryId),
   };
 }
@@ -25,12 +26,12 @@ export function dtoToTask(
 export function taskToDto(task: Partial<Task>): TaskDto {
   return {
     id: task.id,
-    name: task.name!,
+    name: task.name ?? "",
     description: task.description,
     startDate: task.startDate,
     endDate: task.endDate,
     recurringPattern: task.recurringPattern,
-    status: task.status!,
+    status: task.status ?? TaskStatus.TODO,
     calendarId: task.calendar?.id,
     categoryId: task.category?.id,
   };

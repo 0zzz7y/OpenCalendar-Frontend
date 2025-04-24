@@ -4,6 +4,11 @@ import MonthlyCalendar from "@/component/calendar/MonthlyCalendar";
 import CategorySelector from "@/component/category/CategorySelector";
 import NotesPanel from "@/component/note/NotesPanel";
 import TasksPanel from "@/component/task/TasksPanel";
+import { loadCalendars } from "@/controller/calendar.controller";
+import { loadCategories } from "@/controller/category.controller";
+import { loadEvents } from "@/controller/event.controller";
+import { loadNotes } from "@/controller/note.controller";
+import { loadTasks } from "@/controller/task.controller";
 import useCalendar from "@/repository/calendar.repository";
 import useCategory from "@/repository/category.repository";
 import useEvent from "@/repository/event.repository";
@@ -23,19 +28,13 @@ const panelStyle = {
 };
 
 const Dashboard = () => {
-  const { reloadEvents } = useEvent();
-  const { reloadTasks } = useTask();
-  const { reloadNotes } = useNote();
-  const { reloadCalendars } = useCalendar();
-  const { reloadCategories } = useCategory();
-
   useEffect(() => {
-    reloadCalendars();
-    reloadCategories();
-    reloadEvents();
-    reloadTasks();
-    reloadNotes();
-  }, []);
+    loadCalendars()
+    loadCategories()
+    loadEvents()
+    loadTasks()
+    loadNotes()
+  }, [])
 
   return (
     <PanelGroup
