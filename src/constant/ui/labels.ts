@@ -14,6 +14,11 @@ enum LABELS {
   IN_PROGRESS = "In progress",
   DONE = "Done",
 
+  RECURRING_DAILY = "Daily",
+  RECURRING_WEEKLY = "Weekly",
+  RECURRING_MONTHLY = "Monthly",
+  RECURRING_YEARLY = "Yearly",
+
   NONE = "None"
 }
 

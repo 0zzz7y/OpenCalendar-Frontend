@@ -112,7 +112,7 @@ const TaskBoard = ({
                   {...provided.droppableProps}
                   sx={{
                     flex: 1,
-                    minWidth: 280,
+                    minWidth: 250,
                     transition: "background-color 0.2s ease",
                     backgroundColor: snapshot.isDraggingOver
                       ? "#f0f0f0"

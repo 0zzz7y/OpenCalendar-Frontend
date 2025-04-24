@@ -105,10 +105,10 @@ const TasksPanel = () => {
               />
             )
           }}
-          sx={{padding: 1, marginBottom: 2}}
+          sx={{marginBottom: 2}}
         />
 
-      <Box sx={{ flex: 1, overflow: "hidden" }}>
+      <Box sx={{ flex: 1 }}>
         <TaskBoard
           tasks={localTasks}
           calendars={calendars}
