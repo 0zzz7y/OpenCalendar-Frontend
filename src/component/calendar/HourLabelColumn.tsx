@@ -18,18 +18,22 @@ export default function HourLabelsColumn() {
         width: 60,
         flexShrink: 0,
         borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-        pt: 0, // remove top padding
+        // no top padding on container
+        pt: 0,
+        m: 0,
       }}
     >
       {hours.map((label, idx) => (
         <Box
           key={idx}
           sx={{
-            height: 64, // match your slot height
-            px: 1,
+
+            height: 64, // slot height
+            px: 0, // no horizontal padding
             display: "flex",
-            alignItems: "center",
-            justifyContent: "flex-end", // right‑align time labels
+            alignItems: "flex-start", // align at top of cell
+            justifyContent: "center",
+            pr: 0.5,
           }}
         >
           <Typography
