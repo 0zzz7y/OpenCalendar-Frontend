@@ -9,7 +9,7 @@ import type Task from "@/model/domain/task"
 import type TaskDto from "@/model/dto/task.dto"
 import useAppStore from "@/store/useAppStore"
 import { createUseCrud } from "@/repository/crud.repository"
-import { showToast } from "@/utilities/toastNotifications"
+import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const useCrudTask = () => {

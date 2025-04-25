@@ -8,7 +8,7 @@ import { calendarToDto, dtoToCalendar } from "@/model/mapper/calendar.mapper"
 import type Calendar from "@/model/domain/calendar"
 import type CalendarDto from "@/model/dto/calendar.dto"
 import { createUseCrud } from "@/repository/crud.repository"
-import { showToast } from "@/utilities/toastNotifications"
+import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const useCrudCalendar = createUseCrud<Calendar, CalendarDto, CalendarDto>(

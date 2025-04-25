@@ -8,7 +8,7 @@ import { categoryToDto, dtoToCategory } from "@/model/mapper/category.mapper"
 import type Category from "@/model/domain/category"
 import type CategoryDto from "@/model/dto/category.dto"
 import { createUseCrud } from "@/repository/crud.repository"
-import { showToast } from "@/utilities/toastNotifications"
+import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const validateCategory = (category: Partial<Category>) => {

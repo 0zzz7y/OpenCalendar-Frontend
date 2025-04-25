@@ -9,7 +9,7 @@ import type Note from "@/model/domain/note"
 import type NoteDto from "@/model/dto/note.dto"
 import { createUseCrud } from "@/repository/crud.repository"
 import useAppStore from "@/store/useAppStore"
-import { showToast } from "@/utilities/toastNotifications"
+import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const useCrudNote = () => {

@@ -9,7 +9,7 @@ import type Event from "@/model/domain/event"
 import type EventDto from "@/model/dto/event.dto"
 import { createUseCrud } from "@/repository/crud.repository"
 import useAppStore from "@/store/useAppStore"
-import { showToast } from "@/utilities/toastNotifications"
+import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const useCrudEvent = () => {

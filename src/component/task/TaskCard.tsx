@@ -1,52 +1,74 @@
-import type React from "react"
-import { useState, useEffect, useCallback } from "react"
-import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography } from "@mui/material"
-import { Delete as DeleteIcon, ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from "@mui/icons-material"
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import dayjs from "dayjs"
+import type React from "react";
+import { useState, useEffect, useCallback } from "react";
+import {
+  Box,
+  Card,
+  Collapse,
+  IconButton,
+  MenuItem,
+  TextField,
+  Typography,
+} from "@mui/material";
+import {
+  Delete as DeleteIcon,
+  ExpandLess as ExpandLessIcon,
+  ExpandMore as ExpandMoreIcon,
+} from "@mui/icons-material";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import dayjs from "dayjs";
 
-import type Calendar from "@/model/domain/calendar"
-import type Category from "@/model/domain/category"
-import type Task from "@/model/domain/task"
-import RecurringPattern from "@/model/domain/recurringPattern"
-import LABEL from "@/constant/ui/label"
-import FILTER from "@/constant/utility/filter"
+import type Calendar from "@/model/domain/calendar";
+import type Category from "@/model/domain/category";
+import type Task from "@/model/domain/task";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import LABEL from "@/constant/ui/label";
+import FILTER from "@/constant/utility/filter";
 
 export interface TaskCardProps {
-  task: Task
-  calendars: Calendar[]
-  categories: Category[]
-  onUpdate: (task: Task) => void
-  onDelete: (id: string) => void
+  task: Task;
+  calendars: Calendar[];
+  categories: Category[];
+  onUpdate: (task: Task) => void;
+  onDelete: (id: string) => void;
 }
 
 /**
  * Card representing a single task, editable and collapsible.
  */
-const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpdate, onDelete }) => {
-  const [expanded, setExpanded] = useState(true)
-  const [local, setLocal] = useState<Task>(task)
+const TaskCard: React.FC<TaskCardProps> = ({
+  task,
+  calendars,
+  categories,
+  onUpdate,
+  onDelete,
+}) => {
+  const [expanded, setExpanded] = useState(true);
+  const [local, setLocal] = useState<Task>(task);
 
   // Sync props -> state
-  useEffect(() => setLocal(task), [task])
+  useEffect(() => setLocal(task), [task]);
 
   const handleChange = useCallback(
     <K extends keyof Task>(field: K, value: Task[K]) => {
-      const updated = { ...local, [field]: value } as Task
-      setLocal(updated)
-      onUpdate(updated)
+      setLocal((prev) => ({ ...prev, [field]: value }));
     },
-    [local, onUpdate]
-  )
+    []
+  );
 
-  const cardColor = local.category?.color ?? "#f5f5f5"
+  const handleBlur = useCallback(() => {
+    if (local.name.trim() !== task.name.trim()) {
+      onUpdate(local); // Only send update if the name has changed
+    }
+  }, [local, task, onUpdate]);
+
+  const cardColor = local.category?.color ?? "#f5f5f5";
 
   const textFieldSx = {
     "& .MuiOutlinedInput-root": { backgroundColor: "#fff", borderRadius: 1 },
     "& .MuiInputBase-input": { color: "#000" },
     "& .MuiInputLabel-root": { color: "#000" },
-    "& .MuiSelect-icon": { color: "#000" }
-  }
+    "& .MuiSelect-icon": { color: "#000" },
+  };
 
   return (
     <Card
@@ -56,10 +78,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
         mb: 2,
         boxShadow: 3,
         borderRadius: 2,
-        minWidth: 220
+        minWidth: 220,
       }}
     >
-      <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={1}
+      >
         <Box display="flex" alignItems="center" gap={1} flexGrow={1}>
           <IconButton size="small" onClick={() => setExpanded((e) => !e)}>
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
@@ -68,6 +95,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             placeholder={LABEL.NAME}
             value={local.name}
             onChange={(e) => handleChange("name", e.target.value)}
+            onBlur={handleBlur} // Trigger update on blur
             size="small"
             fullWidth
             sx={textFieldSx}
@@ -110,7 +138,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
               label={LABEL.RECURRING}
               select
               value={local.recurringPattern}
-              onChange={(e) => handleChange("recurringPattern", e.target.value as RecurringPattern)}
+              onChange={(e) =>
+                handleChange(
+                  "recurringPattern",
+                  e.target.value as RecurringPattern
+                )
+              }
               size="small"
               fullWidth
               sx={textFieldSx}
@@ -128,8 +161,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             select
             value={local.calendar.id}
             onChange={(e) => {
-              const cal = calendars.find((c) => c.id === e.target.value)
-              cal && handleChange("calendar", cal)
+              const cal = calendars.find((c) => c.id === e.target.value);
+              cal && handleChange("calendar", cal);
             }}
             size="small"
             fullWidth
@@ -150,8 +183,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             select
             value={local.category?.id || ""}
             onChange={(e) => {
-              const cat = categories.find((c) => c.id === e.target.value) || null
-              handleChange("category", cat ? { ...cat, color: cat.color } : undefined)
+              const cat =
+                categories.find((c) => c.id === e.target.value) || null;
+              handleChange(
+                "category",
+                cat ? { ...cat, color: cat.color } : undefined
+              );
             }}
             size="small"
             fullWidth
@@ -166,7 +203,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
                       width: 12,
                       height: 12,
                       borderRadius: "50%",
-                      bgcolor: cat.color
+                      bgcolor: cat.color,
                     }}
                   />
                   <Typography>{cat.name}</Typography>
@@ -177,7 +214,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
         </Box>
       </Collapse>
     </Card>
-  )
-}
+  );
+};
 
-export default TaskCard
+export default TaskCard;
