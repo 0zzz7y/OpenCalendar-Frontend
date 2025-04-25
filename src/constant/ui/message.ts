@@ -1,4 +1,4 @@
-enum MESSAGES {
+enum MESSAGE {
   NEW_EVENT = "New event",
   NEW_TASK = "New task",
   NEW_NOTE = "New note",
@@ -14,6 +14,13 @@ enum MESSAGES {
   EDIT_NOTE = "Edit note",
   EDIT_CATEGORY = "Edit category",
   EDIT_CALENDAR = "Edit calendar",
+
+  EMPTY_STATE = "No data available.",
+  EMPTY_STATE_CALENDAR = "No calendars available.",
+  EMPTY_STATE_CATEGORY = "No categories available.",
+  EMPTY_STATE_EVENT = "No events available.",
+  EMPTY_STATE_TASK = "No tasks available.",
+  EMPTY_STATE_NOTE = "No notes available.",
 
   EVENT_CREATED_SUCCESSFULLY = "Event created successfully.",
   EVENT_UPDATED_SUCCESSFULLY = "Event updated successfully.",
@@ -64,4 +71,4 @@ enum MESSAGES {
   END_AFTER_START = "End date must be after start date."
 }
 
-export default MESSAGES
+export default MESSAGE

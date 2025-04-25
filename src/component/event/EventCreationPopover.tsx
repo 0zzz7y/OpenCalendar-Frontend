@@ -16,9 +16,9 @@ import { toast } from "react-toastify";
 import useEvent from "@/repository/event.repository";
 import RecurringPattern from "@/model/domain/recurringPattern";
 import type Schedulable from "@/model/domain/schedulable";
-import BUTTONS from "@/constant/ui/button";
-import LABELS from "@/constant/ui/label";
-import MESSAGES from "@/constant/ui/message";
+import BUTTON from "@/constant/ui/button";
+import LABEL from "@/constant/ui/label";
+import MESSAGE from "@/constant/ui/message";
 import FILTER from "@/constant/utility/filter";
 
 export interface EventCreationPopoverProps {
@@ -98,16 +98,16 @@ export default function EventCreationPopover({
   const handleSave = useCallback(async () => {
     // Validation
     if (!form.title.trim()) {
-      toast.error(MESSAGES.TITLE_REQUIRED);
+      toast.error(MESSAGE.TITLE_REQUIRED);
       return;
     }
     if (form.end <= form.start) {
-      toast.error(MESSAGES.END_AFTER_START);
+      toast.error(MESSAGE.END_AFTER_START);
       return;
     }
     const calendar = calendars.find((c) => c.id === form.calendarId);
     if (!calendar) {
-      toast.error(MESSAGES.CALENDAR_REQUIRED);
+      toast.error(MESSAGE.CALENDAR_REQUIRED);
       return;
     }
 
@@ -125,16 +125,16 @@ export default function EventCreationPopover({
       if (isEdit && initialEvent?.id) {
         // Update existing event with id included in payload
         await updateEvent({ id: initialEvent.id, ...payload });
-        toast.success(MESSAGES.EVENT_UPDATED_SUCCESSFULLY);
+        toast.success(MESSAGE.EVENT_UPDATED_SUCCESSFULLY);
       } else {
         // Create new event
         await addEvent(payload);
-        toast.success(MESSAGES.EVENT_CREATED_SUCCESSFULLY);
+        toast.success(MESSAGE.EVENT_CREATED_SUCCESSFULLY);
       }
       reloadEvents();
       onClose();
     } catch {
-      toast.error(MESSAGES.EVENT_SAVE_FAILED);
+      toast.error(MESSAGE.EVENT_SAVE_FAILED);
     }
   }, [
     form,
@@ -152,11 +152,11 @@ export default function EventCreationPopover({
     if (isEdit && initialEvent?.id) {
       try {
         await deleteEvent(initialEvent.id);
-        toast.success(MESSAGES.EVENT_DELETED_SUCCESSFULLY);
+        toast.success(MESSAGE.EVENT_DELETED_SUCCESSFULLY);
         reloadEvents();
         onClose();
       } catch {
-        toast.error(MESSAGES.EVENT_DELETE_FAILED);
+        toast.error(MESSAGE.EVENT_DELETE_FAILED);
       }
     }
   }, [isEdit, initialEvent, deleteEvent, reloadEvents, onClose]);
@@ -174,18 +174,18 @@ export default function EventCreationPopover({
     >
       <Stack spacing={2}>
         <Typography variant="h6">
-          {isEdit ? MESSAGES.EDIT_EVENT : MESSAGES.ADD_EVENT}
+          {isEdit ? MESSAGE.EDIT_EVENT : MESSAGE.ADD_EVENT}
         </Typography>
 
         <TextField
-          label={LABELS.NAME}
+          label={LABEL.NAME}
           value={form.title}
           onChange={(e) => handleChange("title", e.target.value)}
           fullWidth
         />
 
         <TextField
-          label={LABELS.CALENDAR}
+          label={LABEL.CALENDAR}
           select
           value={form.calendarId}
           onChange={(e) => handleChange("calendarId", e.target.value)}
@@ -199,7 +199,7 @@ export default function EventCreationPopover({
         </TextField>
 
         <TextField
-          label={LABELS.CATEGORY}
+          label={LABEL.CATEGORY}
           select
           value={form.categoryId}
           onChange={(e) => handleChange("categoryId", e.target.value)}
@@ -223,24 +223,24 @@ export default function EventCreationPopover({
 
         <Divider />
 
-        <Typography variant="body2">{LABELS.START_DATE}</Typography>
+        <Typography variant="body2">{LABEL.START_DATE}</Typography>
         <DateCalendar
           value={form.start}
           onChange={(d) => d && handleChange("start", d)}
         />
         <TimePicker
-          label={LABELS.START_TIME}
+          label={LABEL.START_TIME}
           value={form.start}
           onChange={(d) => d && handleChange("start", d)}
         />
         <TimePicker
-          label={LABELS.END_TIME}
+          label={LABEL.END_TIME}
           value={form.end}
           onChange={(d) => d && handleChange("end", d)}
         />
 
         <TextField
-          label={LABELS.DESCRIPTION}
+          label={LABEL.DESCRIPTION}
           value={form.description}
           onChange={(e) => handleChange("description", e.target.value)}
           fullWidth
@@ -250,15 +250,15 @@ export default function EventCreationPopover({
 
         <Stack direction="row" spacing={1} justifyContent="flex-end">
           <Button onClick={onClose} color="inherit">
-            {BUTTONS.CANCEL}
+            {BUTTON.CANCEL}
           </Button>
           {isEdit && (
             <Button onClick={handleDelete} color="error">
-              {BUTTONS.DELETE}
+              {BUTTON.DELETE}
             </Button>
           )}
           <Button variant="contained" onClick={handleSave}>
-            {BUTTONS.SAVE}
+            {BUTTON.SAVE}
           </Button>
         </Stack>
       </Stack>

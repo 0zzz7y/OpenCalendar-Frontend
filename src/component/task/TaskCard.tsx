@@ -21,7 +21,7 @@ import type Calendar from "@/model/domain/calendar";
 import type Category from "@/model/domain/category";
 import type Task from "@/model/domain/task";
 import RecurringPattern from "@/model/domain/recurringPattern";
-import LABELS from "@/constant/ui/label";
+import LABEL from "@/constant/ui/label";
 import FILTER from "@/constant/utility/filter";
 
 export interface TaskCardProps {
@@ -88,7 +88,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
             {expanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
           </IconButton>
           <TextField
-            placeholder={LABELS.NAME}
+            placeholder={LABEL.NAME}
             value={local.name}
             onChange={(e) => handleChange("name", e.target.value)}
             size="small"
@@ -104,7 +104,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
       <Collapse in={expanded}>
         <Box display="flex" flexDirection="column" gap={1.5}>
           <TextField
-            placeholder={LABELS.DESCRIPTION}
+            placeholder={LABEL.DESCRIPTION}
             value={local.description ?? ""}
             onChange={(e) => handleChange("description", e.target.value)}
             size="small"
@@ -115,14 +115,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
           />
 
           <DateTimePicker
-            label={LABELS.START_DATE}
+            label={LABEL.START_DATE}
             value={local.startDate ? dayjs(local.startDate).toDate() : null}
             onChange={(d) => d && handleChange("startDate", d.toISOString())}
             slotProps={{ textField: { size: "small", sx: textFieldSx } }}
           />
 
           <DateTimePicker
-            label={LABELS.END_DATE}
+            label={LABEL.END_DATE}
             value={local.endDate ? dayjs(local.endDate).toDate() : null}
             onChange={(d) => d && handleChange("endDate", d.toISOString())}
             slotProps={{ textField: { size: "small", sx: textFieldSx } }}
@@ -130,7 +130,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
           {local.startDate && (
             <TextField
-              label={LABELS.RECURRING}
+              label={LABEL.RECURRING}
               select
               value={local.recurringPattern}
               onChange={(e) =>
@@ -152,7 +152,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           )}
 
           <TextField
-            label={LABELS.CALENDAR}
+            label={LABEL.CALENDAR}
             select
             value={local.calendar.id}
             onChange={(e) => {
@@ -174,7 +174,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
           </TextField>
 
           <TextField
-            label={LABELS.CATEGORY}
+            label={LABEL.CATEGORY}
             select
             value={local.category?.id || ""}
             onChange={(e) => {

@@ -15,9 +15,9 @@ import EmojiPicker, {
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions";
 import useCalendar from "@/repository/calendar.repository";
 import EditorMode from "@/model/utility/editorMode";
-import BUTTONS from "@/constant/ui/button";
+import BUTTON from "@/constant/ui/button";
 import PLACEHOLDERS from "@/constant/ui/label";
-import MESSAGES from "@/constant/ui/message";
+import MESSAGE from "@/constant/ui/message";
 
 export interface CalendarEditorProps {
   open: boolean;
@@ -116,8 +116,8 @@ export default function CalendarEditor({
           <>
             <Typography variant="subtitle2" color="primary" fontWeight={500}>
               {mode === EditorMode.ADD
-                ? MESSAGES.ADD_CALENDAR
-                : MESSAGES.EDIT_CALENDAR}
+                ? MESSAGE.ADD_CALENDAR
+                : MESSAGE.EDIT_CALENDAR}
             </Typography>
             <TextField
               inputRef={inputRef}
@@ -162,17 +162,17 @@ export default function CalendarEditor({
               onClick={handleSave}
               disabled={loading}
             >
-              {mode === EditorMode.ADD ? BUTTONS.ADD : BUTTONS.SAVE}
+              {mode === EditorMode.ADD ? BUTTON.ADD : BUTTON.SAVE}
             </Button>
           </>
         ) : (
           <>
             <Typography variant="body2">
-              {MESSAGES.CONFIRM_DELETE_CALENDAR}
+              {MESSAGE.CONFIRM_DELETE_CALENDAR}
             </Typography>
             <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
               <Button onClick={onClose} size="small">
-                {BUTTONS.CANCEL}
+                {BUTTON.CANCEL}
               </Button>
               <Button
                 onClick={handleDelete}
@@ -181,7 +181,7 @@ export default function CalendarEditor({
                 color="error"
                 disabled={loading}
               >
-                {BUTTONS.DELETE}
+                {BUTTON.DELETE}
               </Button>
             </Box>
           </>

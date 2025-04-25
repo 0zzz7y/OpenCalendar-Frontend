@@ -11,8 +11,8 @@ import { HourglassEmpty, Pending, Done } from "@mui/icons-material";
 
 import TaskCard from "./TaskCard";
 import TaskColumn from "./TaskColumn";
-import LABELS from "@/constant/ui/label";
-import MESSAGES from "@/constant/ui/message";
+import LABEL from "@/constant/ui/label";
+import MESSAGE from "@/constant/ui/message";
 import type Calendar from "@/model/domain/calendar";
 import type Category from "@/model/domain/category";
 import type Task from "@/model/domain/task";
@@ -39,9 +39,9 @@ const TaskBoard: React.FC<TaskBoardProps> = ({
   const columns = useMemo(
     () =>
       ({
-        TODO: { title: LABELS.TODO, icon: <HourglassEmpty /> },
-        IN_PROGRESS: { title: LABELS.IN_PROGRESS, icon: <Pending /> },
-        DONE: { title: LABELS.DONE, icon: <Done /> },
+        TODO: { title: LABEL.TODO, icon: <HourglassEmpty /> },
+        IN_PROGRESS: { title: LABEL.IN_PROGRESS, icon: <Pending /> },
+        DONE: { title: LABEL.DONE, icon: <Done /> },
       } as Record<TaskStatus, { title: string; icon: JSX.Element }>),
     []
   );

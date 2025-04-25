@@ -11,8 +11,8 @@ import {
 } from "@mui/material";
 import EditorMode from "@/model/utility/editorMode";
 import PLACEHOLDERS from "@/constant/ui/label";
-import BUTTONS from "@/constant/ui/button";
-import MESSAGES from "@/constant/ui/message";
+import BUTTON from "@/constant/ui/button";
+import MESSAGE from "@/constant/ui/message";
 
 export interface CategoryEditorProps {
   open: boolean;
@@ -89,8 +89,8 @@ export default function CategoryEditor({
             <>
               <Typography variant="subtitle2" gutterBottom>
                 {mode === EditorMode.ADD
-                  ? MESSAGES.ADD_CATEGORY
-                  : MESSAGES.EDIT_CATEGORY}
+                  ? MESSAGE.ADD_CATEGORY
+                  : MESSAGE.EDIT_CATEGORY}
               </Typography>
               <TextField
                 inputRef={inputRef}
@@ -114,7 +114,7 @@ export default function CategoryEditor({
                   onClick={handleSave}
                   disabled={loading}
                 >
-                  {mode === EditorMode.ADD ? BUTTONS.ADD : BUTTONS.SAVE}
+                  {mode === EditorMode.ADD ? BUTTON.ADD : BUTTON.SAVE}
                 </Button>
               </Box>
             </>
@@ -123,11 +123,11 @@ export default function CategoryEditor({
           {mode === EditorMode.DELETE && (
             <>
               <Typography variant="body2">
-                {MESSAGES.CONFIRM_DELETE_CATEGORY}
+                {MESSAGE.CONFIRM_DELETE_CATEGORY}
               </Typography>
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
                 <Button size="small" onClick={onClose}>
-                  {BUTTONS.CANCEL}
+                  {BUTTON.CANCEL}
                 </Button>
                 <Button
                   size="small"
@@ -136,7 +136,7 @@ export default function CategoryEditor({
                   onClick={handleDelete}
                   disabled={loading}
                 >
-                  {BUTTONS.DELETE}
+                  {BUTTON.DELETE}
                 </Button>
               </Box>
             </>

@@ -12,8 +12,8 @@ import dayjs from "dayjs";
 import useAppStore from "@/store/useAppStore";
 import useEvent from "@/repository/event.repository";
 import type Schedulable from "@/model/domain/schedulable";
-import BUTTONS from "@/constant/ui/button";
-import MESSAGES from "@/constant/ui/message";
+import BUTTON from "@/constant/ui/button";
+import MESSAGE from "@/constant/ui/message";
 
 export interface EventInformationPopoverProps {
   anchorEl: HTMLElement | null;
@@ -80,7 +80,7 @@ export default function EventInformationPopover({
             alignItems="center"
           >
             <Typography variant="h6">
-              {current.name || MESSAGES.TITLE_REQUIRED}
+              {current.name || MESSAGE.TITLE_REQUIRED}
             </Typography>
             {!confirmDelete && (
               <Box>
@@ -101,7 +101,7 @@ export default function EventInformationPopover({
                   ? `${dayjs(current.startDate).format("LLL")} – ${dayjs(
                       current.endDate
                     ).format("LLL")}`
-                  : MESSAGES.END_AFTER_START}
+                  : MESSAGE.END_AFTER_START}
               </Typography>
               {current.description && (
                 <Typography>{current.description}</Typography>
@@ -110,7 +110,7 @@ export default function EventInformationPopover({
           ) : (
             <Stack spacing={1}>
               <Typography variant="body2">
-                {MESSAGES.CONFIRM_DELETE_EVENT}
+                {MESSAGE.CONFIRM_DELETE_EVENT}
               </Typography>
               <Stack direction="row" spacing={1} justifyContent="flex-end">
                 <Button
@@ -118,7 +118,7 @@ export default function EventInformationPopover({
                   color="inherit"
                   onClick={handleCancelDelete}
                 >
-                  {BUTTONS.CANCEL}
+                  {BUTTON.CANCEL}
                 </Button>
                 <Button
                   size="small"
@@ -126,7 +126,7 @@ export default function EventInformationPopover({
                   variant="contained"
                   onClick={handleConfirmDelete}
                 >
-                  {BUTTONS.DELETE}
+                  {BUTTON.DELETE}
                 </Button>
               </Stack>
             </Stack>

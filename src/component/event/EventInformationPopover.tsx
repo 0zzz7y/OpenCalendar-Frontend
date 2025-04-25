@@ -1,5 +1,5 @@
-import BUTTONS from "@/constant/ui/button";
-import MESSAGES from "@/constant/ui/message";
+import BUTTON from "@/constant/ui/button";
+import MESSAGE from "@/constant/ui/message";
 import useEvent from "@/repository/event.repository";
 import type Schedulable from "@/model/domain/schedulable";
 
@@ -108,7 +108,7 @@ const EventInformationPopover = ({
           ) : (
             <Stack spacing={1}>
               <Typography variant="body2">
-                {MESSAGES.CONFIRM_DELETE_EVENT}
+                {MESSAGE.CONFIRM_DELETE_EVENT}
               </Typography>
 
               <Stack direction="row" spacing={1} justifyContent="flex-end">
@@ -117,14 +117,14 @@ const EventInformationPopover = ({
                   size="small"
                   color="inherit"
                 >
-                  {BUTTONS.CANCEL}
+                  {BUTTON.CANCEL}
                 </Button>
                 <Button
                   onClick={handleConfirmDelete}
                   size="small"
                   color="error"
                 >
-                  {BUTTONS.DELETE}
+                  {BUTTON.DELETE}
                 </Button>
               </Stack>
             </Stack>

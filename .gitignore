@@ -124,3 +124,5 @@ dist
 
 .DS_Store
 pnpm-lock.yaml
+pnpm-lock.yaml
+src/source.txt

@@ -8,7 +8,7 @@ import TaskBoard from "./TaskBoard";
 import RecurringPattern from "@/model/domain/recurringPattern";
 import type Task from "@/model/domain/task";
 import TaskStatus from "@/model/domain/taskStatus";
-import MESSAGES from "@/constant/ui/message";
+import MESSAGE from "@/constant/ui/message";
 
 /**
  * Panel for creating new tasks and displaying them in a board.
@@ -20,7 +20,10 @@ export default function TasksPanel() {
   const [newTitle, setNewTitle] = useState("");
 
   const defaultCalendar = useMemo(() => calendars[0] || null, [calendars]);
-  const defaultCategory = useMemo(() => categories.findLast || null, [categories]);
+  const defaultCategory = useMemo(
+    () => categories.findLast || null,
+    [categories]
+  );
 
   const handleCreate = useCallback(async () => {
     const title = newTitle.trim();
@@ -70,7 +73,7 @@ export default function TasksPanel() {
       }}
     >
       <TextField
-        label={MESSAGES.NEW_TASK}
+        label={MESSAGE.NEW_TASK}
         value={newTitle}
         onChange={(e) => setNewTitle(e.target.value)}
         onKeyDown={(e) => e.key === "Enter" && handleCreate()}

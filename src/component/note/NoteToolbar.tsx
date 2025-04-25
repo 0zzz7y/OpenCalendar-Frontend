@@ -21,9 +21,9 @@ import {
 } from "@mui/icons-material";
 
 import TOOLBAR from "@/constant/utility/toolbar";
-import MESSAGES from "@/constant/ui/message";
+import MESSAGE from "@/constant/ui/message";
 import type FormatCommand from "@/model/utility/formatCommand";
-import BUTTONS from "@/constant/buttons";
+import BUTTON from "@/constant/ui/button";
 
 export interface NoteToolbarProps {
   isCollapsed: boolean;
@@ -98,7 +98,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
         </IconButton>
 
         <TextField
-          placeholder={MESSAGES.NEW_NOTE}
+          placeholder={MESSAGE.NEW_NOTE}
           value={noteName}
           onChange={(e) => onNameChange(e.target.value)}
           onBlur={onNameBlur}
@@ -178,11 +178,11 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
         PaperProps={{ sx: { p: 2 } }}
       >
         <Typography variant="body2" gutterBottom>
-          {MESSAGES.CONFIRM_DELETE_NOTE}
+          {MESSAGE.CONFIRM_DELETE_NOTE}
         </Typography>
         <Box display="flex" gap={1} justifyContent="flex-end">
           <Button size="small" onClick={handleCancelDelete}>
-            {BUTTONS.CANCEL}
+            {BUTTON.CANCEL}
           </Button>
           <Button
             size="small"
@@ -190,7 +190,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
             color="error"
             onClick={handleConfirmDelete}
           >
-            {BUTTONS.DELETE}
+            {BUTTON.DELETE}
           </Button>
         </Box>
       </Popover>

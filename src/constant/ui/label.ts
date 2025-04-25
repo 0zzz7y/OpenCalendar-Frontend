@@ -1,4 +1,4 @@
-enum LABELS {
+enum LABEL {
   NAME = "Name",
   DESCRIPTION = "Description",
   START_DATE = "Start date",
@@ -20,4 +20,4 @@ enum LABELS {
   RECURRING_YEARLY = "Yearly"
 }
 
-export default LABELS
+export default LABEL
