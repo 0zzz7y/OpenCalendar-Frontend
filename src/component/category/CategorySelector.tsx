@@ -1,3 +1,4 @@
+// src/component/category/CategorySelector.tsx
 import { useState, useMemo, useCallback } from "react"
 import { Box, Typography, IconButton } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"
@@ -14,37 +15,36 @@ import Selector from "@/component/common/selector/Selector"
 import AddButton from "@/component/common/button/AddButton"
 import ColorDot from "@/component/common/colordot/ColorDot"
 
+import { filterByCategory } from "@/utilities/filter"
+
 export default function CategorySelector() {
-  const categories = useAppStore((state) => state.categories)
-  const selectedCategory = useAppStore((state) => state.selectedCategory) || FILTER.ALL
-  const setSelectedCategory = useAppStore((state) => state.setSelectedCategory)
+  const categories = useAppStore(state => state.categories)
+  const selectedCategory = useAppStore(state => state.selectedCategory) || FILTER.ALL
+  const setSelectedCategory = useAppStore(state => state.setSelectedCategory)
+  const tasks = useAppStore(state => state.tasks)
 
   const [editorOpen, setEditorOpen] = useState(false)
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
   const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
   const [editorData, setEditorData] = useState<{ id?: string; name?: string; color?: string }>({})
 
-  const categoryOptions = useMemo(
-    () => [
+  const filteredCategories = useMemo(() => {
+    return [
       { label: FILTER.ALL, value: FILTER.ALL, color: "#ffffff" },
       ...categories.map((category) => ({
         label: category.name,
         value: category.id,
         color: category.color
       }))
-    ],
-    [categories]
-  )
+    ].filter(option => option.value === FILTER.ALL || filterByCategory(tasks, option.value).length > 0)
+  }, [categories, tasks])
 
-  const openEditor = useCallback(
-    (mode: EditorMode, anchor: HTMLElement, data: { id?: string; name?: string; color?: string }) => {
-      setEditorMode(mode)
-      setEditorData(data)
-      setAnchor(anchor)
-      setEditorOpen(true)
-    },
-    []
-  )
+  const openEditor = useCallback((mode: EditorMode, anchor: HTMLElement, data: { id?: string; name?: string; color?: string }) => {
+    setEditorMode(mode)
+    setEditorData(data)
+    setAnchor(anchor)
+    setEditorOpen(true)
+  }, [])
 
   const closeEditor = useCallback(() => {
     setEditorOpen(false)
@@ -58,9 +58,9 @@ export default function CategorySelector() {
     <Box display="flex" alignItems="center" gap={1} width="100%">
       <Selector
         label={LABEL.CATEGORY}
-        value={selectedCategory || FILTER.ALL}
+        value={selectedCategory}
         onChange={handleChange}
-        options={categoryOptions}
+        options={filteredCategories}
       >
         {(option) => (
           <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">

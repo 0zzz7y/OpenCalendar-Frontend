@@ -1,5 +1,13 @@
+// src/component/category/CategoryEditor.tsx
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Box, ClickAwayListener, Input, Paper, TextField, Typography } from "@mui/material"
+import {
+  Box,
+  ClickAwayListener,
+  Input,
+  Paper,
+  TextField,
+  Typography,
+} from "@mui/material"
 
 import Popover from "@/component/common/popover/Popover"
 import SaveButton from "@/component/common/button/SaveButton"
@@ -14,7 +22,11 @@ interface CategoryEditorProperties {
   open: boolean
   anchor: HTMLElement | null
   mode: EditorMode
-  initialData: { id?: string; name?: string; color?: string }
+  initialData: {
+    id?: string
+    name?: string
+    color?: string
+  }
   loading: boolean
   onClose: () => void
   onSave: (payload: { id?: string; name: string; color: string }) => void
@@ -29,7 +41,7 @@ export default function CategoryEditor({
   loading,
   onClose,
   onSave,
-  onDelete
+  onDelete,
 }: CategoryEditorProperties) {
   const inputReference = useRef<HTMLInputElement>(null)
   const [form, setForm] = useState({ name: "", color: "#3b5bdb" })
@@ -38,14 +50,14 @@ export default function CategoryEditor({
     if (open) {
       setForm({
         name: initialData.name?.trim() || "",
-        color: initialData.color || "#3b5bdb"
+        color: initialData.color || "#3b5bdb",
       })
       setTimeout(() => inputReference.current?.focus(), 50)
     }
   }, [open, initialData])
 
   const handleChange = useCallback((field: "name" | "color", value: string) => {
-    setForm((previous) => ({ ...previous, [field]: value }))
+    setForm(previous => ({ ...previous, [field]: value }))
   }, [])
 
   const handleSave = useCallback(() => {
@@ -73,6 +85,7 @@ export default function CategoryEditor({
               <Typography variant="subtitle2" gutterBottom>
                 {mode === EditorMode.ADD ? MESSAGE.ADD_CATEGORY : MESSAGE.EDIT_CATEGORY}
               </Typography>
+
               <TextField
                 inputRef={inputReference}
                 placeholder={LABEL.NAME}
@@ -82,6 +95,7 @@ export default function CategoryEditor({
                 size="small"
                 margin="dense"
               />
+
               <Box display="flex" alignItems="center" gap={1} mt={2}>
                 <Input
                   type="color"
@@ -89,17 +103,28 @@ export default function CategoryEditor({
                   onChange={(element) => handleChange("color", element.target.value)}
                   sx={{ minWidth: 40 }}
                 />
-                <SaveButton onClick={handleSave} loading={loading} />
+
+                <SaveButton
+                  onClick={handleSave}
+                  loading={loading}
+                  label={mode === EditorMode.ADD ? BUTTON.ADD : BUTTON.SAVE}
+                />
               </Box>
             </>
           )}
 
           {mode === EditorMode.DELETE && (
             <>
-              <Typography variant="body2">{MESSAGE.CONFIRM_DELETE_CATEGORY}</Typography>
+              <Typography variant="body2">
+                {MESSAGE.CONFIRM_DELETE_CATEGORY}
+              </Typography>
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
                 <CancelButton onClick={onClose} />
-                <SaveButton onClick={handleDelete} loading={loading} label={BUTTON.DELETE} />
+                <SaveButton
+                  onClick={handleDelete}
+                  loading={loading}
+                  label={BUTTON.DELETE}
+                />
               </Box>
             </>
           )}

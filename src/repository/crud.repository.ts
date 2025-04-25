@@ -50,7 +50,6 @@ export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
       [updateService, toDto, fromDto, items, setItems]
     )
 
-    /** Remove an item by its id */
     const remove = useCallback(
       async (id: string): Promise<void> => {
         await deleteService(id)
