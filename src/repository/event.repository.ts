@@ -9,9 +9,20 @@ import type Event from "@/model/domain/event"
 import type EventDto from "@/model/dto/event.dto"
 import { createUseCrud } from "@/repository/crud.repository"
 import useAppStore from "@/store/useAppStore"
+import { showToast } from "@/utilities/toastNotifications"
+import MESSAGE from "@/constant/ui/message"
 
 const useCrudEvent = () => {
   const { calendars, categories } = useAppStore()
+  const validateEvent = (event: Partial<Event>) => {
+    if (!event.name) {
+      throw new Error("Event title is required.")
+    }
+    if (!event.startDate) {
+      throw new Error("Event start date is required.")
+    }
+  }
+
   return createUseCrud<Event, EventDto, EventDto>(
     "events",
     {
@@ -21,17 +32,46 @@ const useCrudEvent = () => {
       delete: serviceDeleteEvent
     },
     eventToDto,
-    (dto) => dtoToEvent(dto, calendars, categories)
+    (dto) => dtoToEvent(dto, calendars, categories),
+    validateEvent
   )()
 }
 
 export function useEvent() {
   const { reload, add, update, remove } = useCrudEvent()
+
+  const addEvent = async (data: Partial<Event>) => {
+    try {
+      await add(data)
+      showToast("success", MESSAGE.EVENT_CREATED_SUCCESSFULLY)
+    } catch {
+      showToast("error", MESSAGE.EVENT_SAVE_FAILED)
+    }
+  }
+
+  const updateEvent = async (data: Partial<Event> & { id: string }) => {
+    try {
+      await update(data)
+      showToast("success", MESSAGE.EVENT_UPDATED_SUCCESSFULLY)
+    } catch {
+      showToast("error", MESSAGE.EVENT_SAVE_FAILED)
+    }
+  }
+
+  const deleteEvent = async (id: string) => {
+    try {
+      await remove(id)
+      showToast("success", MESSAGE.EVENT_DELETED_SUCCESSFULLY)
+    } catch {
+      showToast("error", MESSAGE.EVENT_DELETE_FAILED)
+    }
+  }
+
   return {
     reloadEvents: reload,
-    addEvent: add,
-    updateEvent: update,
-    deleteEvent: remove
+    addEvent,
+    updateEvent,
+    deleteEvent
   }
 }
 

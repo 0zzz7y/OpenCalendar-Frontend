@@ -68,18 +68,7 @@ export default function CalendarGridCell({
   }, [drop]);
 
   // Preview indicator height: based on dragged item's duration
-  let previewHeight = 32;
-  if (item?.id) {
-    const previewEvent = allEvents.find(
-      (e) => e.id === item.id && e.startDate && e.endDate
-    );
-    if (previewEvent) {
-      const startMs = new Date(previewEvent.startDate ?? "").getTime();
-      const endMs = new Date(previewEvent.endDate ?? "").getTime();
-      const minutes = (endMs - startMs) / (1000 * 60);
-      previewHeight = Math.max(32, (minutes * 32) / 30);
-    }
-  }
+  const previewHeight = 32  // Placeholder logic for preview height}
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) =>
     onClick?.(e.currentTarget);

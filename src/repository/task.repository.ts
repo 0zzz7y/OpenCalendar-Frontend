@@ -9,9 +9,19 @@ import type Task from "@/model/domain/task"
 import type TaskDto from "@/model/dto/task.dto"
 import useAppStore from "@/store/useAppStore"
 import { createUseCrud } from "@/repository/crud.repository"
+import { showToast } from "@/utilities/toastNotifications"
+import MESSAGE from "@/constant/ui/message"
 
 const useCrudTask = () => {
   const { calendars, categories } = useAppStore()
+
+  const validateTask = (task: Partial<Task>) => {
+    if (!task.name) {
+      throw new Error("Task title is required")
+    }
+    // Add other validation rules as needed
+  }
+
   return createUseCrud<Task, TaskDto, TaskDto>(
     "tasks",
     {
@@ -21,17 +31,46 @@ const useCrudTask = () => {
       delete: serviceDeleteTask
     },
     taskToDto,
-    (dto) => dtoToTask(dto, calendars, categories)
+    (dto) => dtoToTask(dto, calendars, categories),
+    validateTask
   )()
 }
 
 export function useTask() {
   const { reload, add, update, remove } = useCrudTask()
+
+  const addTask = async (data: Partial<Task>) => {
+    try {
+      await add(data)
+      showToast("success", MESSAGE.TASK_CREATED_SUCCESSFULLY)
+    } catch {
+      showToast("error", MESSAGE.TASK_SAVE_FAILED)
+    }
+  }
+
+  const updateTask = async (data: Partial<Task> & { id: string }) => {
+    try {
+      await update(data)
+      showToast("success", MESSAGE.TASK_UPDATED_SUCCESSFULLY)
+    } catch {
+      showToast("error", MESSAGE.TASK_SAVE_FAILED)
+    }
+  }
+
+  const deleteTask = async (id: string) => {
+    try {
+      await remove(id)
+      showToast("success", MESSAGE.TASK_DELETED_SUCCESSFULLY)
+    } catch {
+      showToast("error", MESSAGE.TASK_DELETE_FAILED)
+    }
+  }
+
   return {
     reloadTasks: reload,
-    addTask: add,
-    updateTask: update,
-    deleteTask: remove
+    addTask,
+    updateTask,
+    deleteTask
   }
 }
 

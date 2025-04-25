@@ -47,11 +47,16 @@ export default function DayView({
     event?: Event;
   }>({});
   const [editingEvent, setEditingEvent] = useState<Event>();
+  const [creationPopover, setCreationPopover] = useState<{
+    anchorEl: HTMLElement | null;
+    clickedDatetime: Date | null;
+  }>({ anchorEl: null, clickedDatetime: null });
 
   const handleSlotClick = useCallback((anchor: HTMLElement, datetime: Date) => {
-    setEditingEvent(undefined);
-    setInfoState({});
-    setSlotInfo({ anchor, datetime });
+    setCreationPopover({
+      anchorEl: anchor,
+      clickedDatetime: datetime, // Pass the clicked datetime
+    });
   }, []);
 
   const handleEventClick = useCallback(
@@ -120,9 +125,7 @@ export default function DayView({
             borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
           }}
         >
-          <Typography variant="h6">
-            {dayjs(date).format("dddd")}
-          </Typography>
+          <Typography variant="h6">{dayjs(date).format("dddd")}</Typography>
         </Box>
 
         {/* only this scrolls */}
@@ -181,6 +184,17 @@ export default function DayView({
           }}
         />
       )}
+
+      {/* Render the popover */}
+      <EventCreationPopover
+        anchorEl={creationPopover.anchorEl}
+        clickedDatetime={creationPopover.clickedDatetime?? undefined} // Pass it here
+        calendars={calendars}
+        categories={categories}
+        onClose={() =>
+          setCreationPopover({ anchorEl: null, clickedDatetime: null })
+        }
+      />
     </>
   );
 }

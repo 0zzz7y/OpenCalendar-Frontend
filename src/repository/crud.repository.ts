@@ -11,7 +11,8 @@ export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
     delete: (id: string) => Promise<void>
   },
   toDto: (domain: Partial<Domain>) => CreateDto,
-  fromDto: (raw: RawDto) => Domain
+  fromDto: (raw: RawDto) => Domain,
+  validate: (domain: Partial<Domain>) => void
 ) {
   return () => {
     const { getAll, create: createService, update: updateService, delete: deleteService } = service
@@ -30,24 +31,26 @@ export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
 
     const add = useCallback(
       async (domainObj: Partial<Domain>): Promise<Domain> => {
+        validate(domainObj) // Validate the input
         const dto = toDto(domainObj)
         const raw = await createService(dto)
         const newDomain = fromDto(raw)
         setItems([...items, newDomain])
         return newDomain
       },
-      [createService, toDto, fromDto, items, setItems]
+      [createService, toDto, fromDto, items, setItems, validate]
     )
 
     const update = useCallback(
-      async (domainObj: Domain): Promise<Domain> => {
+      async (domainObj: Partial<Domain> & { id: string }): Promise<Domain> => {
+        validate(domainObj) // Validate the input
         const dto = toDto(domainObj)
         const raw = await updateService(domainObj.id, dto)
         const updatedDomain = fromDto(raw)
         setItems(items.map((item) => (item.id === domainObj.id ? updatedDomain : item)))
         return updatedDomain
       },
-      [updateService, toDto, fromDto, items, setItems]
+      [updateService, toDto, fromDto, items, setItems, validate]
     )
 
     const remove = useCallback(

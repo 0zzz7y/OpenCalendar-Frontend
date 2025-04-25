@@ -51,16 +51,16 @@ export default function WeekView({
 
   // Popover state
   const [info, setInfo] = useState<{ anchor?: HTMLElement; event?: Event }>({});
-  const [creation, setCreation] = useState<{
-    anchor?: HTMLElement;
-    datetime?: Date;
+  const [creationPopover, setCreationPopover] = useState<{
+    anchorEl?: HTMLElement;
+    clickedDatetime?: Date;
   }>({});
   const [editingEvent, setEditingEvent] = useState<Event>();
 
   const handleSlotClick = useCallback((anchor: HTMLElement, datetime: Date) => {
     setInfo({});
     setEditingEvent(undefined);
-    setCreation({ anchor, datetime });
+    setCreationPopover({ anchorEl: anchor, clickedDatetime: datetime });
   }, []);
 
   const handleEventClick = useCallback(
@@ -69,7 +69,7 @@ export default function WeekView({
       const evt = sched as Event;
       const anchor = document.getElementById(`event-${evt.id}`);
       if (!anchor) return;
-      setCreation({});
+      setCreationPopover({});
       setInfo({ anchor, event: evt });
       onEventClick?.(evt);
     },
@@ -78,7 +78,7 @@ export default function WeekView({
 
   const closeAll = useCallback(() => {
     setInfo({});
-    setCreation({});
+    setCreationPopover({});
     setEditingEvent(undefined);
   }, []);
 
@@ -113,17 +113,22 @@ export default function WeekView({
     const ev = info.event;
     setInfo({});
     setEditingEvent(ev);
-    setCreation({ anchor: info.anchor, datetime: new Date(ev.startDate) });
+    setCreationPopover({
+      anchorEl: info.anchor,
+      clickedDatetime: new Date(ev.startDate),
+    });
   }, [info]);
 
   // Template for new event
-  const newEvent: Event | undefined = creation.datetime
+  const newEvent: Event | undefined = creationPopover.clickedDatetime
     ? {
         id: "",
         name: "",
         description: "",
-        startDate: creation.datetime.toISOString(),
-        endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),
+        startDate: creationPopover.clickedDatetime.toISOString(),
+        endDate: dayjs(creationPopover.clickedDatetime)
+          .add(1, "hour")
+          .toISOString(),
         recurringPattern: RecurringPattern.NONE,
         calendar: calendars[0],
         category: undefined,
@@ -241,12 +246,15 @@ export default function WeekView({
       </Box>
 
       {/* Popovers */}
-      {creation.anchor && creation.datetime && (
+      {creationPopover.anchorEl && creationPopover.clickedDatetime && (
         <EventCreationPopover
-          anchorEl={creation.anchor}
-          onClose={closeAll}
+          anchorEl={creationPopover.anchorEl}
+          clickedDatetime={creationPopover.clickedDatetime}
           calendars={calendars}
           categories={categories}
+          onClose={() =>
+            setCreationPopover({ anchorEl: null, clickedDatetime: null })
+          }
           initialEvent={editingEvent || newEvent}
         />
       )}
