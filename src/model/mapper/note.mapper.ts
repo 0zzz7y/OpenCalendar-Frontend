@@ -9,9 +9,7 @@ export function dtoToNote(dto: NoteDto, calendars: Calendar[], categories: Categ
     name: dto.name,
     description: dto.description,
     calendar: calendars.find((c) => c.id === dto.calendarId) as Calendar,
-    category: categories.find((c) => c.id === dto.categoryId) as Category,
-    positionX: Math.floor(Math.random() * 100),
-    positionY: Math.floor(Math.random() * 100)
+    category: categories.find((c) => c.id === dto.categoryId) as Category
   }
 }
 

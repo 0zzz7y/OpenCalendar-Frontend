@@ -7,8 +7,6 @@ interface Note {
   description: string
   calendar: Calendar
   category?: Category
-  positionX: number
-  positionY: number
 }
 
 export default Note

@@ -6,115 +6,120 @@
  * Displays a draggable panel of user notes on the current calendar view.
  * Provides functionality to add, update, and delete notes.
  */
-import React, { useState, useEffect, useCallback, useMemo } from "react"
-import { Box, IconButton } from "@mui/material"
-import AddIcon from "@mui/icons-material/Add"
+import React, { useState, useEffect, useCallback, useMemo } from "react";
+import { Box, IconButton } from "@mui/material";
+import AddIcon from "@mui/icons-material/Add";
 
 // Custom hook for note CRUD operations
-import useNotes from "@/repository/note.repository"
+import useNotes from "@/repository/note.repository";
 // Global application state store
-import useAppStore from "@/store/useAppStore"
+import useAppStore from "@/store/useAppStore";
 // Card component for rendering individual notes
-import NoteCard from "./NoteCard"
-import MESSAGE from "@/constant/ui/message"
-import type Note from "@/model/domain/note"
-import LABEL from "@/constant/ui/label"
+import NoteCard from "./NoteCard";
+import MESSAGE from "@/constant/ui/message";
+import type Note from "@/model/domain/note";
+import LABEL from "@/constant/ui/label";
 
 export default function NotesPanel() {
-  // Destructure note operations from repository hook
-  const { addNote, updateNote, deleteNote } = useNotes()
-  // Get global arrays of notes, categories, and calendars
-  const { notes, categories, calendars } = useAppStore()
-  // Local state to manage immediate UI updates before persistence
-  const [localNotes, setLocalNotes] = useState<Note[]>([])
+  const { addNote, updateNote, deleteNote } = useNotes();
+  const { notes, categories, calendars } = useAppStore();
+  const [localNotes, setLocalNotes] = useState<Note[]>([]);
+  const [notePositions, setNotePositions] = useState<
+    Record<string, { x: number; y: number }>
+  >({});
 
-  /**
-   * Sync local copy with global notes whenever they change
-   */
+  // Sync local copy with global notes whenever they change
   useEffect(() => {
-    if (Array.isArray(notes)) setLocalNotes(notes)
-  }, [notes])
+    if (Array.isArray(notes)) setLocalNotes(notes);
+  }, [notes]);
 
-  /**
-   * Default references for adding new notes
-   */
-  const defaultCalendar = useMemo(() => calendars[0] || null, [calendars])
-  const defaultCategory = useMemo(() => categories[0] || undefined, [categories])
+  const defaultCalendar = useMemo(() => calendars[0] || null, [calendars]);
+  const defaultCategory = useMemo(
+    () => categories[0] || undefined,
+    [categories]
+  );
 
-  /**
-   * Update handler: updates note in local state and persists change
-   */
   const handleUpdate = useCallback(
     (updated: Note) => {
-      setLocalNotes((prev) => prev.map((n) => (n.id === updated.id ? updated : n)))
-      updateNote(updated)
+      setLocalNotes((prev) =>
+        prev.map((n) => (n.id === updated.id ? updated : n))
+      );
+      updateNote(updated);
     },
     [updateNote]
-  )
+  );
 
-  /**
-   * Delete handler: removes note from local state and backend
-   */
   const handleDelete = useCallback(
     async (id: string) => {
-      setLocalNotes((prev) => prev.filter((n) => n.id !== id))
-      await deleteNote(id)
+      setLocalNotes((prev) => prev.filter((n) => n.id !== id));
+      setNotePositions((prev) => {
+        const { [id]: _, ...rest } = prev;
+        return rest;
+      });
+      await deleteNote(id);
     },
     [deleteNote]
-  )
+  );
 
-  /**
-   * Add handler: creates a temp note, persists it, and reconciles IDs
-   */
   const handleAddNote = useCallback(async () => {
-    if (!defaultCalendar) return
-    // Temporary ID for optimistic UI update
-    const tempId = `temp-${Date.now()}`
+    if (!defaultCalendar) return;
+
+    const container = document.querySelector("#notes-container") as HTMLElement;
+    const containerWidth = container?.offsetWidth || 800; // Default width
+    const containerHeight = container?.offsetHeight || 600; // Default height
+
+    const tempId = `temp-${Date.now()}`;
+    const randomX = Math.random() * (containerWidth - 200); // Assuming 200px is the note width
+    const randomY = Math.random() * (containerHeight - 100); // Assuming 100px is the note height
+
     const newNote: Note = {
       id: tempId,
-      name: MESSAGE.NEW_NOTE,
-      description: LABEL.DESCRIPTION,
+      name: "New Note",
+      description: "Description",
       calendar: defaultCalendar,
       category: defaultCategory,
-      // Random initial position
-      positionX: Math.random() * 200,
-      positionY: Math.random() * 200
-    }
-    // Optimistically add to UI
-    setLocalNotes((prev) => [...prev, newNote])
+    };
+
+    setLocalNotes((prev) => [...prev, newNote]);
+    setNotePositions((prev) => ({
+      ...prev,
+      [tempId]: { x: randomX, y: randomY },
+    }));
 
     try {
-      // Persist to backend
       const saved = await addNote({
         name: newNote.name,
         description: newNote.description,
         calendar: newNote.calendar,
         category: newNote.category,
-        positionX: newNote.positionX,
-        positionY: newNote.positionY
-      })
-      // Replace temp note with saved note (keeping UI position)
-      setLocalNotes((prev) =>
-        prev.map((n) => (n.id === tempId ? { ...saved, positionX: n.positionX, positionY: n.positionY } : n))
-      )
+      });
+
+      setLocalNotes((prev) => prev.map((n) => (n.id === tempId ? saved : n)));
+      setNotePositions((prev) => {
+        const { [tempId]: position, ...rest } = prev;
+        return { ...rest, [saved.id]: position };
+      });
     } catch {
-      // Rollback on failure
-      setLocalNotes((prev) => prev.filter((n) => n.id !== tempId))
+      setLocalNotes((prev) => prev.filter((n) => n.id !== tempId));
+      setNotePositions((prev) => {
+        const { [tempId]: _, ...rest } = prev;
+        return rest;
+      });
     }
-  }, [addNote, defaultCalendar, defaultCategory])
+  }, [addNote, defaultCalendar, defaultCategory]);
 
   return (
     <Box
+      id="notes-container"
       sx={{
         position: "absolute",
         top: 0,
         left: 0,
         right: 0,
         bottom: 0,
-        overflow: "hidden"
+        overflow: "hidden",
       }}
     >
-      {/* positioning context for draggable notes */}
       <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
         {localNotes.map((note) => (
           <NoteCard
@@ -124,15 +129,14 @@ export default function NotesPanel() {
             content={note.description}
             calendar={note.calendar}
             categories={categories}
-            initialX={note.positionX}
-            initialY={note.positionY}
+            initialX={notePositions[note.id]?.x || 0}
+            initialY={notePositions[note.id]?.y || 0}
             onUpdate={handleUpdate}
             onDelete={handleDelete}
           />
         ))}
       </Box>
 
-      {/* Floating add note button */}
       <IconButton
         onClick={handleAddNote}
         sx={{
@@ -142,11 +146,11 @@ export default function NotesPanel() {
           bgcolor: "primary.main",
           color: "white",
           "&:hover": { bgcolor: "primary.dark" },
-          zIndex: 1300
+          zIndex: 1300,
         }}
       >
         <AddIcon />
       </IconButton>
     </Box>
-  )
+  );
 }
