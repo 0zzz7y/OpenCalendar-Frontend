@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Box, TextField, Typography, IconButton } from "@mui/material"
+import { Box, TextField, Typography, IconButton, ClickAwayListener, Input, Paper } from "@mui/material"
 import EmojiPicker, { type EmojiClickData, EmojiStyle, Theme } from "emoji-picker-react"
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"
 
@@ -20,43 +20,42 @@ interface CalendarEditorProperties {
   mode: EditorMode
   initialData?: {
     id?: string
-    label?: string
+    name?: string
     emoji?: string
   }
   onClose: () => void
 }
 
-export default function CalendarEditor({ open, anchor, mode, initialData = {}, onClose }: CalendarEditorProperties) {
+export function CalendarEditor({ open, anchor, mode, initialData = {}, onClose }: CalendarEditorProperties) {
   const { reloadCalendars, addCalendar, updateCalendar, deleteCalendar } = useCalendar()
+  const inputReference = useRef<HTMLInputElement | null>(null)
 
-  const [form, setForm] = useState({ label: "", emoji: "📅" })
+  const [form, setForm] = useState({ name: "", emoji: "📅" })
   const [pickerOpen, setPickerOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-
-  const inputReference = useRef<HTMLInputElement | null>(null)
 
   useEffect(() => {
     if (open) {
       setForm({
-        label: initialData.label?.trim() || "",
+        name: initialData.name?.trim() || "",
         emoji: initialData.emoji || "📅"
       })
       setTimeout(() => inputReference.current?.focus(), 100)
     }
   }, [open, initialData])
 
-  const handleChange = useCallback((field: "label" | "emoji", value: string) => {
+  const handleChange = useCallback((field: "name" | "emoji", value: string) => {
     setForm((previous) => ({ ...previous, [field]: value }))
   }, [])
 
   const handleSave = useCallback(async () => {
-    if (!form.label) return
+    if (!form.name) return
     setLoading(true)
     try {
       if (mode === EditorMode.ADD) {
-        await addCalendar({ name: form.label, emoji: form.emoji })
+        await addCalendar({ name: form.name, emoji: form.emoji })
       } else if (mode === EditorMode.EDIT && initialData.id) {
-        await updateCalendar({ id: initialData.id, name: form.label, emoji: form.emoji })
+        await updateCalendar({ id: initialData.id, name: form.name, emoji: form.emoji })
       }
       await reloadCalendars()
       onClose()
@@ -83,7 +82,7 @@ export default function CalendarEditor({ open, anchor, mode, initialData = {}, o
 
   return (
     <Popover open={open} anchor={anchor} onClose={onClose}>
-      <Box sx={{ width: 280 }}>
+      <Box sx={{ width: 280 }} paddingRight={2}>
         {mode !== EditorMode.DELETE ? (
           <>
             <Typography variant="subtitle2" color="primary" fontWeight={500}>
@@ -93,18 +92,21 @@ export default function CalendarEditor({ open, anchor, mode, initialData = {}, o
             <TextField
               inputRef={inputReference}
               placeholder={LABEL.NAME}
-              value={form.label}
-              onChange={(element) => handleChange("label", element.target.value)}
+              value={form.name}
+              onChange={(element) => handleChange("name", element.target.value)}
               fullWidth
               size="small"
               margin="dense"
             />
 
-            <Box display="flex" alignItems="center" justifyContent="space-between" mt={2} mb={1}>
-              <Typography fontSize={24}>{form.emoji}</Typography>
-              <IconButton onClick={() => setPickerOpen((previous) => !previous)}>
-                <EmojiEmotionsIcon fontSize="small" />
-              </IconButton>
+            <Box display="flex" alignItems="center" justifyContent="space-between" mt={2}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <Typography fontSize={24}>{form.emoji}</Typography>
+                <IconButton onClick={() => setPickerOpen((previous) => !previous)}>
+                  <EmojiEmotionsIcon fontSize="small" />
+                </IconButton>
+              </Box>
+              <SaveButton onClick={handleSave} loading={loading} />
             </Box>
 
             {pickerOpen && (
@@ -122,8 +124,6 @@ export default function CalendarEditor({ open, anchor, mode, initialData = {}, o
                 theme={Theme.LIGHT}
               />
             )}
-
-            <SaveButton onClick={handleSave} loading={loading} />
           </>
         ) : (
           <>
@@ -138,3 +138,5 @@ export default function CalendarEditor({ open, anchor, mode, initialData = {}, o
     </Popover>
   )
 }
+
+export default CalendarEditor
