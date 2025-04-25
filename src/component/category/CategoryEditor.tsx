@@ -33,7 +33,7 @@ export default function CategoryEditor({
 }: CategoryEditorProperties) {
   const { reloadCategories, addCategory, updateCategory, deleteCategory } = useCategory()
   const inputReference = useRef<HTMLInputElement | null>(null)
-  
+
   const [form, setForm] = useState({ name: "", color: "#3b5bdb" })
   const [loading, setLoading] = useState(false)
 
@@ -50,7 +50,6 @@ export default function CategoryEditor({
   const handleChange = useCallback((field: "name" | "color", value: string) => {
     setForm((previous) => ({ ...previous, [field]: value }))
   }, [])
-
 
   const handleSave = useCallback(async () => {
     if (!form.name) return
