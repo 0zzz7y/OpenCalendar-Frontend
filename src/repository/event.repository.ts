@@ -10,17 +10,20 @@ import type EventDto from "@/model/dto/event.dto"
 import { createUseCrud } from "@/repository/crud.repository"
 import useAppStore from "@/store/useAppStore"
 
-const useCrudEvent = createUseCrud<Event, EventDto, EventDto>(
-  "events",
-  {
-    getAll: getEvents,
-    create: createEvent,
-    update: serviceUpdateEvent,
-    delete: serviceDeleteEvent
-  },
-  eventToDto,
-  (dto) => dtoToEvent(dto, useAppStore().calendars, useAppStore().categories)
-)
+const useCrudEvent = () => {
+  const { calendars, categories } = useAppStore()
+  return createUseCrud<Event, EventDto, EventDto>(
+    "events",
+    {
+      getAll: getEvents,
+      create: createEvent,
+      update: serviceUpdateEvent,
+      delete: serviceDeleteEvent
+    },
+    eventToDto,
+    (dto) => dtoToEvent(dto, calendars, categories)
+  )()
+}
 
 export function useEvent() {
   const { reload, add, update, remove } = useCrudEvent()

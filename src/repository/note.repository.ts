@@ -10,17 +10,20 @@ import type NoteDto from "@/model/dto/note.dto"
 import { createUseCrud } from "@/repository/crud.repository"
 import useAppStore from "@/store/useAppStore"
 
-const useCrudNote = createUseCrud<Note, NoteDto, NoteDto>(
-  "notes",
-  {
-    getAll: getNotes,
-    create: createNote,
-    update: serviceUpdateNote,
-    delete: serviceDeleteNote
-  },
-  noteToDto,
-  (dto) => dtoToNote(dto, useAppStore().calendars, useAppStore().categories)
-)
+const useCrudNote = () => {
+  const { calendars, categories } = useAppStore()
+  return createUseCrud<Note, NoteDto, NoteDto>(
+    "notes",
+    {
+      getAll: getNotes,
+      create: createNote,
+      update: serviceUpdateNote,
+      delete: serviceDeleteNote
+    },
+    noteToDto,
+    (dto) => dtoToNote(dto, calendars, categories)
+  )()
+}
 
 export function useNote() {
   const { reload, add, update, remove } = useCrudNote()

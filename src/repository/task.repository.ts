@@ -10,17 +10,20 @@ import type TaskDto from "@/model/dto/task.dto"
 import useAppStore from "@/store/useAppStore"
 import { createUseCrud } from "@/repository/crud.repository"
 
-const useCrudTask = createUseCrud<Task, TaskDto, TaskDto>(
-  "tasks",
-  {
-    getAll: getTasks,
-    create: createTask,
-    update: serviceUpdateTask,
-    delete: serviceDeleteTask
-  },
-  taskToDto,
-  (dto) => dtoToTask(dto, useAppStore().calendars, useAppStore().categories)
-)
+const useCrudTask = () => {
+  const { calendars, categories } = useAppStore()
+  return createUseCrud<Task, TaskDto, TaskDto>(
+    "tasks",
+    {
+      getAll: getTasks,
+      create: createTask,
+      update: serviceUpdateTask,
+      delete: serviceDeleteTask
+    },
+    taskToDto,
+    (dto) => dtoToTask(dto, calendars, categories)
+  )()
+}
 
 export function useTask() {
   const { reload, add, update, remove } = useCrudTask()

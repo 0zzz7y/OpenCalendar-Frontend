@@ -21,7 +21,7 @@ const useCrudCategory = createUseCrud<Category, CategoryDto, CategoryDto>(
   dtoToCategory
 )
 
-function useCategory() {
+export function useCategory() {
   const { reload, add, update, remove } = useCrudCategory()
   return {
     reloadCategories: reload,
