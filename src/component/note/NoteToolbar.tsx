@@ -197,3 +197,5 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
     </Box>
   );
 };
+
+export default NoteToolbar;

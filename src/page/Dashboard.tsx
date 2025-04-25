@@ -1,28 +1,23 @@
-import CalendarPanel from "@/component/calendar/CalendarPanel"
-import CalendarSelector from "@/component/calendar/CalendarSelector"
+import { CalendarSelector, CalendarPanel } from "@/component/calendar"
 import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
-import CategorySelector from "@/component/category/CategorySelector"
+import { CategorySelector } from "@/component/category"
 import NotesPanel from "@/component/note/NotePanel"
 import TasksPanel from "@/component/task/TaskPanel"
-import { loadCalendars } from "@/controller/calendar.controller"
-import { loadCategories } from "@/controller/category.controller"
-import { loadEvents } from "@/controller/event.controller"
-import { loadNotes } from "@/controller/note.controller"
-import { loadTasks } from "@/controller/task.controller"
+import { loadCalendars, loadCategories, loadEvents, loadTasks, loadNotes } from "@/controller"
 import ThemeToggleButton from "@/theme/ThemeToggleButton"
-
 import { Box } from "@mui/material"
 import { useEffect } from "react"
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
-
 const panelStyle = {
   border: "2px solid #ccc",
   borderRadius: "8px",
   padding: "10px",
   margin: "10px 5px"
 }
-
 const Dashboard = () => {
+  /**
+   * Load all initial data for calendars, categories, events, tasks, and notes
+   */
   useEffect(() => {
     loadCalendars()
     loadCategories()
@@ -33,10 +28,10 @@ const Dashboard = () => {
 
   return (
     <PanelGroup direction="horizontal" style={{ height: "100vh", width: "100%" }}>
-      {/* Left Panel */}
+      {/* Left Sidebar: selectors and mini-calendar */}
       <Panel defaultSize={18}>
         <PanelGroup direction="vertical" style={{ height: "100%", width: "100%" }}>
-          {/* Calendar and Category Section */}
+          {/* Calendar and Category selectors */}
           <Panel style={panelStyle} defaultSize={12}>
             <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
               <Box display="flex" flexDirection="column" gap={2}>
@@ -48,7 +43,7 @@ const Dashboard = () => {
 
           <PanelResizeHandle />
 
-          {/* Monthly Calendar */}
+          {/* Monthly calendar overview */}
           <Panel
             defaultSize={30}
             style={{
@@ -66,12 +61,13 @@ const Dashboard = () => {
 
           <PanelResizeHandle />
 
-          {/* Notes Section */}
+          {/* Notes section in sidebar */}
           <Panel style={{ ...panelStyle, margin: "10px 5px", padding: 0 }}>
             <Box display="flex" flexDirection="column" height="100%" position="relative">
               <Box flexGrow={1} overflow="auto">
                 <NotesPanel />
               </Box>
+              {/* Theme toggle at the bottom */}
               <Box
                 sx={{
                   position: "absolute",
@@ -91,14 +87,14 @@ const Dashboard = () => {
 
       <PanelResizeHandle />
 
-      {/* Center Panel */}
+      {/* Main calendar panel */}
       <Panel style={{ ...panelStyle, margin: "10px 5px" }}>
         <CalendarPanel />
       </Panel>
 
       <PanelResizeHandle />
 
-      {/* Right Panel */}
+      {/* Right Sidebar: tasks list */}
       <Panel defaultSize={20}>
         <Box display="flex" flexDirection="column" height="100%" sx={{ ...panelStyle, m: "10px 10px 5px 5px" }}>
           <Box flexGrow={1} overflow="auto">

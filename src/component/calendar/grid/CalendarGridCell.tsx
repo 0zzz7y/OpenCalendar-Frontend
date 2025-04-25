@@ -102,7 +102,7 @@ export default function CalendarGridCell({ datetime, allEvents, onSave, onClick 
         <Box
           sx={{
             position: "absolute",
-            left: 0,
+            left: 5,
             top: 2,
             fontSize: "0.75rem",
             color: (theme) => theme.palette.text.secondary

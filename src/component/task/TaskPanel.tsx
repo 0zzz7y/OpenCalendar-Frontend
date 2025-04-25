@@ -20,7 +20,7 @@ export default function TasksPanel() {
   const [newTitle, setNewTitle] = useState("");
 
   const defaultCalendar = useMemo(() => calendars[0] || null, [calendars]);
-  const defaultCategory = useMemo(() => categories[0] || null, [categories]);
+  const defaultCategory = useMemo(() => categories.findLast || null, [categories]);
 
   const handleCreate = useCallback(async () => {
     const title = newTitle.trim();

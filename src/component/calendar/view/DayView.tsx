@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useCallback } from "react"
-import { Box } from "@mui/material"
+import { Box, Typography } from "@mui/material"
 import dayjs from "dayjs"
 import { EventCreationPopover, EventInformationPopover } from "@/component/event"
 import useEvent from "@/repository/event.repository"
@@ -16,20 +16,33 @@ export interface DayViewProps {
   onEventClick?: (event: Event) => void
 }
 
-export default function DayView({ date, events, calendars, categories, onEventClick }: DayViewProps) {
+export default function DayView({
+  date,
+  events,
+  calendars,
+  categories,
+  onEventClick,
+}: DayViewProps) {
   const { updateEvent } = useEvent()
 
   const dayEvents = useMemo(
-    () => events.filter((e): e is Event => !!e.startDate && dayjs(e.startDate).isSame(date, "day")),
+    () =>
+      events.filter(
+        (e): e is Event =>
+          !!e.startDate && dayjs(e.startDate).isSame(date, "day")
+      ),
     [events, date]
   )
 
-  const [slotInfo, setSlotInfo] = useState<{ anchor?: HTMLElement; datetime?: Date }>({})
+  const [slotInfo, setSlotInfo] = useState<{
+    anchor?: HTMLElement
+    datetime?: Date
+  }>({})
   const [infoState, setInfoState] = useState<{
     anchor?: HTMLElement
     event?: Event
   }>({})
-  const [editingEvent, setEditingEvent] = useState<Event | undefined>(undefined)
+  const [editingEvent, setEditingEvent] = useState<Event>()
 
   const handleSlotClick = useCallback((anchor: HTMLElement, datetime: Date) => {
     setEditingEvent(undefined)
@@ -67,9 +80,10 @@ export default function DayView({ date, events, calendars, categories, onEventCl
       }
       closeAll()
     },
-    [updateEvent, closeAll, events]
+    [events, updateEvent, closeAll]
   )
 
+  // New‐event template
   const newEvent: Event | undefined = slotInfo.datetime
     ? {
         id: "",
@@ -79,24 +93,59 @@ export default function DayView({ date, events, calendars, categories, onEventCl
         endDate: dayjs(slotInfo.datetime).add(1, "hour").toISOString(),
         recurringPattern: RecurringPattern.NONE,
         calendar: calendars[0],
-        category: undefined
+        category: undefined,
       }
     : undefined
 
   return (
     <>
-      <Box display="flex" flex={1} p={2} sx={{ height: "100vh", overflow: "auto" }}>
-        <DayColumn
-          date={date}
-          events={dayEvents}
-          calendars={calendars}
-          categories={categories}
-          onSave={handleSave}
-          onSlotClick={handleSlotClick}
-          onEventClick={handleEventClick}
-        />
+      {/* fill parent but don’t scroll header */}
+      <Box
+        display="flex"
+        flexDirection="column"
+        flex={1}
+        sx={{ height: "100%", overflow: "hidden" }}
+      >
+        {/* optional single‐day header */}
+        <Box
+          sx={{
+            height: 64,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            borderBottom: (theme) =>
+              `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <Typography variant="h6">
+            {dayjs(date).format("dddd, MMM D")}
+          </Typography>
+        </Box>
+
+        {/* only this scrolls */}
+        <Box
+          sx={{
+            flex: 1,
+            overflowY: "auto",
+            pb: 4, // show 11:30 slot
+            borderLeft: (theme) => `1px solid ${theme.palette.divider}`,
+            borderRight: (theme) => `1px solid ${theme.palette.divider}`,
+            borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
+          }}
+        >
+          <DayColumn
+            date={date}
+            events={dayEvents}
+            calendars={calendars}
+            categories={categories}
+            onSave={handleSave}
+            onSlotClick={handleSlotClick}
+            onEventClick={handleEventClick}
+          />
+        </Box>
       </Box>
 
+      {/* popovers */}
       {slotInfo.anchor && slotInfo.datetime && (
         <EventCreationPopover
           anchorEl={slotInfo.anchor}
@@ -106,7 +155,6 @@ export default function DayView({ date, events, calendars, categories, onEventCl
           initialEvent={editingEvent || newEvent}
         />
       )}
-
       {infoState.anchor && infoState.event && (
         <EventInformationPopover
           anchorElement={infoState.anchor}
