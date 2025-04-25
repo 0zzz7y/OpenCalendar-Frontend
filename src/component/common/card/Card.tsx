@@ -1,10 +1,10 @@
-import { Paper } from '@mui/material';
-import type { ReactNode } from 'react';
+import { Paper } from "@mui/material"
+import type { ReactNode } from "react"
 
 interface CardProperties {
-  children: ReactNode;
-  padding?: number;
-  hoverable?: boolean;
+  children: ReactNode
+  padding?: number
+  hoverable?: boolean
 }
 
 const Card = ({ children, padding = 2, hoverable = true }: CardProperties) => (
@@ -13,12 +13,12 @@ const Card = ({ children, padding = 2, hoverable = true }: CardProperties) => (
     sx={{
       p: padding,
       borderRadius: 2,
-      transition: '0.2s ease',
-      '&:hover': hoverable ? { boxShadow: 6 } : {},
+      transition: "0.2s ease",
+      "&:hover": hoverable ? { boxShadow: 6 } : {}
     }}
   >
     {children}
   </Paper>
-);
+)
 
-export default Card;
+export default Card

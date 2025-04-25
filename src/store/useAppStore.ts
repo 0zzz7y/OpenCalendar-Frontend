@@ -4,6 +4,7 @@ import type Category from "@/model/domain/category"
 import type Event from "@/model/domain/event"
 import type Task from "@/model/domain/task"
 import type Note from "@/model/domain/note"
+import FILTER from "@/constant/utility/filter"
 
 interface AppStore {
   calendars: Calendar[]
@@ -34,10 +35,10 @@ const useAppStore = create<AppStore>((set) => ({
   tasks: [],
   notes: [],
 
-  selectedCalendar: "all",
+  selectedCalendar: FILTER.ALL,
   setSelectedCalendar: (id) => set({ selectedCalendar: id }),
 
-  selectedCategory: "all",
+  selectedCategory: FILTER.ALL,
   setSelectedCategory: (id) => set({ selectedCategory: id }),
 
   setCalendars: (calendars) => set({ calendars: ensureArray<Calendar>(calendars) }),

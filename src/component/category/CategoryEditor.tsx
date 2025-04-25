@@ -1,102 +1,83 @@
-import React, { useState, useEffect, useRef, useCallback } from "react";
-import {
-  Box,
-  Button,
-  ClickAwayListener,
-  Input,
-  Paper,
-  Popover,
-  TextField,
-  Typography,
-} from "@mui/material";
-import EditorMode from "@/model/utility/editorMode";
-import PLACEHOLDERS from "@/constant/ui/label";
-import BUTTON from "@/constant/ui/button";
-import MESSAGE from "@/constant/ui/message";
+import { useState, useEffect, useRef, useCallback } from "react"
+import { Box, ClickAwayListener, Input, Paper, TextField, Typography } from "@mui/material"
 
-export interface CategoryEditorProps {
-  open: boolean;
-  anchorEl: HTMLElement | null;
-  mode: EditorMode.ADD | EditorMode.EDIT | EditorMode.DELETE;
-  initialData: { id?: string; name?: string; color?: string };
-  loading: boolean;
-  onClose: () => void;
-  onSave: (payload: { id?: string; name: string; color: string }) => void;
-  onDelete: (id: string) => void;
+import Popover from "@/component/common/popover/Popover"
+import SaveButton from "@/component/common/button/SaveButton"
+import CancelButton from "@/component/common/button/CancelButton"
+
+import EditorMode from "@/model/utility/editorMode"
+import BUTTON from "@/constant/ui/button"
+import LABEL from "@/constant/ui/label"
+import MESSAGE from "@/constant/ui/message"
+
+interface CategoryEditorProperties {
+  open: boolean
+  anchor: HTMLElement | null
+  mode: EditorMode
+  initialData: { id?: string; name?: string; color?: string }
+  loading: boolean
+  onClose: () => void
+  onSave: (payload: { id?: string; name: string; color: string }) => void
+  onDelete: (id: string) => void
 }
 
 export default function CategoryEditor({
   open,
-  anchorEl,
+  anchor,
   mode,
   initialData,
   loading,
   onClose,
   onSave,
-  onDelete,
-}: CategoryEditorProps) {
-  const inputRef = useRef<HTMLInputElement>(null);
-  const [form, setForm] = useState({ name: "", color: "#3b5bdb" });
+  onDelete
+}: CategoryEditorProperties) {
+  const inputReference = useRef<HTMLInputElement>(null)
+  const [form, setForm] = useState({ name: "", color: "#3b5bdb" })
 
-  // Sync initial data when opening
   useEffect(() => {
     if (open) {
       setForm({
         name: initialData.name?.trim() || "",
-        color: initialData.color || "#3b5bdb",
-      });
-      setTimeout(() => {
-        inputRef.current?.focus();
-      }, 50);
+        color: initialData.color || "#3b5bdb"
+      })
+      setTimeout(() => inputReference.current?.focus(), 50)
     }
-  }, [open, initialData]);
+  }, [open, initialData])
 
-  const handleChange = useCallback(
-    (field: "name" | "color", value: string) =>
-      setForm((prev) => ({ ...prev, [field]: value })),
-    []
-  );
+  const handleChange = useCallback((field: "name" | "color", value: string) => {
+    setForm((previous) => ({ ...previous, [field]: value }))
+  }, [])
 
   const handleSave = useCallback(() => {
-    if (!form.name) return;
-    onSave({ id: initialData.id, name: form.name, color: form.color });
-  }, [form, initialData.id, onSave]);
+    if (!form.name) return
+    onSave({ id: initialData.id, name: form.name, color: form.color })
+  }, [form, initialData.id, onSave])
 
   const handleDelete = useCallback(() => {
-    if (initialData.id) onDelete(initialData.id);
-  }, [initialData.id, onDelete]);
+    if (initialData.id) onDelete(initialData.id)
+  }, [initialData.id, onDelete])
 
   const handleClickAway = useCallback(
     (event: MouseEvent | TouchEvent) => {
-      if (!anchorEl?.contains(event.target as Node)) {
-        onClose();
-      }
+      if (!anchor?.contains(event.target as Node)) onClose()
     },
-    [anchorEl, onClose]
-  );
+    [anchor, onClose]
+  )
 
   return (
-    <Popover
-      open={open}
-      anchorEl={anchorEl}
-      onClose={onClose}
-      anchorOrigin={{ vertical: "bottom", horizontal: "left" }}
-      transformOrigin={{ vertical: "top", horizontal: "left" }}
-    >
+    <Popover open={open} anchor={anchor} onClose={onClose}>
       <ClickAwayListener onClickAway={handleClickAway}>
         <Paper sx={{ p: 2, width: 280 }}>
           {(mode === EditorMode.ADD || mode === EditorMode.EDIT) && (
             <>
               <Typography variant="subtitle2" gutterBottom>
-                {mode === EditorMode.ADD
-                  ? MESSAGE.ADD_CATEGORY
-                  : MESSAGE.EDIT_CATEGORY}
+                {mode === EditorMode.ADD ? MESSAGE.ADD_CATEGORY : MESSAGE.EDIT_CATEGORY}
               </Typography>
               <TextField
-                inputRef={inputRef}
-                placeholder={PLACEHOLDERS.NAME}
+                inputRef={inputReference}
+                placeholder={LABEL.NAME}
                 value={form.name}
-                onChange={(e) => handleChange("name", e.target.value)}
+                onChange={(element) => handleChange("name", element.target.value)}
                 fullWidth
                 size="small"
                 margin="dense"
@@ -105,44 +86,25 @@ export default function CategoryEditor({
                 <Input
                   type="color"
                   value={form.color}
-                  onChange={(e) => handleChange("color", e.target.value)}
+                  onChange={(element) => handleChange("color", element.target.value)}
                   sx={{ minWidth: 40 }}
                 />
-                <Button
-                  variant="contained"
-                  fullWidth
-                  onClick={handleSave}
-                  disabled={loading}
-                >
-                  {mode === EditorMode.ADD ? BUTTON.ADD : BUTTON.SAVE}
-                </Button>
+                <SaveButton onClick={handleSave} loading={loading} />
               </Box>
             </>
           )}
 
           {mode === EditorMode.DELETE && (
             <>
-              <Typography variant="body2">
-                {MESSAGE.CONFIRM_DELETE_CATEGORY}
-              </Typography>
+              <Typography variant="body2">{MESSAGE.CONFIRM_DELETE_CATEGORY}</Typography>
               <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
-                <Button size="small" onClick={onClose}>
-                  {BUTTON.CANCEL}
-                </Button>
-                <Button
-                  size="small"
-                  variant="contained"
-                  color="error"
-                  onClick={handleDelete}
-                  disabled={loading}
-                >
-                  {BUTTON.DELETE}
-                </Button>
+                <CancelButton onClick={onClose} />
+                <SaveButton onClick={handleDelete} loading={loading} label={BUTTON.DELETE} />
               </Box>
             </>
           )}
         </Paper>
       </ClickAwayListener>
     </Popover>
-  );
+  )
 }

@@ -1,4 +1,4 @@
-import { Box } from '@mui/material'
+import { Box } from "@mui/material"
 
 interface ColorDotProperties {
   color: string
@@ -10,8 +10,8 @@ const ColorDot = ({ color, size = 12 }: ColorDotProperties) => (
     sx={{
       width: size,
       height: size,
-      borderRadius: '50%',
-      backgroundColor: color,
+      borderRadius: "50%",
+      backgroundColor: color
     }}
   />
 )

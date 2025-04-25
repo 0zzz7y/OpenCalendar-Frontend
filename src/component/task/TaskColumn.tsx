@@ -22,7 +22,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
       backgroundColor: "#fefefe",
       borderRadius: 2,
       boxShadow: 3,
-      overflow: "hidden",
+      overflow: "hidden"
     }}
   >
     <Box
@@ -35,7 +35,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
         alignItems: "center",
         position: "relative",
         borderBottom: "1px solid #ddd",
-        backgroundColor: "#f5f5f5",
+        backgroundColor: "#f5f5f5"
       }}
     >
       <Box
@@ -49,17 +49,13 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
           height: 32,
           borderRadius: "50%",
           backgroundColor: "#fff",
-          boxShadow: 1,
+          boxShadow: 1
         }}
       >
         {icon}
       </Box>
 
-      <Typography
-        variant="h6"
-        fontWeight="bold"
-        sx={{ color: "#000", textAlign: "center" }}
-      >
+      <Typography variant="h6" fontWeight="bold" sx={{ color: "#000", textAlign: "center" }}>
         {title}
       </Typography>
     </Box>
@@ -72,13 +68,12 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
         p: 2,
         display: "flex",
         flexDirection: "column",
-        gap: 2,
+        gap: 2
       }}
     >
       {children}
     </Box>
   </Paper>
 )
-
 
 export default TaskColumn

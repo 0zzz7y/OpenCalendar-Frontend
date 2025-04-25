@@ -1,170 +1,120 @@
-import React, { useState, useMemo, useCallback } from "react";
-import {
-  Box,
-  MenuItem,
-  TextField,
-  Typography,
-  IconButton,
-} from "@mui/material";
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline";
-import EditIcon from "@mui/icons-material/Edit";
-import DeleteIcon from "@mui/icons-material/Delete";
-import useAppStore from "@/store/useAppStore";
-import CategoryEditor from "./CategoryEditor";
-import EditorMode from "@/model/utility/editorMode";
-import PLACEHOLDERS from "@/constant/ui/label";
-import FILTER from "@/constant/utility/filter";
+import { useState, useMemo, useCallback } from "react"
+import { Box, Typography, IconButton } from "@mui/material"
+import EditIcon from "@mui/icons-material/Edit"
+import DeleteIcon from "@mui/icons-material/Delete"
+
+import useAppStore from "@/store/useAppStore"
+import CategoryEditor from "./CategoryEditor"
+
+import EditorMode from "@/model/utility/editorMode"
+import LABEL from "@/constant/ui/label"
+import FILTER from "@/constant/utility/filter"
+
+import Selector from "@/component/common/selector/Selector"
+import AddButton from "@/component/common/button/AddButton"
+import ColorDot from "@/component/common/colordot/ColorDot"
 
 export default function CategorySelector() {
-  const categories = useAppStore((s) => s.categories);
-  const selectedCategory = useAppStore((s) => s.selectedCategory);
-  const setSelectedCategory = useAppStore((s) => s.setSelectedCategory);
+  const categories = useAppStore((state) => state.categories)
+  const selectedCategory = useAppStore((state) => state.selectedCategory) || FILTER.ALL
+  const setSelectedCategory = useAppStore((state) => state.setSelectedCategory)
 
-  // Editor popover state
-  const [editorOpen, setEditorOpen] = useState(false);
-  const [editorAnchor, setEditorAnchor] = useState<HTMLElement | null>(null);
-  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD);
-  const [editorData, setEditorData] = useState<{
-    id?: string;
-    name?: string;
-    color?: string;
-  }>({});
+  const [editorOpen, setEditorOpen] = useState(false)
+  const [anchor, setAnchor] = useState<HTMLElement | null>(null)
+  const [editorMode, setEditorMode] = useState<EditorMode>(EditorMode.ADD)
+  const [editorData, setEditorData] = useState<{ id?: string; name?: string; color?: string }>({})
 
-  // Memoized options
   const categoryOptions = useMemo(
     () => [
-      { label: "All", value: "all", color: "#ffffff" },
-      ...categories.map((cat) => ({
-        label: cat.name,
-        value: cat.id,
-        color: cat.color,
-      })),
+      { label: FILTER.ALL, value: FILTER.ALL, color: "#ffffff" },
+      ...categories.map((category) => ({
+        label: category.name,
+        value: category.id,
+        color: category.color
+      }))
     ],
     [categories]
-  );
+  )
 
   const openEditor = useCallback(
-    (
-      mode: EditorMode,
-      anchor: HTMLElement,
-      data: { id?: string; name?: string; color?: string } = {}
-    ) => {
-      setEditorMode(mode);
-      setEditorData(data);
-      setEditorAnchor(anchor);
-      setEditorOpen(true);
+    (mode: EditorMode, anchor: HTMLElement, data: { id?: string; name?: string; color?: string }) => {
+      setEditorMode(mode)
+      setEditorData(data)
+      setAnchor(anchor)
+      setEditorOpen(true)
     },
     []
-  );
+  )
 
   const closeEditor = useCallback(() => {
-    setEditorOpen(false);
-    setEditorAnchor(null);
-    setEditorData({});
-  }, []);
+    setEditorOpen(false)
+    setEditorData({})
+    setAnchor(null)
+  }, [])
 
-  const handleSelectChange = useCallback(
-    (value: string) => setSelectedCategory(value),
-    [setSelectedCategory]
-  );
+  const handleChange = useCallback((categoryId: string) => setSelectedCategory(categoryId), [setSelectedCategory])
 
   return (
     <Box display="flex" alignItems="center" gap={1} width="100%">
-      <TextField
-        select
-        label={PLACEHOLDERS.CATEGORY}
+      <Selector
+        label={LABEL.CATEGORY}
         value={selectedCategory || FILTER.ALL}
-        onChange={(e) => handleSelectChange(e.target.value)}
-        fullWidth
-        size="small"
-        SelectProps={{
-          renderValue: (selected) => {
-            const opt = categoryOptions.find((o) => o.value === selected);
-            return (
-              <Box display="flex" alignItems="center" gap={1}>
-                {opt?.color && (
-                  <Box
-                    width={10}
-                    height={10}
-                    borderRadius="50%"
-                    bgcolor={opt.color}
-                  />
-                )}
-                <Typography variant="body2">{opt?.label}</Typography>
-              </Box>
-            );
-          },
-        }}
+        onChange={handleChange}
+        options={categoryOptions}
       >
-        {categoryOptions.map((opt) => (
-          <MenuItem key={opt.value} value={opt.value}>
-            <Box
-              display="flex"
-              justifyContent="space-between"
-              alignItems="center"
-              width="100%"
-            >
-              <Box display="flex" alignItems="center" gap={1}>
-                {opt.color && (
-                  <Box
-                    width={10}
-                    height={10}
-                    borderRadius="50%"
-                    bgcolor={opt.color}
-                  />
-                )}
-                <Typography variant="body2">{opt.label}</Typography>
-              </Box>
-              {opt.value !== "all" && (
-                <Box display="flex" gap={1}>
-                  <IconButton
-                    size="small"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditor(EditorMode.EDIT, e.currentTarget, {
-                        id: opt.value,
-                        name: opt.label,
-                        color: opt.color,
-                      });
-                    }}
-                  >
-                    <EditIcon fontSize="small" />
-                  </IconButton>
-                  <IconButton
-                    size="small"
-                    disabled={opt.value === selectedCategory}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      openEditor(EditorMode.DELETE, e.currentTarget, {
-                        id: opt.value,
-                        name: opt.label,
-                        color: opt.color,
-                      });
-                    }}
-                  >
-                    <DeleteIcon fontSize="small" />
-                  </IconButton>
-                </Box>
-              )}
+        {(option) => (
+          <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
+            <Box display="flex" alignItems="center" gap={1}>
+              <ColorDot color={option.color ?? COLOR.WHITE} size={10} />
+              <Typography variant="body2">{option.label}</Typography>
             </Box>
-          </MenuItem>
-        ))}
-      </TextField>
+            {option.value !== FILTER.ALL && (
+              <Box display="flex" gap={1}>
+                <IconButton
+                  size="small"
+                  onClick={(element) => {
+                    element.stopPropagation()
+                    openEditor(EditorMode.EDIT, element.currentTarget, {
+                      id: option.value,
+                      name: option.label,
+                      color: option.color
+                    })
+                  }}
+                >
+                  <EditIcon fontSize="small" />
+                </IconButton>
+                <IconButton
+                  size="small"
+                  disabled={option.value === selectedCategory}
+                  onClick={(element) => {
+                    element.stopPropagation()
+                    openEditor(EditorMode.DELETE, element.currentTarget, {
+                      id: option.value,
+                      name: option.label,
+                      color: option.color
+                    })
+                  }}
+                >
+                  <DeleteIcon fontSize="small" />
+                </IconButton>
+              </Box>
+            )}
+          </Box>
+        )}
+      </Selector>
 
-      <IconButton
-        onClick={(e) =>
-          openEditor(EditorMode.ADD, e.currentTarget, {
+      <AddButton
+        onClick={(element) =>
+          openEditor(EditorMode.ADD, element.currentTarget, {
             name: "",
-            color: "#3b5bdb",
+            color: "#3b5bdb"
           })
         }
-      >
-        <AddCircleOutlineIcon fontSize="small" />
-      </IconButton>
+      />
 
       <CategoryEditor
         open={editorOpen}
-        anchorEl={editorAnchor}
+        anchor={anchor}
         mode={editorMode}
         initialData={editorData}
         loading={false}
@@ -173,5 +123,5 @@ export default function CategorySelector() {
         onDelete={() => {}}
       />
     </Box>
-  );
+  )
 }

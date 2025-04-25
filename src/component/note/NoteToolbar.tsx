@@ -1,42 +1,35 @@
-import type React from "react";
-import { useState, useCallback } from "react";
-import {
-  Box,
-  IconButton,
-  Popover,
-  Typography,
-  Button,
-  TextField,
-} from "@mui/material";
+import type React from "react"
+import { useState, useCallback } from "react"
+import { Box, IconButton, Popover, Typography, Button, TextField } from "@mui/material"
 import {
   ChevronRight as ChevronRightIcon,
   ExpandMore as ExpandMoreIcon,
   Clear as ClearIcon,
-  Delete as DeleteIcon,
-} from "@mui/icons-material";
+  Delete as DeleteIcon
+} from "@mui/icons-material"
 import {
   FormatBold as FormatBoldIcon,
   FormatItalic as FormatItalicIcon,
-  FormatUnderlined as FormatUnderlinedIcon,
-} from "@mui/icons-material";
+  FormatUnderlined as FormatUnderlinedIcon
+} from "@mui/icons-material"
 
-import TOOLBAR from "@/constant/utility/toolbar";
-import MESSAGE from "@/constant/ui/message";
-import type FormatCommand from "@/model/utility/formatCommand";
-import BUTTON from "@/constant/ui/button";
+import TOOLBAR from "@/constant/utility/toolbar"
+import MESSAGE from "@/constant/ui/message"
+import type FormatCommand from "@/model/utility/formatCommand"
+import BUTTON from "@/constant/ui/button"
 
 export interface NoteToolbarProps {
-  isCollapsed: boolean;
-  onToggleCollapse: () => void;
-  onClearText: () => void;
-  onDelete: () => void;
-  onFormatText: (command: FormatCommand) => void;
-  activeFormats: Record<FormatCommand, boolean>;
-  selectedCategory: string | null;
-  onCategoryMenuOpen: (anchor: HTMLElement) => void;
-  noteName: string;
-  onNameChange: (newName: string) => void;
-  onNameBlur?: () => void;
+  isCollapsed: boolean
+  onToggleCollapse: () => void
+  onClearText: () => void
+  onDelete: () => void
+  onFormatText: (command: FormatCommand) => void
+  activeFormats: Record<FormatCommand, boolean>
+  selectedCategory: string | null
+  onCategoryMenuOpen: (anchor: HTMLElement) => void
+  noteName: string
+  onNameChange: (newName: string) => void
+  onNameBlur?: () => void
 }
 
 /**
@@ -53,23 +46,23 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
   onCategoryMenuOpen,
   noteName,
   onNameChange,
-  onNameBlur,
+  onNameBlur
 }) => {
-  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
 
   const handleDeleteClick = useCallback((e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    setAnchorEl(e.currentTarget);
-  }, []);
+    e.stopPropagation()
+    setAnchorEl(e.currentTarget)
+  }, [])
 
   const handleConfirmDelete = useCallback(() => {
-    onDelete();
-    setAnchorEl(null);
-  }, [onDelete]);
+    onDelete()
+    setAnchorEl(null)
+  }, [onDelete])
 
   const handleCancelDelete = useCallback(() => {
-    setAnchorEl(null);
-  }, []);
+    setAnchorEl(null)
+  }, [])
 
   return (
     <Box
@@ -82,16 +75,9 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
       onMouseDown={(e) => e.stopPropagation()}
     >
       <Box display="flex" alignItems="center">
-        <IconButton
-          size="small"
-          onClick={onToggleCollapse}
-          onMouseDown={(e) => e.stopPropagation()}
-        >
+        <IconButton size="small" onClick={onToggleCollapse} onMouseDown={(e) => e.stopPropagation()}>
           {isCollapsed ? (
-            <ChevronRightIcon
-              fontSize="small"
-              sx={{ transform: "rotate(270deg)" }}
-            />
+            <ChevronRightIcon fontSize="small" sx={{ transform: "rotate(270deg)" }} />
           ) : (
             <ExpandMoreIcon fontSize="small" />
           )}
@@ -107,7 +93,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           sx={{
             ml: 1,
             width: 140,
-            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500 },
+            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500 }
           }}
           onMouseDown={(e) => e.stopPropagation()}
         />
@@ -115,15 +101,9 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
 
       {!isCollapsed && (
         <Box display="flex" gap={0.5} alignItems="center">
-          {(
-            [TOOLBAR.BOLD, TOOLBAR.ITALIC, TOOLBAR.UNDERLINE] as FormatCommand[]
-          ).map((cmd) => {
+          {([TOOLBAR.BOLD, TOOLBAR.ITALIC, TOOLBAR.UNDERLINE] as FormatCommand[]).map((cmd) => {
             const Icon =
-              cmd === TOOLBAR.BOLD
-                ? FormatBoldIcon
-                : cmd === TOOLBAR.ITALIC
-                ? FormatItalicIcon
-                : FormatUnderlinedIcon;
+              cmd === TOOLBAR.BOLD ? FormatBoldIcon : cmd === TOOLBAR.ITALIC ? FormatItalicIcon : FormatUnderlinedIcon
             return (
               <IconButton
                 key={cmd}
@@ -134,14 +114,14 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
               >
                 <Icon fontSize="small" />
               </IconButton>
-            );
+            )
           })}
 
           <IconButton
             size="small"
             onClick={(e) => {
-              e.stopPropagation();
-              onClearText();
+              e.stopPropagation()
+              onClearText()
             }}
           >
             <ClearIcon fontSize="small" />
@@ -150,8 +130,8 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           <IconButton
             size="small"
             onClick={(e) => {
-              e.stopPropagation();
-              onCategoryMenuOpen(e.currentTarget);
+              e.stopPropagation()
+              onCategoryMenuOpen(e.currentTarget)
             }}
           >
             <Box
@@ -184,18 +164,13 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           <Button size="small" onClick={handleCancelDelete}>
             {BUTTON.CANCEL}
           </Button>
-          <Button
-            size="small"
-            variant="contained"
-            color="error"
-            onClick={handleConfirmDelete}
-          >
+          <Button size="small" variant="contained" color="error" onClick={handleConfirmDelete}>
             {BUTTON.DELETE}
           </Button>
         </Box>
       </Popover>
     </Box>
-  );
-};
+  )
+}
 
-export default NoteToolbar;
+export default NoteToolbar

@@ -1,13 +1,13 @@
-import { Box, Paper, Typography } from '@mui/material';
-import type { ReactNode } from 'react';
+import { Box, Paper, Typography } from "@mui/material"
+import type { ReactNode } from "react"
 
 interface PanelProperties {
-  title?: string;
-  icon?: ReactNode;
-  children: ReactNode;
-  padding?: number;
-  borderColor?: string;
-  backgroundColor?: string;
+  title?: string
+  icon?: ReactNode
+  children: ReactNode
+  padding?: number
+  borderColor?: string
+  backgroundColor?: string
 }
 
 const Panel = ({
@@ -15,28 +15,28 @@ const Panel = ({
   icon,
   children,
   padding = 2,
-  borderColor = '#ccc',
-  backgroundColor = '#fff',
+  borderColor = "#ccc",
+  backgroundColor = "#fff"
 }: PanelProperties) => (
   <Paper
     sx={{
       border: `1px solid ${borderColor}`,
       borderRadius: 2,
       backgroundColor,
-      display: 'flex',
-      flexDirection: 'column',
-      overflow: 'hidden',
+      display: "flex",
+      flexDirection: "column",
+      overflow: "hidden"
     }}
   >
     {title && (
       <Box
         sx={{
-          display: 'flex',
-          alignItems: 'center',
+          display: "flex",
+          alignItems: "center",
           gap: 1,
           px: padding,
           py: 1,
-          borderBottom: `1px solid ${borderColor}`,
+          borderBottom: `1px solid ${borderColor}`
         }}
       >
         {icon}
@@ -47,6 +47,6 @@ const Panel = ({
     )}
     <Box sx={{ p: padding }}>{children}</Box>
   </Paper>
-);
+)
 
-export default Panel;
+export default Panel
