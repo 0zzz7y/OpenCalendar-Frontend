@@ -70,7 +70,6 @@ export default function CalendarPanel() {
       ...safeEvents,
       ...safeTasks.filter((t) => t.startDate && t.endDate),
     ].filter((item) => {
-      // treat empty or FILTER.ALL as “no filter”
       const calMatch =
         !selectedCalendar ||
         selectedCalendar === FILTER.ALL ||
@@ -117,19 +116,16 @@ export default function CalendarPanel() {
 
   const handleSave = useCallback(
     async (data: Partial<Event> & { id?: string }) => {
-      // Require startDate and calendar
       if (!data.startDate || !data.calendar) {
         return;
       }
 
       if (data.id) {
-        // update existing
         const original = events.find((e): e is Event => e.id === data.id);
         if (original) {
           await updateEvent({ ...original, ...data });
         }
       } else {
-        // add new
         const newEvent: Omit<Event, "id"> = {
           name: data.name || "New Event",
           description: data.description || "",
@@ -188,47 +184,55 @@ export default function CalendarPanel() {
         <CalendarViewSwitcher view={view} onChange={setView} />
       </Box>
 
-      {view === ViewType.DAY && (
-        <DayView
-          date={selectedDate}
-          events={schedulables}
-          calendars={calendars}
-          categories={categories}
-          onEventClick={handleEventClick}
-        />
-      )}
+      <Box
+        sx={{
+          height: "100%",
+          overflow: "auto",
+          pb: 8,
+        }}
+      >
+        {view === ViewType.DAY && (
+          <DayView
+            date={selectedDate}
+            events={schedulables}
+            calendars={calendars}
+            categories={categories}
+            onEventClick={handleEventClick}
+          />
+        )}
 
-      {view === ViewType.WEEK && (
-        <WeekView
-          date={selectedDate}
-          events={schedulables}
-          calendars={calendars}
-          categories={categories}
-          onEventClick={handleEventClick}
-        />
-      )}
+        {view === ViewType.WEEK && (
+          <WeekView
+            date={selectedDate}
+            events={schedulables}
+            calendars={calendars}
+            categories={categories}
+            onEventClick={handleEventClick}
+          />
+        )}
 
-      {view === ViewType.MONTH && (
-        <MonthView
-          date={selectedDate}
-          events={schedulables}
-          calendars={calendars}
-          categories={categories}
-          onSlotClick={handleSlotClick}
-          onSave={handleSave}
-          onEventClick={handleEventClick}
-        />
-      )}
+        {view === ViewType.MONTH && (
+          <MonthView
+            date={selectedDate}
+            events={schedulables}
+            calendars={calendars}
+            categories={categories}
+            onSlotClick={handleSlotClick}
+            onSave={handleSave}
+            onEventClick={handleEventClick}
+          />
+        )}
 
-      {view === ViewType.YEAR && (
-        <YearView
-          date={selectedDate}
-          events={schedulables}
-          calendars={calendars}
-          categories={categories}
-          onEventClick={handleEventClick}
-        />
-      )}
+        {view === ViewType.YEAR && (
+          <YearView
+            date={selectedDate}
+            events={schedulables}
+            calendars={calendars}
+            categories={categories}
+            onEventClick={handleEventClick}
+          />
+        )}
+      </Box>
 
       {creation.anchor && creation.datetime && (
         <EventPopover

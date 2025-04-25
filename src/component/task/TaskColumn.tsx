@@ -16,7 +16,7 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
     sx={{
       display: "flex",
       flexDirection: "column",
-      minHeight: 500,
+      minHeight: 100,
       maxHeight: "80vh",
       width: "100%",
       backgroundColor: "#fefefe",

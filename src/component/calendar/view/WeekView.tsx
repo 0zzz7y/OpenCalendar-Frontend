@@ -204,7 +204,6 @@ export default function WeekView({
           flex={1}
           sx={{
             overflowY: "auto",
-            // you can also add paddingBottom: 4 to see the 11:30 slot
             pb: 4,
           }}
         >
@@ -253,7 +252,7 @@ export default function WeekView({
           calendars={calendars}
           categories={categories}
           onClose={() =>
-            setCreationPopover({ anchorEl: null, clickedDatetime: null })
+            setCreationPopover({ anchorEl: undefined, clickedDatetime: undefined })
           }
           initialEvent={editingEvent || newEvent}
         />
