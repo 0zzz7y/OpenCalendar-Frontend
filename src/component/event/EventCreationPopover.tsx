@@ -47,11 +47,17 @@ export default function EventCreationPopover({
     description: "",
     calendarId: "",
     categoryId: "",
-    start: clickedDatetime || new Date(),
-    end: new Date((clickedDatetime ? clickedDatetime.getTime() : Date.now()) + 3600_000),
+    start: clickedDatetime || new Date(), // Use clickedDatetime for the start date
+    end: new Date((clickedDatetime ? clickedDatetime.getTime() : Date.now()) + 3600_000), // Default to 1 hour later
   });
 
   const [loading, setLoading] = useState(false); // Loading state for buttons
+  const [errors, setErrors] = useState({
+    title: false,
+    calendarId: false,
+    endDate: false,
+    description: false,
+  });
 
   const validAnchor = Boolean(anchorEl && document.body.contains(anchorEl));
 
@@ -82,12 +88,22 @@ export default function EventCreationPopover({
 
   const handleChange = useCallback(<K extends keyof FormState>(field: K, value: FormState[K]) => {
     setForm((prev) => ({ ...prev, [field]: value }));
+    setErrors((prev) => ({ ...prev, [field]: false })); // Reset error for the field
   }, []);
 
+  const validateForm = useCallback(() => {
+    const newErrors = {
+      title: !form.title.trim(),
+      calendarId: !form.calendarId,
+      endDate: form.end <= form.start,
+      description: form.description.length > 4096,
+    };
+    setErrors(newErrors);
+    return !Object.values(newErrors).some((error) => error);
+  }, [form]);
+
   const handleSave = useCallback(async () => {
-    if (!form.title.trim() || form.end <= form.start || !calendars.find((c) => c.id === form.calendarId)) {
-      return;
-    }
+    if (!validateForm()) return;
 
     const payload = {
       name: form.title,
@@ -112,7 +128,7 @@ export default function EventCreationPopover({
     } finally {
       setLoading(false); // Stop loading
     }
-  }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose]);
+  }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose, validateForm]);
 
   return (
     <Popover
@@ -133,6 +149,8 @@ export default function EventCreationPopover({
           value={form.title}
           onChange={(e) => handleChange("title", e.target.value)}
           fullWidth
+          error={errors.title}
+          helperText={errors.title ? MESSAGE.FIELD_REQUIRED : ""}
         />
 
         <TextField
@@ -141,6 +159,8 @@ export default function EventCreationPopover({
           value={form.calendarId}
           onChange={(e) => handleChange("calendarId", e.target.value)}
           fullWidth
+          error={errors.calendarId}
+          helperText={errors.calendarId ? MESSAGE.FIELD_REQUIRED : ""}
         >
           {calendars.map((c) => (
             <MenuItem key={c.id} value={c.id}>
@@ -169,8 +189,22 @@ export default function EventCreationPopover({
 
         <Typography variant="body2">{LABEL.START_DATE}</Typography>
         <DateCalendar value={form.start} onChange={(d) => d && handleChange("start", d)} />
-        <TimePicker label={LABEL.START_TIME} value={form.start} onChange={(d) => d && handleChange("start", d)} />
-        <TimePicker label={LABEL.END_TIME} value={form.end} onChange={(d) => d && handleChange("end", d)} />
+        <TimePicker
+          label={LABEL.START_TIME}
+          value={form.start}
+          onChange={(d) => d && handleChange("start", d)}
+        />
+        <TimePicker
+          label={LABEL.END_TIME}
+          value={form.end}
+          onChange={(d) => d && handleChange("end", d)}
+          slotProps={{
+            textField: {
+              error: errors.endDate,
+              helperText: errors.endDate ? MESSAGE.END_DATE_BEFORE_START_DATE : "",
+            },
+          }}
+        />
 
         <TextField
           label={LABEL.DESCRIPTION}
@@ -179,6 +213,8 @@ export default function EventCreationPopover({
           fullWidth
           multiline
           minRows={2}
+          error={errors.description}
+          helperText={errors.description ? MESSAGE.DESCRIPTION_TOO_LONG : ""}
         />
 
         <Stack direction="row" spacing={1} justifyContent="flex-end">

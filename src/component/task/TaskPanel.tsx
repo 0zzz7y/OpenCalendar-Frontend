@@ -20,7 +20,7 @@ export default function TasksPanel() {
   const [newTitle, setNewTitle] = useState("")
 
   const defaultCalendar = useMemo(() => calendars[0] || null, [calendars])
-  const defaultCategory = useMemo(() => categories.findLast || null, [categories])
+  const defaultCategory = useMemo(() => categories.findLast(() => true) || null, [categories])
 
   const handleCreate = useCallback(async () => {
     const title = newTitle.trim()
@@ -30,7 +30,7 @@ export default function TasksPanel() {
       name: title,
       description: "",
       calendar: defaultCalendar,
-      category: defaultCategory,
+      category: defaultCategory ?? undefined,
       status: TaskStatus.TODO,
       recurringPattern: RecurringPattern.NONE,
       startDate: "",
