@@ -8,12 +8,12 @@ import { noteToDto, dtoToNote } from "@/model/mapper/note.mapper"
 import type Note from "@/model/domain/note"
 import type NoteDto from "@/model/dto/note.dto"
 import { createUseCrud } from "@/repository/crud.repository"
-import useAppStore from "@/store/useAppStore"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const useCrudNote = () => {
-  const { calendars, categories } = useAppStore()
+  const { calendars, categories } = useApplicationStorage()
   const validateNote = (note: Partial<Note>) => {
     if (!note.name || note.name.trim() === "") {
       throw new Error("Note title is required.")

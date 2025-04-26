@@ -1,25 +1,25 @@
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Box, Input, TextField, Typography } from "@mui/material";
+import { useState, useEffect, useRef, useCallback } from "react"
+import { Box, Input, TextField, Typography } from "@mui/material"
 
-import Popover from "@/component/common/popover/Popover";
-import SaveButton from "@/component/common/button/SaveButton";
-import CancelButton from "@/component/common/button/CancelButton";
+import Popover from "@/component/common/popover/Popover"
+import SaveButton from "@/component/common/button/SaveButton"
+import CancelButton from "@/component/common/button/CancelButton"
 
-import EditorMode from "@/model/utility/editorMode";
-import BUTTON from "@/constant/ui/button";
-import LABEL from "@/constant/ui/label";
-import MESSAGE from "@/constant/ui/message";
-import useCategory from "@/repository/category.repository";
-import COLOR from "@/constant/ui/color";
+import EditorMode from "@/model/utility/editorMode"
+import BUTTON from "@/constant/ui/button"
+import LABEL from "@/constant/ui/label"
+import MESSAGE from "@/constant/ui/message"
+import useCategory from "@/repository/category.repository"
+import COLOR from "@/constant/ui/color"
 
 interface CategoryEditorProperties {
-  open: boolean;
-  anchor: HTMLElement | null;
-  mode: EditorMode;
-  initialData: { id?: string; name?: string; color?: string };
-  onClose: () => void;
-  onSave: (payload: { id?: string; name: string; color: string }) => void;
-  onDelete: (id: string) => void;
+  open: boolean
+  anchor: HTMLElement | null
+  mode: EditorMode
+  initialData: { id?: string; name?: string; color?: string }
+  onClose: () => void
+  onSave: (payload: { id?: string; name: string; color: string }) => void
+  onDelete: (id: string) => void
 }
 
 export default function CategoryEditor({
@@ -29,73 +29,64 @@ export default function CategoryEditor({
   initialData,
   onClose,
   onSave,
-  onDelete,
+  onDelete
 }: CategoryEditorProperties) {
-  const { reloadCategories, addCategory, updateCategory, deleteCategory } =
-    useCategory();
-  const inputReference = useRef<HTMLInputElement | null>(null);
+  const { reloadCategories, addCategory, updateCategory, deleteCategory } = useCategory()
+  const inputReference = useRef<HTMLInputElement | null>(null)
 
-  const [form, setForm] = useState({ name: "", color: "#3b5bdb" });
-  const [loading, setLoading] = useState(false);
+  const [form, setForm] = useState({ name: "", color: "#3b5bdb" })
+  const [loading, setLoading] = useState(false)
 
   useEffect(() => {
     if (open) {
       setForm({
         name: initialData.name?.trim() || "",
-        color: initialData.color || COLOR.WHITE,
-      });
-      setTimeout(() => inputReference.current?.focus(), 100);
+        color: initialData.color || COLOR.WHITE
+      })
+      setTimeout(() => inputReference.current?.focus(), 100)
     }
-  }, [open, initialData]);
+  }, [open, initialData])
 
   const handleChange = useCallback((field: "name" | "color", value: string) => {
-    setForm((previous) => ({ ...previous, [field]: value }));
-  }, []);
+    setForm((previous) => ({ ...previous, [field]: value }))
+  }, [])
 
   const handleSave = useCallback(async () => {
-    if (!form.name) return;
-    setLoading(true);
+    if (!form.name) return
+    setLoading(true)
     try {
       if (mode === EditorMode.ADD) {
-        await addCategory({ name: form.name, color: form.color });
+        await addCategory({ name: form.name, color: form.color })
       } else if (mode === EditorMode.EDIT && initialData.id) {
         await updateCategory({
           id: initialData.id,
           name: form.name,
-          color: form.color,
-        });
+          color: form.color
+        })
       }
-      await reloadCategories();
-      onClose();
+      await reloadCategories()
+      onClose()
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [
-    form,
-    mode,
-    initialData.id,
-    addCategory,
-    updateCategory,
-    reloadCategories,
-    onClose,
-  ]);
+  }, [form, mode, initialData.id, addCategory, updateCategory, reloadCategories, onClose])
 
   const handleDelete = useCallback(async () => {
-    if (!initialData.id) return;
-    setLoading(true);
+    if (!initialData.id) return
+    setLoading(true)
     try {
-      await deleteCategory(initialData.id);
-      await reloadCategories();
-      onDelete(initialData.id); // ← notify parent to select ALL
-      onClose();
+      await deleteCategory(initialData.id)
+      await reloadCategories()
+      onDelete(initialData.id) // ← notify parent to select ALL
+      onClose()
     } catch (error) {
-      console.error(error);
+      console.error(error)
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
-  }, [initialData.id, deleteCategory, reloadCategories, onClose, onDelete]);
+  }, [initialData.id, deleteCategory, reloadCategories, onClose, onDelete])
 
   return (
     <Popover open={open} anchor={anchor} onClose={onClose}>
@@ -103,9 +94,7 @@ export default function CategoryEditor({
         {(mode === EditorMode.ADD || mode === EditorMode.EDIT) && (
           <>
             <Typography variant="subtitle2" color="primary" fontWeight={500}>
-              {mode === EditorMode.ADD
-                ? MESSAGE.ADD_CATEGORY
-                : MESSAGE.EDIT_CATEGORY}
+              {mode === EditorMode.ADD ? MESSAGE.ADD_CATEGORY : MESSAGE.EDIT_CATEGORY}
             </Typography>
 
             <TextField
@@ -118,18 +107,11 @@ export default function CategoryEditor({
               margin="dense"
             />
 
-            <Box
-              display="flex"
-              alignItems="center"
-              justifyContent="space-between"
-              mt={2}
-            >
+            <Box display="flex" alignItems="center" justifyContent="space-between" mt={2}>
               <Input
                 type="color"
                 value={form.color}
-                onChange={(element) =>
-                  handleChange("color", element.target.value)
-                }
+                onChange={(element) => handleChange("color", element.target.value)}
                 sx={{ minWidth: 40 }}
               />
               <SaveButton onClick={handleSave} loading={loading} />
@@ -139,20 +121,14 @@ export default function CategoryEditor({
 
         {mode === EditorMode.DELETE && (
           <>
-            <Typography variant="body2">
-              {MESSAGE.CONFIRM_DELETE_CATEGORY}
-            </Typography>
+            <Typography variant="body2">{MESSAGE.CONFIRM_DELETE_CATEGORY}</Typography>
             <Box display="flex" justifyContent="flex-end" mt={2} gap={1}>
               <CancelButton onClick={onClose} />
-              <SaveButton
-                onClick={handleDelete}
-                loading={loading}
-                label={BUTTON.DELETE}
-              />
+              <SaveButton onClick={handleDelete} loading={loading} label={BUTTON.DELETE} />
             </Box>
           </>
         )}
       </Box>
     </Popover>
-  );
+  )
 }

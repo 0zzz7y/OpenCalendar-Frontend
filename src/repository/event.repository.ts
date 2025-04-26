@@ -8,12 +8,12 @@ import { eventToDto, dtoToEvent } from "@/model/mapper/event.mapper"
 import type Event from "@/model/domain/event"
 import type EventDto from "@/model/dto/event.dto"
 import { createUseCrud } from "@/repository/crud.repository"
-import useAppStore from "@/store/useAppStore"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const useCrudEvent = () => {
-  const { calendars, categories } = useAppStore()
+  const { calendars, categories } = useApplicationStorage()
   const validateEvent = (event: Partial<Event>) => {
     if (!event.name) {
       throw new Error("Event title is required.")

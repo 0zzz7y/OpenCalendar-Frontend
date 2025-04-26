@@ -1,123 +1,112 @@
 // src/component/calendar/view/WeekView.tsx
-import React, { useState, useMemo, useCallback } from "react";
-import { Box, Typography, useTheme } from "@mui/material";
-import dayjs from "dayjs";
-import {
-  EventCreationPopover,
-  EventInformationPopover,
-} from "@/component/event";
-import useEvent from "@/repository/event.repository";
-import type Event from "@/model/domain/event";
-import type Schedulable from "@/model/domain/schedulable";
-import RecurringPattern from "@/model/domain/recurringPattern";
-import DayColumn from "../DayColumn";
-import HourLabelsColumn from "../HourLabelColumn";
+import React, { useState, useMemo, useCallback } from "react"
+import { Box, Typography, useTheme } from "@mui/material"
+import dayjs from "dayjs"
+import { EventCreationPopover, EventInformationPopover } from "@/component/event"
+import useEvent from "@/repository/event.repository"
+import type Event from "@/model/domain/event"
+import type Schedulable from "@/model/domain/schedulable"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import DayColumn from "../DayColumn"
+import HourLabelsColumn from "../HourLabelColumn"
 
 export interface WeekViewProps {
-  date: Date;
-  events: Schedulable[];
-  calendars: { id: string; name: string; emoji: string }[];
-  categories: { id: string; name: string; color: string }[];
-  onEventClick?: (event: Event) => void;
+  date: Date
+  events: Schedulable[]
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  onEventClick?: (event: Event) => void
 }
 
 // Helper: Monday‐based week start
 const getStartOfWeek = (date: Date): Date => {
-  const d = new Date(date);
-  const day = d.getDay();
-  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-  d.setDate(diff);
-  d.setHours(0, 0, 0, 0);
-  return d;
-};
+  const d = new Date(date)
+  const day = d.getDay()
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1)
+  d.setDate(diff)
+  d.setHours(0, 0, 0, 0)
+  return d
+}
 
-export default function WeekView({
-  date,
-  events,
-  calendars,
-  categories,
-  onEventClick,
-}: WeekViewProps) {
-  const theme = useTheme();
-  const { updateEvent, reloadEvents } = useEvent();
+export default function WeekView({ date, events, calendars, categories, onEventClick }: WeekViewProps) {
+  const theme = useTheme()
+  const { updateEvent, reloadEvents } = useEvent()
 
   // Build array of 7 dates (Mon–Sun)
   const weekDates = useMemo(() => {
-    const start = getStartOfWeek(date);
-    return Array.from({ length: 7 }, (_, i) =>
-      dayjs(start).add(i, "day").toDate()
-    );
-  }, [date]);
+    const start = getStartOfWeek(date)
+    return Array.from({ length: 7 }, (_, i) => dayjs(start).add(i, "day").toDate())
+  }, [date])
 
   // Popover state
-  const [info, setInfo] = useState<{ anchor?: HTMLElement; event?: Event }>({});
+  const [info, setInfo] = useState<{ anchor?: HTMLElement; event?: Event }>({})
   const [creationPopover, setCreationPopover] = useState<{
-    anchorEl?: HTMLElement;
-    clickedDatetime?: Date;
-  }>({});
-  const [editingEvent, setEditingEvent] = useState<Event>();
+    anchorEl?: HTMLElement
+    clickedDatetime?: Date
+  }>({})
+  const [editingEvent, setEditingEvent] = useState<Event>()
 
   const handleSlotClick = useCallback((anchor: HTMLElement, datetime: Date) => {
-    setInfo({});
-    setEditingEvent(undefined);
-    setCreationPopover({ anchorEl: anchor, clickedDatetime: datetime });
-  }, []);
+    setInfo({})
+    setEditingEvent(undefined)
+    setCreationPopover({ anchorEl: anchor, clickedDatetime: datetime })
+  }, [])
 
   const handleEventClick = useCallback(
     (sched: Schedulable) => {
-      if (!("id" in sched)) return;
-      const evt = sched as Event;
-      const anchor = document.getElementById(`event-${evt.id}`);
-      if (!anchor) return;
-      setCreationPopover({});
-      setInfo({ anchor, event: evt });
-      onEventClick?.(evt);
+      if (!("id" in sched)) return
+      const evt = sched as Event
+      const anchor = document.getElementById(`event-${evt.id}`)
+      if (!anchor) return
+      setCreationPopover({})
+      setInfo({ anchor, event: evt })
+      onEventClick?.(evt)
     },
     [onEventClick]
-  );
+  )
 
   const closeAll = useCallback(() => {
-    setInfo({});
-    setCreationPopover({});
-    setEditingEvent(undefined);
-  }, []);
+    setInfo({})
+    setCreationPopover({})
+    setEditingEvent(undefined)
+  }, [])
 
   const handleSave = useCallback(
     async (payload: Partial<Event> & { id?: string }) => {
       if (payload.id) {
-        const original = events.find((e): e is Event => e.id === payload.id);
+        const original = events.find((e): e is Event => e.id === payload.id)
         if (original) {
-          await updateEvent({ ...original, ...payload });
-          await reloadEvents();
+          await updateEvent({ ...original, ...payload })
+          await reloadEvents()
         }
       }
-      closeAll();
+      closeAll()
     },
     [events, updateEvent, reloadEvents, closeAll]
-  );
+  )
 
   const handleDelete = useCallback(
     async (id: string) => {
-      const original = events.find((e): e is Event => e.id === id);
+      const original = events.find((e): e is Event => e.id === id)
       if (original) {
-        await updateEvent({ ...original, name: "" });
-        await reloadEvents();
+        await updateEvent({ ...original, name: "" })
+        await reloadEvents()
       }
-      setInfo({});
+      setInfo({})
     },
     [events, updateEvent, reloadEvents]
-  );
+  )
 
   const handleEdit = useCallback(() => {
-    if (!info.anchor || !info.event) return;
-    const ev = info.event;
-    setInfo({});
-    setEditingEvent(ev);
+    if (!info.anchor || !info.event) return
+    const ev = info.event
+    setInfo({})
+    setEditingEvent(ev)
     setCreationPopover({
       anchorEl: info.anchor,
-      clickedDatetime: new Date(ev.startDate),
-    });
-  }, [info]);
+      clickedDatetime: new Date(ev.startDate)
+    })
+  }, [info])
 
   // Template for new event
   const newEvent: Event | undefined = creationPopover.clickedDatetime
@@ -126,52 +115,40 @@ export default function WeekView({
         name: "",
         description: "",
         startDate: creationPopover.clickedDatetime.toISOString(),
-        endDate: dayjs(creationPopover.clickedDatetime)
-          .add(1, "hour")
-          .toISOString(),
+        endDate: dayjs(creationPopover.clickedDatetime).add(1, "hour").toISOString(),
         recurringPattern: RecurringPattern.NONE,
         calendar: calendars[0],
-        category: undefined,
+        category: undefined
       }
-    : undefined;
+    : undefined
 
   return (
     <>
-      <Box
-        display="flex"
-        flexDirection="column"
-        flex={1}
-        sx={{ height: "100%" }}
-      >
+      <Box display="flex" flexDirection="column" flex={1} sx={{ height: "100%" }}>
         {/* 1) Day‐of‐week header */}
         <Box
-          display="flex"
           sx={{
+            display: "grid",
+            gridTemplateColumns: "60px repeat(7, 1fr)", // match HourLabelsColumn
             borderBottom: `1px solid ${theme.palette.divider}`,
             backgroundColor: theme.palette.background.default,
             zIndex: 1,
+            pr: 2
           }}
         >
-          {/* placeholder above HourLabelColumn */}
-          <Box
-            sx={{
-              width: 60, // match HourLabelsColumn width
-              flexShrink: 0,
-            }}
-          />
+          <Box />
           {weekDates.map((d) => {
-            const isToday = dayjs(d).isSame(dayjs(), "day");
+            const isToday = dayjs(d).isSame(dayjs(), "day")
             return (
               <Box
                 key={d.toISOString()}
-                flex={1}
                 textAlign="center"
                 py={1}
                 sx={{
                   borderLeft: `1px solid ${theme.palette.divider}`,
                   "&:first-of-type": {
-                    borderLeft: "none",
-                  },
+                    borderLeft: "none"
+                  }
                 }}
               >
                 <Typography
@@ -182,20 +159,16 @@ export default function WeekView({
                     lineHeight: "32px",
                     textAlign: "center",
                     borderRadius: "50%",
-                    bgcolor: isToday
-                      ? theme.palette.primary.main
-                      : "transparent",
+                    bgcolor: isToday ? theme.palette.primary.main : "transparent",
                     color: isToday ? "#fff" : "inherit",
-                    margin: "0 auto",
+                    margin: "0 auto"
                   }}
                 >
                   {dayjs(d).date()}
                 </Typography>
-                <Typography variant="caption">
-                  {dayjs(d).format("dddd")}
-                </Typography>
+                <Typography variant="caption">{dayjs(d).format("dddd")}</Typography>
               </Box>
-            );
+            )
           })}
         </Box>
 
@@ -204,15 +177,13 @@ export default function WeekView({
           flex={1}
           sx={{
             overflowY: "auto",
-            pb: 4,
+            pb: 4
           }}
         >
           <Box display="flex">
             <HourLabelsColumn />
             {weekDates.map((d, idx) => {
-              const dayEvents = events.filter(
-                (e) => e.startDate && dayjs(e.startDate).isSame(d, "day")
-              );
+              const dayEvents = events.filter((e) => e.startDate && dayjs(e.startDate).isSame(d, "day"))
               return (
                 <Box
                   key={d.toISOString()}
@@ -221,11 +192,11 @@ export default function WeekView({
                     borderLeft: `1px solid ${theme.palette.divider}`,
                     borderBottom: `1px solid ${theme.palette.divider}`,
                     "&:first-of-type": {
-                      borderLeft: "none",
+                      borderLeft: "none"
                     },
                     "&:last-of-type": {
-                      borderRight: `1px solid ${theme.palette.divider}`,
-                    },
+                      borderRight: `1px solid ${theme.palette.divider}`
+                    }
                   }}
                 >
                   <DayColumn
@@ -238,7 +209,7 @@ export default function WeekView({
                     onEventClick={handleEventClick}
                   />
                 </Box>
-              );
+              )
             })}
           </Box>
         </Box>
@@ -251,9 +222,7 @@ export default function WeekView({
           clickedDatetime={creationPopover.clickedDatetime}
           calendars={calendars}
           categories={categories}
-          onClose={() =>
-            setCreationPopover({ anchorEl: undefined, clickedDatetime: undefined })
-          }
+          onClose={() => setCreationPopover({ anchorEl: undefined, clickedDatetime: undefined })}
           initialEvent={editingEvent || newEvent}
         />
       )}
@@ -267,5 +236,5 @@ export default function WeekView({
         />
       )}
     </>
-  );
+  )
 }

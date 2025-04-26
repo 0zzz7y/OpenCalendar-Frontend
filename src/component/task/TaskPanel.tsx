@@ -3,7 +3,7 @@ import { Box, TextField, InputAdornment } from "@mui/material"
 import { AddCircleOutline } from "@mui/icons-material"
 
 import useTask from "@/repository/task.repository"
-import useAppStore from "@/store/useAppStore"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 import TaskBoard from "./TaskBoard"
 import RecurringPattern from "@/model/domain/recurringPattern"
 import type Task from "@/model/domain/task"
@@ -14,7 +14,7 @@ import MESSAGE from "@/constant/ui/message"
  * Panel for creating new tasks and displaying them in a board.
  */
 export default function TasksPanel() {
-  const { tasks, categories, calendars } = useAppStore()
+  const { tasks, categories, calendars } = useApplicationStorage()
   const { addTask, updateTask, deleteTask, reloadTasks } = useTask()
 
   const [newTitle, setNewTitle] = useState("")

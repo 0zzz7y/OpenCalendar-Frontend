@@ -6,7 +6,7 @@ import type Task from "@/model/domain/task"
 import type Note from "@/model/domain/note"
 import FILTER from "@/constant/utility/filter"
 
-interface AppStore {
+interface ApplicationStorage {
   calendars: Calendar[]
   categories: Category[]
   events: Event[]
@@ -28,7 +28,7 @@ interface AppStore {
 
 const ensureArray = <T>(value: unknown): T[] => (Array.isArray(value) ? value : [])
 
-const useAppStore = create<AppStore>((set) => ({
+const useApplicationStorage = create<ApplicationStorage>((set) => ({
   calendars: [],
   categories: [],
   events: [],
@@ -48,4 +48,4 @@ const useAppStore = create<AppStore>((set) => ({
   setNotes: (notes) => set({ notes: ensureArray<Note>(notes) })
 }))
 
-export default useAppStore
+export default useApplicationStorage

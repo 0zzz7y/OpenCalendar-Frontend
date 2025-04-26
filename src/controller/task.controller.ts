@@ -1,7 +1,7 @@
 import * as taskService from "@/service/task.service"
 import { dtoToTask, taskToDto } from "@/model/mapper/task.mapper"
 import { createCrudController } from "./crud.controller"
-import useAppStore from "@/store/useAppStore"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 
 export const {
   load: loadTasks,
@@ -18,6 +18,7 @@ export const {
   },
   {
     toDto: taskToDto,
-    fromDto: (dto) => dtoToTask(dto, useAppStore.getState().calendars, useAppStore.getState().categories)
+    fromDto: (dto) =>
+      dtoToTask(dto, useApplicationStorage.getState().calendars, useApplicationStorage.getState().categories)
   }
 )

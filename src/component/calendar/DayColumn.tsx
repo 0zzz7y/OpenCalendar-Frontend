@@ -13,10 +13,12 @@ const SLOT_HEIGHT = 32 // px for 30-minute slot
 export interface DayColumnProps {
   date: Date
   events: Schedulable[]
-  onSave: (event: Partial<Event> & { startDate: string }) => void
-  onSlotClick?: (slot: HTMLElement, datetime: Date) => void
-  dragTargetId?: string | null
-  onEventClick?: (event: Event) => void
+  calendars: { id: string; name: string; emoji: string }[]
+  categories: { id: string; name: string; color: string }[]
+  onSave: (payload: Partial<Event> & { id?: string }) => Promise<void>
+  onSlotClick: (anchor: HTMLElement, datetime: Date) => void
+  onEventClick: (sched: Schedulable) => void
+  dragTargetId?: string
 }
 
 /**

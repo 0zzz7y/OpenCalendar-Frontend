@@ -7,13 +7,13 @@ import {
 import { taskToDto, dtoToTask } from "@/model/mapper/task.mapper"
 import type Task from "@/model/domain/task"
 import type TaskDto from "@/model/dto/task.dto"
-import useAppStore from "@/store/useAppStore"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 import { createUseCrud } from "@/repository/crud.repository"
 import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const useCrudTask = () => {
-  const { calendars, categories } = useAppStore()
+  const { calendars, categories } = useApplicationStorage()
 
   const validateTask = (task: Partial<Task>) => {
     if (!task.name) {

@@ -1,7 +1,7 @@
 import * as noteService from "@/service/note.service"
 import { dtoToNote, noteToDto } from "@/model/mapper/note.mapper"
 import { createCrudController } from "./crud.controller"
-import useAppStore from "@/store/useAppStore"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 
 export const {
   load: loadNotes,
@@ -18,6 +18,7 @@ export const {
   },
   {
     toDto: noteToDto,
-    fromDto: (dto) => dtoToNote(dto, useAppStore.getState().calendars, useAppStore.getState().categories)
+    fromDto: (dto) =>
+      dtoToNote(dto, useApplicationStorage.getState().calendars, useApplicationStorage.getState().categories)
   }
 )

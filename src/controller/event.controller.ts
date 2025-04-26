@@ -1,7 +1,7 @@
 import * as eventService from "@/service/event.service"
 import { dtoToEvent, eventToDto } from "@/model/mapper/event.mapper"
 import { createCrudController } from "./crud.controller"
-import useAppStore from "@/store/useAppStore"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 
 export const {
   load: loadEvents,
@@ -18,6 +18,7 @@ export const {
   },
   {
     toDto: eventToDto,
-    fromDto: (dto) => dtoToEvent(dto, useAppStore.getState().calendars, useAppStore.getState().categories)
+    fromDto: (dto) =>
+      dtoToEvent(dto, useApplicationStorage.getState().calendars, useApplicationStorage.getState().categories)
   }
 )

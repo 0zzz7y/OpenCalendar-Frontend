@@ -1,32 +1,23 @@
-import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Box,
-  Paper,
-  Collapse,
-  Menu,
-  MenuItem,
-  Popover,
-  Typography,
-  Button,
-} from "@mui/material";
-import NoteToolbar from "./NoteToolbar";
-import type FormatCommand from "@/model/utility/formatCommand";
-import type Calendar from "@/model/domain/calendar";
-import type Category from "@/model/domain/category";
-import MESSAGES from "@/constant/ui/message";
-import type Note from "@/model/domain/note";
+import { useCallback, useEffect, useRef, useState } from "react"
+import { Box, Paper, Collapse, Menu, MenuItem, Popover, Typography, Button } from "@mui/material"
+import NoteToolbar from "./NoteToolbar"
+import type FormatCommand from "@/model/utility/formatCommand"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import MESSAGES from "@/constant/ui/message"
+import type Note from "@/model/domain/note"
 
 export interface NoteCardProperties {
-  id: string;
-  content: string;
-  initialX?: number;
-  initialY?: number;
-  color?: string;
-  categories: Category[];
-  onDelete?: (id: string) => void;
-  onUpdate: (note: Note) => void;
-  calendar: Calendar;
-  name?: string;
+  id: string
+  content: string
+  initialX?: number
+  initialY?: number
+  color?: string
+  categories: Category[]
+  onDelete?: (id: string) => void
+  onUpdate: (note: Note) => void
+  calendar: Calendar
+  name?: string
 }
 
 const NoteCard = ({
@@ -39,103 +30,105 @@ const NoteCard = ({
   onDelete,
   onUpdate,
   calendar,
-  name = MESSAGES.NEW_NOTE,
+  name = MESSAGES.NEW_NOTE
 }: NoteCardProperties) => {
-  const contentRef = useRef<HTMLDivElement | null>(null);
-  const wrapperRef = useRef<HTMLDivElement | null>(null);
-  const toolbarRef = useRef<HTMLDivElement | null>(null);
-  const [dimensions, setDimensions] = useState({ width: 380, height: 200 });
-  const [position, setPosition] = useState({ x: initialX, y: initialY });
-  const [dragging, setDragging] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+  const contentRef = useRef<HTMLDivElement | null>(null)
+  const wrapperRef = useRef<HTMLDivElement | null>(null)
+  const toolbarRef = useRef<HTMLDivElement | null>(null)
+  const [dimensions, setDimensions] = useState({ width: 380, height: 200 })
+  const [position, setPosition] = useState({ x: initialX, y: initialY })
+  const [dragging, setDragging] = useState(false)
+  const [collapsed, setCollapsed] = useState(false)
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined)
+  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
   const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
     bold: false,
     italic: false,
-    underline: false,
-  });
-  const [noteName, setNoteName] = useState(name);
-  const [lastSavedContent, setLastSavedContent] = useState(content);
-  const [lastSavedName, setLastSavedName] = useState(name);
+    underline: false
+  })
+  const [noteName, setNoteName] = useState(name)
+  const [lastSavedContent, setLastSavedContent] = useState(content)
+  const [lastSavedName, setLastSavedName] = useState(name)
 
   // Debounce timer for saving
-  const saveTimeoutRef = useRef<number | null>(null);
+  const saveTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
     if (content && !contentRef.current?.innerHTML) {
       if (contentRef.current) {
-        contentRef.current.innerHTML = content;
+        contentRef.current.innerHTML = content
       }
     }
-  }, [content]);
+  }, [content])
 
-  const getCategoryColor = (category: Category | undefined) =>
-    category?.color || color;
+  const getCategoryColor = (category: Category | undefined) => category?.color || color
 
   const clearText = () => {
-    if (contentRef.current) contentRef.current.innerHTML = "";
-  };
+    if (contentRef.current) contentRef.current.innerHTML = ""
+  }
 
   const formatText = (command: FormatCommand) => {
-    contentRef.current?.focus();
+    contentRef.current?.focus()
     setTimeout(() => {
-      document.execCommand(command, false);
+      document.execCommand(command, false)
       setActiveFormats((prev) => ({
         ...prev,
-        [command]: document.queryCommandState(command),
-      }));
-    }, 0);
-  };
+        [command]: document.queryCommandState(command)
+      }))
+    }, 0)
+  }
 
   const handleMouseDown = (e: React.MouseEvent) => {
     // Only allow dragging if the toolbar is clicked
     if (toolbarRef.current?.contains(e.target as Node)) {
-      setDragging(true);
+      setDragging(true)
     }
-  };
+  }
 
   const handleMouseUp = useCallback(() => {
-    setDragging(false);
-  }, []);
+    setDragging(false)
+  }, [])
 
-  const handleDrag = useCallback((e: MouseEvent) => {
-    if (!dragging) return;
-    setPosition((prev) => ({
-      x: Math.max(0, prev.x + e.movementX),
-      y: Math.max(0, prev.y + e.movementY),
-    }));
-  }, [dragging]);
+  const handleDrag = useCallback(
+    (e: MouseEvent) => {
+      if (!dragging) return
+      setPosition((prev) => ({
+        x: Math.max(0, prev.x + e.movementX),
+        y: Math.max(0, prev.y + e.movementY)
+      }))
+    },
+    [dragging]
+  )
 
   const handleResize = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
-    const startX = e.clientX;
-    const startY = e.clientY;
-    const startWidth = dimensions.width;
-    const startHeight = dimensions.height;
+    const startX = e.clientX
+    const startY = e.clientY
+    const startWidth = dimensions.width
+    const startHeight = dimensions.height
 
     const onMouseMove = (moveEvent: MouseEvent) => {
-      const newWidth = Math.max(150, startWidth + (moveEvent.clientX - startX));
-      const newHeight = Math.max(100, startHeight + (moveEvent.clientY - startY));
-      setDimensions({ width: newWidth, height: newHeight });
-    };
+      const newWidth = Math.max(150, startWidth + (moveEvent.clientX - startX))
+      const newHeight = Math.max(100, startHeight + (moveEvent.clientY - startY))
+      setDimensions({ width: newWidth, height: newHeight })
+    }
 
     const onMouseUp = () => {
-      window.removeEventListener("mousemove", onMouseMove);
-      window.removeEventListener("mouseup", onMouseUp);
-    };
+      window.removeEventListener("mousemove", onMouseMove)
+      window.removeEventListener("mouseup", onMouseUp)
+    }
 
-    window.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mousemove", onMouseMove)
     window.addEventListener("mouseup", onMouseUp)
-  };
+  }
 
   const handleBlur = () => {
-    const currentContent = contentRef.current?.innerHTML || "";
+    const currentContent = contentRef.current?.innerHTML || ""
     if (currentContent !== lastSavedContent || noteName !== lastSavedName) {
       if (saveTimeoutRef.current) {
-        clearTimeout(saveTimeoutRef.current);
+        clearTimeout(saveTimeoutRef.current)
       }
       saveTimeoutRef.current = window.setTimeout(() => {
         if (onUpdate) {
@@ -143,43 +136,43 @@ const NoteCard = ({
             id,
             name: noteName,
             description: currentContent,
-            calendar,
-          });
-          setLastSavedContent(currentContent);
-          setLastSavedName(noteName);
+            calendar
+          })
+          setLastSavedContent(currentContent)
+          setLastSavedName(noteName)
         }
-      }, 500); // Save after 500ms of inactivity
+      }, 500) // Save after 500ms of inactivity
     }
-  };
+  }
 
   useEffect(() => {
     if (dragging) {
-      window.addEventListener("mousemove", handleDrag);
-      window.addEventListener("mouseup", handleMouseUp);
+      window.addEventListener("mousemove", handleDrag)
+      window.addEventListener("mouseup", handleMouseUp)
       return () => {
-        window.removeEventListener("mousemove", handleDrag);
-        window.removeEventListener("mouseup", handleMouseUp);
-      };
+        window.removeEventListener("mousemove", handleDrag)
+        window.removeEventListener("mouseup", handleMouseUp)
+      }
     }
-  }, [dragging, handleDrag, handleMouseUp]);
+  }, [dragging, handleDrag, handleMouseUp])
 
   useEffect(() => {
     const updateActiveFormats = () => {
       setActiveFormats({
         bold: document.queryCommandState("bold"),
         italic: document.queryCommandState("italic"),
-        underline: document.queryCommandState("underline"),
-      });
-    };
+        underline: document.queryCommandState("underline")
+      })
+    }
 
-    contentRef.current?.addEventListener("keyup", updateActiveFormats);
-    contentRef.current?.addEventListener("mouseup", updateActiveFormats);
+    contentRef.current?.addEventListener("keyup", updateActiveFormats)
+    contentRef.current?.addEventListener("mouseup", updateActiveFormats)
 
     return () => {
-      contentRef.current?.removeEventListener("keyup", updateActiveFormats);
-      contentRef.current?.removeEventListener("mouseup", updateActiveFormats);
-    };
-  }, []);
+      contentRef.current?.removeEventListener("keyup", updateActiveFormats)
+      contentRef.current?.removeEventListener("mouseup", updateActiveFormats)
+    }
+  }, [])
 
   return (
     <Box
@@ -193,7 +186,7 @@ const NoteCard = ({
         zIndex: dragging ? 1000 : 100,
         pointerEvents: "auto",
         transition: "all 0.15s ease",
-        transform: dragging ? "scale(1.02)" : "none",
+        transform: dragging ? "scale(1.02)" : "none"
       }}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
@@ -207,14 +200,14 @@ const NoteCard = ({
           boxShadow: dragging ? "0 0 10px #2196f3" : 3,
           overflow: "hidden",
           cursor: dragging ? "grabbing" : "default",
-          position: "relative",
+          position: "relative"
         }}
       >
         <Box
           ref={toolbarRef}
           sx={{
             cursor: dragging ? "grabbing" : "grab",
-            transition: "cursor 0.15s ease",
+            transition: "cursor 0.15s ease"
           }}
         >
           <NoteToolbar
@@ -248,7 +241,7 @@ const NoteCard = ({
               overflowY: "auto",
               whiteSpace: "pre-wrap",
               wordBreak: "break-word",
-              color: "#000",
+              color: "#000"
             }}
           />
         </Collapse>
@@ -262,12 +255,12 @@ const NoteCard = ({
             bottom: 0,
             right: 0,
             cursor: "nwse-resize",
-            zIndex: 10,
+            zIndex: 10
           }}
         />
       </Paper>
     </Box>
-  );
-};
+  )
+}
 
-export default NoteCard;
+export default NoteCard

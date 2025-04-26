@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import useAppStore from "@/store/useAppStore"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 import capitalize from "@/utilities/capitalize"
 
 export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
@@ -17,7 +17,7 @@ export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
   return () => {
     const { getAll, create: createService, update: updateService, delete: deleteService } = service
 
-    const store = useAppStore()
+    const store = useApplicationStorage()
     const typedStore = store as unknown as Record<string, unknown>
 
     const items = (typedStore[resourceKey] as Domain[] | undefined) ?? ([] as Domain[])
