@@ -33,30 +33,35 @@ const useCrudCategory = createUseCrud<Category, CategoryDto, CategoryDto>(
 export function useCategory() {
   const { reload, add, update, remove } = useCrudCategory()
 
-  const addCategory = async (data: Partial<Category>) => {
+  const addCategory = async (data: Partial<Category>): Promise<Category> => {
     try {
-      await add(data)
+      const savedCategory = await add(data)
       showToast("success", MESSAGE.CATEGORY_CREATED_SUCCESSFULLY)
+      return savedCategory
     } catch {
       showToast("error", MESSAGE.CATEGORY_SAVE_FAILED)
+      throw new Error(MESSAGE.CATEGORY_SAVE_FAILED)
     }
   }
 
-  const updateCategory = async (data: Partial<Category> & { id: string }) => {
+  const updateCategory = async (data: Partial<Category> & { id: string }): Promise<Category> => {
     try {
-      await update(data)
+      const updatedCategory = await update(data)
       showToast("success", MESSAGE.CATEGORY_UPDATED_SUCCESSFULLY)
+      return updatedCategory
     } catch {
       showToast("error", MESSAGE.CATEGORY_SAVE_FAILED)
+      throw new Error(MESSAGE.CATEGORY_SAVE_FAILED)
     }
   }
 
-  const deleteCategory = async (id: string) => {
+  const deleteCategory = async (id: string): Promise<void> => {
     try {
       await remove(id)
       showToast("success", MESSAGE.CATEGORY_DELETED_SUCCESSFULLY)
     } catch {
       showToast("error", MESSAGE.CATEGORY_DELETE_FAILED)
+      throw new Error(MESSAGE.CATEGORY_DELETE_FAILED)
     }
   }
 

@@ -20,6 +20,17 @@ import MESSAGE from "@/constant/ui/message";
 import type Note from "@/model/domain/note";
 import LABEL from "@/constant/ui/label";
 
+async function addNote(note: Partial<Note>): Promise<Note> {
+  // Implementation here
+  return {
+    id: "generated-id",
+    name: note.name || "",
+    description: note.description || "",
+    calendar: note.calendar !== undefined ? note.calendar : (() => { throw new Error("Calendar is required"); })(),
+    category: note.category,
+  }; // Replace with actual implementation
+}
+
 export default function NotesPanel() {
   const { addNote, updateNote, deleteNote } = useNotes();
   const { notes, categories, calendars } = useAppStore();
@@ -87,18 +98,20 @@ export default function NotesPanel() {
     }));
 
     try {
-      const saved = await addNote({
+      const saved: Note = await addNote({
         name: newNote.name,
         description: newNote.description,
         calendar: newNote.calendar,
         category: newNote.category,
       });
 
-      setLocalNotes((prev) => prev.map((n) => (n.id === tempId ? saved : n)));
-      setNotePositions((prev) => {
-        const { [tempId]: position, ...rest } = prev;
-        return { ...rest, [saved.id]: position };
-      });
+      if (saved !== undefined) {
+        setLocalNotes((prev) => prev.map((n) => (n.id === tempId ? saved : n)));
+        setNotePositions((prev) => {
+          const { [tempId]: position, ...rest } = prev;
+          return { ...rest, [saved.id]: position };
+        });
+      }
     } catch {
       setLocalNotes((prev) => prev.filter((n) => n.id !== tempId));
       setNotePositions((prev) => {

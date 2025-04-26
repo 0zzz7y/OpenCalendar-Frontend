@@ -31,30 +31,35 @@ const useCrudCalendar = createUseCrud<Calendar, CalendarDto, CalendarDto>(
 export function useCalendar() {
   const { reload, add, update, remove } = useCrudCalendar()
 
-  const addCalendar = async (data: Partial<Calendar>) => {
+  const addCalendar = async (data: Partial<Calendar>): Promise<Calendar> => {
     try {
-      await add(data)
+      const savedCalendar = await add(data)
       showToast("success", MESSAGE.CALENDAR_CREATED_SUCCESSFULLY)
+      return savedCalendar
     } catch {
       showToast("error", MESSAGE.CALENDAR_SAVE_FAILED)
+      throw new Error(MESSAGE.CALENDAR_SAVE_FAILED)
     }
   }
 
-  const updateCalendar = async (data: Partial<Calendar> & { id: string }) => {
+  const updateCalendar = async (data: Partial<Calendar> & { id: string }): Promise<Calendar> => {
     try {
-      await update(data)
+      const updatedCalendar = await update(data)
       showToast("success", MESSAGE.CALENDAR_UPDATED_SUCCESSFULLY)
+      return updatedCalendar
     } catch {
       showToast("error", MESSAGE.CALENDAR_SAVE_FAILED)
+      throw new Error(MESSAGE.CALENDAR_SAVE_FAILED)
     }
   }
 
-  const deleteCalendar = async (id: string) => {
+  const deleteCalendar = async (id: string): Promise<void> => {
     try {
       await remove(id)
       showToast("success", MESSAGE.CALENDAR_DELETED_SUCCESSFULLY)
     } catch {
       showToast("error", MESSAGE.CALENDAR_DELETE_FAILED)
+      throw new Error(MESSAGE.CALENDAR_DELETE_FAILED)
     }
   }
 

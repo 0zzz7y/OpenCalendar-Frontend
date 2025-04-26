@@ -40,30 +40,35 @@ const useCrudEvent = () => {
 export function useEvent() {
   const { reload, add, update, remove } = useCrudEvent()
 
-  const addEvent = async (data: Partial<Event>) => {
+  const addEvent = async (data: Partial<Event>): Promise<Event> => {
     try {
-      await add(data)
+      const savedEvent = await add(data)
       showToast("success", MESSAGE.EVENT_CREATED_SUCCESSFULLY)
+      return savedEvent
     } catch {
       showToast("error", MESSAGE.EVENT_SAVE_FAILED)
+      throw new Error(MESSAGE.EVENT_SAVE_FAILED)
     }
   }
 
-  const updateEvent = async (data: Partial<Event> & { id: string }) => {
+  const updateEvent = async (data: Partial<Event> & { id: string }): Promise<Event> => {
     try {
-      await update(data)
+      const updatedEvent = await update(data)
       showToast("success", MESSAGE.EVENT_UPDATED_SUCCESSFULLY)
+      return updatedEvent
     } catch {
       showToast("error", MESSAGE.EVENT_SAVE_FAILED)
+      throw new Error(MESSAGE.EVENT_SAVE_FAILED)
     }
   }
 
-  const deleteEvent = async (id: string) => {
+  const deleteEvent = async (id: string): Promise<void> => {
     try {
       await remove(id)
       showToast("success", MESSAGE.EVENT_DELETED_SUCCESSFULLY)
     } catch {
       showToast("error", MESSAGE.EVENT_DELETE_FAILED)
+      throw new Error(MESSAGE.EVENT_DELETE_FAILED)
     }
   }
 

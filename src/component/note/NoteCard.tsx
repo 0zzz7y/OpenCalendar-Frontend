@@ -1,10 +1,4 @@
-import MESSAGES from "@/constant/ui/message";
-import type Calendar from "@/model/domain/calendar";
-import type Category from "@/model/domain/category";
-import Note from "@/model/domain/note";
-
 import { useCallback, useEffect, useRef, useState } from "react";
-
 import {
   Box,
   Paper,
@@ -15,9 +9,12 @@ import {
   Typography,
   Button,
 } from "@mui/material";
-
 import NoteToolbar from "./NoteToolbar";
 import type FormatCommand from "@/model/utility/formatCommand";
+import type Calendar from "@/model/domain/calendar";
+import type Category from "@/model/domain/category";
+import MESSAGES from "@/constant/ui/message";
+import type Note from "@/model/domain/note";
 
 export interface NoteCardProperties {
   id: string;
@@ -27,7 +24,7 @@ export interface NoteCardProperties {
   color?: string;
   categories: Category[];
   onDelete?: (id: string) => void;
-  onUpdate?: (note: { id: string; name: string; description: string }) => void;
+  onUpdate: (note: Note) => void;
   calendar: Calendar;
   name?: string;
 }
@@ -47,32 +44,23 @@ const NoteCard = ({
   const contentRef = useRef<HTMLDivElement | null>(null);
   const wrapperRef = useRef<HTMLDivElement | null>(null);
   const toolbarRef = useRef<HTMLDivElement | null>(null);
-  const positionRef = useRef({ x: initialX, y: initialY });
-  const lastMousePos = useRef<{ x: number; y: number } | null>(null);
-  const animationFrameRef = useRef<number | null>(null);
-  const dragReady = useRef(false);
-
   const [dimensions, setDimensions] = useState({ width: 380, height: 200 });
-  const [position, setPosition] = useState(positionRef.current);
+  const [position, setPosition] = useState({ x: initialX, y: initialY });
   const [dragging, setDragging] = useState(false);
   const [collapsed, setCollapsed] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<
-    Category | undefined
-  >(undefined);
-  const [confirmAnchorEl, setConfirmAnchorEl] = useState<null | HTMLElement>(
-    null
-  );
-  const [confirmAction, setConfirmAction] = useState<() => void>(() => {});
-  const [confirmOpen, setConfirmOpen] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined);
   const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-  const [activeFormats, setActiveFormats] = useState<
-    Record<FormatCommand, boolean>
-  >({
+  const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
     bold: false,
     italic: false,
     underline: false,
   });
   const [noteName, setNoteName] = useState(name);
+  const [lastSavedContent, setLastSavedContent] = useState(content);
+  const [lastSavedName, setLastSavedName] = useState(name);
+
+  // Debounce timer for saving
+  const saveTimeoutRef = useRef<number | null>(null);
 
   useEffect(() => {
     if (content && !contentRef.current?.innerHTML) {
@@ -95,40 +83,28 @@ const NoteCard = ({
       document.execCommand(command, false);
       setActiveFormats((prev) => ({
         ...prev,
-        [command]: !prev[command],
+        [command]: document.queryCommandState(command),
       }));
     }, 0);
   };
 
   const handleMouseDown = (e: React.MouseEvent) => {
+    // Only allow dragging if the toolbar is clicked
     if (toolbarRef.current?.contains(e.target as Node)) {
-      dragReady.current = true;
-      lastMousePos.current = { x: e.clientX, y: e.clientY };
       setDragging(true);
     }
   };
 
   const handleMouseUp = useCallback(() => {
     setDragging(false);
-    dragReady.current = false;
-    lastMousePos.current = null;
   }, []);
 
   const handleDrag = useCallback((e: MouseEvent) => {
-    if (!dragging || !lastMousePos.current) return;
-    const dx = e.clientX - lastMousePos.current.x;
-    const dy = e.clientY - lastMousePos.current.y;
-    lastMousePos.current = { x: e.clientX, y: e.clientY };
-    positionRef.current = {
-      x: Math.max(0, positionRef.current.x + dx),
-      y: Math.max(0, positionRef.current.y + dy),
-    };
-    if (animationFrameRef.current === null) {
-      animationFrameRef.current = requestAnimationFrame(() => {
-        setPosition({ ...positionRef.current });
-        animationFrameRef.current = null;
-      });
-    }
+    if (!dragging) return;
+    setPosition((prev) => ({
+      x: Math.max(0, prev.x + e.movementX),
+      y: Math.max(0, prev.y + e.movementY),
+    }));
   }, [dragging]);
 
   const handleResize = (e: React.MouseEvent) => {
@@ -142,10 +118,7 @@ const NoteCard = ({
 
     const onMouseMove = (moveEvent: MouseEvent) => {
       const newWidth = Math.max(150, startWidth + (moveEvent.clientX - startX));
-      const newHeight = Math.max(
-        100,
-        startHeight + (moveEvent.clientY - startY)
-      );
+      const newHeight = Math.max(100, startHeight + (moveEvent.clientY - startY));
       setDimensions({ width: newWidth, height: newHeight });
     };
 
@@ -155,27 +128,27 @@ const NoteCard = ({
     };
 
     window.addEventListener("mousemove", onMouseMove);
-    window.addEventListener("mouseup", onMouseUp);
-  };
-
-  const handleConfirm = (message: string, action: () => void) => {
-    setConfirmAction(() => action);
-    setConfirmOpen(true);
-    setConfirmAnchorEl(wrapperRef.current);
-  };
-
-  const handleConfirmClose = () => {
-    setConfirmOpen(false);
-    setConfirmAnchorEl(null);
+    window.addEventListener("mouseup", onMouseUp)
   };
 
   const handleBlur = () => {
-    if (onUpdate) {
-      onUpdate({
-        id,
-        name: noteName,
-        description: contentRef.current?.innerHTML || "",
-      });
+    const currentContent = contentRef.current?.innerHTML || "";
+    if (currentContent !== lastSavedContent || noteName !== lastSavedName) {
+      if (saveTimeoutRef.current) {
+        clearTimeout(saveTimeoutRef.current);
+      }
+      saveTimeoutRef.current = window.setTimeout(() => {
+        if (onUpdate) {
+          onUpdate({
+            id,
+            name: noteName,
+            description: currentContent,
+            calendar,
+          });
+          setLastSavedContent(currentContent);
+          setLastSavedName(noteName);
+        }
+      }, 500); // Save after 500ms of inactivity
     }
   };
 
@@ -191,14 +164,22 @@ const NoteCard = ({
   }, [dragging, handleDrag, handleMouseUp]);
 
   useEffect(() => {
-    if (onUpdate) {
-      onUpdate({
-        id,
-        name: noteName,
-        description: contentRef.current?.innerHTML || "",
+    const updateActiveFormats = () => {
+      setActiveFormats({
+        bold: document.queryCommandState("bold"),
+        italic: document.queryCommandState("italic"),
+        underline: document.queryCommandState("underline"),
       });
-    }
-  }, [id, noteName, onUpdate]);
+    };
+
+    contentRef.current?.addEventListener("keyup", updateActiveFormats);
+    contentRef.current?.addEventListener("mouseup", updateActiveFormats);
+
+    return () => {
+      contentRef.current?.removeEventListener("keyup", updateActiveFormats);
+      contentRef.current?.removeEventListener("mouseup", updateActiveFormats);
+    };
+  }, []);
 
   return (
     <Box
@@ -225,7 +206,7 @@ const NoteCard = ({
           borderRadius: 2,
           boxShadow: dragging ? "0 0 10px #2196f3" : 3,
           overflow: "hidden",
-          cursor: "default",
+          cursor: dragging ? "grabbing" : "default",
           position: "relative",
         }}
       >
@@ -240,13 +221,7 @@ const NoteCard = ({
             isCollapsed={collapsed}
             onToggleCollapse={() => setCollapsed((c) => !c)}
             onClearText={clearText}
-            onDelete={() =>
-              contentRef.current?.innerText.trim()
-                ? handleConfirm(MESSAGES.CONFIRM_CLEAR_CONTENTS, () =>
-                    onDelete?.(id)
-                  )
-                : onDelete?.(id)
-            }
+            onDelete={() => onDelete?.(id)}
             onFormatText={formatText}
             activeFormats={activeFormats}
             selectedCategory={selectedCategory?.id || null}
@@ -254,6 +229,7 @@ const NoteCard = ({
             noteName={noteName}
             onNameChange={setNoteName}
             onNameBlur={handleBlur}
+            onDrag={(dx, dy) => setPosition((prev) => ({ x: Math.max(0, prev.x + dx), y: Math.max(0, prev.y + dy) }))}
           />
         </Box>
 
@@ -290,68 +266,6 @@ const NoteCard = ({
           }}
         />
       </Paper>
-
-      <Popover
-        open={confirmOpen}
-        anchorEl={confirmAnchorEl}
-        onClose={handleConfirmClose}
-        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
-        transformOrigin={{ vertical: "top", horizontal: "center" }}
-        PaperProps={{ sx: { p: 2 } }}
-      >
-        <Typography variant="body2" gutterBottom>
-          {MESSAGES.CONFIRM_CLEAR_CONTENTS}
-        </Typography>
-        <Box display="flex" gap={1} justifyContent="flex-end">
-          <Button size="small" onClick={handleConfirmClose}>
-            Cancel
-          </Button>
-          <Button
-            size="small"
-            color="error"
-            variant="contained"
-            onClick={() => {
-              confirmAction();
-              handleConfirmClose();
-            }}
-          >
-            Delete
-          </Button>
-        </Box>
-      </Popover>
-
-      <Menu
-        anchorEl={menuAnchorEl}
-        open={Boolean(menuAnchorEl)}
-        onClose={() => setMenuAnchorEl(null)}
-        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
-        transformOrigin={{ vertical: "top", horizontal: "right" }}
-        MenuListProps={{ dense: true }}
-      >
-        {categories.map((cat) => (
-          <MenuItem
-            key={cat.id}
-            selected={selectedCategory?.id === cat.id}
-            onClick={() => {
-              setSelectedCategory(cat);
-              setMenuAnchorEl(null);
-            }}
-            sx={{ display: "flex", alignItems: "center", gap: 1 }}
-          >
-            <Box
-              component="span"
-              sx={{
-                width: 12,
-                height: 12,
-                borderRadius: "50%",
-                backgroundColor: cat.color,
-                mr: 1,
-              }}
-            />
-            {cat.name}
-          </MenuItem>
-        ))}
-      </Menu>
     </Box>
   );
 };

@@ -39,30 +39,35 @@ const useCrudTask = () => {
 export function useTask() {
   const { reload, add, update, remove } = useCrudTask()
 
-  const addTask = async (data: Partial<Task>) => {
+  const addTask = async (data: Partial<Task>): Promise<Task> => {
     try {
-      await add(data)
+      const savedTask = await add(data)
       showToast("success", MESSAGE.TASK_CREATED_SUCCESSFULLY)
+      return savedTask
     } catch {
       showToast("error", MESSAGE.TASK_SAVE_FAILED)
+      throw new Error(MESSAGE.TASK_SAVE_FAILED)
     }
   }
 
-  const updateTask = async (data: Partial<Task> & { id: string }) => {
+  const updateTask = async (data: Partial<Task> & { id: string }): Promise<Task> => {
     try {
-      await update(data)
+      const updatedTask = await update(data)
       showToast("success", MESSAGE.TASK_UPDATED_SUCCESSFULLY)
+      return updatedTask
     } catch {
       showToast("error", MESSAGE.TASK_SAVE_FAILED)
+      throw new Error(MESSAGE.TASK_SAVE_FAILED)
     }
   }
 
-  const deleteTask = async (id: string) => {
+  const deleteTask = async (id: string): Promise<void> => {
     try {
       await remove(id)
       showToast("success", MESSAGE.TASK_DELETED_SUCCESSFULLY)
     } catch {
       showToast("error", MESSAGE.TASK_DELETE_FAILED)
+      throw new Error(MESSAGE.TASK_DELETE_FAILED)
     }
   }
 
