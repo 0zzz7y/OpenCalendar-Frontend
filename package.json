@@ -17,7 +17,6 @@
     "@mui/material": "^7.0.2",
     "@mui/x-date-pickers": "^7.29.0",
     "axios": "^1.8.4",
-    "client@^18": "link:react-dom/client@^18",
     "date-fns": "^2.29.3",
     "dayjs": "^1.11.13",
     "emoji-picker-react": "^4.12.2",

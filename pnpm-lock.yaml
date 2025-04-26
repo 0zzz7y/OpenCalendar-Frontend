@@ -29,9 +29,6 @@ importers:
       axios:
         specifier: ^1.8.4
         version: 1.9.0
-      client@^18:
-        specifier: link:react-dom/client@^18
-        version: link:react-dom/client@^18
       date-fns:
         specifier: ^2.29.3
         version: 2.30.0
