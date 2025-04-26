@@ -1,59 +1,59 @@
-import React, { useState, useEffect, useCallback } from "react"
-import { Popover, TextField, MenuItem, Button, Stack, Divider, Typography, Box } from "@mui/material"
-import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
-import dayjs from "dayjs"
-import { toast } from "react-toastify"
+import React, { useState, useEffect, useCallback } from "react";
+import { Popover, TextField, MenuItem, Stack, Divider, Typography, Box } from "@mui/material";
+import { DateCalendar, TimePicker } from "@mui/x-date-pickers";
+import dayjs from "dayjs";
 
-import useEvent from "@/repository/event.repository"
-import RecurringPattern from "@/model/domain/recurringPattern"
-import type Schedulable from "@/model/domain/schedulable"
-import BUTTON from "@/constant/ui/button"
-import LABEL from "@/constant/ui/label"
-import MESSAGE from "@/constant/ui/message"
-import FILTER from "@/constant/utility/filter"
+import useEvent from "@/repository/event.repository";
+import RecurringPattern from "@/model/domain/recurringPattern";
+import type Schedulable from "@/model/domain/schedulable";
+import BUTTON from "@/constant/ui/button";
+import LABEL from "@/constant/ui/label";
+import MESSAGE from "@/constant/ui/message";
+import FILTER from "@/constant/utility/filter";
+import SaveButton from "@/component/common/button/SaveButton";
+import CancelButton from "@/component/common/button/CancelButton";
 
 export interface EventCreationPopoverProps {
-  anchorEl: HTMLElement | null
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
-  initialEvent?: Schedulable
-  clickedDatetime?: Date // Add this prop
-  onClose: () => void
+  anchorEl: HTMLElement | null;
+  calendars: { id: string; name: string; emoji: string }[];
+  categories: { id: string; name: string; color: string }[];
+  initialEvent?: Schedulable;
+  clickedDatetime?: Date;
+  onClose: () => void;
 }
 
 interface FormState {
-  title: string
-  description: string
-  calendarId: string
-  categoryId: string
-  start: Date
-  end: Date
+  title: string;
+  description: string;
+  calendarId: string;
+  categoryId: string;
+  start: Date;
+  end: Date;
 }
 
-/**
- * Popover for creating or editing an event.
- */
 export default function EventCreationPopover({
   anchorEl,
   calendars,
   categories,
   initialEvent,
-  clickedDatetime, // Use this prop
-  onClose
+  clickedDatetime,
+  onClose,
 }: EventCreationPopoverProps) {
-  const { reloadEvents, updateEvent, addEvent, deleteEvent } = useEvent()
-  const isEdit = Boolean(initialEvent?.id)
+  const { reloadEvents, updateEvent, addEvent } = useEvent();
+  const isEdit = Boolean(initialEvent?.id);
 
   const [form, setForm] = useState<FormState>({
     title: "",
     description: "",
     calendarId: "",
     categoryId: "",
-    start: clickedDatetime || new Date(), // Use clickedDatetime if provided
-    end: new Date((clickedDatetime ? clickedDatetime.getTime() : Date.now()) + 3600_000) // Default to 1 hour later
-  })
+    start: clickedDatetime || new Date(),
+    end: new Date((clickedDatetime ? clickedDatetime.getTime() : Date.now()) + 3600_000),
+  });
 
-  const validAnchor = Boolean(anchorEl && document.body.contains(anchorEl))
+  const [loading, setLoading] = useState(false); // Loading state for buttons
+
+  const validAnchor = Boolean(anchorEl && document.body.contains(anchorEl));
 
   // Sync initial data when popover opens
   useEffect(() => {
@@ -65,8 +65,8 @@ export default function EventCreationPopover({
           calendarId: initialEvent.calendar?.id || "",
           categoryId: initialEvent.category?.id || "",
           start: new Date(initialEvent.startDate || Date.now()),
-          end: new Date(initialEvent.endDate || Date.now())
-        })
+          end: new Date(initialEvent.endDate || Date.now()),
+        });
       } else if (clickedDatetime && calendars.length > 0) {
         setForm({
           title: "",
@@ -74,27 +74,19 @@ export default function EventCreationPopover({
           calendarId: calendars[0].id,
           categoryId: "",
           start: clickedDatetime,
-          end: new Date(clickedDatetime.getTime() + 3600_000)
-        })
+          end: new Date(clickedDatetime.getTime() + 3600_000),
+        });
       }
     }
-  }, [validAnchor, isEdit, initialEvent, clickedDatetime, calendars])
+  }, [validAnchor, isEdit, initialEvent, clickedDatetime, calendars]);
 
   const handleChange = useCallback(<K extends keyof FormState>(field: K, value: FormState[K]) => {
-    setForm((prev) => ({ ...prev, [field]: value }))
-  }, [])
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }, []);
 
   const handleSave = useCallback(async () => {
-    // Validation
-    if (!form.title.trim()) {
-      return
-    }
-    if (form.end <= form.start) {
-      return
-    }
-    const calendar = calendars.find((c) => c.id === form.calendarId)
-    if (!calendar) {
-      return
+    if (!form.title.trim() || form.end <= form.start || !calendars.find((c) => c.id === form.calendarId)) {
+      return;
     }
 
     const payload = {
@@ -103,35 +95,24 @@ export default function EventCreationPopover({
       startDate: dayjs(form.start).format("YYYY-MM-DDTHH:mm:ss"),
       endDate: dayjs(form.end).format("YYYY-MM-DDTHH:mm:ss"),
       recurringPattern: RecurringPattern.NONE,
-      calendar,
-      category: categories.find((c) => c.id === form.categoryId) || undefined
-    }
+      calendar: calendars.find((c) => c.id === form.calendarId),
+      category: categories.find((c) => c.id === form.categoryId) || undefined,
+    };
 
+    setLoading(true); // Start loading
     try {
       if (isEdit && initialEvent?.id) {
-        // Update existing event with id included in payload
-        await updateEvent({ id: initialEvent.id, ...payload })
+        await updateEvent({ id: initialEvent.id, ...payload });
       } else {
-        // Create new event
-        await addEvent(payload)
+        await addEvent(payload);
       }
-      reloadEvents()
-      onClose()
-    } catch {}
-  }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose])
-
-  const handleDelete = useCallback(async () => {
-    if (isEdit && initialEvent?.id) {
-      try {
-        await deleteEvent(initialEvent.id)
-        toast.success(MESSAGE.EVENT_DELETED_SUCCESSFULLY)
-        reloadEvents()
-        onClose()
-      } catch {
-        toast.error(MESSAGE.EVENT_DELETE_FAILED)
-      }
+      reloadEvents();
+      onClose();
+    } catch {
+    } finally {
+      setLoading(false); // Stop loading
     }
-  }, [isEdit, initialEvent, deleteEvent, reloadEvents, onClose])
+  }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose]);
 
   return (
     <Popover
@@ -141,7 +122,7 @@ export default function EventCreationPopover({
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "left" }}
       PaperProps={{
-        sx: { p: 2, width: 340, maxHeight: "90vh", overflowY: "auto" }
+        sx: { p: 2, width: 340, maxHeight: "90vh", overflowY: "auto" },
       }}
     >
       <Stack spacing={2}>
@@ -201,19 +182,10 @@ export default function EventCreationPopover({
         />
 
         <Stack direction="row" spacing={1} justifyContent="flex-end">
-          <Button onClick={onClose} color="inherit">
-            {BUTTON.CANCEL}
-          </Button>
-          {isEdit && (
-            <Button onClick={handleDelete} color="error">
-              {BUTTON.DELETE}
-            </Button>
-          )}
-          <Button variant="contained" onClick={handleSave}>
-            {BUTTON.SAVE}
-          </Button>
+          <CancelButton onClick={onClose} />
+          <SaveButton onClick={handleSave} loading={loading} />
         </Stack>
       </Stack>
     </Popover>
-  )
+  );
 }

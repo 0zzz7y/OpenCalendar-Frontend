@@ -46,8 +46,8 @@ export function useEvent() {
       showToast("success", MESSAGE.EVENT_CREATED_SUCCESSFULLY)
       return savedEvent
     } catch {
-      showToast("error", MESSAGE.EVENT_SAVE_FAILED)
-      throw new Error(MESSAGE.EVENT_SAVE_FAILED)
+      showToast("error", MESSAGE.EVENT_CREATE_FAILED)
+      throw new Error(MESSAGE.EVENT_CREATE_FAILED)
     }
   }
 
@@ -57,8 +57,8 @@ export function useEvent() {
       showToast("success", MESSAGE.EVENT_UPDATED_SUCCESSFULLY)
       return updatedEvent
     } catch {
-      showToast("error", MESSAGE.EVENT_SAVE_FAILED)
-      throw new Error(MESSAGE.EVENT_SAVE_FAILED)
+      showToast("error", MESSAGE.EVENT_CREATE_FAILED)
+      throw new Error(MESSAGE.EVENT_CREATE_FAILED)
     }
   }
 

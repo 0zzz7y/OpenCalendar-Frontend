@@ -46,6 +46,7 @@ export default function MonthView({
   const [creation, setCreation] = useState<{
     anchor?: HTMLElement
     datetime?: Date
+    event?: Event // Add the event property to the state type
   }>({})
 
   const openInfo = useCallback(
@@ -87,13 +88,15 @@ export default function MonthView({
   )
 
   const handleEdit = useCallback(() => {
-    if (!info.anchor || !info.event) return
-    closeInfo()
+    if (!info.anchor || !info.event) return;
+    const ev = info.event; // Extract the event being edited
+    setInfo({});
     setCreation({
       anchor: info.anchor,
-      datetime: new Date(info.event.startDate)
-    })
-  }, [info, closeInfo])
+      datetime: new Date(ev.startDate), // Use the start date of the event being edited
+      event: ev, // Pass the event being edited
+    });
+  }, [info]);
 
   return (
     <Box sx={{ overflow: "auto", height: "100%", p: 2 }}>
@@ -220,16 +223,20 @@ export default function MonthView({
           onClose={closeCreation}
           calendars={calendars}
           categories={categories}
-          initialEvent={{
-            id: "",
-            name: "",
-            description: "",
-            startDate: creation.datetime.toISOString(),
-            endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),
-            calendar: calendars[0],
-            category: undefined,
-            recurringPattern: RecurringPattern.NONE
-          }}
+          initialEvent={
+            creation.event // If editing, pass the event being edited
+              ? creation.event
+              : {
+                  id: "",
+                  name: "",
+                  description: "",
+                  startDate: creation.datetime.toISOString(),
+                  endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),
+                  calendar: calendars[0],
+                  category: undefined,
+                  recurringPattern: RecurringPattern.NONE,
+                }
+          }
         />
       )}
     </Box>

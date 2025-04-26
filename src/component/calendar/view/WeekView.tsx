@@ -125,7 +125,6 @@ export default function WeekView({ date, events, calendars, categories, onEventC
   return (
     <>
       <Box display="flex" flexDirection="column" flex={1} sx={{ height: "100%" }}>
-        {/* 1) Day‐of‐week header */}
         <Box
           sx={{
             display: "grid",

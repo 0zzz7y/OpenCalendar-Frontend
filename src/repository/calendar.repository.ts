@@ -37,8 +37,8 @@ export function useCalendar() {
       showToast("success", MESSAGE.CALENDAR_CREATED_SUCCESSFULLY)
       return savedCalendar
     } catch {
-      showToast("error", MESSAGE.CALENDAR_SAVE_FAILED)
-      throw new Error(MESSAGE.CALENDAR_SAVE_FAILED)
+      showToast("error", MESSAGE.CALENDAR_CREATE_FAILED)
+      throw new Error(MESSAGE.CALENDAR_CREATE_FAILED)
     }
   }
 
@@ -48,8 +48,8 @@ export function useCalendar() {
       showToast("success", MESSAGE.CALENDAR_UPDATED_SUCCESSFULLY)
       return updatedCalendar
     } catch {
-      showToast("error", MESSAGE.CALENDAR_SAVE_FAILED)
-      throw new Error(MESSAGE.CALENDAR_SAVE_FAILED)
+      showToast("error", MESSAGE.CALENDAR_CREATE_FAILED)
+      throw new Error(MESSAGE.CALENDAR_CREATE_FAILED)
     }
   }
 

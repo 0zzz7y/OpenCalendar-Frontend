@@ -39,8 +39,8 @@ export function useCategory() {
       showToast("success", MESSAGE.CATEGORY_CREATED_SUCCESSFULLY)
       return savedCategory
     } catch {
-      showToast("error", MESSAGE.CATEGORY_SAVE_FAILED)
-      throw new Error(MESSAGE.CATEGORY_SAVE_FAILED)
+      showToast("error", MESSAGE.CATEGORY_CREATE_FAILED)
+      throw new Error(MESSAGE.CATEGORY_CREATE_FAILED)
     }
   }
 
@@ -50,8 +50,8 @@ export function useCategory() {
       showToast("success", MESSAGE.CATEGORY_UPDATED_SUCCESSFULLY)
       return updatedCategory
     } catch {
-      showToast("error", MESSAGE.CATEGORY_SAVE_FAILED)
-      throw new Error(MESSAGE.CATEGORY_SAVE_FAILED)
+      showToast("error", MESSAGE.CATEGORY_CREATE_FAILED)
+      throw new Error(MESSAGE.CATEGORY_CREATE_FAILED)
     }
   }
 

@@ -43,8 +43,8 @@ export function useNote() {
       showToast("success", MESSAGE.NOTE_CREATED_SUCCESSFULLY)
       return savedNote
     } catch {
-      showToast("error", MESSAGE.NOTE_SAVE_FAILED)
-      throw new Error(MESSAGE.NOTE_SAVE_FAILED)
+      showToast("error", MESSAGE.NOTE_CREATE_FAILED)
+      throw new Error(MESSAGE.NOTE_CREATE_FAILED)
     }
   }
 
@@ -54,8 +54,8 @@ export function useNote() {
       showToast("success", MESSAGE.NOTE_UPDATED_SUCCESSFULLY)
       return updatedNote
     } catch {
-      showToast("error", MESSAGE.NOTE_SAVE_FAILED)
-      throw new Error(MESSAGE.NOTE_SAVE_FAILED)
+      showToast("error", MESSAGE.NOTE_CREATE_FAILED)
+      throw new Error(MESSAGE.NOTE_CREATE_FAILED)
     }
   }
 

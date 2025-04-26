@@ -26,35 +26,40 @@ enum MESSAGE {
   EVENT_UPDATED_SUCCESSFULLY = "Event updated successfully.",
   EVENT_DELETED_SUCCESSFULLY = "Event deleted successfully.",
 
-  EVENT_SAVE_FAILED = "Failed to save event.",
+  EVENT_CREATE_FAILED = "Failed to save event.",
+  EVENT_UPDATE_FAILED = "Failed to update event.",
   EVENT_DELETE_FAILED = "Failed to delete event.",
 
   TASK_CREATED_SUCCESSFULLY = "Task created successfully.",
   TASK_UPDATED_SUCCESSFULLY = "Task updated successfully.",
   TASK_DELETED_SUCCESSFULLY = "Task deleted successfully.",
 
-  TASK_SAVE_FAILED = "Failed to save task.",
+  TASK_CREATE_FAILED = "Failed to save task.",
+  TASK_UPDATE_FAILED = "Failed to update task.",
   TASK_DELETE_FAILED = "Failed to delete task.",
 
   NOTE_CREATED_SUCCESSFULLY = "Note created successfully.",
   NOTE_UPDATED_SUCCESSFULLY = "Note updated successfully.",
   NOTE_DELETED_SUCCESSFULLY = "Note deleted successfully.",
 
-  NOTE_SAVE_FAILED = "Failed to save note.",
+  NOTE_CREATE_FAILED = "Failed to save note.",
+  NOTE_UPDATE_FAILED = "Failed to update note.",
   NOTE_DELETE_FAILED = "Failed to delete note.",
 
   CATEGORY_CREATED_SUCCESSFULLY = "Category created successfully.",
   CATEGORY_UPDATED_SUCCESSFULLY = "Category updated successfully.",
   CATEGORY_DELETED_SUCCESSFULLY = "Category deleted successfully.",
 
-  CATEGORY_SAVE_FAILED = "Failed to save category.",
+  CATEGORY_CREATE_FAILED = "Failed to save category.",
+  CATEGORY_UPDATE_FAILED = "Failed to update category.",
   CATEGORY_DELETE_FAILED = "Failed to delete category.",
 
   CALENDAR_CREATED_SUCCESSFULLY = "Calendar created successfully.",
   CALENDAR_UPDATED_SUCCESSFULLY = "Calendar updated successfully.",
   CALENDAR_DELETED_SUCCESSFULLY = "Calendar deleted successfully.",
 
-  CALENDAR_SAVE_FAILED = "Failed to save calendar.",
+  CALENDAR_CREATE_FAILED = "Failed to save calendar.",
+  CALENDAR_UPDATE_FAILED = "Failed to update calendar.",
   CALENDAR_DELETE_FAILED = "Failed to delete calendar.",
 
   CONFIRM_CLEAR_CONTENTS = "Are you sure you want to clear contents?",

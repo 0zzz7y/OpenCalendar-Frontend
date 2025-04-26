@@ -72,7 +72,7 @@ const EventInformationPopover = ({
         <Stack spacing={2}>
           <Stack direction="row" justifyContent="space-between">
             <Typography variant="h6">{currentEvent.name || "Untitled"}</Typography>
-            <Box>
+            <Box sx={{position: "absolute", top: 10, right: 10}}>
               {!confirmingDelete && (
                 <>
                   <IconButton size="small" onClick={onEdit}>

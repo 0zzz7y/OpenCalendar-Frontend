@@ -45,8 +45,8 @@ export function useTask() {
       showToast("success", MESSAGE.TASK_CREATED_SUCCESSFULLY)
       return savedTask
     } catch {
-      showToast("error", MESSAGE.TASK_SAVE_FAILED)
-      throw new Error(MESSAGE.TASK_SAVE_FAILED)
+      showToast("error", MESSAGE.TASK_CREATE_FAILED)
+      throw new Error(MESSAGE.TASK_CREATE_FAILED)
     }
   }
 
@@ -56,8 +56,8 @@ export function useTask() {
       showToast("success", MESSAGE.TASK_UPDATED_SUCCESSFULLY)
       return updatedTask
     } catch {
-      showToast("error", MESSAGE.TASK_SAVE_FAILED)
-      throw new Error(MESSAGE.TASK_SAVE_FAILED)
+      showToast("error", MESSAGE.TASK_CREATE_FAILED)
+      throw new Error(MESSAGE.TASK_CREATE_FAILED)
     }
   }
 
