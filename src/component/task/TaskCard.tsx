@@ -31,31 +31,45 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     name: false,
     startDate: false,
     endDate: false,
+    description: false,
   });
 
   // Sync props -> state
   useEffect(() => setLocal(task), [task]);
 
-  const validateTask = useCallback(() => {
-    const newErrors = {
-      name: !local.name.trim(),
-      startDate: !local.startDate,
-      endDate: local.endDate ? dayjs(local.endDate).isBefore(dayjs(local.startDate)) : false,
-    };
-    setErrors(newErrors);
-    return !Object.values(newErrors).some((error) => error);
-  }, [local]);
+  const validateField = useCallback(
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    (field: keyof Task, value: any) => {
+      switch (field) {
+        case "name":
+          return !value.trim();
+        case "startDate":
+          return !value;
+        case "endDate":
+          return value ? dayjs(value).isBefore(dayjs(local.startDate)) : false;
+        case "description":
+          return value.length > 4096;
+        default:
+          return false;
+      }
+    },
+    [local.startDate]
+  );
 
-  const handleChange = useCallback(<K extends keyof Task>(field: K, value: Task[K]) => {
-    setLocal((prev) => ({ ...prev, [field]: value }));
-    setErrors((prev) => ({ ...prev, [field]: false })); // Reset error for the field
-  }, []);
+  const handleChange = useCallback(
+    <K extends keyof Task>(field: K, value: Task[K]) => {
+      setLocal((prev) => {
+        const updated = { ...prev, [field]: value };
+        setErrors((prevErrors) => ({ ...prevErrors, [field]: validateField(field, value) })); // Validate the field
+        return updated;
+      });
+    },
+    [validateField]
+  );
 
   const handleBlur = useCallback(() => {
-    if (validateTask()) {
-      onUpdate(local); // Save the task only if validation passes
-    }
-  }, [local, validateTask, onUpdate]);
+    onUpdate(local); // Save the task when the user finishes interacting with a field
+  }, [local, onUpdate]);
 
   const cardColor = local.category?.color ?? "#f5f5f5";
 
@@ -86,7 +100,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             placeholder={LABEL.NAME}
             value={local.name}
             onChange={(e) => handleChange("name", e.target.value)}
-            onBlur={handleBlur} // Trigger update on blur
+            onBlur={handleBlur} // Save on blur
             size="small"
             fullWidth
             error={errors.name}
@@ -105,10 +119,13 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             placeholder={LABEL.DESCRIPTION}
             value={local.description ?? ""}
             onChange={(e) => handleChange("description", e.target.value)}
+            onBlur={handleBlur} // Save on blur
             size="small"
             fullWidth
             multiline
             minRows={2}
+            error={errors.description}
+            helperText={errors.description ? MESSAGE.DESCRIPTION_TOO_LONG : ""}
             sx={textFieldSx}
           />
 
@@ -116,7 +133,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             label={LABEL.START_DATE}
             value={local.startDate ? dayjs(local.startDate).toDate() : null}
             onChange={(d) => d && handleChange("startDate", d.toISOString())}
-            onClose={handleBlur} // Save on close
+            onClose={handleBlur} // Save when date selection is finished
             slotProps={{
               textField: {
                 size: "small",
@@ -131,7 +148,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             label={LABEL.END_DATE}
             value={local.endDate ? dayjs(local.endDate).toDate() : null}
             onChange={(d) => d && handleChange("endDate", d.toISOString())}
-            onClose={handleBlur} // Save on close
+            onClose={handleBlur} // Save when date selection is finished
             slotProps={{
               textField: {
                 size: "small",
@@ -148,6 +165,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
               select
               value={local.recurringPattern}
               onChange={(e) => handleChange("recurringPattern", e.target.value as RecurringPattern)}
+              onBlur={handleBlur} // Save on blur
               size="small"
               fullWidth
               sx={textFieldSx}
@@ -168,6 +186,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
               const cal = calendars.find((c) => c.id === e.target.value);
               cal && handleChange("calendar", cal);
             }}
+            onBlur={handleBlur} // Save on blur
             size="small"
             fullWidth
             sx={textFieldSx}
@@ -190,6 +209,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
               const cat = categories.find((c) => c.id === e.target.value) || null;
               handleChange("category", cat ? { ...cat, color: cat.color } : undefined);
             }}
+            onBlur={handleBlur} // Save on blur
             size="small"
             fullWidth
             sx={textFieldSx}
