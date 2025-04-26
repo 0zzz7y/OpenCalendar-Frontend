@@ -6,4 +6,4 @@ export const {
   create: createEvent,
   update: updateEvent,
   delete: deleteEvent
-} = createCrudService<EventDto>(`${import.meta.env.VITE_BASE_URL}/events`)
+} = createCrudService<EventDto>(`${import.meta.env.VITE_API_URL}/events`)

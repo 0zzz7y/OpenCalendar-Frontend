@@ -6,4 +6,4 @@ export const {
   create: createCalendar,
   update: updateCalendar,
   delete: deleteCalendar
-} = createCrudService<CalendarDto>(`${import.meta.env.VITE_BASE_URL}/calendars`)
+} = createCrudService<CalendarDto>(`${import.meta.env.VITE_API_URL}/calendars`)

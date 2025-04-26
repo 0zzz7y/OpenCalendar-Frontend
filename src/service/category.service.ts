@@ -6,4 +6,4 @@ export const {
   create: createCategory,
   update: updateCategory,
   delete: deleteCategory
-} = createCrudService<CategoryDto>(`${import.meta.env.VITE_BASE_URL}/categories`)
+} = createCrudService<CategoryDto>(`${import.meta.env.VITE_API_URL}/categories`)
