@@ -1,28 +1,33 @@
 # ──────────────────── Dependencies ────────────────────
-FROM node:20-alpine AS dependencies
+FROM node:20-bullseye-slim AS dependencies
 
 WORKDIR /app
 
-COPY package*.json ./
+RUN npm install -g pnpm
 
-RUN npm install
+COPY package.json pnpm-lock.yaml ./
+
+RUN pnpm install
+
 # ──────────────────── Builder ────────────────────
-FROM node:20-alpine AS builder
+FROM node:20-bullseye-slim AS builder
 
 WORKDIR /app
+
+RUN npm install -g pnpm
 
 COPY --from=dependencies /app/node_modules ./node_modules
 
 COPY . .
 
-RUN npm run build
+RUN pnpm run build
 
 # ──────────────────── Production ────────────────────
 FROM nginx:stable-alpine
 
 RUN rm -rf /usr/share/nginx/html/*
 
-COPY --from=builder /app/build /usr/share/nginx/html
+COPY --from=builder /app/dist /usr/share/nginx/html
 
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 
