@@ -20,7 +20,7 @@ COPY --from=dependencies /app/node_modules ./node_modules
 
 COPY . .
 
-RUN pnpm run build
+RUN pnpm production
 
 # ──────────────────── Production ────────────────────
 FROM nginx:stable-alpine
