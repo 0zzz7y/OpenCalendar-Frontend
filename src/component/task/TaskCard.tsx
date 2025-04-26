@@ -1,9 +1,12 @@
 import type React from "react";
 import { useState, useEffect, useCallback } from "react";
-import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography } from "@mui/material";
+import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography, Popover } from "@mui/material";
 import { Delete as DeleteIcon, ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 import dayjs from "dayjs";
+
+import CancelButton from "@/component/common/button/CancelButton";
+import DeleteButton from "@/component/common/button/DeleteButton";
 
 import type Calendar from "@/model/domain/calendar";
 import type Category from "@/model/domain/category";
@@ -33,12 +36,12 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     endDate: false,
     description: false,
   });
+  const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null); // Anchor for delete confirmation popover
 
   // Sync props -> state
   useEffect(() => setLocal(task), [task]);
 
   const validateField = useCallback(
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (field: keyof Task, value: any) => {
       switch (field) {
         case "name":
@@ -70,6 +73,19 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
   const handleBlur = useCallback(() => {
     onUpdate(local); // Save the task when the user finishes interacting with a field
   }, [local, onUpdate]);
+
+  const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {
+    setDeleteAnchorEl(event.currentTarget); // Open the delete confirmation popover
+  };
+
+  const handleDeleteConfirm = () => {
+    onDelete(local.id); // Confirm deletion
+    setDeleteAnchorEl(null); // Close the popover
+  };
+
+  const handleDeleteCancel = () => {
+    setDeleteAnchorEl(null); // Close the popover
+  };
 
   const cardColor = local.category?.color ?? "#f5f5f5";
 
@@ -108,7 +124,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             sx={textFieldSx}
           />
         </Box>
-        <IconButton size="small" onClick={() => onDelete(local.id)}>
+        <IconButton size="small" onClick={handleDeleteClick}>
           <DeleteIcon />
         </IconButton>
       </Box>
@@ -233,6 +249,24 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
           </TextField>
         </Box>
       </Collapse>
+
+      {/* Delete Confirmation Popover */}
+      <Popover
+        open={Boolean(deleteAnchorEl)}
+        anchorEl={deleteAnchorEl}
+        onClose={handleDeleteCancel}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+        transformOrigin={{ vertical: "top", horizontal: "center" }}
+        PaperProps={{ sx: { p: 2 } }}
+      >
+        <Typography variant="body2" gutterBottom>
+          {MESSAGE.CONFIRM_DELETE_TASK}
+        </Typography>
+        <Box display="flex" gap={1} justifyContent="flex-end">
+          <CancelButton onClick={handleDeleteCancel} />
+          <DeleteButton onClick={handleDeleteConfirm} />
+        </Box>
+      </Popover>
     </Card>
   );
 };

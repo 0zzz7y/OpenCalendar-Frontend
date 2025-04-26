@@ -214,7 +214,7 @@ const NoteCard = ({
             isCollapsed={collapsed}
             onToggleCollapse={() => setCollapsed((c) => !c)}
             onClearText={clearText}
-            onDelete={() => onDelete?.(id)}
+            onDelete={async () => onDelete?.(id)}
             onFormatText={formatText}
             activeFormats={activeFormats}
             selectedCategory={selectedCategory?.id || null}
@@ -223,6 +223,11 @@ const NoteCard = ({
             onNameChange={setNoteName}
             onNameBlur={handleBlur}
             onDrag={(dx, dy) => setPosition((prev) => ({ x: Math.max(0, prev.x + dx), y: Math.max(0, prev.y + dy) }))}
+            onCategoryChange={(categoryId) => {
+              const category = categories.find((cat) => cat.id === categoryId) || undefined
+              setSelectedCategory(category)
+            }}
+            categories={categories}
           />
         </Box>
 

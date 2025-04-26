@@ -1,7 +1,7 @@
 import React, { useState, useCallback, useMemo } from "react"
-import { Box, TextField, InputAdornment } from "@mui/material"
-import { AddCircleOutline } from "@mui/icons-material"
+import { Box, TextField } from "@mui/material"
 
+import AddButton from "@/component/common/button/AddButton"
 import useTask from "@/repository/task.repository"
 import useApplicationStorage from "@/storage/useApplicationStorage"
 import TaskBoard from "./TaskBoard"
@@ -69,21 +69,17 @@ export default function TasksPanel() {
         boxSizing: "border-box"
       }}
     >
-      <TextField
-        label={MESSAGE.NEW_TASK}
-        value={newTitle}
-        onChange={(e) => setNewTitle(e.target.value)}
-        onKeyDown={(e) => e.key === "Enter" && handleCreate()}
-        fullWidth
-        InputProps={{
-          endAdornment: (
-            <InputAdornment position="end">
-              <AddCircleOutline sx={{ cursor: "pointer" }} onClick={handleCreate} />
-            </InputAdornment>
-          )
-        }}
-        sx={{ mb: 2 }}
-      />
+      <Box display="flex" alignItems="center" gap={1} mb={2}>
+        <TextField
+          label={MESSAGE.NEW_TASK}
+          value={newTitle}
+          onChange={(e) => setNewTitle(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleCreate()}
+          size="small"
+          fullWidth
+        />
+        <AddButton onClick={handleCreate} />
+      </Box>
 
       <Box sx={{ flex: 1 }}>
         <TaskBoard

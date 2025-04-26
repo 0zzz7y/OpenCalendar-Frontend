@@ -3,11 +3,9 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "proxy": "http://localhost:8080",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc -b && vite build",
-    "lint": "eslint .",
+    "development": "vite",
+    "production": "tsc -b && vite build",
     "preview": "vite preview",
     "format": "biome format --write ."
   },

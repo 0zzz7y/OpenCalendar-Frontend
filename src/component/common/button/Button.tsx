@@ -5,11 +5,12 @@ interface ButtonProperties extends MuiButtonProps {
   loading?: boolean
 }
 
-const Button = ({ loading, children, ...properties }: ButtonProperties) => (
+const Button = ({ loading, children, size = "medium", ...properties }: ButtonProperties) => (
   <MuiButton
     variant="contained"
     color="primary"
     disableElevation
+    size={size}
     sx={{ textTransform: "none", fontWeight: 600 }}
     {...properties}
   >

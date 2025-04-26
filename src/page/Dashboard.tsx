@@ -32,7 +32,13 @@ const Dashboard = () => {
       <Panel defaultSize={18}>
         <PanelGroup direction="vertical" style={{ height: "100%", width: "100%" }}>
           {/* Calendar and Category selectors */}
-          <Panel style={panelStyle} defaultSize={12}>
+          <Panel defaultSize={12} style={{
+              ...panelStyle,
+              minWidth: "160px",
+              minHeight: "125px",
+              position: "relative",
+              margin: "5px 5px"
+            }}>
             <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
               <Box display="flex" flexDirection="column" gap={2}>
                 <CalendarSelector />
