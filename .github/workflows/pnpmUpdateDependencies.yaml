@@ -2,7 +2,6 @@ name: Update Dependencies
 
 on:
   schedule:
-    # Every Monday at 3 am
     - cron: "0 3 * * 1"
   workflow_dispatch:
 
@@ -19,18 +18,27 @@ jobs:
     needs: checkout
     runs-on: ubuntu-latest
     steps:
-      - name: Install
-        run: npm install -g npm-check-updates
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: "pnpm"
 
-      - name: Upgrade dependencies
+      - name: Install pnpm
+        run: npm install -g pnpm
+
+      - name: Install npm-check-updates
+        run: pnpm add -g npm-check-updates
+
+      - name: Upgrade Dependencies
         run: |
           ncu -u
-          npm install
+          pnpm install
 
       - name: Commit and Push
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add .
-          git diff-index --quiet HEAD || git commit -m "chore: auto-update NPM dependencies"
+          git diff-index --quiet HEAD || git commit -m "chore: auto-update dependencies"
           git push
