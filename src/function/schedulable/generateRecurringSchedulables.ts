@@ -1,13 +1,8 @@
 import dayjs from "dayjs"
-import type Event from "@/model/domain/event"
 import type Schedulable from "@/model/domain/schedulable"
 import RecurringPattern from "@/model/domain/recurringPattern"
 
-/**
- * Generates recurring event instances based on the recurring pattern.
- * Only handled on frontend (clones events locally).
- */
-export function generateRecurringSchedulables(event: Event): Schedulable[] {
+export function generateRecurringSchedulables(event: Schedulable): Schedulable[] {
   if (!event.startDate) return []
 
   const instances: Schedulable[] = []
@@ -75,7 +70,6 @@ export function generateRecurringSchedulables(event: Event): Schedulable[] {
       }
       break
 
-    case RecurringPattern.NONE:
     default:
       break
   }

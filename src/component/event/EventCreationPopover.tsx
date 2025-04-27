@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useState, useEffect, useCallback, useMemo } from "react"
 import { Popover, TextField, MenuItem, Stack, Divider, Typography, Box } from "@mui/material"
 import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
 import dayjs from "dayjs"
@@ -13,6 +13,8 @@ import MESSAGE from "@/constant/ui/message"
 import FILTER from "@/constant/utility/filter"
 import SaveButton from "@/component/common/button/SaveButton"
 import CancelButton from "@/component/common/button/CancelButton"
+import type Calendar from "@/model/domain/calendar"
+import useApplicationStorage from "@/storage/useApplicationStorage"
 
 export interface EventCreationPopoverProps {
   anchorEl: HTMLElement | null
@@ -21,7 +23,6 @@ export interface EventCreationPopoverProps {
   initialEvent?: Schedulable
   clickedDatetime?: Date
   onClose: () => void
-  schedulables: Schedulable[];
 }
 
 interface FormState {
@@ -41,10 +42,11 @@ export default function EventCreationPopover({
   initialEvent,
   clickedDatetime,
   onClose,
-  schedulables
 }: EventCreationPopoverProps) {
   const { reloadEvents, updateEvent, addEvent } = useEvent()
   const isEdit = Boolean(initialEvent?.id)
+  const { events, tasks } = useApplicationStorage()
+  const schedulables: Schedulable[] = useMemo(() => [...(events || []), ...(tasks || [])], [events, tasks])
 
   const [form, setForm] = useState<FormState>({
     title: "",
@@ -132,77 +134,122 @@ export default function EventCreationPopover({
 
   const handleSave = useCallback(async () => {
     if (!form.calendarId) {
-      toast.error("Cannot create or edit event. No calendar is selected.");
-      return;
+      toast.error("Cannot create or edit event. No calendar is selected.")
+      return
     }
-
-    if (!validateForm()) return;
-
+  
+    if (!validateForm()) return
+  
     const payload = {
       name: form.title,
       description: form.description,
-      startDate: dayjs(form.start)
-        .year(dayjs(initialEvent?.startDate).year())
-        .month(dayjs(initialEvent?.startDate).month())
-        .date(dayjs(initialEvent?.startDate).date())
-        .format("YYYY-MM-DDTHH:mm:ss"),
-      endDate: dayjs(form.end)
-        .year(dayjs(initialEvent?.startDate).year())
-        .month(dayjs(initialEvent?.startDate).month())
-        .date(dayjs(initialEvent?.startDate).date())
-        .format("YYYY-MM-DDTHH:mm:ss"),
+      startDate: dayjs(form.start).format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: dayjs(form.end).format("YYYY-MM-DDTHH:mm:ss"),
       recurringPattern: form.recurringPattern,
       calendar: calendars.find((c) => c.id === form.calendarId),
       category: categories.find((c) => c.id === form.categoryId) || undefined,
-    };
-
-    setLoading(true);
+    }
+  
+    setLoading(true)
     try {
-      if (isEdit && initialEvent?.id) {
-        // Check if the event's id is equal to its originalEventId or originalEventId is null
-        if (
-          initialEvent.id === initialEvent.originalEventId ||
-          !initialEvent.originalEventId
-        ) {
-          // Update the event normally
-          await updateEvent({ id: initialEvent.id, ...payload });
+      if (isEdit && initialEvent?.id !== undefined) {
+        if (initialEvent.id === initialEvent.originalEventId || !initialEvent.originalEventId) {
+          console.log("Editing the original event")
+          // Edit the event normally
+          await updateEvent({ id: initialEvent.id, ...payload })
         } else {
-          // Find the original event using originalEventId
+          console.log("Editing a copy of the event")
+          // It’s a copy! Only update changed fields of original
           const originalEvent = schedulables.find(
             (e) => e.id === initialEvent.originalEventId
-          );
-
+          )
+  
           if (originalEvent) {
-            // Update the original event
-            await updateEvent({ id: originalEvent.id, ...payload });
+            // Zbuduj bazowy pełny payload na podstawie originalEvent
+            const basePayload = {
+              name: originalEvent.name,
+              description: originalEvent.description,
+              startDate: dayjs(originalEvent.startDate).format("YYYY-MM-DDTHH:mm:ss"),
+              endDate: dayjs(originalEvent.endDate).format("YYYY-MM-DDTHH:mm:ss"),
+              recurringPattern: originalEvent.recurringPattern,
+              calendar: originalEvent.calendar,
+              category: originalEvent.category || undefined,
+            }
+          
+            // Teraz nadpisz tylko zmienione pola
+            const updatedPayload = { ...basePayload }
+          
+            if (form.title !== originalEvent.name) {
+              updatedPayload.name = form.title
+            }
+            if (form.description !== originalEvent.description) {
+              updatedPayload.description = form.description
+            }
+            if (form.calendarId !== originalEvent.calendar?.id) {
+              updatedPayload.calendar = calendars.find((c) => c.id === form.calendarId) as Calendar
+            }
+            if (form.categoryId !== (originalEvent.category?.id || "")) {
+              updatedPayload.category = categories.find((c) => c.id === form.categoryId) || undefined
+            }
+            if (
+              dayjs(form.start).format("HH:mm") !== dayjs(originalEvent.startDate).format("HH:mm") ||
+              dayjs(form.end).format("HH:mm") !== dayjs(originalEvent.endDate).format("HH:mm")
+            ) {
+              const originalStart = dayjs(originalEvent.startDate)
+              const originalEnd = dayjs(originalEvent.endDate)
+              const newStartTime = dayjs(form.start)
+              const newEndTime = dayjs(form.end)
+            
+              const updatedStartDate = originalStart
+                .hour(newStartTime.hour())
+                .minute(newStartTime.minute())
+                .second(newStartTime.second())
+            
+              const updatedEndDate = originalEnd
+                .hour(newEndTime.hour())
+                .minute(newEndTime.minute())
+                .second(newEndTime.second())
+            
+              updatedPayload.startDate = updatedStartDate.format("YYYY-MM-DDTHH:mm:ss")
+              updatedPayload.endDate = updatedEndDate.format("YYYY-MM-DDTHH:mm:ss")
+            }
+            if (form.recurringPattern !== originalEvent.recurringPattern) {
+              updatedPayload.recurringPattern = form.recurringPattern
+            }
+          
+            console.log("Updated full payload:", updatedPayload)
+          
+            await updateEvent({ id: originalEvent.id, ...updatedPayload })
           } else {
-            toast.error("Original event not found.");
+            toast.error("Original event not found.")
           }
         }
       } else {
-        // Create a new event
-        await addEvent(payload);
+        // New event
+        await addEvent(payload)
       }
-      reloadEvents();
-      onClose();
+  
+      reloadEvents()
+      onClose()
     } catch {
-      toast.error("Failed to save event.");
+      toast.error("Failed to save event.")
     } finally {
-      setLoading(false);
+      setLoading(false)
     }
   }, [
     form,
     calendars,
     categories,
-    schedulables, // Use schedulables from props
+    schedulables,
     isEdit,
     initialEvent,
     updateEvent,
     addEvent,
     reloadEvents,
     onClose,
-    validateForm,
-  ]);
+    validateForm
+  ])
+  
 
   return (
     <Popover

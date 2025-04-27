@@ -47,7 +47,7 @@ export default function YearView({ date, events, calendars, categories, onEventC
 
   const openDayPopover = useCallback(async (anchor: HTMLElement, date: Date) => {
     closeInfo()
-    await reloadEvents() // <-- Force refresh events before showing
+    await reloadEvents()
     setDayAnchor(anchor)
     setDayDate(date)
   }, [closeInfo, reloadEvents])
@@ -78,7 +78,8 @@ export default function YearView({ date, events, calendars, categories, onEventC
     }
   }, [info, closeInfo])
   
-  const openCreate = useCallback(() => {
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
+    const openCreate = useCallback(() => {
     if (dayAnchor && dayDate) {
       setEdit({ anchor: dayAnchor, event: null, datetime: dayDate })
       closeDayPopover()
@@ -159,7 +160,7 @@ export default function YearView({ date, events, calendars, categories, onEventC
                   return (
                     <Box
                       key={dayKey}
-                      onClick={(e) => isValid && openDayPopover(e.currentTarget as HTMLElement, dayDate!)}
+                      onClick={(e) => isValid && dayDate && openDayPopover(e.currentTarget as HTMLElement, dayDate)}
                       sx={{
                         height: 60,
                         px: 1,

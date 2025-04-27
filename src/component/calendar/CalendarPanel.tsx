@@ -50,8 +50,9 @@ export default function CalendarPanel({ selectedDate, setSelectedDate, view, set
   const schedulables: Schedulable[] = useMemo(() => {
     const safeEvents = Array.isArray(events) ? events : []
     const safeTasks = Array.isArray(tasks) ? tasks : []
+    const schedulables = [...safeEvents, ...safeTasks]
   
-    const expandedEvents = safeEvents.flatMap((event) => {
+    const expandedEvents = schedulables.flatMap((event) => {
       const recurringInstances = generateRecurringSchedulables(event)
   
       return [
@@ -220,7 +221,6 @@ export default function CalendarPanel({ selectedDate, setSelectedDate, view, set
           onClose={closeAll}
           calendars={calendars}
           categories={categories}
-          schedulables={schedulables}
           initialEvent={
             editingEvent || {
               id: "",
