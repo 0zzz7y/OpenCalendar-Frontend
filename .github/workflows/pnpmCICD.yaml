@@ -10,45 +10,49 @@ on:
 jobs:
   install:
     name: Install Dependencies
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node-version: [20]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Install Dependencies
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Install dependencies
         run: pnpm install
 
   build:
     name: Build Application
     needs: install
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node-version: [20]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Install Dependencies
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Install dependencies
         run: pnpm install
 
       - name: Run Production Build
@@ -57,23 +61,25 @@ jobs:
   test:
     name: Run Tests
     needs: build
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node-version: [20]
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: "pnpm"
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
 
-      - name: Install Dependencies
+      - name: Setup Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: "pnpm"
+
+      - name: Install dependencies
         run: pnpm install
 
       - name: Run Tests
