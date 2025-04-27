@@ -1,9 +1,9 @@
 export { default as CalendarGridCell } from "./CalendarGridCell"
 export { default as CalendarPanel } from "./CalendarPanel"
 export { default as CalendarViewSwitcher } from "./CalendarViewSwitcher"
-export { default as DayColumn } from "./DayColumn"
-export { default as DayGrid } from "./DayGrid"
-export { default as HourLabelColumn } from "./HourLabelColumn"
+export { default as DayColumn } from "./day/DayColumn"
+export { default as DayGrid } from "./day/DayGrid"
+export { default as HourLabelColumn } from "./hour/HourLabelColumn"
 export { default as MonthlyCalendar } from "./MonthlyCalendar"
 
 export { default as CalendarSelector } from "./selector/CalendarSelector"

@@ -10,7 +10,6 @@ import TasksPanel from "@/component/task/TaskPanel"
 import ThemeToggleButton from "@/theme/ThemeToggleButton"
 import { loadCalendars, loadCategories, loadEvents, loadTasks, loadNotes } from "@/controller"
 import ViewType from "@/model/utility/viewType"
-import useNotificationScheduler from "@/notification/useNotificationScheduler"
 
 const panelStyle = {
   border: "2px solid #ccc",
@@ -20,7 +19,6 @@ const panelStyle = {
 }
 
 const Dashboard = () => {
-  useNotificationScheduler()
   const [selectedDate, setSelectedDate] = useState(new Date())
   const [view, setView] = useState<ViewType>(ViewType.WEEK)
   const [jumpToDate, setJumpToDate] = useState<Date | null>(null)

@@ -1,7 +1,7 @@
 import React, { useMemo, useCallback } from "react"
 import type { FC, CSSProperties } from "react"
 import { Box } from "@mui/material"
-import CalendarGridCell from "./CalendarGridCell"
+import CalendarGridCell from "../CalendarGridCell"
 import EventBox from "@/component/event/EventBox"
 import type Event from "@/model/domain/event"
 import type Schedulable from "@/model/domain/schedulable"

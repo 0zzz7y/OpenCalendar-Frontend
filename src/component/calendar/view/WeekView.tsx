@@ -7,8 +7,8 @@ import useEvent from "@/repository/event.repository"
 import type Event from "@/model/domain/event"
 import type Schedulable from "@/model/domain/schedulable"
 import RecurringPattern from "@/model/domain/recurringPattern"
-import DayColumn from "../DayColumn"
-import HourLabelsColumn from "../HourLabelColumn"
+import DayColumn from "../day/DayColumn"
+import HourLabelsColumn from "../hour/HourLabelColumn"
 
 export interface WeekViewProps {
   date: Date
