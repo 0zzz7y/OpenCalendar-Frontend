@@ -20,6 +20,7 @@ import WeekView from "@/component/calendar/view/WeekView"
 import MonthView from "@/component/calendar/view/MonthView"
 import YearView from "@/component/calendar/view/YearView"
 import { EventCreationPopover as EventPopover, EventInformationPopover } from "@/component/event"
+import { generateRecurringSchedulables } from "@/function/schedulable/generateRecurringSchedulables"
 
 interface CalendarPanelProperties {
   selectedDate: Date
@@ -46,11 +47,30 @@ export default function CalendarPanel({ selectedDate, setSelectedDate, view, set
     [view, selectedDate, setSelectedDate]
   )
 
-  // Combined schedulables (events + tasks with dates)
   const schedulables: Schedulable[] = useMemo(() => {
     const safeEvents = Array.isArray(events) ? events : []
     const safeTasks = Array.isArray(tasks) ? tasks : []
-    return [...safeEvents, ...safeTasks.filter((t) => t.startDate && t.endDate)].filter((item) => {
+  
+    const expandedEvents = safeEvents.flatMap((event) => {
+      const recurringInstances = generateRecurringSchedulables(event)
+  
+      return [
+        event,
+        ...recurringInstances.filter((instance) => {
+          // Nie pokazuj jeśli data kopii == data oryginału
+          if (!instance.startDate || !event.startDate) return true
+          const isSameDay = dayjs(instance.startDate).isSame(event.startDate, "day")
+          return !isSameDay
+        })
+      ]
+    })
+  
+    const combined: Schedulable[] = [
+      ...expandedEvents,
+      ...safeTasks.filter((t) => t.startDate && t.endDate)
+    ]
+  
+    return combined.filter((item) => {
       const calMatch = !selectedCalendar || selectedCalendar === FILTER.ALL || item.calendar.id === selectedCalendar
       const catMatch = !selectedCategory || selectedCategory === FILTER.ALL || item.category?.id === selectedCategory
       return calMatch && catMatch

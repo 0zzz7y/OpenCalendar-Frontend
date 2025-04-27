@@ -3,6 +3,7 @@ import type Category from "./category"
 import type RecurringPattern from "./recurringPattern"
 
 interface Schedulable {
+  originalEventId?: string
   id: string
   name?: string
   description?: string

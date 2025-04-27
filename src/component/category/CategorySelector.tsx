@@ -14,7 +14,7 @@ import COLOR from "@/constant/ui/color"
 import Selector from "@/component/common/selector/Selector"
 import AddButton from "@/component/common/button/AddButton"
 import ColorDot from "@/component/common/colordot/ColorDot"
-import { isCategoryUsed } from "@/utilities/filter"
+import { isCategoryUsed } from "@/function/filter/useFilter"
 import { useCategory, useEvent, useTask, useNote } from "@/repository"
 
 export default function CategorySelector() {
