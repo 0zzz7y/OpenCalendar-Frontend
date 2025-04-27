@@ -152,16 +152,21 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
       alignItems="center"
       bgcolor="rgba(255,255,255,0.4)"
       p={0.5}
-      sx={{ cursor: "move", userSelect: "none" }}
+      sx={{ cursor: "move", userSelect: "none", color: "#000" }} // Set main black color
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >
       <Box display="flex" alignItems="center">
-        <IconButton size="small" onClick={onToggleCollapse} onMouseDown={(e) => e.stopPropagation()}>
+        <IconButton
+          size="small"
+          onClick={onToggleCollapse}
+          onMouseDown={(e) => e.stopPropagation()}
+          sx={{ color: "#000" }} // Set icon color to black
+        >
           {isCollapsed ? (
-            <ChevronRightIcon fontSize="small" sx={{ transform: "rotate(270deg)" }} />
+            <ChevronRightIcon fontSize="small" sx={{ transform: "rotate(270deg)", color: "#000" }} />
           ) : (
-            <ExpandMoreIcon fontSize="small" />
+            <ExpandMoreIcon fontSize="small" sx={{ color: "#000" }} />
           )}
         </IconButton>
 
@@ -175,7 +180,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           sx={{
             ml: 1,
             width: 140,
-            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500 }
+            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500, color: "#000" }, // Set text color to black
           }}
           onMouseDown={(e) => e.stopPropagation()}
         />
@@ -185,27 +190,34 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
         <Box display="flex" gap={0.5} alignItems="center">
           {([TOOLBAR.BOLD, TOOLBAR.ITALIC, TOOLBAR.UNDERLINE] as FormatCommand[]).map((cmd) => {
             const Icon =
-              cmd === TOOLBAR.BOLD ? FormatBoldIcon : cmd === TOOLBAR.ITALIC ? FormatItalicIcon : FormatUnderlinedIcon
+              cmd === TOOLBAR.BOLD ? FormatBoldIcon : cmd === TOOLBAR.ITALIC ? FormatItalicIcon : FormatUnderlinedIcon;
             return (
               <IconButton
                 key={cmd}
                 size="small"
                 onClick={() => onFormatText(cmd)}
                 onMouseDown={(e) => e.stopPropagation()}
-                sx={{ bgcolor: activeFormats[cmd] ? "#ddd" : "transparent" }}
+                sx={{ bgcolor: activeFormats[cmd] ? "#ddd" : "transparent", color: "#000" }} // Set icon color to black
               >
-                <Icon fontSize="small" />
+                <Icon fontSize="small" sx={{ color: "#000" }} />
               </IconButton>
-            )
+            );
           })}
 
           {/* Clear Text */}
-          <IconButton size="small" onClick={(e) => { e.stopPropagation(); onClearText() }}>
-            <ClearIcon fontSize="small" />
+          <IconButton
+            size="small"
+            onClick={(e) => {
+              e.stopPropagation();
+              onClearText();
+            }}
+            sx={{ color: "#000" }} // Set icon color to black
+          >
+            <ClearIcon fontSize="small" sx={{ color: "#000" }} />
           </IconButton>
 
           {/* Select Category */}
-          <IconButton size="small" onClick={handleCategoryMenuOpen}>
+          <IconButton size="small" onClick={handleCategoryMenuOpen} sx={{ color: "#000" }}>
             <Box
               width={14}
               height={14}
@@ -216,9 +228,11 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           </IconButton>
 
           <Menu anchorEl={categoryMenuAnchor} open={Boolean(categoryMenuAnchor)} onClose={handleCategoryMenuClose}>
-            <MenuItem onClick={() => handleCategorySelect(null)}>{FILTER.ALL}</MenuItem>
+            <MenuItem onClick={() => handleCategorySelect(null)} sx={{ color: "#000" }}>
+              {FILTER.ALL}
+            </MenuItem>
             {categories.map((category) => (
-              <MenuItem key={category.id} onClick={() => handleCategorySelect(category.id)}>
+              <MenuItem key={category.id} onClick={() => handleCategorySelect(category.id)} sx={{ color: "#000" }}>
                 <Box
                   width={14}
                   height={14}
@@ -233,22 +247,26 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           </Menu>
 
           {/* Select Calendar */}
-          <IconButton size="small" onClick={handleCalendarMenuOpen}>
-            <Typography fontSize="18px">{currentCalendar?.emoji || "📅"}</Typography>
+          <IconButton size="small" onClick={handleCalendarMenuOpen} sx={{ color: "#000" }}>
+            <Typography fontSize="18px" sx={{ color: "#000" }}>
+              {currentCalendar?.emoji || "📅"}
+            </Typography>
           </IconButton>
 
           <Menu anchorEl={calendarMenuAnchor} open={Boolean(calendarMenuAnchor)} onClose={handleCalendarMenuClose}>
             {calendars.map((calendar) => (
-              <MenuItem key={calendar.id} onClick={() => handleCalendarSelect(calendar.id)}>
-                <Typography fontSize="18px" mr={1}>{calendar.emoji}</Typography>
+              <MenuItem key={calendar.id} onClick={() => handleCalendarSelect(calendar.id)} sx={{ color: "#000" }}>
+                <Typography fontSize="18px" mr={1} sx={{ color: "#000" }}>
+                  {calendar.emoji}
+                </Typography>
                 {calendar.name}
               </MenuItem>
             ))}
           </Menu>
 
           {/* Delete */}
-          <IconButton size="small" onClick={handleDeleteClick}>
-            <DeleteIcon fontSize="small" />
+          <IconButton size="small" onClick={handleDeleteClick} sx={{ color: "#000" }}>
+            <DeleteIcon fontSize="small" sx={{ color: "#000" }} />
           </IconButton>
         </Box>
       )}
@@ -259,9 +277,9 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
         onClose={handleCancelDelete}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
-        PaperProps={{ sx: { p: 2 } }}
+        PaperProps={{ sx: { p: 2, color: "#000" } }} // Set popover text color to black
       >
-        <Typography variant="body2" gutterBottom>
+        <Typography variant="body2" gutterBottom sx={{ color: "#000" }}>
           {MESSAGE.CONFIRM_DELETE_NOTE}
         </Typography>
         <Box display="flex" gap={1} justifyContent="flex-end">
