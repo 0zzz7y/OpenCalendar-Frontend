@@ -8,12 +8,14 @@ on:
 jobs:
   update:
     name: Update Packages
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
+    strategy:
+      matrix:
+        node-version: [20]
     steps:
-      - name: Checkout Repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup pnpm
+      - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
           version: 10
@@ -21,10 +23,13 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          node-version: ${{ matrix.node-version }}
           cache: "pnpm"
 
-      - name: Check Updates
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Install npm-check-updates
         run: pnpm add -g npm-check-updates
 
       - name: Upgrade Dependencies
