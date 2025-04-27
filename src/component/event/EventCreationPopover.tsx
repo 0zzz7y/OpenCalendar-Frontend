@@ -91,9 +91,31 @@ export default function EventCreationPopover({
   }, [validAnchor, isEdit, initialEvent, clickedDatetime, calendars])
 
   const handleChange = useCallback(<K extends keyof FormState>(field: K, value: FormState[K]) => {
-    setForm((prev) => ({ ...prev, [field]: value }))
-    setErrors((prev) => ({ ...prev, [field]: false }))
-  }, [])
+    setForm((prev) => {
+      const updatedForm = { ...prev, [field]: value };
+
+      // Ensure end date has the same day, month, and year as the start date
+      if (field === "start") {
+        const start = value as Date;
+        const end = new Date(updatedForm.end);
+
+        // Update end date to match the day, month, and year of the start date
+        end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate());
+        updatedForm.end = end;
+      } else if (field === "end") {
+        const start = new Date(updatedForm.start);
+        const end = value as Date;
+
+        // Update end date to match the day, month, and year of the start date
+        end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate());
+        updatedForm.end = end;
+      }
+
+      return updatedForm;
+    });
+
+    setErrors((prev) => ({ ...prev, [field]: false }));
+  }, []);
 
   const validateForm = useCallback(() => {
     const newErrors = {
