@@ -8,7 +8,6 @@
  */
 import React, { useState, useEffect, useCallback, useMemo } from "react"
 import { Box, IconButton } from "@mui/material"
-import AddIcon from "@mui/icons-material/Add"
 
 // Custom hook for note CRUD operations
 import useNotes from "@/repository/note.repository"
@@ -19,6 +18,7 @@ import NoteCard from "./NoteCard"
 import MESSAGE from "@/constant/ui/message"
 import type Note from "@/model/domain/note"
 import LABEL from "@/constant/ui/label"
+import { AddButton } from "../common"
 
 async function addNote(note: Partial<Note>): Promise<Note> {
   // Implementation here
@@ -148,20 +148,17 @@ export default function NotesPanel() {
         ))}
       </Box>
 
-      <IconButton
-        onClick={handleAddNote}
-        sx={{
-          position: "absolute",
-          bottom: 16,
-          right: 16,
-          bgcolor: "primary.main",
-          color: "white",
-          "&:hover": { bgcolor: "primary.dark" },
-          zIndex: 1300
-        }}
-      >
-        <AddIcon />
-      </IconButton>
+        <AddButton
+          onClick={handleAddNote}
+          sx={{
+            position: "absolute",
+            bottom: 12,
+            right: 8,
+            zIndex: 1300
+          }}
+        >
+        </AddButton>
     </Box>
   )
 }
+

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { Box, Paper, Collapse, Menu, MenuItem, Popover, Typography, Button } from "@mui/material"
+import { Box, Paper, Collapse } from "@mui/material"
 import NoteToolbar from "./NoteToolbar"
 import type FormatCommand from "@/model/utility/formatCommand"
 import type Calendar from "@/model/domain/calendar"
@@ -50,7 +50,6 @@ const NoteCard = ({
   const [lastSavedContent, setLastSavedContent] = useState(content)
   const [lastSavedName, setLastSavedName] = useState(name)
 
-  // Debounce timer for saving
   const saveTimeoutRef = useRef<number | null>(null)
 
   useEffect(() => {
@@ -79,26 +78,14 @@ const NoteCard = ({
   }
 
   const handleMouseDown = (e: React.MouseEvent) => {
-    // Only allow dragging if the toolbar is clicked
     if (toolbarRef.current?.contains(e.target as Node)) {
-      setDragging(true)
+      // Do nothing — dragging will be handled after 0.2s hold inside toolbar
     }
   }
 
   const handleMouseUp = useCallback(() => {
     setDragging(false)
   }, [])
-
-  const handleDrag = useCallback(
-    (e: MouseEvent) => {
-      if (!dragging) return
-      setPosition((prev) => ({
-        x: Math.max(0, prev.x + e.movementX),
-        y: Math.max(0, prev.y + e.movementY)
-      }))
-    },
-    [dragging]
-  )
 
   const handleResize = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -141,20 +128,26 @@ const NoteCard = ({
           setLastSavedContent(currentContent)
           setLastSavedName(noteName)
         }
-      }, 500) // Save after 500ms of inactivity
+      }, 500)
     }
   }
 
-  useEffect(() => {
-    if (dragging) {
-      window.addEventListener("mousemove", handleDrag)
-      window.addEventListener("mouseup", handleMouseUp)
-      return () => {
-        window.removeEventListener("mousemove", handleDrag)
-        window.removeEventListener("mouseup", handleMouseUp)
-      }
+  const handleCategoryChange = (categoryId: string) => {
+    const category = categories.find((cat) => cat.id === categoryId) || undefined
+    setSelectedCategory(category)
+    if (onUpdate) {
+      const currentContent = contentRef.current?.innerHTML || ""
+      onUpdate({
+        id,
+        name: noteName,
+        description: currentContent,
+        calendar,
+        category: category ? { id: category.id, name: category.name, color: category.color } : undefined
+      })
+      setLastSavedContent(currentContent)
+      setLastSavedName(noteName)
     }
-  }, [dragging, handleDrag, handleMouseUp])
+  }
 
   useEffect(() => {
     const updateActiveFormats = () => {
@@ -222,11 +215,14 @@ const NoteCard = ({
             noteName={noteName}
             onNameChange={setNoteName}
             onNameBlur={handleBlur}
-            onDrag={(dx, dy) => setPosition((prev) => ({ x: Math.max(0, prev.x + dx), y: Math.max(0, prev.y + dy) }))}
-            onCategoryChange={(categoryId) => {
-              const category = categories.find((cat) => cat.id === categoryId) || undefined
-              setSelectedCategory(category)
+            onDrag={(dx, dy) => {
+              setDragging(true)
+              setPosition((prev) => ({
+                x: Math.max(0, prev.x + dx),
+                y: Math.max(0, prev.y + dy)
+              }))
             }}
+            onCategoryChange={handleCategoryChange}
             categories={categories}
           />
         </Box>

@@ -29,7 +29,16 @@ export interface TaskCardProps {
  */
 const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpdate, onDelete }) => {
   const [expanded, setExpanded] = useState(true);
-  const [local, setLocal] = useState<Task>(task);
+  const [local, setLocal] = useState<Task>(task || {
+    id: "",
+    name: "",
+    description: "",
+    startDate: null,
+    endDate: null,
+    calendar: calendars[0],
+    category: undefined,
+    recurringPattern: RecurringPattern.NONE,
+  });
   const [errors, setErrors] = useState({
     name: false,
     startDate: false,
@@ -39,7 +48,9 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
   const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null); // Anchor for delete confirmation popover
 
   // Sync props -> state
-  useEffect(() => setLocal(task), [task]);
+  useEffect(() => {
+    if (task) setLocal(task); // Sync props -> state
+  }, [task]);
 
   const validateField = useCallback(
     (field: keyof Task, value: any) => {
