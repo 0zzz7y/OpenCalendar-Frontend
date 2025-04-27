@@ -25,7 +25,6 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
-          pnpm: true
 
   test:
     name: Run Tests
@@ -40,7 +39,6 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
-          pnpm: true
 
       - name: Run Tests
         run: pnpm test -- --watchAll=false --ci
@@ -58,7 +56,6 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
-          pnpm: true
 
       - name: Lint
         run: pnpm run lint
