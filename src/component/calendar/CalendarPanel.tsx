@@ -195,6 +195,7 @@ export default function CalendarPanel() {
             events={schedulables}
             calendars={calendars}
             categories={categories}
+            onSave={handleSave}
             onEventClick={handleEventClick}
           />
         )}

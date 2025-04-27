@@ -6,7 +6,7 @@ import type Schedulable from "@/model/domain/schedulable"
 import { useEffect, useState, useRef } from "react"
 
 import { Edit, Delete } from "@mui/icons-material"
-import { Box, Typography, IconButton, Stack, Popover, Button } from "@mui/material"
+import { Box, Typography, IconButton, Stack, Popover, Button, PopoverProps } from "@mui/material"
 import useApplicationStorage from "@/storage/useApplicationStorage"
 
 interface EventInformationPopoverProperties {
@@ -15,6 +15,7 @@ interface EventInformationPopoverProperties {
   onClose: () => void
   onEdit: () => void
   onDelete: (eventId: string) => void
+  PaperProps?: PopoverProps["PaperProps"]
 }
 
 const EventInformationPopover = ({
@@ -22,7 +23,8 @@ const EventInformationPopover = ({
   event,
   onClose,
   onEdit,
-  onDelete
+  onDelete,
+  PaperProps
 }: EventInformationPopoverProperties) => {
   const open = Boolean(anchorElement && event)
   const { events } = useApplicationStorage()
@@ -66,7 +68,10 @@ const EventInformationPopover = ({
       onClose={onClose}
       anchorOrigin={{ vertical: "top", horizontal: "right" }}
       transformOrigin={{ vertical: "top", horizontal: "left" }}
-      PaperProps={{ sx: { p: 2, width: 300 } }}
+      PaperProps={{
+        sx: { p: 2, width: 300, ...PaperProps?.sx },
+        ...PaperProps 
+      }}
     >
       {currentEvent && (
         <Stack spacing={2}>

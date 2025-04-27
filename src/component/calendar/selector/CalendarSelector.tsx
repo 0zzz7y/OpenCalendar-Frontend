@@ -13,6 +13,8 @@ import FILTER from "@/constant/utility/filter"
 import Selector from "@/component/common/selector/Selector"
 import AddButton from "@/component/common/button/AddButton"
 import { isCalendarUsed } from "@/utilities/filter"
+import useCalendar from "@/repository/calendar.repository"
+import { useEvent, useNote, useTask } from "@/repository"
 
 export default function CalendarSelector() {
   const calendars = useApplicationStorage((state) => state.calendars)
@@ -22,6 +24,11 @@ export default function CalendarSelector() {
   const tasks = useApplicationStorage((state) => state.tasks)
   const events = useApplicationStorage((state) => state.events)
   const notes = useApplicationStorage((state) => state.notes)
+
+  const { reloadCalendars } = useCalendar()
+  const { reloadEvents } = useEvent()
+  const { reloadTasks } = useTask()
+  const { reloadNotes } = useNote()
 
   const [editorOpen, setEditorOpen] = useState(false)
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
@@ -60,6 +67,14 @@ export default function CalendarSelector() {
   }, [])
 
   const handleChange = useCallback((calendarId: string) => setSelectedCalendar(calendarId), [setSelectedCalendar])
+
+  const handleAfterDelete = useCallback(async () => {
+    setSelectedCalendar(FILTER.ALL)
+    await reloadCalendars()
+    await reloadEvents()
+    await reloadTasks()
+    await reloadNotes()
+  }, [reloadCalendars, setSelectedCalendar])
 
   return (
     <Box display="flex" alignItems="center" gap={1} width="100%">
@@ -119,7 +134,7 @@ export default function CalendarSelector() {
         mode={editorMode}
         initialData={editorData}
         onClose={closeEditor}
-        onDelete={() => setSelectedCalendar(FILTER.ALL)}
+        onDelete={handleAfterDelete} // <-- USE NEW function
       />
     </Box>
   )

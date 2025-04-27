@@ -15,6 +15,7 @@ import Selector from "@/component/common/selector/Selector"
 import AddButton from "@/component/common/button/AddButton"
 import ColorDot from "@/component/common/colordot/ColorDot"
 import { isCategoryUsed } from "@/utilities/filter"
+import { useCategory, useEvent, useTask, useNote } from "@/repository"
 
 export default function CategorySelector() {
   const categories = useApplicationStorage((state) => state.categories)
@@ -24,6 +25,11 @@ export default function CategorySelector() {
   const tasks = useApplicationStorage((state) => state.tasks)
   const events = useApplicationStorage((state) => state.events)
   const notes = useApplicationStorage((state) => state.notes)
+
+  const { reloadCategories } = useCategory()
+  const { reloadEvents } = useEvent()
+  const { reloadTasks } = useTask()
+  const { reloadNotes } = useNote()
 
   const [editorOpen, setEditorOpen] = useState(false)
   const [anchor, setAnchor] = useState<HTMLElement | null>(null)
@@ -62,6 +68,14 @@ export default function CategorySelector() {
   }, [])
 
   const handleChange = useCallback((categoryId: string) => setSelectedCategory(categoryId), [setSelectedCategory])
+
+  const handleAfterDelete = useCallback(async () => {
+    setSelectedCategory(FILTER.ALL)
+    await reloadCategories()
+    await reloadEvents()
+    await reloadTasks()
+    await reloadNotes()
+  }, [reloadCategories, setSelectedCategory])
 
   return (
     <Box display="flex" alignItems="center" gap={1} width="100%">
@@ -122,7 +136,7 @@ export default function CategorySelector() {
         initialData={editorData}
         onClose={closeEditor}
         onSave={() => {}}
-        onDelete={() => setSelectedCategory(FILTER.ALL)}
+        onDelete={handleAfterDelete}
       />
     </Box>
   )
