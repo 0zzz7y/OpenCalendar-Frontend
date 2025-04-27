@@ -23,9 +23,7 @@ jobs:
         with:
           node-version: 20
           cache: "pnpm"
-
-      - name: Install pnpm
-        run: npm install -g pnpm
+          pnpm: true
 
       - name: Install npm-check-updates
         run: pnpm add -g npm-check-updates
@@ -34,6 +32,7 @@ jobs:
         run: |
           ncu -u
           pnpm install
+          pnpm: true
 
       - name: Commit and Push
         run: |
