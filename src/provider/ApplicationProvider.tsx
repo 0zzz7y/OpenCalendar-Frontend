@@ -6,8 +6,15 @@ import { HTML5Backend } from "react-dnd-html5-backend"
 import { ToastContainer } from "react-toastify"
 
 import ThemeProvider from "@/theme/ThemeProvider"
+import { useEffect } from "react"
 
 const Application = ({ children }: { children: React.ReactNode }) => {
+  useEffect(() => {
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission()
+    }
+  }, [])
+  
   return (
     <>
       <ThemeProvider>

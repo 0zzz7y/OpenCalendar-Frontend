@@ -1,23 +1,30 @@
+import { useEffect, useState } from "react"
+import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
+import { Box } from "@mui/material"
+
 import { CalendarSelector, CalendarPanel } from "@/component/calendar"
-import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
 import { CategorySelector } from "@/component/category"
+import MonthlyCalendar from "@/component/calendar/MonthlyCalendar"
 import NotesPanel from "@/component/note/NotePanel"
 import TasksPanel from "@/component/task/TaskPanel"
-import { loadCalendars, loadCategories, loadEvents, loadTasks, loadNotes } from "@/controller"
 import ThemeToggleButton from "@/theme/ThemeToggleButton"
-import { Box } from "@mui/material"
-import { useEffect } from "react"
-import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
+import { loadCalendars, loadCategories, loadEvents, loadTasks, loadNotes } from "@/controller"
+import ViewType from "@/model/utility/viewType"
+import useNotificationScheduler from "@/notification/useNotificationScheduler"
+
 const panelStyle = {
   border: "2px solid #ccc",
   borderRadius: "8px",
   padding: "10px",
   margin: "10px 5px"
 }
+
 const Dashboard = () => {
-  /**
-   * Load all initial data for calendars, categories, events, tasks, and notes
-   */
+  useNotificationScheduler()
+  const [selectedDate, setSelectedDate] = useState(new Date())
+  const [view, setView] = useState<ViewType>(ViewType.WEEK)
+  const [jumpToDate, setJumpToDate] = useState<Date | null>(null)
+
   useEffect(() => {
     loadCalendars()
     loadCategories()
@@ -28,16 +35,9 @@ const Dashboard = () => {
 
   return (
     <PanelGroup direction="horizontal" style={{ height: "100vh", width: "100%" }}>
-      {/* Left Sidebar: selectors and mini-calendar */}
       <Panel defaultSize={18}>
         <PanelGroup direction="vertical" style={{ height: "100%", width: "100%" }}>
-          {/* Calendar and Category selectors */}
-          <Panel defaultSize={12} style={{
-              ...panelStyle,
-              minWidth: "160px",
-              minHeight: "125px",
-              position: "relative",
-            }}>
+          <Panel defaultSize={12} style={{ ...panelStyle, minWidth: "160px", minHeight: "125px" }}>
             <Box display="flex" flexDirection="column" justifyContent="space-between" height="100%">
               <Box display="flex" flexDirection="column" gap={2}>
                 <CalendarSelector />
@@ -48,41 +48,24 @@ const Dashboard = () => {
 
           <PanelResizeHandle />
 
-          {/* Monthly calendar overview */}
-          <Panel
-            defaultSize={30}
-            style={{
-              ...panelStyle,
-              minHeight: "290px",
-              minWidth: "320px",
-              position: "relative",
-              margin: "5px 5px"
-            }}
-          >
+          <Panel defaultSize={30} style={{ ...panelStyle, minHeight: "290px", minWidth: "320px" }}>
             <Box sx={{ alignSelf: "left", mt: "-16px", ml: "-24px" }}>
-              <MonthlyCalendar />
+            <MonthlyCalendar
+              onDateSelect={(date) => {
+                setSelectedDate(date)
+              }}
+            />
             </Box>
           </Panel>
 
           <PanelResizeHandle />
 
-          {/* Notes section in sidebar */}
           <Panel style={{ ...panelStyle, margin: "10px 5px", padding: 0 }}>
             <Box display="flex" flexDirection="column" height="100%" position="relative">
               <Box flexGrow={1} overflow="auto">
                 <NotesPanel />
               </Box>
-              {/* Theme toggle at the bottom */}
-              <Box
-                sx={{
-                  position: "absolute",
-                  bottom: 0,
-                  left: 0,
-                  p: 1.5,
-                  width: "100%",
-                  zIndex: 2
-                }}
-              >
+              <Box sx={{ position: "absolute", bottom: 0, left: 0, p: 1.5, width: "100%", zIndex: 2 }}>
                 <ThemeToggleButton />
               </Box>
             </Box>
@@ -92,14 +75,19 @@ const Dashboard = () => {
 
       <PanelResizeHandle />
 
-      {/* Main calendar panel */}
       <Panel style={{ ...panelStyle, margin: "10px 5px" }}>
-        <CalendarPanel />
+        <CalendarPanel
+          selectedDate={selectedDate}
+          setSelectedDate={setSelectedDate}
+          view={view}
+          setView={setView}
+          jumpToDate={jumpToDate}
+          setJumpToDate={setJumpToDate}
+        />
       </Panel>
 
       <PanelResizeHandle />
 
-      {/* Right Sidebar: tasks list */}
       <Panel defaultSize={20}>
         <Box display="flex" flexDirection="column" height="100%" sx={{ ...panelStyle, m: "10px 10px 5px 5px" }}>
           <Box flexGrow={1} overflow="auto">

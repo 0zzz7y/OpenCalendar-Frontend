@@ -1,4 +1,5 @@
-import React, { useState, useMemo, useCallback } from "react"
+// CalendarPanel.tsx
+import React, { useMemo, useCallback, useState, useEffect } from "react"
 import { Box, Typography, Button } from "@mui/material"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
@@ -8,15 +9,10 @@ import ViewType from "@/model/utility/viewType"
 import RecurringPattern from "@/model/domain/recurringPattern"
 import type Event from "@/model/domain/event"
 import type Schedulable from "@/model/domain/schedulable"
-import type Task from "@/model/domain/task"
 
 import useApplicationStorage from "@/storage/useApplicationStorage"
 import FILTER from "@/constant/utility/filter"
 import useEvent from "@/repository/event.repository"
-import useTask from "@/repository/task.repository"
-import useCalendar from "@/repository/calendar.repository"
-import useNote from "@/repository/note.repository"
-import useCategory from "@/repository/category.repository"
 
 import CalendarViewSwitcher from "@/component/calendar/CalendarViewSwitcher"
 import DayView from "@/component/calendar/view/DayView"
@@ -25,26 +21,29 @@ import MonthView from "@/component/calendar/view/MonthView"
 import YearView from "@/component/calendar/view/YearView"
 import { EventCreationPopover as EventPopover, EventInformationPopover } from "@/component/event"
 
-export default function CalendarPanel() {
+interface CalendarPanelProperties {
+  selectedDate: Date
+  setSelectedDate: (date: Date) => void
+  view: ViewType
+  setView: (view: ViewType) => void
+  jumpToDate: Date | null
+  setJumpToDate: (date: Date | null) => void
+}
+
+export default function CalendarPanel({ selectedDate, setSelectedDate, view, setView, jumpToDate, setJumpToDate }: CalendarPanelProperties) {
   // Stores & repositories
   const { events, tasks, calendars, categories, selectedCalendar, selectedCategory } = useApplicationStorage()
   const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent()
-  const { reloadTasks } = useTask()
-  const { reloadCalendars } = useCalendar()
-  const { reloadNotes } = useNote()
-  const { reloadCategories } = useCategory()
-
-  // View & date navigation
-  const [view, setView] = useState<ViewType>(ViewType.WEEK)
-  const [selectedDate, setSelectedDate] = useState(new Date())
 
   const navigate = useCallback(
     (direction: "previous" | "next") => {
-      const unit: ManipulateType = view === ViewType.MONTH ? "month" : view === ViewType.DAY ? "day" : "week"
+      const unit: ManipulateType =
+        view === ViewType.MONTH ? "month" : view === ViewType.DAY ? "day" : "week"
       const delta = direction === "next" ? 1 : -1
-      setSelectedDate((d) => dayjs(d).add(delta, unit).toDate())
+      const newDate = dayjs(selectedDate).add(delta, unit).toDate()
+      setSelectedDate(newDate)
     },
-    [view]
+    [view, selectedDate, setSelectedDate]
   )
 
   // Combined schedulables (events + tasks with dates)
@@ -59,14 +58,8 @@ export default function CalendarPanel() {
   }, [events, tasks, selectedCalendar, selectedCategory])
 
   // Popover & editing state
-  const [creation, setCreation] = useState<{
-    anchor?: HTMLElement
-    datetime?: Date
-  }>({})
-  const [info, setInfo] = useState<{
-    anchor?: HTMLElement
-    event?: Event
-  }>({})
+  const [creation, setCreation] = useState<{ anchor?: HTMLElement; datetime?: Date }>({})
+  const [info, setInfo] = useState<{ anchor?: HTMLElement; event?: Event }>({})
   const [editingEvent, setEditingEvent] = useState<Event | undefined>(undefined)
 
   const handleSlotClick = useCallback((anchor: HTMLElement, datetime: Date) => {
@@ -93,7 +86,6 @@ export default function CalendarPanel() {
       if (!data.startDate || !data.calendar) {
         return
       }
-
       if (data.id) {
         const original = events.find((e): e is Event => e.id === data.id)
         if (original) {
@@ -133,8 +125,16 @@ export default function CalendarPanel() {
     setCreation({ anchor: info.anchor, datetime: new Date(ev.startDate) })
   }, [info])
 
+  useEffect(() => {
+    if (jumpToDate) {
+      setSelectedDate(jumpToDate)
+      setJumpToDate(null)
+    }
+  }, [jumpToDate, setSelectedDate, setJumpToDate])
+  
   return (
     <>
+      {/* Toolbar */}
       <Box display="flex" justifyContent="space-between" alignItems="center" px={2} py={1}>
         <Box display="flex" alignItems="center" gap={1}>
           <Button onClick={() => navigate("previous")}>
@@ -150,13 +150,8 @@ export default function CalendarPanel() {
         <CalendarViewSwitcher view={view} onChange={setView} />
       </Box>
 
-      <Box
-        sx={{
-          height: "100%",
-          overflow: "auto",
-          pb: 8
-        }}
-      >
+      {/* Main view */}
+      <Box sx={{ height: "100%", overflow: "auto", pb: 8 }}>
         {view === ViewType.DAY && (
           <DayView
             date={selectedDate}
@@ -166,7 +161,6 @@ export default function CalendarPanel() {
             onEventClick={handleEventClick}
           />
         )}
-
         {view === ViewType.WEEK && (
           <WeekView
             date={selectedDate}
@@ -176,7 +170,6 @@ export default function CalendarPanel() {
             onEventClick={handleEventClick}
           />
         )}
-
         {view === ViewType.MONTH && (
           <MonthView
             date={selectedDate}
@@ -188,7 +181,6 @@ export default function CalendarPanel() {
             onEventClick={handleEventClick}
           />
         )}
-
         {view === ViewType.YEAR && (
           <YearView
             date={selectedDate}
@@ -201,6 +193,7 @@ export default function CalendarPanel() {
         )}
       </Box>
 
+      {/* Popovers */}
       {creation.anchor && creation.datetime && (
         <EventPopover
           anchorEl={creation.anchor}

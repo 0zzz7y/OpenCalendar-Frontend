@@ -1,10 +1,18 @@
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar"
 
-function MonthlyCalendar() {
+interface MonthlyCalendarProperties {
+  onDateSelect: (date: Date) => void
+}
+
+function MonthlyCalendar({ onDateSelect }: MonthlyCalendarProperties) {
   return (
-    <>
-      <DateCalendar />
-    </>
+    <DateCalendar
+      onChange={(newDate) => {
+        if (newDate) {
+          onDateSelect(newDate)
+        }
+      }}
+    />
   )
 }
 
