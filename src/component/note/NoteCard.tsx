@@ -14,9 +14,11 @@ export interface NoteCardProperties {
   initialY?: number
   color?: string
   categories: Category[]
+  calendars: Calendar[]
   onDelete?: (id: string) => void
   onUpdate: (note: Note) => void
   calendar: Calendar
+  category?: Category
   name?: string
 }
 
@@ -27,20 +29,22 @@ const NoteCard = ({
   color = "#fff59d",
   content = "",
   categories,
+  calendars,
   onDelete,
   onUpdate,
   calendar,
+  category,
   name = MESSAGES.NEW_NOTE
 }: NoteCardProperties) => {
   const contentRef = useRef<HTMLDivElement | null>(null)
   const wrapperRef = useRef<HTMLDivElement | null>(null)
   const toolbarRef = useRef<HTMLDivElement | null>(null)
-  const [dimensions, setDimensions] = useState({ width: 380, height: 200 })
+  const [dimensions, setDimensions] = useState({ width: 420, height: 200 })
   const [position, setPosition] = useState({ x: initialX, y: initialY })
   const [dragging, setDragging] = useState(false)
   const [collapsed, setCollapsed] = useState(false)
-  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(undefined)
-  const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null)
+  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>(category)
+  const [selectedCalendar, setSelectedCalendar] = useState<Calendar>(calendar)
   const [activeFormats, setActiveFormats] = useState<Record<FormatCommand, boolean>>({
     bold: false,
     italic: false,
@@ -79,7 +83,7 @@ const NoteCard = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (toolbarRef.current?.contains(e.target as Node)) {
-      // Do nothing — dragging will be handled after 0.2s hold inside toolbar
+      // do nothing
     }
   }
 
@@ -123,7 +127,12 @@ const NoteCard = ({
             id,
             name: noteName,
             description: currentContent,
-            calendar
+            calendar: selectedCalendar,
+            category: selectedCategory ? {
+              id: selectedCategory.id,
+              name: selectedCategory.name,
+              color: selectedCategory.color
+            } : undefined
           })
           setLastSavedContent(currentContent)
           setLastSavedName(noteName)
@@ -135,17 +144,42 @@ const NoteCard = ({
   const handleCategoryChange = (categoryId: string) => {
     const category = categories.find((cat) => cat.id === categoryId) || undefined
     setSelectedCategory(category)
+  
     if (onUpdate) {
       const currentContent = contentRef.current?.innerHTML || ""
       onUpdate({
         id,
         name: noteName,
         description: currentContent,
-        calendar,
-        category: category ? { id: category.id, name: category.name, color: category.color } : undefined
+        calendar: selectedCalendar, // use latest calendar
+        category: category
+          ? { id: category.id, name: category.name, color: category.color }
+          : undefined
       })
       setLastSavedContent(currentContent)
       setLastSavedName(noteName)
+    }
+  }
+  
+  const handleCalendarChange = (calendarId: string) => {
+    const calendar = calendars.find((cal) => cal.id === calendarId)
+    if (calendar) {
+      setSelectedCalendar(calendar)
+  
+      if (onUpdate) {
+        const currentContent = contentRef.current?.innerHTML || ""
+        onUpdate({
+          id,
+          name: noteName,
+          description: currentContent,
+          calendar: calendar, // use updated calendar
+          category: selectedCategory
+            ? { id: selectedCategory.id, name: selectedCategory.name, color: selectedCategory.color }
+            : undefined
+        })
+        setLastSavedContent(currentContent)
+        setLastSavedName(noteName)
+      }
     }
   }
 
@@ -157,7 +191,6 @@ const NoteCard = ({
         underline: document.queryCommandState("underline")
       })
     }
-
     contentRef.current?.addEventListener("keyup", updateActiveFormats)
     contentRef.current?.addEventListener("mouseup", updateActiveFormats)
 
@@ -211,7 +244,11 @@ const NoteCard = ({
             onFormatText={formatText}
             activeFormats={activeFormats}
             selectedCategory={selectedCategory?.id || null}
-            onCategoryMenuOpen={(anchor: HTMLElement) => setMenuAnchorEl(anchor)}
+            onCategoryChange={handleCategoryChange}
+            categories={categories}
+            selectedCalendarId={selectedCalendar?.id}
+            onCalendarChange={handleCalendarChange}
+            calendars={calendars}
             noteName={noteName}
             onNameChange={setNoteName}
             onNameBlur={handleBlur}
@@ -222,8 +259,6 @@ const NoteCard = ({
                 y: Math.max(0, prev.y + dy)
               }))
             }}
-            onCategoryChange={handleCategoryChange}
-            categories={categories}
           />
         </Box>
 
