@@ -34,7 +34,7 @@ export function generateRecurringSchedulables(event: Event): Schedulable[] {
       break
 
     case RecurringPattern.WEEKLY:
-      limitDate = start.add(1, "month")
+      limitDate = start.add(3, "month")
       while (cursor.isBefore(limitDate)) {
         instances.push({
           ...event,
