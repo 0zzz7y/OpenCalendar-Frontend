@@ -21,6 +21,7 @@ export interface EventCreationPopoverProps {
   initialEvent?: Schedulable
   clickedDatetime?: Date
   onClose: () => void
+  schedulables: Schedulable[];
 }
 
 interface FormState {
@@ -39,7 +40,8 @@ export default function EventCreationPopover({
   categories,
   initialEvent,
   clickedDatetime,
-  onClose
+  onClose,
+  schedulables
 }: EventCreationPopoverProps) {
   const { reloadEvents, updateEvent, addEvent } = useEvent()
   const isEdit = Boolean(initialEvent?.id)
@@ -130,37 +132,77 @@ export default function EventCreationPopover({
 
   const handleSave = useCallback(async () => {
     if (!form.calendarId) {
-      toast.error("Cannot create event. No calendar is available.")
-      return
+      toast.error("Cannot create or edit event. No calendar is selected.");
+      return;
     }
 
-    if (!validateForm()) return
+    if (!validateForm()) return;
 
     const payload = {
       name: form.title,
       description: form.description,
-      startDate: dayjs(form.start).format("YYYY-MM-DDTHH:mm:ss"),
-      endDate: dayjs(form.end).format("YYYY-MM-DDTHH:mm:ss"),
+      startDate: dayjs(form.start)
+        .year(dayjs(initialEvent?.startDate).year())
+        .month(dayjs(initialEvent?.startDate).month())
+        .date(dayjs(initialEvent?.startDate).date())
+        .format("YYYY-MM-DDTHH:mm:ss"),
+      endDate: dayjs(form.end)
+        .year(dayjs(initialEvent?.startDate).year())
+        .month(dayjs(initialEvent?.startDate).month())
+        .date(dayjs(initialEvent?.startDate).date())
+        .format("YYYY-MM-DDTHH:mm:ss"),
       recurringPattern: form.recurringPattern,
       calendar: calendars.find((c) => c.id === form.calendarId),
-      category: categories.find((c) => c.id === form.categoryId) || undefined
-    }
+      category: categories.find((c) => c.id === form.categoryId) || undefined,
+    };
 
-    setLoading(true)
+    setLoading(true);
     try {
       if (isEdit && initialEvent?.id) {
-        await updateEvent({ id: initialEvent.id, ...payload })
+        // Check if the event's id is equal to its originalEventId or originalEventId is null
+        if (
+          initialEvent.id === initialEvent.originalEventId ||
+          !initialEvent.originalEventId
+        ) {
+          // Update the event normally
+          await updateEvent({ id: initialEvent.id, ...payload });
+        } else {
+          // Find the original event using originalEventId
+          const originalEvent = schedulables.find(
+            (e) => e.id === initialEvent.originalEventId
+          );
+
+          if (originalEvent) {
+            // Update the original event
+            await updateEvent({ id: originalEvent.id, ...payload });
+          } else {
+            toast.error("Original event not found.");
+          }
+        }
       } else {
-        await addEvent(payload)
+        // Create a new event
+        await addEvent(payload);
       }
-      reloadEvents()
-      onClose()
+      reloadEvents();
+      onClose();
     } catch {
-      toast.error("Failed to create event.")
+      toast.error("Failed to save event.");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose, validateForm])
+  }, [
+    form,
+    calendars,
+    categories,
+    schedulables, // Use schedulables from props
+    isEdit,
+    initialEvent,
+    updateEvent,
+    addEvent,
+    reloadEvents,
+    onClose,
+    validateForm,
+  ]);
 
   return (
     <Popover

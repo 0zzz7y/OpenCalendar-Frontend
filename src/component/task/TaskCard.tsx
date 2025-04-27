@@ -53,6 +53,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
   }, [task]);
 
   const validateField = useCallback(
+    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (field: keyof Task, value: any) => {
       switch (field) {
         case "name":

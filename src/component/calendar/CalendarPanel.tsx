@@ -220,6 +220,7 @@ export default function CalendarPanel({ selectedDate, setSelectedDate, view, set
           onClose={closeAll}
           calendars={calendars}
           categories={categories}
+          schedulables={schedulables}
           initialEvent={
             editingEvent || {
               id: "",
