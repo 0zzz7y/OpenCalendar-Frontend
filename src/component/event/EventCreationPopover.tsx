@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Popover, TextField, MenuItem, Stack, Divider, Typography, Box } from "@mui/material";
 import { DateCalendar, TimePicker } from "@mui/x-date-pickers";
 import dayjs from "dayjs";
+import { toast } from "react-toastify";
 
 import useEvent from "@/repository/event.repository";
 import RecurringPattern from "@/model/domain/recurringPattern";
@@ -103,6 +104,11 @@ export default function EventCreationPopover({
   }, [form]);
 
   const handleSave = useCallback(async () => {
+    if (!form.calendarId) {
+      toast.error("Cannot create event. No calendar is available.");
+      return;
+    }
+
     if (!validateForm()) return;
 
     const payload = {
@@ -115,7 +121,7 @@ export default function EventCreationPopover({
       category: categories.find((c) => c.id === form.categoryId) || undefined,
     };
 
-    setLoading(true); // Start loading
+    setLoading(true);
     try {
       if (isEdit && initialEvent?.id) {
         await updateEvent({ id: initialEvent.id, ...payload });
@@ -125,8 +131,9 @@ export default function EventCreationPopover({
       reloadEvents();
       onClose();
     } catch {
+      toast.error("Failed to create event.");
     } finally {
-      setLoading(false); // Stop loading
+      setLoading(false);
     }
   }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose, validateForm]);
 

@@ -19,6 +19,7 @@ import MESSAGE from "@/constant/ui/message"
 import type Note from "@/model/domain/note"
 import LABEL from "@/constant/ui/label"
 import { AddButton } from "../common"
+import { toast } from "react-toastify"
 
 async function addNote(note: Partial<Note>): Promise<Note> {
   // Implementation here
@@ -71,53 +72,57 @@ export default function NotesPanel() {
   )
 
   const handleAddNote = useCallback(async () => {
-    if (!defaultCalendar) return
+    if (!defaultCalendar) {
+      toast.error("Cannot create note. No calendar is available.");
+      return;
+    }
 
-    const container = document.querySelector("#notes-container") as HTMLElement
-    const containerWidth = container?.offsetWidth || 800 // Default width
-    const containerHeight = container?.offsetHeight || 600 // Default height
+    const container = document.querySelector("#notes-container") as HTMLElement;
+    const containerWidth = container?.offsetWidth || 800;
+    const containerHeight = container?.offsetHeight || 600;
 
-    const tempId = `temp-${Date.now()}`
-    const randomX = Math.random() * (containerWidth - 200) // Assuming 200px is the note width
-    const randomY = Math.random() * (containerHeight - 100) // Assuming 100px is the note height
+    const tempId = `temp-${Date.now()}`;
+    const randomX = Math.random() * (containerWidth - 200);
+    const randomY = Math.random() * (containerHeight - 100);
 
     const newNote: Note = {
       id: tempId,
       name: "New Note",
       description: "Description",
       calendar: defaultCalendar,
-      category: defaultCategory
-    }
+      category: defaultCategory,
+    };
 
-    setLocalNotes((prev) => [...prev, newNote])
+    setLocalNotes((prev) => [...prev, newNote]);
     setNotePositions((prev) => ({
       ...prev,
-      [tempId]: { x: randomX, y: randomY }
-    }))
+      [tempId]: { x: randomX, y: randomY },
+    }));
 
     try {
       const saved: Note = await addNote({
         name: newNote.name,
         description: newNote.description,
         calendar: newNote.calendar,
-        category: newNote.category
-      })
+        category: newNote.category,
+      });
 
       if (saved !== undefined) {
-        setLocalNotes((prev) => prev.map((n) => (n.id === tempId ? saved : n)))
+        setLocalNotes((prev) => prev.map((n) => (n.id === tempId ? saved : n)));
         setNotePositions((prev) => {
-          const { [tempId]: position, ...rest } = prev
-          return { ...rest, [saved.id]: position }
-        })
+          const { [tempId]: position, ...rest } = prev;
+          return { ...rest, [saved.id]: position };
+        });
       }
     } catch {
-      setLocalNotes((prev) => prev.filter((n) => n.id !== tempId))
+      toast.error("Failed to create note.");
+      setLocalNotes((prev) => prev.filter((n) => n.id !== tempId));
       setNotePositions((prev) => {
-        const { [tempId]: _, ...rest } = prev
-        return rest
-      })
+        const { [tempId]: _, ...rest } = prev;
+        return rest;
+      });
     }
-  }, [addNote, defaultCalendar, defaultCategory])
+  }, [addNote, defaultCalendar, defaultCategory]);
 
   return (
     <Box

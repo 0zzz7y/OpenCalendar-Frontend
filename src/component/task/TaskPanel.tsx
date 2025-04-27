@@ -9,6 +9,7 @@ import RecurringPattern from "@/model/domain/recurringPattern"
 import type Task from "@/model/domain/task"
 import TaskStatus from "@/model/domain/taskStatus"
 import MESSAGE from "@/constant/ui/message"
+import { toast } from "react-toastify"
 
 /**
  * Panel for creating new tasks and displaying them in a board.
@@ -23,8 +24,11 @@ export default function TasksPanel() {
   const defaultCategory = useMemo(() => categories.findLast(() => true) || null, [categories])
 
   const handleCreate = useCallback(async () => {
-    const title = newTitle.trim()
-    if (!title || !defaultCalendar) return
+    const title = newTitle.trim();
+    if (!title || !defaultCalendar) {
+      toast.error("Cannot create task. No calendar is available.");
+      return;
+    }
 
     const payload: Omit<Task, "id"> = {
       name: title,
@@ -34,13 +38,13 @@ export default function TasksPanel() {
       status: TaskStatus.TODO,
       recurringPattern: RecurringPattern.NONE,
       startDate: "",
-      endDate: ""
-    }
+      endDate: "",
+    };
 
-    await addTask(payload)
-    await reloadTasks()
-    setNewTitle("")
-  }, [newTitle, defaultCalendar, defaultCategory, addTask, reloadTasks])
+    await addTask(payload);
+    await reloadTasks();
+    setNewTitle("");
+  }, [newTitle, defaultCalendar, defaultCategory, addTask, reloadTasks]);
 
   const handleUpdate = useCallback(
     async (updated: Task) => {
