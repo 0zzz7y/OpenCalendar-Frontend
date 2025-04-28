@@ -31,15 +31,21 @@ interface CalendarPanelProperties {
   setJumpToDate: (date: Date | null) => void
 }
 
-export default function CalendarPanel({ selectedDate, setSelectedDate, view, setView, jumpToDate, setJumpToDate }: CalendarPanelProperties) {
+export default function CalendarPanel({
+  selectedDate,
+  setSelectedDate,
+  view,
+  setView,
+  jumpToDate,
+  setJumpToDate
+}: CalendarPanelProperties) {
   // Stores & repositories
   const { events, tasks, calendars, categories, selectedCalendar, selectedCategory } = useApplicationStorage()
   const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent()
 
   const navigate = useCallback(
     (direction: "previous" | "next") => {
-      const unit: ManipulateType =
-        view === ViewType.MONTH ? "month" : view === ViewType.DAY ? "day" : "week"
+      const unit: ManipulateType = view === ViewType.MONTH ? "month" : view === ViewType.DAY ? "day" : "week"
       const delta = direction === "next" ? 1 : -1
       const newDate = dayjs(selectedDate).add(delta, unit).toDate()
       setSelectedDate(newDate)
@@ -51,10 +57,10 @@ export default function CalendarPanel({ selectedDate, setSelectedDate, view, set
     const safeEvents = Array.isArray(events) ? events : []
     const safeTasks = Array.isArray(tasks) ? tasks : []
     const schedulables = [...safeEvents, ...safeTasks]
-  
+
     const expandedEvents = schedulables.flatMap((event) => {
       const recurringInstances = generateRecurringSchedulables(event)
-  
+
       return [
         event,
         ...recurringInstances.filter((instance) => {
@@ -65,12 +71,9 @@ export default function CalendarPanel({ selectedDate, setSelectedDate, view, set
         })
       ]
     })
-  
-    const combined: Schedulable[] = [
-      ...expandedEvents,
-      ...safeTasks.filter((t) => t.startDate && t.endDate)
-    ]
-  
+
+    const combined: Schedulable[] = [...expandedEvents, ...safeTasks.filter((t) => t.startDate && t.endDate)]
+
     return combined.filter((item) => {
       const calMatch = !selectedCalendar || selectedCalendar === FILTER.ALL || item.calendar.id === selectedCalendar
       const catMatch = !selectedCategory || selectedCategory === FILTER.ALL || item.category?.id === selectedCategory
@@ -152,7 +155,7 @@ export default function CalendarPanel({ selectedDate, setSelectedDate, view, set
       setJumpToDate(null)
     }
   }, [jumpToDate, setSelectedDate, setJumpToDate])
-  
+
   return (
     <>
       {/* Toolbar */}

@@ -48,25 +48,25 @@ export default function NotesPanel() {
       selectedCalendar && selectedCalendar !== FILTER.ALL
         ? calendars.find((c) => c.id === selectedCalendar)
         : defaultCalendar
-  
+
     const category =
       selectedCategory && selectedCategory !== FILTER.ALL
         ? categories.find((c) => c.id === selectedCategory)
         : defaultCategory
-  
+
     if (!calendar) {
       toast.error("Cannot create note. No calendar is available.")
       return
     }
-  
+
     const container = document.querySelector("#notes-container") as HTMLElement
     const containerWidth = container?.offsetWidth || 800
     const containerHeight = container?.offsetHeight || 600
-  
+
     const tempId = `temp-${Date.now()}`
     const randomX = Math.random() * (containerWidth - 200)
     const randomY = Math.random() * (containerHeight - 100)
-  
+
     const newNote: Note = {
       id: tempId,
       name: "New Note",
@@ -74,13 +74,13 @@ export default function NotesPanel() {
       calendar: calendar,
       category: category || undefined
     }
-  
+
     setLocalNotes((prev) => [...prev, newNote])
     setNotePositions((prev) => ({
       ...prev,
       [tempId]: { x: randomX, y: randomY }
     }))
-  
+
     try {
       const saved: Note = await addNote({
         name: newNote.name,
@@ -88,7 +88,7 @@ export default function NotesPanel() {
         calendar: newNote.calendar,
         category: newNote.category
       })
-  
+
       if (saved !== undefined) {
         setLocalNotes((prev) => prev.map((n) => (n.id === tempId ? saved : n)))
         setNotePositions((prev) => {
@@ -108,14 +108,8 @@ export default function NotesPanel() {
 
   const filteredNotes = useMemo(() => {
     return localNotes.filter((note) => {
-      const calMatch =
-        !selectedCalendar ||
-        selectedCalendar === FILTER.ALL ||
-        note.calendar?.id === selectedCalendar
-      const catMatch =
-        !selectedCategory ||
-        selectedCategory === FILTER.ALL ||
-        note.category?.id === selectedCategory
+      const calMatch = !selectedCalendar || selectedCalendar === FILTER.ALL || note.calendar?.id === selectedCalendar
+      const catMatch = !selectedCategory || selectedCategory === FILTER.ALL || note.category?.id === selectedCategory
       return calMatch && catMatch
     })
   }, [localNotes, selectedCalendar, selectedCategory])
@@ -135,20 +129,20 @@ export default function NotesPanel() {
       <Box sx={{ position: "relative", width: "100%", height: "100%" }}>
         {filteredNotes.length > 0 ? (
           filteredNotes.map((note) => (
-          <NoteCard
-            key={note.id}
-            id={note.id}
-            name={note.name}
-            content={note.description}
-            calendar={note.calendar}
-            category={note.category}
-            categories={categories}
-            calendars={calendars}
-            initialX={notePositions[note.id]?.x || 0}
-            initialY={notePositions[note.id]?.y || 0}
-            onUpdate={handleUpdate}
-            onDelete={handleDelete}
-          />
+            <NoteCard
+              key={note.id}
+              id={note.id}
+              name={note.name}
+              content={note.description}
+              calendar={note.calendar}
+              category={note.category}
+              categories={categories}
+              calendars={calendars}
+              initialX={notePositions[note.id]?.x || 0}
+              initialY={notePositions[note.id]?.y || 0}
+              onUpdate={handleUpdate}
+              onDelete={handleDelete}
+            />
           ))
         ) : (
           <Box

@@ -180,7 +180,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           sx={{
             ml: 1,
             width: 140,
-            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500, color: "#000" }, // Set text color to black
+            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500, color: "#000" } // Set text color to black
           }}
           onMouseDown={(e) => e.stopPropagation()}
         />
@@ -190,7 +190,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
         <Box display="flex" gap={0.5} alignItems="center">
           {([TOOLBAR.BOLD, TOOLBAR.ITALIC, TOOLBAR.UNDERLINE] as FormatCommand[]).map((cmd) => {
             const Icon =
-              cmd === TOOLBAR.BOLD ? FormatBoldIcon : cmd === TOOLBAR.ITALIC ? FormatItalicIcon : FormatUnderlinedIcon;
+              cmd === TOOLBAR.BOLD ? FormatBoldIcon : cmd === TOOLBAR.ITALIC ? FormatItalicIcon : FormatUnderlinedIcon
             return (
               <IconButton
                 key={cmd}
@@ -201,15 +201,15 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
               >
                 <Icon fontSize="small" sx={{ color: "#000" }} />
               </IconButton>
-            );
+            )
           })}
 
           {/* Clear Text */}
           <IconButton
             size="small"
             onClick={(e) => {
-              e.stopPropagation();
-              onClearText();
+              e.stopPropagation()
+              onClearText()
             }}
             sx={{ color: "#000" }} // Set icon color to black
           >

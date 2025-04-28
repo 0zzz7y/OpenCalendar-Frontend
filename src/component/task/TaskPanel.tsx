@@ -24,10 +24,10 @@ export default function TasksPanel() {
   const defaultCategory = useMemo(() => categories.findLast(() => true) || null, [categories])
 
   const handleCreate = useCallback(async () => {
-    const title = newTitle.trim();
+    const title = newTitle.trim()
     if (!title || !defaultCalendar) {
-      toast.error("Cannot create task. No calendar is available.");
-      return;
+      toast.error("Cannot create task. No calendar is available.")
+      return
     }
 
     const payload: Omit<Task, "id"> = {
@@ -38,13 +38,13 @@ export default function TasksPanel() {
       status: TaskStatus.TODO,
       recurringPattern: RecurringPattern.NONE,
       startDate: "",
-      endDate: "",
-    };
+      endDate: ""
+    }
 
-    await addTask(payload);
-    await reloadTasks();
-    setNewTitle("");
-  }, [newTitle, defaultCalendar, defaultCategory, addTask, reloadTasks]);
+    await addTask(payload)
+    await reloadTasks()
+    setNewTitle("")
+  }, [newTitle, defaultCalendar, defaultCategory, addTask, reloadTasks])
 
   const handleUpdate = useCallback(
     async (updated: Task) => {

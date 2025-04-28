@@ -46,7 +46,7 @@ export default function MonthView({
   const [creation, setCreation] = useState<{
     anchor?: HTMLElement
     datetime?: Date
-    event?: Event // Add the event property to the state type
+    event?: Event
   }>({})
 
   const openInfo = useCallback(
@@ -88,15 +88,15 @@ export default function MonthView({
   )
 
   const handleEdit = useCallback(() => {
-    if (!info.anchor || !info.event) return;
-    const ev = info.event; // Extract the event being edited
-    setInfo({});
+    if (!info.anchor || !info.event) return
+    const ev = info.event
+    setInfo({})
     setCreation({
       anchor: info.anchor,
-      datetime: new Date(ev.startDate), // Use the start date of the event being edited
-      event: ev, // Pass the event being edited
-    });
-  }, [info]);
+      datetime: new Date(ev.startDate),
+      event: ev
+    })
+  }, [info])
 
   return (
     <Box sx={{ overflow: "auto", height: "100%", p: 2 }}>
@@ -135,12 +135,12 @@ export default function MonthView({
               elevation={0}
               onClick={(e) => openCreation(e.currentTarget as HTMLElement, dayDate)}
               sx={{
-                height: 120, // Ustaw SZTYWNĄ wysokość
+                height: 120,
                 p: 1,
                 border: "1px solid",
                 borderColor: "divider",
                 cursor: "pointer",
-                overflow: "hidden", // <- zapobiega rozciąganiu
+                overflow: "hidden",
                 display: "flex",
                 flexDirection: "column",
                 justifyContent: "flex-start",
@@ -154,8 +154,21 @@ export default function MonthView({
                 {dayjs(dayDate).format("D")}
               </Typography>
 
-              <Box sx={{ mt: 0.5 }}>
-                {dayEvents.slice(0, 3).map((ev) => (
+              {/* Scrollable event list */}
+              <Box
+                sx={{
+                  mt: 0.5,
+                  overflowY: "auto", // Enable vertical scrolling
+                  maxHeight: 75, // Limit the height of the event list
+                  position: "relative", // Required for positioning the chevron
+                  "&::-webkit-scrollbar": {
+                    display: "none" // Hide scrollbar for WebKit-based browsers
+                  },
+                  "-ms-overflow-style": "none", // Hide scrollbar for Internet Explorer
+                  "scrollbar-width": "none" // Hide scrollbar for Firefox
+                }}
+              >
+                {dayEvents.map((ev, index) => (
                   <Box
                     key={ev.id}
                     sx={{
@@ -178,6 +191,7 @@ export default function MonthView({
                         width: 8,
                         height: 8,
                         bgcolor: ev.category?.color,
+                        flexShrink: 0,
                         borderRadius: "50%"
                       }}
                     />
@@ -188,7 +202,7 @@ export default function MonthView({
                         textOverflow: "ellipsis",
                         whiteSpace: "nowrap",
                         flexGrow: 1,
-                        minWidth: 0 // <- kluczowe!
+                        minWidth: 0
                       }}
                     >
                       {dayjs(ev.startDate).format("H:mm")} {ev.name} {ev.calendar?.emoji}
@@ -196,10 +210,22 @@ export default function MonthView({
                   </Box>
                 ))}
 
+                {/* Chevron indicator */}
                 {dayEvents.length > 3 && (
-                  <Typography variant="caption" color="text.secondary">
-                    jeszcze {dayEvents.length - 3}
-                  </Typography>
+                  <Box
+                    sx={{
+                      position: "absolute",
+                      bottom: -7,
+                      left: 0,
+                      right: 0,
+                      textAlign: "center",
+                      pointerEvents: "none" // Ensure it doesn't block interactions
+                    }}
+                  >
+                    <Typography variant="caption" color="text.secondary">
+                      ▼
+                    </Typography>
+                  </Box>
                 )}
               </Box>
             </Paper>
@@ -224,7 +250,7 @@ export default function MonthView({
           calendars={calendars}
           categories={categories}
           initialEvent={
-            creation.event // If editing, pass the event being edited
+            creation.event
               ? creation.event
               : {
                   id: "",
@@ -234,7 +260,7 @@ export default function MonthView({
                   endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),
                   calendar: calendars[0],
                   category: undefined,
-                  recurringPattern: RecurringPattern.NONE,
+                  recurringPattern: RecurringPattern.NONE
                 }
           }
         />

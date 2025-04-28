@@ -48,11 +48,11 @@ const Dashboard = () => {
 
           <Panel defaultSize={30} style={{ ...panelStyle, minHeight: "290px", minWidth: "320px" }}>
             <Box sx={{ alignSelf: "left", mt: "-16px", ml: "-24px" }}>
-            <MonthlyCalendar
-              onDateSelect={(date) => {
-                setSelectedDate(date)
-              }}
-            />
+              <MonthlyCalendar
+                onDateSelect={(date) => {
+                  setSelectedDate(date)
+                }}
+              />
             </Box>
           </Panel>
 

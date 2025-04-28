@@ -37,20 +37,26 @@ export default function YearView({ date, events, calendars, categories, onEventC
   const [dayDate, setDayDate] = useState<Date | null>(null)
   const [edit, setEdit] = useState<{ anchor?: HTMLElement; event?: Event | null; datetime?: Date }>({})
 
-  const openInfo = useCallback((event: Event, anchor: HTMLElement) => {
-    closeDayPopover()
-    setInfo({ anchor, event })
-    onEventClick?.(event)
-  }, [onEventClick])
+  const openInfo = useCallback(
+    (event: Event, anchor: HTMLElement) => {
+      closeDayPopover()
+      setInfo({ anchor, event })
+      onEventClick?.(event)
+    },
+    [onEventClick]
+  )
 
   const closeInfo = useCallback(() => setInfo({}), [])
 
-  const openDayPopover = useCallback(async (anchor: HTMLElement, date: Date) => {
-    closeInfo()
-    await reloadEvents()
-    setDayAnchor(anchor)
-    setDayDate(date)
-  }, [closeInfo, reloadEvents])
+  const openDayPopover = useCallback(
+    async (anchor: HTMLElement, date: Date) => {
+      closeInfo()
+      await reloadEvents()
+      setDayAnchor(anchor)
+      setDayDate(date)
+    },
+    [closeInfo, reloadEvents]
+  )
 
   const closeDayPopover = useCallback(() => {
     setDayAnchor(null)
@@ -60,9 +66,9 @@ export default function YearView({ date, events, calendars, categories, onEventC
   const openEdit = useCallback(() => {
     if (info.anchor && info.event) {
       const anchorRect = info.anchor.getBoundingClientRect()
-  
+
       closeInfo()
-  
+
       setTimeout(() => {
         const fakeAnchor = document.createElement("div")
         fakeAnchor.style.position = "absolute"
@@ -72,14 +78,14 @@ export default function YearView({ date, events, calendars, categories, onEventC
         fakeAnchor.style.height = "1px"
         fakeAnchor.style.pointerEvents = "none"
         document.body.appendChild(fakeAnchor)
-  
+
         setEdit({ anchor: fakeAnchor, event: info.event })
       }, 0)
     }
   }, [info, closeInfo])
-  
+
   // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
-    const openCreate = useCallback(() => {
+  const openCreate = useCallback(() => {
     if (dayAnchor && dayDate) {
       setEdit({ anchor: dayAnchor, event: null, datetime: dayDate })
       closeDayPopover()
@@ -88,17 +94,23 @@ export default function YearView({ date, events, calendars, categories, onEventC
 
   const closeEdit = useCallback(() => setEdit({}), [])
 
-  const handleDelete = useCallback(async (id: string) => {
-    await deleteEvent(id)
-    reloadEvents()
-    closeInfo()
-  }, [deleteEvent, reloadEvents, closeInfo])
+  const handleDelete = useCallback(
+    async (id: string) => {
+      await deleteEvent(id)
+      reloadEvents()
+      closeInfo()
+    },
+    [deleteEvent, reloadEvents, closeInfo]
+  )
 
-  const handleSave = useCallback(async (data: Partial<Event>) => {
-    await onSave(data) // <- await saving (if async)
-    await reloadEvents() // <- important!
-    closeEdit()
-  }, [onSave, reloadEvents, closeEdit])
+  const handleSave = useCallback(
+    async (data: Partial<Event>) => {
+      await onSave(data) // <- await saving (if async)
+      await reloadEvents() // <- important!
+      closeEdit()
+    },
+    [onSave, reloadEvents, closeEdit]
+  )
 
   const findCalendar = (calendarId?: string) => calendars.find((c) => c.id === calendarId)
   const findCategory = (categoryId?: string) => categories.find((c) => c.id === categoryId)
@@ -251,7 +263,9 @@ export default function YearView({ date, events, calendars, categories, onEventC
         onClose={closeDayPopover}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
-        PaperProps={{ sx: { p: 1, minWidth: 240, position: "relative", maxHeight: 400, overflowY: "auto", maxWidth: 240 } }}
+        PaperProps={{
+          sx: { p: 1, minWidth: 240, position: "relative", maxHeight: 400, overflowY: "auto", maxWidth: 240 }
+        }}
       >
         {dayDate && (
           <Stack spacing={1} sx={{ position: "relative" }}>
@@ -260,9 +274,7 @@ export default function YearView({ date, events, calendars, categories, onEventC
               <AddButton onClick={openCreate} size="small" />
             </Box>
 
-            <Typography variant="subtitle2">
-              {dayjs(dayDate).format("MMMM D, YYYY")}
-            </Typography>
+            <Typography variant="subtitle2">{dayjs(dayDate).format("MMMM D, YYYY")}</Typography>
 
             {events
               .filter((e): e is Event => !!e.startDate && dayjs(e.startDate).isSame(dayDate, "day"))

@@ -41,7 +41,7 @@ export default function EventCreationPopover({
   categories,
   initialEvent,
   clickedDatetime,
-  onClose,
+  onClose
 }: EventCreationPopoverProps) {
   const { reloadEvents, updateEvent, addEvent } = useEvent()
   const isEdit = Boolean(initialEvent?.id)
@@ -96,30 +96,30 @@ export default function EventCreationPopover({
 
   const handleChange = useCallback(<K extends keyof FormState>(field: K, value: FormState[K]) => {
     setForm((prev) => {
-      const updatedForm = { ...prev, [field]: value };
+      const updatedForm = { ...prev, [field]: value }
 
       // Ensure end date has the same day, month, and year as the start date
       if (field === "start") {
-        const start = value as Date;
-        const end = new Date(updatedForm.end);
+        const start = value as Date
+        const end = new Date(updatedForm.end)
 
         // Update end date to match the day, month, and year of the start date
-        end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate());
-        updatedForm.end = end;
+        end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate())
+        updatedForm.end = end
       } else if (field === "end") {
-        const start = new Date(updatedForm.start);
-        const end = value as Date;
+        const start = new Date(updatedForm.start)
+        const end = value as Date
 
         // Update end date to match the day, month, and year of the start date
-        end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate());
-        updatedForm.end = end;
+        end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate())
+        updatedForm.end = end
       }
 
-      return updatedForm;
-    });
+      return updatedForm
+    })
 
-    setErrors((prev) => ({ ...prev, [field]: false }));
-  }, []);
+    setErrors((prev) => ({ ...prev, [field]: false }))
+  }, [])
 
   const validateForm = useCallback(() => {
     const newErrors = {
@@ -137,9 +137,9 @@ export default function EventCreationPopover({
       toast.error("Cannot create or edit event. No calendar is selected.")
       return
     }
-  
+
     if (!validateForm()) return
-  
+
     const payload = {
       name: form.title,
       description: form.description,
@@ -147,9 +147,9 @@ export default function EventCreationPopover({
       endDate: dayjs(form.end).format("YYYY-MM-DDTHH:mm:ss"),
       recurringPattern: form.recurringPattern,
       calendar: calendars.find((c) => c.id === form.calendarId),
-      category: categories.find((c) => c.id === form.categoryId) || undefined,
+      category: categories.find((c) => c.id === form.categoryId) || undefined
     }
-  
+
     setLoading(true)
     try {
       if (isEdit && initialEvent?.id !== undefined) {
@@ -160,10 +160,8 @@ export default function EventCreationPopover({
         } else {
           console.log("Editing a copy of the event")
           // It’s a copy! Only update changed fields of original
-          const originalEvent = schedulables.find(
-            (e) => e.id === initialEvent.originalEventId
-          )
-  
+          const originalEvent = schedulables.find((e) => e.id === initialEvent.originalEventId)
+
           if (originalEvent) {
             // Zbuduj bazowy pełny payload na podstawie originalEvent
             const basePayload = {
@@ -173,12 +171,12 @@ export default function EventCreationPopover({
               endDate: dayjs(originalEvent.endDate).format("YYYY-MM-DDTHH:mm:ss"),
               recurringPattern: originalEvent.recurringPattern,
               calendar: originalEvent.calendar,
-              category: originalEvent.category || undefined,
+              category: originalEvent.category || undefined
             }
-          
+
             // Teraz nadpisz tylko zmienione pola
             const updatedPayload = { ...basePayload }
-          
+
             if (form.title !== originalEvent.name) {
               updatedPayload.name = form.title
             }
@@ -199,26 +197,26 @@ export default function EventCreationPopover({
               const originalEnd = dayjs(originalEvent.endDate)
               const newStartTime = dayjs(form.start)
               const newEndTime = dayjs(form.end)
-            
+
               const updatedStartDate = originalStart
                 .hour(newStartTime.hour())
                 .minute(newStartTime.minute())
                 .second(newStartTime.second())
-            
+
               const updatedEndDate = originalEnd
                 .hour(newEndTime.hour())
                 .minute(newEndTime.minute())
                 .second(newEndTime.second())
-            
+
               updatedPayload.startDate = updatedStartDate.format("YYYY-MM-DDTHH:mm:ss")
               updatedPayload.endDate = updatedEndDate.format("YYYY-MM-DDTHH:mm:ss")
             }
             if (form.recurringPattern !== originalEvent.recurringPattern) {
               updatedPayload.recurringPattern = form.recurringPattern
             }
-          
+
             console.log("Updated full payload:", updatedPayload)
-          
+
             await updateEvent({ id: originalEvent.id, ...updatedPayload })
           } else {
             toast.error("Original event not found.")
@@ -228,7 +226,7 @@ export default function EventCreationPopover({
         // New event
         await addEvent(payload)
       }
-  
+
       reloadEvents()
       onClose()
     } catch {
@@ -249,7 +247,6 @@ export default function EventCreationPopover({
     onClose,
     validateForm
   ])
-  
 
   return (
     <Popover
@@ -310,11 +307,7 @@ export default function EventCreationPopover({
 
         <Typography variant="body2">{LABEL.START_DATE}</Typography>
         <DateCalendar value={form.start} onChange={(d) => d && handleChange("start", d)} />
-        <TimePicker
-          label={LABEL.START_TIME}
-          value={form.start}
-          onChange={(d) => d && handleChange("start", d)}
-        />
+        <TimePicker label={LABEL.START_TIME} value={form.start} onChange={(d) => d && handleChange("start", d)} />
         <TimePicker
           label={LABEL.END_TIME}
           value={form.end}

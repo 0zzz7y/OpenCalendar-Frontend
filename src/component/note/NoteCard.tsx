@@ -128,11 +128,13 @@ const NoteCard = ({
             name: noteName,
             description: currentContent,
             calendar: selectedCalendar,
-            category: selectedCategory ? {
-              id: selectedCategory.id,
-              name: selectedCategory.name,
-              color: selectedCategory.color
-            } : undefined
+            category: selectedCategory
+              ? {
+                  id: selectedCategory.id,
+                  name: selectedCategory.name,
+                  color: selectedCategory.color
+                }
+              : undefined
           })
           setLastSavedContent(currentContent)
           setLastSavedName(noteName)
@@ -144,7 +146,7 @@ const NoteCard = ({
   const handleCategoryChange = (categoryId: string) => {
     const category = categories.find((cat) => cat.id === categoryId) || undefined
     setSelectedCategory(category)
-  
+
     if (onUpdate) {
       const currentContent = contentRef.current?.innerHTML || ""
       onUpdate({
@@ -152,20 +154,18 @@ const NoteCard = ({
         name: noteName,
         description: currentContent,
         calendar: selectedCalendar, // use latest calendar
-        category: category
-          ? { id: category.id, name: category.name, color: category.color }
-          : undefined
+        category: category ? { id: category.id, name: category.name, color: category.color } : undefined
       })
       setLastSavedContent(currentContent)
       setLastSavedName(noteName)
     }
   }
-  
+
   const handleCalendarChange = (calendarId: string) => {
     const calendar = calendars.find((cal) => cal.id === calendarId)
     if (calendar) {
       setSelectedCalendar(calendar)
-  
+
       if (onUpdate) {
         const currentContent = contentRef.current?.innerHTML || ""
         onUpdate({

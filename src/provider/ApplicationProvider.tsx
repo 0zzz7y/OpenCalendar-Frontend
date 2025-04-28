@@ -14,7 +14,7 @@ const Application = ({ children }: { children: React.ReactNode }) => {
       Notification.requestPermission()
     }
   }, [])
-  
+
   return (
     <>
       <ThemeProvider>

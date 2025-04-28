@@ -1,35 +1,35 @@
-import type React from "react";
-import { useState, useEffect, useCallback } from "react";
-import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography, Popover } from "@mui/material";
-import { Delete as DeleteIcon, ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from "@mui/icons-material";
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-import dayjs from "dayjs";
+import type React from "react"
+import { useState, useEffect, useCallback } from "react"
+import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography, Popover } from "@mui/material"
+import { Delete as DeleteIcon, ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from "@mui/icons-material"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
+import dayjs from "dayjs"
 
-import CancelButton from "@/component/common/button/CancelButton";
-import DeleteButton from "@/component/common/button/DeleteButton";
+import CancelButton from "@/component/common/button/CancelButton"
+import DeleteButton from "@/component/common/button/DeleteButton"
 
-import type Calendar from "@/model/domain/calendar";
-import type Category from "@/model/domain/category";
-import type Task from "@/model/domain/task";
-import RecurringPattern from "@/model/domain/recurringPattern";
-import LABEL from "@/constant/ui/label";
-import FILTER from "@/constant/utility/filter";
-import MESSAGE from "@/constant/ui/message";
-import TaskStatus from "@/model/domain/taskStatus";
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import type Task from "@/model/domain/task"
+import RecurringPattern from "@/model/domain/recurringPattern"
+import LABEL from "@/constant/ui/label"
+import FILTER from "@/constant/utility/filter"
+import MESSAGE from "@/constant/ui/message"
+import TaskStatus from "@/model/domain/taskStatus"
 
 export interface TaskCardProps {
-  task: Task;
-  calendars: Calendar[];
-  categories: Category[];
-  onUpdate: (task: Task) => void;
-  onDelete: (id: string) => void;
+  task: Task
+  calendars: Calendar[]
+  categories: Category[]
+  onUpdate: (task: Task) => void
+  onDelete: (id: string) => void
 }
 
 /**
  * Card representing a single task, editable and collapsible.
  */
 const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpdate, onDelete }) => {
-  const [expanded, setExpanded] = useState(true);
+  const [expanded, setExpanded] = useState(true)
   const [local, setLocal] = useState<Task>({
     id: task?.id || "",
     name: task?.name || "",
@@ -39,76 +39,76 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     calendar: task?.calendar || calendars[0],
     category: task?.category || undefined,
     status: task?.status || TaskStatus.TODO,
-    recurringPattern: task?.recurringPattern || RecurringPattern.NONE,
-  });
+    recurringPattern: task?.recurringPattern || RecurringPattern.NONE
+  })
   const [errors, setErrors] = useState({
     name: false,
     startDate: false,
     endDate: false,
-    description: false,
-  });
-  const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null); // Anchor for delete confirmation popover
+    description: false
+  })
+  const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null) // Anchor for delete confirmation popover
 
   // Sync props -> state
   useEffect(() => {
-    if (task) setLocal(task); // Sync props -> state
-  }, [task]);
+    if (task) setLocal(task) // Sync props -> state
+  }, [task])
 
   const validateField = useCallback(
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (field: keyof Task, value: any) => {
       switch (field) {
         case "name":
-          return !value.trim();
+          return !value.trim()
         case "startDate":
-          return !value;
+          return !value
         case "endDate":
-          return value ? dayjs(value).isBefore(dayjs(local.startDate)) : false;
+          return value ? dayjs(value).isBefore(dayjs(local.startDate)) : false
         case "description":
-          return value.length > 4096;
+          return value.length > 4096
         default:
-          return false;
+          return false
       }
     },
     [local.startDate]
-  );
+  )
 
   const handleChange = useCallback(
     <K extends keyof Task>(field: K, value: Task[K]) => {
       setLocal((prev) => {
-        const updated = { ...prev, [field]: value };
-        setErrors((prevErrors) => ({ ...prevErrors, [field]: validateField(field, value) })); // Validate the field
-        return updated;
-      });
+        const updated = { ...prev, [field]: value }
+        setErrors((prevErrors) => ({ ...prevErrors, [field]: validateField(field, value) })) // Validate the field
+        return updated
+      })
     },
     [validateField]
-  );
+  )
 
   const handleBlur = useCallback(() => {
-    onUpdate(local); // Save the task when the user finishes interacting with a field
-  }, [local, onUpdate]);
+    onUpdate(local) // Save the task when the user finishes interacting with a field
+  }, [local, onUpdate])
 
   const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {
-    setDeleteAnchorEl(event.currentTarget); // Open the delete confirmation popover
-  };
+    setDeleteAnchorEl(event.currentTarget) // Open the delete confirmation popover
+  }
 
   const handleDeleteConfirm = () => {
-    onDelete(local.id); // Confirm deletion
-    setDeleteAnchorEl(null); // Close the popover
-  };
+    onDelete(local.id) // Confirm deletion
+    setDeleteAnchorEl(null) // Close the popover
+  }
 
   const handleDeleteCancel = () => {
-    setDeleteAnchorEl(null); // Close the popover
-  };
+    setDeleteAnchorEl(null) // Close the popover
+  }
 
-  const cardColor = local.category?.color ?? "#f5f5f5";
+  const cardColor = local.category?.color ?? "#f5f5f5"
 
   const textFieldSx = {
     "& .MuiOutlinedInput-root": { backgroundColor: "#fff", borderRadius: 1 },
     "& .MuiInputBase-input": { color: "#000" },
     "& .MuiInputLabel-root": { color: "#000" },
-    "& .MuiSelect-icon": { color: "#000" },
-  };
+    "& .MuiSelect-icon": { color: "#000" }
+  }
 
   return (
     <Card
@@ -118,7 +118,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
         mb: 2,
         boxShadow: 3,
         borderRadius: 2,
-        minWidth: 220,
+        minWidth: 220
       }}
     >
       <Box display="flex" alignItems="center" justifyContent="space-between" mb={1}>
@@ -169,8 +169,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
                 size: "small",
                 sx: textFieldSx,
                 error: errors.startDate,
-                helperText: errors.startDate ? MESSAGE.FIELD_REQUIRED : "",
-              },
+                helperText: errors.startDate ? MESSAGE.FIELD_REQUIRED : ""
+              }
             }}
           />
 
@@ -184,8 +184,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
                 size: "small",
                 sx: textFieldSx,
                 error: errors.endDate,
-                helperText: errors.endDate ? MESSAGE.END_DATE_BEFORE_START_DATE : "",
-              },
+                helperText: errors.endDate ? MESSAGE.END_DATE_BEFORE_START_DATE : ""
+              }
             }}
           />
 
@@ -211,10 +211,10 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
           <TextField
             label={LABEL.CALENDAR}
             select
-            value={local.calendar.id}
+            value={local?.calendar?.id}
             onChange={(e) => {
-              const cal = calendars.find((c) => c.id === e.target.value);
-              cal && handleChange("calendar", cal);
+              const cal = calendars.find((c) => c.id === e.target.value)
+              cal && handleChange("calendar", cal)
             }}
             onBlur={handleBlur} // Save on blur
             size="small"
@@ -236,8 +236,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             select
             value={local.category?.id || ""}
             onChange={(e) => {
-              const cat = categories.find((c) => c.id === e.target.value) || null;
-              handleChange("category", cat ? { ...cat, color: cat.color } : undefined);
+              const cat = categories.find((c) => c.id === e.target.value) || null
+              handleChange("category", cat ? { ...cat, color: cat.color } : undefined)
             }}
             onBlur={handleBlur} // Save on blur
             size="small"
@@ -253,7 +253,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
                       width: 12,
                       height: 12,
                       borderRadius: "50%",
-                      bgcolor: cat.color,
+                      bgcolor: cat.color
                     }}
                   />
                   <Typography>{cat.name}</Typography>
@@ -282,7 +282,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
         </Box>
       </Popover>
     </Card>
-  );
-};
+  )
+}
 
-export default TaskCard;
+export default TaskCard

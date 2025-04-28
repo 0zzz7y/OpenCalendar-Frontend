@@ -75,7 +75,7 @@ enum MESSAGE {
   CALENDAR_REQUIRED = "Calendar is required.",
   END_DATE_BEFORE_START_DATE = "End date must be after start date.",
   DESCRIPTION_TOO_LONG = "Description is too long, maximum is 4096 characters.",
-  FIELD_REQUIRED = "This field is required.",
+  FIELD_REQUIRED = "This field is required."
 }
 
 export default MESSAGE
