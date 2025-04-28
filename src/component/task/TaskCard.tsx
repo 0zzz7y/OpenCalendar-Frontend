@@ -15,6 +15,7 @@ import RecurringPattern from "@/model/domain/recurringPattern";
 import LABEL from "@/constant/ui/label";
 import FILTER from "@/constant/utility/filter";
 import MESSAGE from "@/constant/ui/message";
+import TaskStatus from "@/model/domain/taskStatus";
 
 export interface TaskCardProps {
   task: Task;
@@ -29,15 +30,16 @@ export interface TaskCardProps {
  */
 const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpdate, onDelete }) => {
   const [expanded, setExpanded] = useState(true);
-  const [local, setLocal] = useState<Task>(task || {
-    id: "",
-    name: "",
-    description: "",
-    startDate: null,
-    endDate: null,
-    calendar: calendars[0],
-    category: undefined,
-    recurringPattern: RecurringPattern.NONE,
+  const [local, setLocal] = useState<Task>({
+    id: task?.id || "",
+    name: task?.name || "",
+    description: task?.description || "",
+    startDate: task?.startDate,
+    endDate: task?.endDate,
+    calendar: task?.calendar || calendars[0],
+    category: task?.category || undefined,
+    status: task?.status || TaskStatus.TODO,
+    recurringPattern: task?.recurringPattern || RecurringPattern.NONE,
   });
   const [errors, setErrors] = useState({
     name: false,

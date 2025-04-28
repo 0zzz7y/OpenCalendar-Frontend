@@ -94,31 +94,33 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, calendars, categories, onU
                 }}
               >
                 <TaskColumn title={title} icon={icon}>
-                  {order[status as TaskStatus].map((task, index) => (
-                    <Draggable draggableId={task.id} index={index} key={task.id}>
-                      {(prov, snap) => (
-                        <Box
-                          ref={prov.innerRef}
-                          {...prov.draggableProps}
-                          {...prov.dragHandleProps}
-                          sx={{
-                            opacity: snap.isDragging ? 0.85 : 1,
-                            transform: snap.isDragging ? "scale(1.02)" : "none",
-                            transition: "all 0.15s",
-                            cursor: snap.isDragging ? "grabbing" : "grab"
-                          }}
-                        >
-                          <TaskCard
-                            task={task}
-                            calendars={calendars}
-                            categories={categories}
-                            onUpdate={onUpdate}
-                            onDelete={onDelete}
-                          />
-                        </Box>
-                      )}
-                    </Draggable>
-                  ))}
+                  {order[status as TaskStatus]
+                    .filter((task) => task?.id) // Filter out invalid tasks
+                    .map((task, index) => (
+                      <Draggable draggableId={task.id} index={index} key={task.id}>
+                        {(prov, snap) => (
+                          <Box
+                            ref={prov.innerRef}
+                            {...prov.draggableProps}
+                            {...prov.dragHandleProps}
+                            sx={{
+                              opacity: snap.isDragging ? 0.85 : 1,
+                              transform: snap.isDragging ? "scale(1.02)" : "none",
+                              transition: "all 0.15s",
+                              cursor: snap.isDragging ? "grabbing" : "grab"
+                            }}
+                          >
+                            <TaskCard
+                              task={task}
+                              calendars={calendars}
+                              categories={categories}
+                              onUpdate={onUpdate}
+                              onDelete={onDelete}
+                            />
+                          </Box>
+                        )}
+                      </Draggable>
+                    ))}
                   {provided.placeholder}
                 </TaskColumn>
               </Box>
