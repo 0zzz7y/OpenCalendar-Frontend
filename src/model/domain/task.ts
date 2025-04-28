@@ -1,12 +1,10 @@
+import RecurringPattern from "./recurringPattern"
 import type Schedulable from "./schedulable"
 import type TaskStatus from "./taskStatus"
 
 interface Task extends Schedulable {
-  id: string
   name: string
-  description?: string
-  startDate?: string
-  endDate?: string
+  recurringPattern: RecurringPattern
   status: TaskStatus
 }
 
