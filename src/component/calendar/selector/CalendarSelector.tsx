@@ -21,10 +21,6 @@ export default function CalendarSelector() {
   const selectedCalendar = useApplicationStorage((state) => state.selectedCalendar) || FILTER.ALL
   const setSelectedCalendar = useApplicationStorage((state) => state.setSelectedCalendar)
 
-  const tasks = useApplicationStorage((state) => state.tasks)
-  const events = useApplicationStorage((state) => state.events)
-  const notes = useApplicationStorage((state) => state.notes)
-
   const { reloadCalendars } = useCalendar()
   const { reloadEvents } = useEvent()
   const { reloadTasks } = useTask()
@@ -39,7 +35,8 @@ export default function CalendarSelector() {
     emoji?: string
   }>({})
 
-  const filteredCalendars = useMemo(() => {
+  // No filtering applied to calendars
+  const calendarOptions = useMemo(() => {
     return [
       { label: FILTER.ALL, value: FILTER.ALL, emoji: "📅" },
       ...calendars.map((calendar) => ({
@@ -47,8 +44,8 @@ export default function CalendarSelector() {
         value: calendar.id,
         emoji: calendar.emoji
       }))
-    ].filter((option) => isCalendarUsed(option.value, tasks, events, notes))
-  }, [calendars, tasks, events, notes])
+    ]
+  }, [calendars])
 
   const openEditor = useCallback(
     (mode: EditorMode, anchor: HTMLElement, data: { id?: string; label?: string; emoji?: string }) => {
@@ -74,11 +71,11 @@ export default function CalendarSelector() {
     await reloadEvents()
     await reloadTasks()
     await reloadNotes()
-  }, [reloadCalendars, setSelectedCalendar])
+  }, [reloadCalendars, setSelectedCalendar, reloadEvents, reloadTasks, reloadNotes])
 
   return (
     <Box display="flex" alignItems="center" gap={1} width="100%">
-      <Selector label={LABEL.CALENDAR} value={selectedCalendar} onChange={handleChange} options={filteredCalendars}>
+      <Selector label={LABEL.CALENDAR} value={selectedCalendar} onChange={handleChange} options={calendarOptions}>
         {(option) => (
           <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
             <Box display="flex" alignItems="center" gap={1}>
@@ -134,7 +131,7 @@ export default function CalendarSelector() {
         mode={editorMode}
         initialData={editorData}
         onClose={closeEditor}
-        onDelete={handleAfterDelete} // <-- USE NEW function
+        onDelete={handleAfterDelete}
       />
     </Box>
   )

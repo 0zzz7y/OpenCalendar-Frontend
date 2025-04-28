@@ -14,17 +14,12 @@ import COLOR from "@/constant/ui/color"
 import Selector from "@/component/common/selector/Selector"
 import AddButton from "@/component/common/button/AddButton"
 import ColorDot from "@/component/common/colordot/ColorDot"
-import { isCategoryUsed } from "@/function/filter/useFilter"
 import { useCategory, useEvent, useTask, useNote } from "@/repository"
 
 export default function CategorySelector() {
   const categories = useApplicationStorage((state) => state.categories)
   const selectedCategory = useApplicationStorage((state) => state.selectedCategory) || FILTER.ALL
   const setSelectedCategory = useApplicationStorage((state) => state.setSelectedCategory)
-
-  const tasks = useApplicationStorage((state) => state.tasks)
-  const events = useApplicationStorage((state) => state.events)
-  const notes = useApplicationStorage((state) => state.notes)
 
   const { reloadCategories } = useCategory()
   const { reloadEvents } = useEvent()
@@ -40,7 +35,8 @@ export default function CategorySelector() {
     color?: string
   }>({})
 
-  const filteredCategories = useMemo(() => {
+  // No filtering applied to categories
+  const categoryOptions = useMemo(() => {
     return [
       { label: FILTER.ALL, value: FILTER.ALL, color: COLOR.WHITE },
       ...categories.map((category) => ({
@@ -48,8 +44,8 @@ export default function CategorySelector() {
         value: category.id,
         color: category.color
       }))
-    ].filter((option) => isCategoryUsed(option.value, tasks, events, notes))
-  }, [categories, tasks, events, notes])
+    ]
+  }, [categories])
 
   const openEditor = useCallback(
     (mode: EditorMode, anchor: HTMLElement, data: { id?: string; name?: string; color?: string }) => {
@@ -75,11 +71,11 @@ export default function CategorySelector() {
     await reloadEvents()
     await reloadTasks()
     await reloadNotes()
-  }, [reloadCategories, setSelectedCategory])
+  }, [reloadCategories, setSelectedCategory, reloadEvents, reloadTasks, reloadNotes])
 
   return (
     <Box display="flex" alignItems="center" gap={1} width="100%">
-      <Selector label={LABEL.CATEGORY} value={selectedCategory} onChange={handleChange} options={filteredCategories}>
+      <Selector label={LABEL.CATEGORY} value={selectedCategory} onChange={handleChange} options={categoryOptions}>
         {(option) => (
           <Box display="flex" justifyContent="space-between" alignItems="center" width="100%">
             <Box display="flex" alignItems="center" gap={1}>
