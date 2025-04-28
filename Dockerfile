@@ -12,6 +12,10 @@ RUN pnpm install
 # ──────────────────── Builder ────────────────────
 FROM node:20-bullseye-slim AS builder
 
+ARG VITE_API_URL
+
+ENV VITE_API_URL=$VITE_API_URL
+
 WORKDIR /app
 
 RUN npm install -g pnpm

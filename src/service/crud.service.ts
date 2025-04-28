@@ -8,17 +8,17 @@ export interface CrudService<TDto> {
 }
 
 export function createCrudService<TDto>(resource: string): CrudService<TDto> {
-  const baseUrl = `${resource}`
+  const url = `${resource}`
 
   async function getAll(): Promise<TDto[]> {
-    const res = await fetch(baseUrl)
+    const res = await fetch(url)
     if (!res.ok) throw new Error(`Failed to fetch ${resource}: ${res.statusText}`)
     const page = (await res.json()) as PaginatedResponse<TDto>
     return page.content
   }
 
   async function create(dto: TDto): Promise<TDto> {
-    const res = await fetch(baseUrl, {
+    const res = await fetch(url, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dto)
@@ -28,7 +28,7 @@ export function createCrudService<TDto>(resource: string): CrudService<TDto> {
   }
 
   async function update(id: string, dto: TDto): Promise<TDto> {
-    const res = await fetch(`${baseUrl}/${id}`, {
+    const res = await fetch(`${url}/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(dto)
@@ -38,7 +38,7 @@ export function createCrudService<TDto>(resource: string): CrudService<TDto> {
   }
 
   async function remove(id: string): Promise<void> {
-    const res = await fetch(`${baseUrl}/${id}`, { method: "DELETE" })
+    const res = await fetch(`${url}/${id}`, { method: "DELETE" })
     if (!res.ok) throw new Error(`Failed to delete ${resource}/${id}: ${res.statusText}`)
   }
 
