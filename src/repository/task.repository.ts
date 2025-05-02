@@ -16,7 +16,7 @@ const useCrudTask = () => {
   const { calendars, categories } = useApplicationStorage()
 
   const validateTask = (task: Partial<Task>) => {
-    if (!task.name) {
+    if (!task.title) {
       throw new Error("Task title is required")
     }
     // Add other validation rules as needed

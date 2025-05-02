@@ -5,12 +5,13 @@ import { EventCreationPopover, EventInformationPopover } from "@/component/event
 import type Event from "@/model/domain/event"
 import type Schedulable from "@/model/domain/schedulable"
 import RecurringPattern from "@/model/domain/recurringPattern"
-
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
 export interface MonthViewProps {
   date: Date
-  events: Schedulable[]
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
+  events: Event[]
+  calendars: Calendar[]
+  categories: Category[]
   onSave: (data: Partial<Event>) => void
   onSlotClick?: (element: HTMLElement, datetime: Date) => void
   onEventClick?: (event: Event) => void
@@ -205,7 +206,7 @@ export default function MonthView({
                         minWidth: 0
                       }}
                     >
-                      {dayjs(ev.startDate).format("H:mm")} {ev.name} {ev.calendar?.emoji}
+                      {dayjs(ev.startDate).format("H:mm")} {ev.title} {ev.calendar?.emoji}
                     </Typography>
                   </Box>
                 ))}
@@ -254,11 +255,11 @@ export default function MonthView({
               ? creation.event
               : {
                   id: "",
-                  name: "",
+                  title: "",
                   description: "",
                   startDate: creation.datetime.toISOString(),
                   endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),
-                  calendar: calendars[0],
+                  calendar: { ...calendars[0], title: calendars[0].title },
                   category: undefined,
                   recurringPattern: RecurringPattern.NONE
                 }

@@ -9,12 +9,14 @@ import type Schedulable from "@/model/domain/schedulable"
 import RecurringPattern from "@/model/domain/recurringPattern"
 import DayColumn from "../day/DayColumn"
 import HourLabelsColumn from "../hour/HourLabelColumn"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
 
 export interface WeekViewProps {
   date: Date
-  events: Schedulable[]
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
+  events: Event[]
+  calendars: Calendar[]
+  categories: Category[]
   onEventClick?: (event: Event) => void
 }
 
@@ -89,7 +91,7 @@ export default function WeekView({ date, events, calendars, categories, onEventC
     async (id: string) => {
       const original = events.find((e): e is Event => e.id === id)
       if (original) {
-        await updateEvent({ ...original, name: "" })
+        await updateEvent({ ...original, title: "" })
         await reloadEvents()
       }
       setInfo({})
@@ -112,12 +114,12 @@ export default function WeekView({ date, events, calendars, categories, onEventC
   const newEvent: Event | undefined = creationPopover.clickedDatetime
     ? {
         id: "",
-        name: "",
+        title: "",
         description: "",
         startDate: creationPopover.clickedDatetime.toISOString(),
         endDate: dayjs(creationPopover.clickedDatetime).add(1, "hour").toISOString(),
         recurringPattern: RecurringPattern.NONE,
-        calendar: calendars[0],
+        calendar: { id: calendars[0].id, title: calendars[0].title, emoji: calendars[0].emoji },
         category: undefined
       }
     : undefined

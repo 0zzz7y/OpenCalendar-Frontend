@@ -4,7 +4,7 @@ import type CategoryDto from "@/model/dto/category.dto"
 export function dtoToCategory(dto: CategoryDto): Category {
   return {
     id: dto.id ?? "",
-    name: dto.name,
+    title: dto.title,
     color: dto.color
   }
 }
@@ -12,7 +12,7 @@ export function dtoToCategory(dto: CategoryDto): Category {
 export function categoryToDto(category: Partial<Category>): CategoryDto {
   return {
     id: category.id,
-    name: category.name ?? "",
+    title: category.title ?? "",
     color: category.color ?? ""
   }
 }

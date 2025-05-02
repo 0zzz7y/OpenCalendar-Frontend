@@ -5,6 +5,8 @@ import CalendarGridCell from "../CalendarGridCell"
 import EventBox from "@/component/event/EventBox"
 import type Event from "@/model/domain/event"
 import type Schedulable from "@/model/domain/schedulable"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
 
 // Constants
 const GAP = 4 // px gap between events
@@ -13,8 +15,8 @@ const SLOT_HEIGHT = 32 // px for 30-minute slot
 export interface DayColumnProps {
   date: Date
   events: Schedulable[]
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
+  calendars: Calendar[]
+  categories: Category[]
   onSave: (payload: Partial<Event> & { id?: string }) => Promise<void>
   onSlotClick: (anchor: HTMLElement, datetime: Date) => void
   onEventClick: (sched: Schedulable) => void

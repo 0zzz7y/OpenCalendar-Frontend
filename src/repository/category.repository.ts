@@ -12,7 +12,7 @@ import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const validateCategory = (category: Partial<Category>) => {
-  if (!category.name || category.name.trim() === "") {
+  if (!category.title || category.title.trim() === "") {
     throw new Error("Category name is required.")
   }
 }

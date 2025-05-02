@@ -31,14 +31,11 @@ export default function TasksPanel() {
     }
 
     const payload: Omit<Task, "id"> = {
-      name: title,
+      title: title,
       description: "",
       calendar: defaultCalendar,
       category: defaultCategory ?? undefined,
       status: TaskStatus.TODO,
-      recurringPattern: RecurringPattern.NONE,
-      startDate: "",
-      endDate: ""
     }
 
     await addTask(payload)

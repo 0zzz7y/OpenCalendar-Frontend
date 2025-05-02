@@ -8,12 +8,14 @@ import type Schedulable from "@/model/domain/schedulable"
 import RecurringPattern from "@/model/domain/recurringPattern"
 import DayColumn from "../day/DayColumn"
 import HourLabelsColumn from "@/component/calendar/hour/HourLabelColumn"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
 
 export interface DayViewProps {
   date: Date
-  events: Schedulable[]
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
+  events: Event[]
+  calendars: Calendar[]
+  categories: Category[]
   onEventClick?: (event: Event) => void
 }
 
@@ -83,12 +85,12 @@ export default function DayView({ date, events, calendars, categories, onEventCl
   const newEvent: Event | undefined = slotInfo.datetime
     ? {
         id: "",
-        name: "",
+        title: "",
         description: "",
         startDate: slotInfo.datetime.toISOString(),
         endDate: dayjs(slotInfo.datetime).add(1, "hour").toISOString(),
         recurringPattern: RecurringPattern.NONE,
-        calendar: calendars[0],
+        calendar: { id: calendars[0].id, title: calendars[0].title, emoji: calendars[0].emoji },
         category: undefined
       }
     : undefined
@@ -160,7 +162,7 @@ export default function DayView({ date, events, calendars, categories, onEventCl
           onDelete={(id) => {
             const original = events.find((e): e is Event => e.id === id)
             if (original) {
-              updateEvent({ ...original, name: "" })
+              updateEvent({ ...original, title: "" })
             }
             setInfoState({})
           }}

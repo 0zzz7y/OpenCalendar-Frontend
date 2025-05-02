@@ -1,11 +1,14 @@
-import RecurringPattern from "./recurringPattern"
-import type Schedulable from "./schedulable"
+import type Calendar from "./calendar"
+import type Category from "./category"
 import type TaskStatus from "./taskStatus"
 
-interface Task extends Schedulable {
-  name: string
-  recurringPattern: RecurringPattern
+interface Task {
+  id: string
+  title: string
+  description?: string
   status: TaskStatus
+  calendar: Calendar
+  category?: Category
 }
 
 export default Task

@@ -1,6 +1,6 @@
 interface Calendar {
   id: string
-  name: string
+  title: string
   emoji: string
 }
 

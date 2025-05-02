@@ -32,14 +32,11 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
   const [expanded, setExpanded] = useState(true)
   const [local, setLocal] = useState<Task>({
     id: task?.id || "",
-    name: task?.name || "",
+    title: task?.title || "",
     description: task?.description || "",
-    startDate: task?.startDate,
-    endDate: task?.endDate,
-    calendar: task?.calendar || calendars[0],
+    calendar: task?.calendar || (calendars.length > 0 ? calendars[0] : undefined),
     category: task?.category || undefined,
     status: task?.status || TaskStatus.TODO,
-    recurringPattern: task?.recurringPattern || RecurringPattern.NONE
   })
   const [errors, setErrors] = useState({
     name: false,
@@ -58,19 +55,15 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (field: keyof Task, value: any) => {
       switch (field) {
-        case "name":
+        case "title":
           return !value.trim()
-        case "startDate":
-          return !value
-        case "endDate":
-          return value ? dayjs(value).isBefore(dayjs(local.startDate)) : false
         case "description":
           return value.length > 4096
         default:
           return false
       }
     },
-    [local.startDate]
+    []
   )
 
   const handleChange = useCallback(
@@ -128,8 +121,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
           </IconButton>
           <TextField
             placeholder={LABEL.NAME}
-            value={local.name}
-            onChange={(e) => handleChange("name", e.target.value)}
+            value={local.title}
+            onChange={(e) => handleChange("title", e.target.value)}
             onBlur={handleBlur} // Save on blur
             size="small"
             fullWidth
@@ -159,78 +152,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             sx={textFieldSx}
           />
 
-          <DateTimePicker
-            label={LABEL.START_DATE}
-            value={local.startDate ? dayjs(local.startDate).toDate() : null}
-            onChange={(d) => d && handleChange("startDate", d.toISOString())}
-            onClose={handleBlur} // Save when date selection is finished
-            slotProps={{
-              textField: {
-                size: "small",
-                sx: textFieldSx,
-                error: errors.startDate,
-                helperText: errors.startDate ? MESSAGE.FIELD_REQUIRED : ""
-              }
-            }}
-          />
-
-          <DateTimePicker
-            label={LABEL.END_DATE}
-            value={local.endDate ? dayjs(local.endDate).toDate() : null}
-            onChange={(d) => d && handleChange("endDate", d.toISOString())}
-            onClose={handleBlur} // Save when date selection is finished
-            slotProps={{
-              textField: {
-                size: "small",
-                sx: textFieldSx,
-                error: errors.endDate,
-                helperText: errors.endDate ? MESSAGE.END_DATE_BEFORE_START_DATE : ""
-              }
-            }}
-          />
-
-          {local.startDate && (
-            <TextField
-              label={LABEL.RECURRING}
-              select
-              value={local.recurringPattern}
-              onChange={(e) => handleChange("recurringPattern", e.target.value as RecurringPattern)}
-              onBlur={handleBlur} // Save on blur
-              size="small"
-              fullWidth
-              sx={textFieldSx}
-            >
-              {Object.values(RecurringPattern).map((pattern) => (
-                <MenuItem key={pattern} value={pattern}>
-                  {pattern}
-                </MenuItem>
-              ))}
-            </TextField>
-          )}
-
-          <TextField
-            label={LABEL.CALENDAR}
-            select
-            value={local?.calendar?.id}
-            onChange={(e) => {
-              const cal = calendars.find((c) => c.id === e.target.value)
-              cal && handleChange("calendar", cal)
-            }}
-            onBlur={handleBlur} // Save on blur
-            size="small"
-            fullWidth
-            sx={textFieldSx}
-          >
-            {calendars.map((cal) => (
-              <MenuItem key={cal.id} value={cal.id}>
-                <Box display="flex" alignItems="center" gap={1}>
-                  <Typography>{cal.emoji}</Typography>
-                  <Typography>{cal.name}</Typography>
-                </Box>
-              </MenuItem>
-            ))}
-          </TextField>
-
           <TextField
             label={LABEL.CATEGORY}
             select
@@ -256,7 +177,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
                       bgcolor: cat.color
                     }}
                   />
-                  <Typography>{cat.name}</Typography>
+                  <Typography>{cat.title}</Typography>
                 </Box>
               </MenuItem>
             ))}

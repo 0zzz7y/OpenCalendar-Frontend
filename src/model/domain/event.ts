@@ -1,8 +1,7 @@
-import RecurringPattern from "./recurringPattern"
 import type Schedulable from "./schedulable"
 
 interface Event extends Schedulable {
-  name: string
+  title: string
   startDate: string
   endDate: string
 }

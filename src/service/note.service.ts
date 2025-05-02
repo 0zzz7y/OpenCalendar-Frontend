@@ -6,4 +6,4 @@ export const {
   create: createNote,
   update: updateNote,
   delete: deleteNote
-} = createCrudService<NoteDto>(`${import.meta.env.VITE_API_URL}/notes`)
+} = createCrudService<NoteDto>(`${import.meta.env.VITE_BACKEND_URL}/notes`)

@@ -1,11 +1,11 @@
 import dayjs from "dayjs"
-import type Schedulable from "@/model/domain/schedulable"
+import type Event from "@/model/domain/event"
 import RecurringPattern from "@/model/domain/recurringPattern"
 
-export function generateRecurringSchedulables(event: Schedulable): Schedulable[] {
+export function generateRecurringSchedulables(event: Event): Event[] {
   if (!event.startDate) return []
 
-  const instances: Schedulable[] = []
+  const instances: Event[] = []
 
   const start = dayjs(event.startDate)
   const end = event.endDate ? dayjs(event.endDate) : start.add(1, "hour")

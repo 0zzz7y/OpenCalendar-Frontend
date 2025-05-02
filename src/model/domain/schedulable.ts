@@ -5,7 +5,7 @@ import type RecurringPattern from "./recurringPattern"
 interface Schedulable {
   originalEventId?: string
   id: string
-  name?: string
+  title?: string
   description?: string
   startDate?: string
   endDate?: string

@@ -7,12 +7,14 @@ import AddButton from "@/component/common/button/AddButton"
 import type Event from "@/model/domain/event"
 import type Schedulable from "@/model/domain/schedulable"
 import useEvent from "@/repository/event.repository"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
 
 export interface YearViewProps {
   date: Date
-  events: Schedulable[]
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
+  events: Event[]
+  calendars: Calendar[]
+  categories: Category[]
   onEventClick?: (event: Event) => void
   onSave: (data: Partial<Event>) => void
 }
@@ -318,7 +320,7 @@ export default function YearView({ date, events, calendars, categories, onEventC
                         whiteSpace: "nowrap"
                       }}
                     >
-                      {event.name} {calendar?.emoji}
+                      {event.title} {calendar?.emoji}
                     </Typography>
                   </Box>
                 )

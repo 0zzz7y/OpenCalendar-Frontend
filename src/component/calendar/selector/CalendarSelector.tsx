@@ -40,7 +40,7 @@ export default function CalendarSelector() {
     return [
       { label: FILTER.ALL, value: FILTER.ALL, emoji: "📅" },
       ...calendars.map((calendar) => ({
-        label: calendar.name,
+        label: calendar.title,
         value: calendar.id,
         emoji: calendar.emoji
       }))

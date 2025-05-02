@@ -22,7 +22,7 @@ const useCrudCalendar = createUseCrud<Calendar, CalendarDto, CalendarDto>(
   calendarToDto,
   dtoToCalendar,
   (domain: Partial<Calendar>) => {
-    if (!domain.name) {
+    if (!domain.title) {
       throw new Error("Calendar name is required.")
     }
   }

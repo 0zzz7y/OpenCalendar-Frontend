@@ -13,13 +13,14 @@ import MESSAGE from "@/constant/ui/message"
 import FILTER from "@/constant/utility/filter"
 import SaveButton from "@/component/common/button/SaveButton"
 import CancelButton from "@/component/common/button/CancelButton"
-import type Calendar from "@/model/domain/calendar"
 import useApplicationStorage from "@/storage/useApplicationStorage"
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
 
 export interface EventCreationPopoverProps {
   anchorEl: HTMLElement | null
-  calendars: { id: string; name: string; emoji: string }[]
-  categories: { id: string; name: string; color: string }[]
+  calendars: Calendar[]
+  categories: Category[]
   initialEvent?: Schedulable
   clickedDatetime?: Date
   onClose: () => void
@@ -45,8 +46,7 @@ export default function EventCreationPopover({
 }: EventCreationPopoverProps) {
   const { reloadEvents, updateEvent, addEvent } = useEvent()
   const isEdit = Boolean(initialEvent?.id)
-  const { events, tasks } = useApplicationStorage()
-  const schedulables: Schedulable[] = useMemo(() => [...(events || []), ...(tasks || [])], [events, tasks])
+  const { events } = useApplicationStorage()
 
   const [form, setForm] = useState<FormState>({
     title: "",
@@ -72,7 +72,7 @@ export default function EventCreationPopover({
     if (validAnchor) {
       if (isEdit && initialEvent) {
         setForm({
-          title: initialEvent.name || "",
+          title: initialEvent.title || "",
           description: initialEvent.description || "",
           calendarId: initialEvent.calendar?.id || "",
           categoryId: initialEvent.category?.id || "",
@@ -132,6 +132,7 @@ export default function EventCreationPopover({
     return !Object.values(newErrors).some((error) => error)
   }, [form])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const handleSave = useCallback(async () => {
     if (!form.calendarId) {
       toast.error("Cannot create or edit event. No calendar is selected.")
@@ -141,13 +142,23 @@ export default function EventCreationPopover({
     if (!validateForm()) return
 
     const payload = {
-      name: form.title,
+      title: form.title,
       description: form.description,
       startDate: dayjs(form.start).format("YYYY-MM-DDTHH:mm:ss"),
       endDate: dayjs(form.end).format("YYYY-MM-DDTHH:mm:ss"),
       recurringPattern: form.recurringPattern,
-      calendar: calendars.find((c) => c.id === form.calendarId),
-      category: categories.find((c) => c.id === form.categoryId) || undefined
+      calendar: calendars.find((c) => c.id === form.calendarId)
+        ? (() => {
+            const calendar = calendars.find((c) => c.id === form.calendarId);
+            return calendar ? { ...calendar, title: calendar.title } : undefined;
+          })()
+        : undefined,
+      category: categories.find((c) => c.id === form.categoryId)
+        ? (() => {
+            const category = categories.find((c) => c.id === form.categoryId);
+            return category ? { ...category, title: category.title } : undefined;
+          })()
+        : undefined
     }
 
     setLoading(true)
@@ -160,12 +171,12 @@ export default function EventCreationPopover({
         } else {
           console.log("Editing a copy of the event")
           // It’s a copy! Only update changed fields of original
-          const originalEvent = schedulables.find((e) => e.id === initialEvent.originalEventId)
+          const originalEvent = events.find((e) => e.id === initialEvent.originalEventId)
 
           if (originalEvent) {
             // Zbuduj bazowy pełny payload na podstawie originalEvent
             const basePayload = {
-              name: originalEvent.name,
+              name: originalEvent.title,
               description: originalEvent.description,
               startDate: dayjs(originalEvent.startDate).format("YYYY-MM-DDTHH:mm:ss"),
               endDate: dayjs(originalEvent.endDate).format("YYYY-MM-DDTHH:mm:ss"),
@@ -177,17 +188,25 @@ export default function EventCreationPopover({
             // Teraz nadpisz tylko zmienione pola
             const updatedPayload = { ...basePayload }
 
-            if (form.title !== originalEvent.name) {
+            if (form.title !== originalEvent.title) {
               updatedPayload.name = form.title
             }
             if (form.description !== originalEvent.description) {
               updatedPayload.description = form.description
             }
             if (form.calendarId !== originalEvent.calendar?.id) {
-              updatedPayload.calendar = calendars.find((c) => c.id === form.calendarId) as Calendar
+              const selectedCalendar = calendars.find((c) => c.id === form.calendarId)
+              if (selectedCalendar) {
+                updatedPayload.calendar = { ...selectedCalendar, title: selectedCalendar.title }
+              }
             }
             if (form.categoryId !== (originalEvent.category?.id || "")) {
-              updatedPayload.category = categories.find((c) => c.id === form.categoryId) || undefined
+              updatedPayload.category = categories.find((c) => c.id === form.categoryId)
+                ? (() => {
+                    const category = categories.find((c) => c.id === form.categoryId);
+                    return category ? { ...category, title: category.title } : undefined;
+                  })()
+                : undefined
             }
             if (
               dayjs(form.start).format("HH:mm") !== dayjs(originalEvent.startDate).format("HH:mm") ||
@@ -238,7 +257,6 @@ export default function EventCreationPopover({
     form,
     calendars,
     categories,
-    schedulables,
     isEdit,
     initialEvent,
     updateEvent,
@@ -282,7 +300,7 @@ export default function EventCreationPopover({
         >
           {calendars.map((c) => (
             <MenuItem key={c.id} value={c.id}>
-              {c.emoji} {c.name}
+              {c.emoji} {c.title}
             </MenuItem>
           ))}
         </TextField>
@@ -298,7 +316,7 @@ export default function EventCreationPopover({
           {categories.map((c) => (
             <MenuItem key={c.id} value={c.id}>
               <Box display="inline-block" width={12} height={12} borderRadius={6} bgcolor={c.color} mr={1} />
-              {c.name}
+              {c.title}
             </MenuItem>
           ))}
         </TextField>

@@ -4,7 +4,7 @@ import type CalendarDto from "@/model/dto/calendar.dto"
 export function dtoToCalendar(dto: CalendarDto): Calendar {
   return {
     id: dto.id ?? "",
-    name: dto.name,
+    title: dto.title,
     emoji: dto.emoji
   }
 }
@@ -12,7 +12,7 @@ export function dtoToCalendar(dto: CalendarDto): Calendar {
 export function calendarToDto(calendar: Partial<Calendar>): CalendarDto {
   return {
     id: calendar.id,
-    name: calendar.name ?? "",
+    title: calendar.title ?? "",
     emoji: calendar.emoji ?? ""
   }
 }

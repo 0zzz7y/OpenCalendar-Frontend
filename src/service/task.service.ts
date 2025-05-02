@@ -6,4 +6,4 @@ export const {
   create: createTask,
   update: updateTask,
   delete: deleteTask
-} = createCrudService<TaskDto>(`${import.meta.env.VITE_API_URL}/tasks`)
+} = createCrudService<TaskDto>(`${import.meta.env.VITE_BACKEND_URL}/tasks`)

@@ -53,10 +53,10 @@ export default function CalendarPanel({
     [view, selectedDate, setSelectedDate]
   )
 
-  const schedulables: Schedulable[] = useMemo(() => {
+  const schedulables: Event[] = useMemo(() => {
     const safeEvents = Array.isArray(events) ? events : []
     const safeTasks = Array.isArray(tasks) ? tasks : []
-    const schedulables = [...safeEvents, ...safeTasks]
+    const schedulables = [...safeEvents]
 
     const expandedEvents = schedulables.flatMap((event) => {
       const recurringInstances = generateRecurringSchedulables(event)
@@ -64,17 +64,14 @@ export default function CalendarPanel({
       return [
         event,
         ...recurringInstances.filter((instance) => {
-          // Nie pokazuj jeśli data kopii == data oryginału
-          if (!instance.startDate || !event.startDate) return true
+          if (!instance.startDate || !('startDate' in event && event.startDate)) return true
           const isSameDay = dayjs(instance.startDate).isSame(event.startDate, "day")
           return !isSameDay
         })
       ]
     })
 
-    const combined: Schedulable[] = [...expandedEvents, ...safeTasks.filter((t) => t.startDate && t.endDate)]
-
-    return combined.filter((item) => {
+    return expandedEvents.filter((item) => {
       const calMatch = !selectedCalendar || selectedCalendar === FILTER.ALL || item.calendar.id === selectedCalendar
       const catMatch = !selectedCategory || selectedCategory === FILTER.ALL || item.category?.id === selectedCategory
       return calMatch && catMatch
@@ -117,7 +114,7 @@ export default function CalendarPanel({
         }
       } else {
         const newEvent: Omit<Event, "id"> = {
-          name: data.name || "New Event",
+          title: data.title || "New Event",
           description: data.description || "",
           startDate: data.startDate,
           endDate: data.endDate || data.startDate,
@@ -227,7 +224,7 @@ export default function CalendarPanel({
           initialEvent={
             editingEvent || {
               id: "",
-              name: "",
+              title: "",
               description: "",
               startDate: creation.datetime.toISOString(),
               endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),

@@ -3,7 +3,7 @@ import type Category from "./category"
 
 interface Note {
   id: string
-  name?: string
+  title?: string
   description: string
   calendar: Calendar
   category?: Category

@@ -1,6 +1,6 @@
 interface NoteDto {
   id?: string
-  name?: string
+  title?: string
   description: string
   calendarId: string
   categoryId?: string

@@ -241,7 +241,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
                   border="1px solid #333"
                   mr={1}
                 />
-                {category.name}
+                {category.title}
               </MenuItem>
             ))}
           </Menu>
@@ -259,7 +259,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
                 <Typography fontSize="18px" mr={1} sx={{ color: "#000" }}>
                   {calendar.emoji}
                 </Typography>
-                {calendar.name}
+                {calendar.title}
               </MenuItem>
             ))}
           </Menu>
