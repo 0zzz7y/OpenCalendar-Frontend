@@ -34,7 +34,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     id: task?.id || "",
     title: task?.title || "",
     description: task?.description || "",
-    calendar: task?.calendar || (calendars.length > 0 ? calendars[0] : undefined),
+    calendar: task?.calendar || (calendars.length > 0 ? calendars.find((c) => c.id === task.calendar.id) : undefined),
     category: task?.category || undefined,
     status: task?.status || TaskStatus.TODO,
   })
