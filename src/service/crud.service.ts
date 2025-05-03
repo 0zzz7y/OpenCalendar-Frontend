@@ -11,10 +11,23 @@ export function createCrudService<TDto>(resource: string): CrudService<TDto> {
   const url = `${resource}`
 
   async function getAll(): Promise<TDto[]> {
-    const res = await fetch(url)
-    if (!res.ok) throw new Error(`Failed to fetch ${resource}: ${res.statusText}`)
-    const page = (await res.json()) as PaginatedResponse<TDto>
-    return page.content
+    const allItems: TDto[] = []
+    let pageIndex = 0
+    let totalPages = 1
+
+    // fetch page by page until we've collected all
+    while (pageIndex < totalPages) {
+      const res = await fetch(`${url}?page=${pageIndex}`)
+      if (!res.ok) {
+        throw new Error(`Failed to fetch ${resource} page ${pageIndex}: ${res.statusText}`)
+      }
+      const page = (await res.json()) as PaginatedResponse<TDto>
+      allItems.push(...page.content)
+      totalPages = page.totalPages
+      pageIndex += 1
+    }
+
+    return allItems
   }
 
   async function create(dto: TDto): Promise<TDto> {

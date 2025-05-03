@@ -20,7 +20,7 @@ export interface DayViewProps {
 }
 
 export default function DayView({ date, events, calendars, categories, onEventClick }: DayViewProps) {
-  const { updateEvent } = useEvent()
+  const { updateEvent, reloadEvents } = useEvent()
 
   const dayEvents = useMemo(
     () => events.filter((e): e is Event => !!e.startDate && dayjs(e.startDate).isSame(date, "day")),
@@ -74,11 +74,12 @@ export default function DayView({ date, events, calendars, categories, onEventCl
         const original = events.find((e): e is Event => e.id === payload.id)
         if (original) {
           await updateEvent({ ...original, ...payload })
+          await reloadEvents()
         }
       }
       closeAll()
     },
-    [events, updateEvent, closeAll]
+    [events, updateEvent, closeAll, reloadEvents]
   )
 
   // New‐event template
@@ -163,6 +164,7 @@ export default function DayView({ date, events, calendars, categories, onEventCl
             const original = events.find((e): e is Event => e.id === id)
             if (original) {
               updateEvent({ ...original, title: "" })
+              reloadEvents()
             }
             setInfoState({})
           }}

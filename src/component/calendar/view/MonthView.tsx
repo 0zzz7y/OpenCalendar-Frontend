@@ -7,6 +7,7 @@ import type Schedulable from "@/model/domain/schedulable"
 import RecurringPattern from "@/model/domain/recurringPattern"
 import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"
+import useEvent from "@/repository/event.repository"
 export interface MonthViewProps {
   date: Date
   events: Event[]
@@ -26,6 +27,7 @@ export default function MonthView({
   onSlotClick,
   onEventClick
 }: MonthViewProps) {
+  const {reloadEvents} = useEvent()
   const theme = useTheme()
 
   // Compute start of grid (42 days view)
