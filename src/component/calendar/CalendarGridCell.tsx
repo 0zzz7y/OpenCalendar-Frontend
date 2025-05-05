@@ -15,17 +15,32 @@ export interface CalendarGridCellProps {
 export default function CalendarGridCell({ datetime, allEvents, onSave, onClick }: CalendarGridCellProps) {
   const ref = useRef<HTMLDivElement>(null)
 
-  const [{ isOver, canDrop, item }, drop] = useDrop(
+  // helper: format as local ISO for LocalDateTime
+  function toLocalDateTime(date: Date): string {
+    const pad = (n: number) => String(n).padStart(2, "0")
+    return (
+      // biome-ignore lint/style/useTemplate: <explanation>
+      date.getFullYear() + "-" +
+      pad(date.getMonth() + 1) + "-" +
+      pad(date.getDate()) + "T" +
+      pad(date.getHours()) + ":" +
+      pad(date.getMinutes()) + ":" +
+      pad(date.getSeconds())
+    )
+  }
+
+  const [{ isOver, canDrop }, drop] = useDrop(
     () => ({
       accept: "event",
       drop: (dragged: { id: string }) => {
         const moved = allEvents.find((e) => e.id === dragged.id)
         if (!moved?.startDate || !moved?.endDate) return
 
-        const newStart = new Date(datetime)
+        // snap to this 30-min slot start
+        const slotStart = new Date(datetime)
         const oldStart = new Date(moved.startDate)
         const durationMs = new Date(moved.endDate).getTime() - oldStart.getTime()
-        const newEnd = new Date(newStart.getTime() + durationMs)
+        const slotEnd = new Date(slotStart.getTime() + durationMs)
 
         onSave({
           id: moved.id,
@@ -33,14 +48,13 @@ export default function CalendarGridCell({ datetime, allEvents, onSave, onClick 
           description: moved.description ?? "",
           calendar: moved.calendar,
           category: moved.category,
-          startDate: newStart.toISOString(),
-          endDate: newEnd.toISOString()
+          startDate: toLocalDateTime(slotStart),
+          endDate: toLocalDateTime(slotEnd)
         })
       },
       collect: (monitor) => ({
         isOver: monitor.isOver(),
-        canDrop: monitor.canDrop(),
-        item: monitor.getItem()
+        canDrop: monitor.canDrop()
       })
     }),
     [allEvents, datetime, onSave]
@@ -51,7 +65,6 @@ export default function CalendarGridCell({ datetime, allEvents, onSave, onClick 
   }, [drop])
 
   const previewHeight = 32
-
   const handleClick = (e: React.MouseEvent<HTMLElement>) => onClick?.(e.currentTarget)
 
   return (
@@ -60,16 +73,14 @@ export default function CalendarGridCell({ datetime, allEvents, onSave, onClick 
       onClick={handleClick}
       sx={{
         position: "relative",
-        minHeight: 32,
+        minHeight: previewHeight,
         px: 1,
         py: 0.5,
         borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
         cursor: "pointer",
         bgcolor: isOver && canDrop ? (theme) => theme.palette.action.hover : "transparent",
         zIndex: 10,
-        "&:hover": {
-          backgroundColor: (theme) => theme.palette.action.selected
-        }
+        "&:hover": { backgroundColor: (theme) => theme.palette.action.selected }
       }}
     >
       {isOver && canDrop && (
