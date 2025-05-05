@@ -173,7 +173,7 @@ export default function EventCreationPopover({
 
           if (originalEvent) {
             const basePayload = {
-              name: originalEvent.title,
+              title: originalEvent.title,
               description: originalEvent.description,
               startDate: dayjs(originalEvent.startDate).format("YYYY-MM-DDTHH:mm:ss"),
               endDate: dayjs(originalEvent.endDate).format("YYYY-MM-DDTHH:mm:ss"),
@@ -185,7 +185,7 @@ export default function EventCreationPopover({
             const updatedPayload = { ...basePayload }
 
             if (form.title !== originalEvent.title) {
-              updatedPayload.name = form.title
+              updatedPayload.title = form.title
             }
             if (form.description !== originalEvent.description) {
               updatedPayload.description = form.description
