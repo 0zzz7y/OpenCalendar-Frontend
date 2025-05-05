@@ -86,7 +86,6 @@ export default function YearView({ date, events, calendars, categories, onEventC
     }
   }, [info, closeInfo])
 
-  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const openCreate = useCallback(() => {
     if (dayAnchor && dayDate) {
       setEdit({ anchor: dayAnchor, event: null, datetime: dayDate })
@@ -107,8 +106,8 @@ export default function YearView({ date, events, calendars, categories, onEventC
 
   const handleSave = useCallback(
     async (data: Partial<Event>) => {
-      await onSave(data) // <- await saving (if async)
-      await reloadEvents() // <- important!
+      await onSave(data)
+      await reloadEvents()
       closeEdit()
     },
     [onSave, reloadEvents, closeEdit]
@@ -195,7 +194,6 @@ export default function YearView({ date, events, calendars, categories, onEventC
                         {isValid ? dayIndex : ""}
                       </Typography>
 
-                      {/* Small dots and emoji preview */}
                       {isValid && dayEvents.length > 0 && (
                         <Box sx={{ display: "flex", alignItems: "center", flexWrap: "wrap", mt: 0.5 }}>
                           {dayEvents.slice(0, 3).map((event) => {
@@ -234,7 +232,6 @@ export default function YearView({ date, events, calendars, categories, onEventC
         })}
       </Box>
 
-      {/* Event Information Popover */}
       {info.anchor && info.event && (
         <EventInformationPopover
           anchorElement={info.anchor}
@@ -242,11 +239,10 @@ export default function YearView({ date, events, calendars, categories, onEventC
           onClose={closeInfo}
           onEdit={openEdit}
           onDelete={handleDelete}
-          PaperProps={{ sx: { width: 300, p: 2 } }} // <- fix size here
+          PaperProps={{ sx: { width: 300, p: 2 } }}
         />
       )}
 
-      {/* Event Creation / Edit Popover */}
       {edit.anchor && (
         <EventCreationPopover
           anchorEl={edit.anchor}
@@ -258,7 +254,6 @@ export default function YearView({ date, events, calendars, categories, onEventC
         />
       )}
 
-      {/* Day Events Popover */}
       <Popover
         open={Boolean(dayAnchor)}
         anchorEl={dayAnchor}
@@ -271,7 +266,6 @@ export default function YearView({ date, events, calendars, categories, onEventC
       >
         {dayDate && (
           <Stack spacing={1} sx={{ position: "relative" }}>
-            {/* Add button */}
             <Box sx={{ position: "absolute", top: 2, right: -4 }}>
               <AddButton onClick={openCreate} size="small" />
             </Box>

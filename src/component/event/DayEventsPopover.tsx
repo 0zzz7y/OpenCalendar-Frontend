@@ -5,29 +5,20 @@ import dayjs from "dayjs"
 import type Event from "@/model/domain/event"
 
 export interface DayEventsPopoverProps {
-  /** Anchor element for the popover */
   anchorEl: HTMLElement | null
-  /** Date for which events are shown */
   date: Date
-  /** Events occurring on that date */
   events: Event[]
-  /** Called to close the popover */
   onClose: () => void
 }
 
-/**
- * Shows a list of events for a given day in a popover.
- */
 export default function DayEventsPopover({ anchorEl, date, events, onClose }: DayEventsPopoverProps) {
   const open = Boolean(anchorEl)
 
-  // Memoize sorted events by start date
   const sortedEvents = useMemo(
     () => [...events].sort((a, b) => dayjs(a.startDate).valueOf() - dayjs(b.startDate).valueOf()),
     [events]
   )
 
-  // Close handler, wrapped
   const handleClose = useCallback(() => onClose(), [onClose])
 
   return (

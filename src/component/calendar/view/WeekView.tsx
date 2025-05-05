@@ -1,4 +1,3 @@
-// src/component/calendar/view/WeekView.tsx
 import React, { useState, useMemo, useCallback } from "react"
 import { Box, Typography, useTheme } from "@mui/material"
 import dayjs from "dayjs"
@@ -20,7 +19,6 @@ export interface WeekViewProps {
   onEventClick?: (event: Event) => void
 }
 
-// Helper: Monday‐based week start
 const getStartOfWeek = (date: Date): Date => {
   const d = new Date(date)
   const day = d.getDay()
@@ -34,13 +32,11 @@ export default function WeekView({ date, events, calendars, categories, onEventC
   const theme = useTheme()
   const { updateEvent, reloadEvents } = useEvent()
 
-  // Build array of 7 dates (Mon–Sun)
   const weekDates = useMemo(() => {
     const start = getStartOfWeek(date)
     return Array.from({ length: 7 }, (_, i) => dayjs(start).add(i, "day").toDate())
   }, [date])
 
-  // Popover state
   const [info, setInfo] = useState<{ anchor?: HTMLElement; event?: Event }>({})
   const [creationPopover, setCreationPopover] = useState<{
     anchorEl?: HTMLElement
@@ -110,7 +106,6 @@ export default function WeekView({ date, events, calendars, categories, onEventC
     })
   }, [info])
 
-  // Template for new event
   const newEvent: Event | undefined = creationPopover.clickedDatetime
     ? {
         id: "",
@@ -130,7 +125,7 @@ export default function WeekView({ date, events, calendars, categories, onEventC
         <Box
           sx={{
             display: "grid",
-            gridTemplateColumns: "60px repeat(7, 1fr)", // match HourLabelsColumn
+            gridTemplateColumns: "60px repeat(7, 1fr)",
             borderBottom: `1px solid ${theme.palette.divider}`,
             backgroundColor: theme.palette.background.default,
             zIndex: 1,
@@ -173,7 +168,6 @@ export default function WeekView({ date, events, calendars, categories, onEventC
           })}
         </Box>
 
-        {/* 2) Scrollable grid */}
         <Box
           flex={1}
           sx={{
@@ -216,7 +210,6 @@ export default function WeekView({ date, events, calendars, categories, onEventC
         </Box>
       </Box>
 
-      {/* Popovers */}
       {creationPopover.anchorEl && creationPopover.clickedDatetime && (
         <EventCreationPopover
           anchorEl={creationPopover.anchorEl}

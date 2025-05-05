@@ -6,20 +6,12 @@ import type Event from "@/model/domain/event"
 import type Schedulable from "@/model/domain/schedulable"
 
 export interface CalendarGridCellProps {
-  /** Date/time represented by this cell */
   datetime: Date
-  /** All schedulable items (events/tasks) */
   allEvents: Schedulable[]
-  /** Called when an item is dropped, or moved */
   onSave: (evt: Partial<Event> & { startDate: string; endDate: string }) => void
-  /** Optional click handler for opening popovers */
   onClick?: (element: HTMLElement) => void
 }
 
-/**
- * A single time slot in the calendar grid. Handles drag‑and‑drop of events,
- * highlights drop targets, and optionally shows hour labels.
- */
 export default function CalendarGridCell({ datetime, allEvents, onSave, onClick }: CalendarGridCellProps) {
   const ref = useRef<HTMLDivElement>(null)
 
@@ -54,13 +46,11 @@ export default function CalendarGridCell({ datetime, allEvents, onSave, onClick 
     [allEvents, datetime, onSave]
   )
 
-  // Attach drop ref
   useEffect(() => {
     if (ref.current) drop(ref.current)
   }, [drop])
 
-  // Preview indicator height: based on dragged item's duration
-  const previewHeight = 32 // Placeholder logic for preview height}
+  const previewHeight = 32
 
   const handleClick = (e: React.MouseEvent<HTMLElement>) => onClick?.(e.currentTarget)
 

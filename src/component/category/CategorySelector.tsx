@@ -35,7 +35,6 @@ export default function CategorySelector() {
     color?: string
   }>({})
 
-  // No filtering applied to categories
   const categoryOptions = useMemo(() => {
     return [
       { label: FILTER.ALL, value: FILTER.ALL, color: COLOR.WHITE },

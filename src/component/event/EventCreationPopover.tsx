@@ -98,19 +98,16 @@ export default function EventCreationPopover({
     setForm((prev) => {
       const updatedForm = { ...prev, [field]: value }
 
-      // Ensure end date has the same day, month, and year as the start date
       if (field === "start") {
         const start = value as Date
         const end = new Date(updatedForm.end)
 
-        // Update end date to match the day, month, and year of the start date
         end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate())
         updatedForm.end = end
       } else if (field === "end") {
         const start = new Date(updatedForm.start)
         const end = value as Date
 
-        // Update end date to match the day, month, and year of the start date
         end.setFullYear(start.getFullYear(), start.getMonth(), start.getDate())
         updatedForm.end = end
       }
@@ -166,15 +163,12 @@ export default function EventCreationPopover({
       if (isEdit && initialEvent?.id !== undefined) {
         if (initialEvent.id === initialEvent.originalEventId || !initialEvent.originalEventId) {
           console.log("Editing the original event")
-          // Edit the event normally
           await updateEvent({ id: initialEvent.id, ...payload })
         } else {
           console.log("Editing a copy of the event")
-          // It’s a copy! Only update changed fields of original
           const originalEvent = events.find((e) => e.id === initialEvent.originalEventId)
 
           if (originalEvent) {
-            // Zbuduj bazowy pełny payload na podstawie originalEvent
             const basePayload = {
               name: originalEvent.title,
               description: originalEvent.description,
@@ -185,7 +179,6 @@ export default function EventCreationPopover({
               category: originalEvent.category || undefined
             }
 
-            // Teraz nadpisz tylko zmienione pola
             const updatedPayload = { ...basePayload }
 
             if (form.title !== originalEvent.title) {
@@ -242,7 +235,6 @@ export default function EventCreationPopover({
           }
         }
       } else {
-        // New event
         await addEvent(payload)
       }
 
@@ -338,7 +330,6 @@ export default function EventCreationPopover({
           }}
         />
 
-        {/* NEW: Recurring Pattern Selector */}
         <TextField
           label={LABEL.RECURRING}
           select

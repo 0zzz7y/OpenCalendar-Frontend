@@ -35,7 +35,6 @@ export default function CalendarSelector() {
     emoji?: string
   }>({})
 
-  // No filtering applied to calendars
   const calendarOptions = useMemo(() => {
     return [
       { label: FILTER.ALL, value: FILTER.ALL, emoji: "📅" },

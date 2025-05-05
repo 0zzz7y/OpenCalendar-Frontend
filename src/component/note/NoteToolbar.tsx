@@ -152,7 +152,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
       alignItems="center"
       bgcolor="rgba(255,255,255,0.4)"
       p={0.5}
-      sx={{ cursor: "move", userSelect: "none", color: "#000" }} // Set main black color
+      sx={{ cursor: "move", userSelect: "none", color: "#000" }}
       onMouseDown={handleMouseDown}
       onMouseUp={handleMouseUp}
     >
@@ -161,7 +161,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           size="small"
           onClick={onToggleCollapse}
           onMouseDown={(e) => e.stopPropagation()}
-          sx={{ color: "#000" }} // Set icon color to black
+          sx={{ color: "#000" }}
         >
           {isCollapsed ? (
             <ChevronRightIcon fontSize="small" sx={{ transform: "rotate(270deg)", color: "#000" }} />
@@ -180,7 +180,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
           sx={{
             ml: 1,
             width: 140,
-            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500, color: "#000" } // Set text color to black
+            "& .MuiInputBase-input": { fontSize: 14, fontWeight: 500, color: "#000" }
           }}
           onMouseDown={(e) => e.stopPropagation()}
         />
@@ -197,7 +197,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
                 size="small"
                 onClick={() => onFormatText(cmd)}
                 onMouseDown={(e) => e.stopPropagation()}
-                sx={{ bgcolor: activeFormats[cmd] ? "#ddd" : "transparent", color: "#000" }} // Set icon color to black
+                sx={{ bgcolor: activeFormats[cmd] ? "#ddd" : "transparent", color: "#000" }}
               >
                 <Icon fontSize="small" sx={{ color: "#000" }} />
               </IconButton>
@@ -211,7 +211,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
               e.stopPropagation()
               onClearText()
             }}
-            sx={{ color: "#000" }} // Set icon color to black
+            sx={{ color: "#000" }}
           >
             <ClearIcon fontSize="small" sx={{ color: "#000" }} />
           </IconButton>
@@ -277,7 +277,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
         onClose={handleCancelDelete}
         anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
         transformOrigin={{ vertical: "top", horizontal: "center" }}
-        PaperProps={{ sx: { p: 2, color: "#000" } }} // Set popover text color to black
+        PaperProps={{ sx: { p: 2, color: "#000" } }}
       >
         <Typography variant="body2" gutterBottom sx={{ color: "#000" }}>
           {MESSAGE.CONFIRM_DELETE_NOTE}

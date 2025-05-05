@@ -12,15 +12,11 @@ export interface EventBoxProps {
   onClick?: () => void
 }
 
-/**
- * Draggable event box rendered within DayColumn.
- */
 export default function EventBox({ event, dragTargetId, customStyle, onClick }: EventBoxProps) {
   const ref = useRef<HTMLDivElement>(null)
   const timeoutRef = useRef<number>()
   const [enableDrag, setEnableDrag] = useState(false)
 
-  // Parse start/end and compute layout values
   const { top, height } = useMemo(() => {
     const startDate = new Date(event.startDate || Date.now())
     const endDate = new Date(event.endDate || Date.now())
@@ -39,7 +35,6 @@ export default function EventBox({ event, dragTargetId, customStyle, onClick }: 
     [event]
   )
 
-  // DnD setup
   const [{ isDragging }, drag] = useDrag(
     () => ({
       type: "event",
@@ -50,7 +45,6 @@ export default function EventBox({ event, dragTargetId, customStyle, onClick }: 
     [enableDrag, event.id, event.startDate]
   )
 
-  // Handlers
   const handlePointerDown = useCallback(() => {
     timeoutRef.current = window.setTimeout(() => setEnableDrag(true), 200)
   }, [])
@@ -64,7 +58,6 @@ export default function EventBox({ event, dragTargetId, customStyle, onClick }: 
     setEnableDrag(false)
   }, [enableDrag, onClick])
 
-  // Attach drag ref
   useEffect(() => {
     if (ref.current) drag(ref.current)
   }, [drag])

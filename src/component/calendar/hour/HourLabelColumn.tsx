@@ -1,11 +1,9 @@
 import { Box, Typography } from "@mui/material"
 
 export default function HourLabelsColumn() {
-  // generate a Date for each hour of today
   const hours = Array.from({ length: 24 }, (_, i) => {
     const d = new Date()
     d.setHours(i, 0, 0, 0)
-    // respect the user’s locale/time‑format preference
     return new Intl.DateTimeFormat(undefined, {
       hour: "numeric",
       minute: "2-digit"
@@ -18,7 +16,6 @@ export default function HourLabelsColumn() {
         width: 60,
         flexShrink: 0,
         borderRight: (theme) => `1px solid ${theme.palette.divider}`,
-        // no top padding on container
         pt: 0,
         m: 0
       }}
@@ -27,10 +24,10 @@ export default function HourLabelsColumn() {
         <Box
           key={label}
           sx={{
-            height: 64, // slot height
-            px: 0, // no horizontal padding
+            height: 64,
+            px: 0,
             display: "flex",
-            alignItems: "flex-start", // align at top of cell
+            alignItems: "flex-start",
             justifyContent: "center",
             pr: 0.5
           }}

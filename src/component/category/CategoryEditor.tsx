@@ -79,7 +79,7 @@ export default function CategoryEditor({
     try {
       await deleteCategory(initialData.id)
       await reloadCategories()
-      onDelete(initialData.id) // ← notify parent to select ALL
+      onDelete(initialData.id)
       onClose()
     } catch (error) {
       console.error(error)

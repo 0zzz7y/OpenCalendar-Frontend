@@ -8,9 +8,6 @@ export interface TaskColumnProps {
   children: ReactNode
 }
 
-/**
- * Column container for a specific task status, with header and list of tasks.
- */
 const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
   <Paper
     sx={{
@@ -27,7 +24,6 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
   >
     <Box
       sx={{
-        /* Lock the header to exactly 64px tall */
         flex: "0 0 64px",
         width: "100%",
         display: "flex",
@@ -62,7 +58,6 @@ const TaskColumn: React.FC<TaskColumnProps> = ({ title, icon, children }) => (
 
     <Box
       sx={{
-        /* Let the task list grow/shrink and scroll */
         flex: "1 1 auto",
         overflowY: "auto",
         p: 2,

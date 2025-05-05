@@ -11,9 +11,6 @@ import TaskStatus from "@/model/domain/taskStatus"
 import MESSAGE from "@/constant/ui/message"
 import { toast } from "react-toastify"
 
-/**
- * Panel for creating new tasks and displaying them in a board.
- */
 export default function TasksPanel() {
   const { tasks, categories, calendars } = useApplicationStorage()
   const { addTask, updateTask, deleteTask, reloadTasks } = useTask()

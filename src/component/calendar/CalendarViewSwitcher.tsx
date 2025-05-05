@@ -3,15 +3,10 @@ import ViewType from "@/model/utility/viewType"
 import { FormControl, InputLabel, Select, MenuItem, type SelectChangeEvent } from "@mui/material"
 
 export interface CalendarViewSwitcherProps {
-  /** Current view mode */
   view: ViewType
-  /** Called when the view changes */
   onChange: (view: ViewType) => void
 }
 
-/**
- * Dropdown to select calendar view (Day, Week, Month, Year).
- */
 export default function CalendarViewSwitcher({ view, onChange }: CalendarViewSwitcherProps) {
   const handleChange = useCallback((e: SelectChangeEvent<ViewType>) => onChange(e.target.value as ViewType), [onChange])
 

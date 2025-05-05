@@ -33,7 +33,6 @@ const EventInformationPopover = ({
   const [currentEvent, setCurrentEvent] = useState<Schedulable | null>(event)
   const [confirmingDelete, setConfirmingDelete] = useState(false)
 
-  // Ref to track the last fetched event ID to prevent redundant API calls
   const lastFetchedEventId = useRef<string | null>(null)
 
   const handleDeleteClick = () => setConfirmingDelete(true)
@@ -52,7 +51,7 @@ const EventInformationPopover = ({
         await reloadEvents()
         const updated = events.find((e) => e.id === event.id)
         if (updated) setCurrentEvent(updated)
-        lastFetchedEventId.current = event.id // Update the last fetched event ID
+        lastFetchedEventId.current = event.id
       }
     }
 

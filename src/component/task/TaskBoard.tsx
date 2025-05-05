@@ -20,9 +20,6 @@ export interface TaskBoardProps {
   onDelete: (id: string) => void
 }
 
-/**
- * Kanban-style board for tasks, supporting drag-and-drop status changes.
- */
 const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, calendars, categories, onUpdate, onDelete }) => {
   const columns = useMemo(
     () =>
@@ -40,7 +37,6 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, calendars, categories, onU
     DONE: []
   })
 
-  // Initialize columns from tasks
   useEffect(() => {
     const safe = Array.isArray(tasks) ? tasks : []
     setOrder({
@@ -50,7 +46,6 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, calendars, categories, onU
     })
   }, [tasks])
 
-  // Handle drag-and-drop between columns
   const handleDragEnd = useCallback(
     (result: DropResult) => {
       const { source, destination } = result
@@ -94,7 +89,7 @@ const TaskBoard: React.FC<TaskBoardProps> = ({ tasks, calendars, categories, onU
               >
                 <TaskColumn title={title} icon={icon}>
                   {order[status as TaskStatus]
-                    .filter((task) => task?.id) // Filter out invalid tasks
+                    .filter((task) => task?.id)
                     .map((task, index) => (
                       <Draggable draggableId={task.id} index={index} key={task.id}>
                         {(prov, snap) => (

@@ -2,19 +2,13 @@ import React from "react"
 import { Box, Typography, useTheme } from "@mui/material"
 
 export interface DayGridProps {
-  /** The base date for this column */
   date: Date
-  /** Called when a time-slot is clicked */
   onSlotClick: (datetime: Date, element: HTMLElement) => void
 }
 
-/**
- * Renders 48 half-hour slots for a single day.
- */
 export default function DayGrid({ date, onSlotClick }: DayGridProps) {
   const theme = useTheme()
 
-  // Generate 48 half-hour increments
   const slots = React.useMemo(
     () =>
       Array.from({ length: 48 }, (_, idx) => {
@@ -43,7 +37,7 @@ export default function DayGrid({ date, onSlotClick }: DayGridProps) {
       flexDirection="column"
       flexGrow={1}
       sx={{
-        height: `${48 * 32}px`, // 32px per slot
+        height: `${48 * 32}px`,
         border: `1px solid ${theme.palette.divider}`,
         overflow: "visible"
       }}

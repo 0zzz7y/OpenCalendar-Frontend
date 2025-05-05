@@ -25,9 +25,6 @@ export interface TaskCardProps {
   onDelete: (id: string) => void
 }
 
-/**
- * Card representing a single task, editable and collapsible.
- */
 const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpdate, onDelete }) => {
   const [expanded, setExpanded] = useState(true)
   const [local, setLocal] = useState<Task>({
@@ -45,10 +42,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     description: false
   })
   const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null) // Anchor for delete confirmation popover
-
-  // Sync props -> state
   useEffect(() => {
-    if (task) setLocal(task) // Sync props -> state
+    if (task) setLocal(task)
   }, [task])
 
   const validateField = useCallback(
@@ -78,20 +73,20 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
   )
 
   const handleBlur = useCallback(() => {
-    onUpdate(local) // Save the task when the user finishes interacting with a field
+    onUpdate(local)
   }, [local, onUpdate])
 
   const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {
-    setDeleteAnchorEl(event.currentTarget) // Open the delete confirmation popover
+    setDeleteAnchorEl(event.currentTarget)
   }
 
   const handleDeleteConfirm = () => {
-    onDelete(local.id) // Confirm deletion
-    setDeleteAnchorEl(null) // Close the popover
+    onDelete(local.id)
+    setDeleteAnchorEl(null)
   }
 
   const handleDeleteCancel = () => {
-    setDeleteAnchorEl(null) // Close the popover
+    setDeleteAnchorEl(null)
   }
 
   const cardColor = local.category?.color ?? "#f5f5f5"
@@ -123,7 +118,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             placeholder={LABEL.NAME}
             value={local.title}
             onChange={(e) => handleChange("title", e.target.value)}
-            onBlur={handleBlur} // Save on blur
+            onBlur={handleBlur}
             size="small"
             fullWidth
             error={errors.name}
@@ -142,7 +137,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
             placeholder={LABEL.DESCRIPTION}
             value={local.description ?? ""}
             onChange={(e) => handleChange("description", e.target.value)}
-            onBlur={handleBlur} // Save on blur
+            onBlur={handleBlur}
             size="small"
             fullWidth
             multiline
@@ -160,7 +155,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
               const cat = categories.find((c) => c.id === e.target.value) || null
               handleChange("category", cat ? { ...cat, color: cat.color } : undefined)
             }}
-            onBlur={handleBlur} // Save on blur
+            onBlur={handleBlur}
             size="small"
             fullWidth
             sx={textFieldSx}

@@ -30,7 +30,6 @@ export default function MonthView({
   const {reloadEvents} = useEvent()
   const theme = useTheme()
 
-  // Compute start of grid (42 days view)
   const { gridDates, todayString } = useMemo(() => {
     const startOfMonth = dayjs(date).startOf("month")
     const startDay = startOfMonth.startOf("week")
@@ -38,13 +37,11 @@ export default function MonthView({
     return { gridDates: dates, todayString: dayjs().format("YYYY-MM-DD") }
   }, [date])
 
-  // Weekday names for header (Sun, Mon, …)
   const weekDayNames = useMemo(() => {
     const startOfWeek = dayjs(date).startOf("week")
     return Array.from({ length: 7 }, (_, i) => startOfWeek.add(i, "day").format("dddd"))
   }, [date])
 
-  // Handlers for info and creation popovers
   const [info, setInfo] = useState<{ anchor?: HTMLElement; event?: Event }>({})
   const [creation, setCreation] = useState<{
     anchor?: HTMLElement
@@ -103,7 +100,6 @@ export default function MonthView({
 
   return (
     <Box sx={{ overflow: "auto", height: "100%", p: 2 }}>
-      {/* 1) Weekday names header */}
       <Box
         sx={{
           display: "grid",
@@ -119,7 +115,6 @@ export default function MonthView({
         ))}
       </Box>
 
-      {/* 2) Month grid */}
       <Box
         sx={{
           display: "grid",
@@ -157,18 +152,17 @@ export default function MonthView({
                 {dayjs(dayDate).format("D")}
               </Typography>
 
-              {/* Scrollable event list */}
               <Box
                 sx={{
                   mt: 0.5,
-                  overflowY: "auto", // Enable vertical scrolling
-                  maxHeight: 75, // Limit the height of the event list
-                  position: "relative", // Required for positioning the chevron
+                  overflowY: "auto",
+                  maxHeight: 75,
+                  position: "relative",
                   "&::-webkit-scrollbar": {
-                    display: "none" // Hide scrollbar for WebKit-based browsers
+                    display: "none"
                   },
-                  "-ms-overflow-style": "none", // Hide scrollbar for Internet Explorer
-                  "scrollbar-width": "none" // Hide scrollbar for Firefox
+                  "-ms-overflow-style": "none",
+                  "scrollbar-width": "none"
                 }}
               >
                 {dayEvents.map((ev, index) => (
@@ -213,7 +207,6 @@ export default function MonthView({
                   </Box>
                 ))}
 
-                {/* Chevron indicator */}
                 {dayEvents.length > 3 && (
                   <Box
                     sx={{
@@ -222,7 +215,7 @@ export default function MonthView({
                       left: 0,
                       right: 0,
                       textAlign: "center",
-                      pointerEvents: "none" // Ensure it doesn't block interactions
+                      pointerEvents: "none"
                     }}
                   >
                     <Typography variant="caption" color="text.secondary">

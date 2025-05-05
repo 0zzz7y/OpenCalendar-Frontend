@@ -83,7 +83,7 @@ const NoteCard = ({
 
   const handleMouseDown = (e: React.MouseEvent) => {
     if (toolbarRef.current?.contains(e.target as Node)) {
-      // do nothing
+
     }
   }
 
@@ -153,7 +153,7 @@ const NoteCard = ({
         id,
         title: noteName,
         description: currentContent,
-        calendar: selectedCalendar, // use latest calendar
+        calendar: selectedCalendar,
         category: category ? { id: category.id, title: category.title, color: category.color } : undefined
       })
       setLastSavedContent(currentContent)
@@ -172,7 +172,7 @@ const NoteCard = ({
           id,
           title: noteName,
           description: currentContent,
-          calendar: calendar, // use updated calendar
+          calendar: calendar,
           category: selectedCategory
             ? { id: selectedCategory.id, title: selectedCategory.title, color: selectedCategory.color }
             : undefined

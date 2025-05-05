@@ -1,4 +1,3 @@
-// CalendarPanel.tsx
 import React, { useMemo, useCallback, useState, useEffect } from "react"
 import { Box, Typography, Button } from "@mui/material"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
@@ -39,7 +38,6 @@ export default function CalendarPanel({
   jumpToDate,
   setJumpToDate
 }: CalendarPanelProperties) {
-  // Stores & repositories
   const { events, tasks, calendars, categories, selectedCalendar, selectedCategory } = useApplicationStorage()
   const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent()
 
@@ -78,7 +76,6 @@ export default function CalendarPanel({
     })
   }, [events, tasks, selectedCalendar, selectedCategory])
 
-  // Popover & editing state
   const [creation, setCreation] = useState<{ anchor?: HTMLElement; datetime?: Date }>({})
   const [info, setInfo] = useState<{ anchor?: HTMLElement; event?: Event }>({})
   const [editingEvent, setEditingEvent] = useState<Event | undefined>(undefined)
@@ -155,7 +152,6 @@ export default function CalendarPanel({
 
   return (
     <>
-      {/* Toolbar */}
       <Box display="flex" justifyContent="space-between" alignItems="center" px={2} py={1}>
         <Box display="flex" alignItems="center" gap={1}>
           <Button onClick={() => navigate("previous")}>
@@ -171,7 +167,6 @@ export default function CalendarPanel({
         <CalendarViewSwitcher view={view} onChange={setView} />
       </Box>
 
-      {/* Main view */}
       <Box sx={{ height: "100%", overflow: "auto", pb: 8 }}>
         {view === ViewType.DAY && (
           <DayView
@@ -214,7 +209,6 @@ export default function CalendarPanel({
         )}
       </Box>
 
-      {/* Popovers */}
       {creation.anchor && creation.datetime && (
         <EventPopover
           anchorEl={creation.anchor}

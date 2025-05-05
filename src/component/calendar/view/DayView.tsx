@@ -44,7 +44,7 @@ export default function DayView({ date, events, calendars, categories, onEventCl
   const handleSlotClick = useCallback((anchor: HTMLElement, datetime: Date) => {
     setCreationPopover({
       anchorEl: anchor,
-      clickedDatetime: datetime // Pass the clicked datetime
+      clickedDatetime: datetime
     })
   }, [])
 
@@ -82,7 +82,6 @@ export default function DayView({ date, events, calendars, categories, onEventCl
     [events, updateEvent, closeAll, reloadEvents]
   )
 
-  // New‐event template
   const newEvent: Event | undefined = slotInfo.datetime
     ? {
         id: "",
@@ -98,9 +97,7 @@ export default function DayView({ date, events, calendars, categories, onEventCl
 
   return (
     <>
-      {/* fill parent but don’t scroll header */}
       <Box display="flex" flexDirection="column" flex={1} sx={{ height: "100%", overflow: "hidden" }}>
-        {/* optional single‐day header */}
         <Box
           sx={{
             height: 64,
@@ -113,13 +110,12 @@ export default function DayView({ date, events, calendars, categories, onEventCl
           <Typography variant="h6">{dayjs(date).format("dddd")}</Typography>
         </Box>
 
-        {/* only this scrolls */}
         <Box
           sx={{
             flex: 1,
-            display: "flex", // lay out labels + column side by side
+            display: "flex",
             overflowY: "auto",
-            pb: 4, // show 11:30 slot
+            pb: 4,
             borderLeft: (theme) => `1px solid ${theme.palette.divider}`,
             borderRight: (theme) => `1px solid ${theme.palette.divider}`,
             borderBottom: (theme) => `1px solid ${theme.palette.divider}`
@@ -138,7 +134,6 @@ export default function DayView({ date, events, calendars, categories, onEventCl
         </Box>
       </Box>
 
-      {/* popovers */}
       {slotInfo.anchor && slotInfo.datetime && (
         <EventCreationPopover
           anchorEl={slotInfo.anchor}
@@ -171,10 +166,9 @@ export default function DayView({ date, events, calendars, categories, onEventCl
         />
       )}
 
-      {/* Render the popover */}
       <EventCreationPopover
         anchorEl={creationPopover.anchorEl}
-        clickedDatetime={creationPopover.clickedDatetime ?? undefined} // Pass it here
+        clickedDatetime={creationPopover.clickedDatetime ?? undefined}
         calendars={calendars}
         categories={categories}
         onClose={() => setCreationPopover({ anchorEl: null, clickedDatetime: null })}

@@ -77,7 +77,7 @@ export function CalendarEditor({ open, anchor, mode, initialData = {}, onClose, 
     try {
       await deleteCalendar(initialData.id)
       await reloadCalendars()
-      onDelete?.() // Call onDelete callback after successful deletion
+      onDelete?.()
       onClose()
     } catch (error) {
       console.error(error)

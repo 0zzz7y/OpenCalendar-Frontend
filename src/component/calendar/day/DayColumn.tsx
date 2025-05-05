@@ -8,9 +8,8 @@ import type Schedulable from "@/model/domain/schedulable"
 import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"
 
-// Constants
-const GAP = 4 // px gap between events
-const SLOT_HEIGHT = 32 // px for 30-minute slot
+const GAP = 4
+const SLOT_HEIGHT = 32
 
 export interface DayColumnProps {
   date: Date
@@ -23,14 +22,9 @@ export interface DayColumnProps {
   dragTargetId?: string
 }
 
-/**
- * Renders a single-day column with hourly slots and draggable events.
- */
 const DayColumn: FC<DayColumnProps> = ({ date, events, onSave, onSlotClick, dragTargetId, onEventClick }) => {
-  // Pre-filter timed events
   const timedEvents = useMemo(() => events.filter((e) => e.startDate && e.endDate), [events])
 
-  // Generate 48 half-hour slots
   const slots = useMemo(
     () =>
       Array.from({ length: 48 }, (_, i) => {
@@ -41,7 +35,6 @@ const DayColumn: FC<DayColumnProps> = ({ date, events, onSave, onSlotClick, drag
     [date]
   )
 
-  // Check overlap
   const eventsOverlap = useCallback((a: Schedulable, b: Schedulable): boolean => {
     if (!a.startDate || !a.endDate || !b.startDate || !b.endDate) return false
     const startA = new Date(a.startDate).getTime()
@@ -51,7 +44,6 @@ const DayColumn: FC<DayColumnProps> = ({ date, events, onSave, onSlotClick, drag
     return startA < endB && startB < endA
   }, [])
 
-  // Group overlapping events
   const groupedEvents = useMemo(() => {
     const groups: Schedulable[][] = []
     for (const evt of timedEvents) {
@@ -68,7 +60,6 @@ const DayColumn: FC<DayColumnProps> = ({ date, events, onSave, onSlotClick, drag
     return groups
   }, [timedEvents, eventsOverlap])
 
-  // Layout events for absolute positioning
   const layoutedEvents = useMemo(() => {
     const laidOut: (Schedulable & { style: CSSProperties })[] = []
     for (const group of groupedEvents) {
