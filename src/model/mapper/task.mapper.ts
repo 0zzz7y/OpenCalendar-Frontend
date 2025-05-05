@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type Task from "@/model/domain/task"
 import type TaskDto from "@/model/dto/task.dto"
 import type Calendar from "@/model/domain/calendar"

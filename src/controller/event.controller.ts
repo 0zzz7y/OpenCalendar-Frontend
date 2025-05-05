@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import * as eventService from "@/service/event.service"
 import { dtoToEvent, eventToDto } from "@/model/mapper/event.mapper"
 import { createCrudController } from "./crud.controller"

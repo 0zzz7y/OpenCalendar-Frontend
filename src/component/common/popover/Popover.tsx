@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { Popover as MuiPopover, Box } from "@mui/material"
 import type { ReactNode } from "react"
 

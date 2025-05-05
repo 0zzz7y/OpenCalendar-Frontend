@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 enum MESSAGE {
   NEW_EVENT = "New event",
   NEW_TASK = "New task",

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { Button as MuiButton, CircularProgress } from "@mui/material"
 import type { ButtonProps as MuiButtonProps } from "@mui/material"
 

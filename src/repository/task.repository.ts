@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import {
   getTasks,
   createTask,
@@ -19,7 +23,6 @@ const useCrudTask = () => {
     if (!task.title) {
       throw new Error("Task title is required")
     }
-    // Add other validation rules as needed
   }
 
   return createUseCrud<Task, TaskDto, TaskDto>(

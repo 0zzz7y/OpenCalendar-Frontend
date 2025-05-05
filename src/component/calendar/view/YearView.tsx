@@ -1,11 +1,14 @@
-import React, { useState, useMemo, useCallback } from "react"
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
+import { useState, useMemo, useCallback } from "react"
 import { Box, Typography, Paper, Popover, Stack, useTheme } from "@mui/material"
 import { lighten, darken } from "@mui/material/styles"
 import dayjs from "dayjs"
 import { EventInformationPopover, EventCreationPopover } from "@/component/event"
 import AddButton from "@/component/common/button/AddButton"
 import type Event from "@/model/domain/event"
-import type Schedulable from "@/model/domain/schedulable"
 import useEvent from "@/repository/event.repository"
 import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"
@@ -86,6 +89,7 @@ export default function YearView({ date, events, calendars, categories, onEventC
     }
   }, [info, closeInfo])
 
+  // biome-ignore lint/correctness/useExhaustiveDependencies: <explanation>
   const openCreate = useCallback(() => {
     if (dayAnchor && dayDate) {
       setEdit({ anchor: dayAnchor, event: null, datetime: dayDate })

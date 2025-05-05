@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 enum TOOLBAR {
   BOLD = "bold",
   ITALIC = "italic",

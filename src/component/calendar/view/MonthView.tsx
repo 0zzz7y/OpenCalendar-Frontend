@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { useState, useMemo, useCallback } from "react"
 import { Box, Typography, Paper, useTheme } from "@mui/material"
 import dayjs from "dayjs"
@@ -27,7 +31,7 @@ export default function MonthView({
   onSlotClick,
   onEventClick
 }: MonthViewProps) {
-  const {reloadEvents} = useEvent()
+  const { reloadEvents } = useEvent()
   const theme = useTheme()
 
   const { gridDates, todayString } = useMemo(() => {

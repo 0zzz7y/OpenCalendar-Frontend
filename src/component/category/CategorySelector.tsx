@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { useState, useMemo, useCallback } from "react"
 import { Box, Typography, IconButton } from "@mui/material"
 import EditIcon from "@mui/icons-material/Edit"

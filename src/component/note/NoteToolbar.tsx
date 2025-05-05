@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type React from "react"
 import { useState, useCallback, useRef } from "react"
 import { Box, IconButton, Popover, Typography, TextField, MenuItem, Menu } from "@mui/material"
@@ -8,8 +12,7 @@ import {
   Delete as DeleteIcon,
   FormatBold as FormatBoldIcon,
   FormatItalic as FormatItalicIcon,
-  FormatUnderlined as FormatUnderlinedIcon,
-  CalendarToday as CalendarTodayIcon
+  FormatUnderlined as FormatUnderlinedIcon
 } from "@mui/icons-material"
 
 import CancelButton from "@/component/common/button/CancelButton"

@@ -1,9 +1,12 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type React from "react"
 import { useRef, useState, useEffect, useMemo, useCallback } from "react"
 import { Box, Typography } from "@mui/material"
 import { useDrag } from "react-dnd"
 import type Schedulable from "@/model/domain/schedulable"
-import type Event from "@/model/domain/event"
 
 export interface EventBoxProps {
   event: Schedulable

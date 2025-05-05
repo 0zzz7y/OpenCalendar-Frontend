@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type Note from "@/model/domain/note"
 import type NoteDto from "@/model/dto/note.dto"
 import type Calendar from "@/model/domain/calendar"

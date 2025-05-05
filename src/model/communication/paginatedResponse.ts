@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 interface PaginatedResponse<T> {
   content: T[]
   totalPages: number

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type CalendarDto from "@/model/dto/calendar.dto"
 import { createCrudService } from "./crud.service"
 

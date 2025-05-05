@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 export { loadCalendars } from "@/controller/calendar.controller"
 export { loadCategories } from "@/controller/category.controller"
 export { loadEvents } from "@/controller/event.controller"

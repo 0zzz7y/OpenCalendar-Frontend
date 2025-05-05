@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 export { default as CalendarGridCell } from "./CalendarGridCell"
 export { default as CalendarPanel } from "./CalendarPanel"
 export { default as CalendarViewSwitcher } from "./CalendarViewSwitcher"

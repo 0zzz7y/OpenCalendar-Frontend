@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 enum RecurringPattern {
   NONE = "NONE",
   DAILY = "DAILY",

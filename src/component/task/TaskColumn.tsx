@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type React from "react"
 import type { ReactNode } from "react"
 import { Paper, Typography, Box } from "@mui/material"

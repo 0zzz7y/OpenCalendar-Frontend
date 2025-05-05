@@ -1,4 +1,7 @@
-import type RecurringPattern from "@/model/domain/recurringPattern"
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type TaskStatus from "@/model/domain/taskStatus"
 
 interface TaskDto {

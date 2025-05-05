@@ -1,3 +1,6 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
 import { useCallback } from "react"
 import useApplicationStorage from "@/storage/useApplicationStorage"
 import capitalize from "@/utilities/capitalize"

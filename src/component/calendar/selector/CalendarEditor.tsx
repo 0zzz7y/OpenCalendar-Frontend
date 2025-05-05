@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { useState, useEffect, useRef, useCallback } from "react"
 import { Box, TextField, Typography, IconButton, ClickAwayListener, Input, Paper } from "@mui/material"
 import EmojiPicker, { type EmojiClickData, EmojiStyle, Theme } from "emoji-picker-react"

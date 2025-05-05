@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type CategoryDto from "@/model/dto/category.dto"
 import { createCrudService } from "./crud.service"
 

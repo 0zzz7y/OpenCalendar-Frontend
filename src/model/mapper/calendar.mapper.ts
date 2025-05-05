@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type Calendar from "@/model/domain/calendar"
 import type CalendarDto from "@/model/dto/calendar.dto"
 

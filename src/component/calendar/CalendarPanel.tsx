@@ -1,4 +1,8 @@
-import React, { useMemo, useCallback, useState, useEffect } from "react"
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
+import { useMemo, useCallback, useState, useEffect } from "react"
 import { Box, Typography, Button } from "@mui/material"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
 import ChevronRightIcon from "@mui/icons-material/ChevronRight"
@@ -7,7 +11,6 @@ import dayjs, { type ManipulateType } from "dayjs"
 import ViewType from "@/model/utility/viewType"
 import RecurringPattern from "@/model/domain/recurringPattern"
 import type Event from "@/model/domain/event"
-import type Schedulable from "@/model/domain/schedulable"
 
 import useApplicationStorage from "@/storage/useApplicationStorage"
 import FILTER from "@/constant/utility/filter"
@@ -62,7 +65,7 @@ export default function CalendarPanel({
       return [
         event,
         ...recurringInstances.filter((instance) => {
-          if (!instance.startDate || !('startDate' in event && event.startDate)) return true
+          if (!instance.startDate || !("startDate" in event && event.startDate)) return true
           const isSameDay = dayjs(instance.startDate).isSame(event.startDate, "day")
           return !isSameDay
         })

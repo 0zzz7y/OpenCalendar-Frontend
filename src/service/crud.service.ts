@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type PaginatedResponse from "@/model/communication/paginatedResponse"
 
 export interface CrudService<TDto> {
@@ -15,7 +19,6 @@ export function createCrudService<TDto>(resource: string): CrudService<TDto> {
     let pageIndex = 0
     let totalPages = 1
 
-    // fetch page by page until we've collected all
     while (pageIndex < totalPages) {
       const res = await fetch(`${url}?page=${pageIndex}`)
       if (!res.ok) {

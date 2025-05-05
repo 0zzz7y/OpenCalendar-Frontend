@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { createTheme } from "@mui/material/styles"
 
 const lightTheme = createTheme({

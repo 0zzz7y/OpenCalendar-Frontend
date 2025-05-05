@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 export { default as Button } from "./button/Button"
 export { default as AddButton } from "./button/AddButton"
 export { default as SaveButton } from "./button/SaveButton"

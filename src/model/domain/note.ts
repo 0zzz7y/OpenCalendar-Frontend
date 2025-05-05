@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type Calendar from "./calendar"
 import type Category from "./category"
 

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { useMemo, useCallback } from "react"
 import { Box, Typography, Popover, IconButton } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"

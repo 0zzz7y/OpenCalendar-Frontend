@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 interface NoteDto {
   id?: string
   title?: string

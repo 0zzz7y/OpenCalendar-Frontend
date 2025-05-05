@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type EventDto from "@/model/dto/event.dto"
 import { createCrudService } from "./crud.service"
 

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import * as calendarService from "@/service/calendar.service"
 import { dtoToCalendar, calendarToDto } from "@/model/mapper/calendar.mapper"
 import { createCrudController } from "./crud.controller"

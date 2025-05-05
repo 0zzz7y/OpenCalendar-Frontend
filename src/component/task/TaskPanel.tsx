@@ -1,11 +1,14 @@
-import React, { useState, useCallback, useMemo } from "react"
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
+import { useState, useCallback, useMemo } from "react"
 import { Box, TextField } from "@mui/material"
 
 import AddButton from "@/component/common/button/AddButton"
 import useTask from "@/repository/task.repository"
 import useApplicationStorage from "@/storage/useApplicationStorage"
 import TaskBoard from "./TaskBoard"
-import RecurringPattern from "@/model/domain/recurringPattern"
 import type Task from "@/model/domain/task"
 import TaskStatus from "@/model/domain/taskStatus"
 import MESSAGE from "@/constant/ui/message"
@@ -32,7 +35,7 @@ export default function TasksPanel() {
       description: "",
       calendar: defaultCalendar,
       category: defaultCategory ?? undefined,
-      status: TaskStatus.TODO,
+      status: TaskStatus.TODO
     }
 
     await addTask(payload)

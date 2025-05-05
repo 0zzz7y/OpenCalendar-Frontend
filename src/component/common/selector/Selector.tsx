@@ -1,4 +1,7 @@
-// src/component/common/selector/Selector.tsx
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { MenuItem, Select, InputLabel, FormControl, type SelectChangeEvent, Box } from "@mui/material"
 
 import type { ReactNode } from "react"

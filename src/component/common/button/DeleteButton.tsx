@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import Button from "./Button"
 import BUTTON from "@/constant/ui/button"
 import { Delete } from "@mui/icons-material"

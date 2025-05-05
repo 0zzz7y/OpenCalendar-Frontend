@@ -1,4 +1,8 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react"
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
+import { useState, useEffect, useCallback } from "react"
 import { Popover, TextField, MenuItem, Stack, Divider, Typography, Box } from "@mui/material"
 import { DateCalendar, TimePicker } from "@mui/x-date-pickers"
 import dayjs from "dayjs"
@@ -7,7 +11,6 @@ import { toast } from "react-toastify"
 import useEvent from "@/repository/event.repository"
 import RecurringPattern from "@/model/domain/recurringPattern"
 import type Schedulable from "@/model/domain/schedulable"
-import BUTTON from "@/constant/ui/button"
 import LABEL from "@/constant/ui/label"
 import MESSAGE from "@/constant/ui/message"
 import FILTER from "@/constant/utility/filter"
@@ -146,14 +149,14 @@ export default function EventCreationPopover({
       recurringPattern: form.recurringPattern,
       calendar: calendars.find((c) => c.id === form.calendarId)
         ? (() => {
-            const calendar = calendars.find((c) => c.id === form.calendarId);
-            return calendar ? { ...calendar, title: calendar.title } : undefined;
+            const calendar = calendars.find((c) => c.id === form.calendarId)
+            return calendar ? { ...calendar, title: calendar.title } : undefined
           })()
         : undefined,
       category: categories.find((c) => c.id === form.categoryId)
         ? (() => {
-            const category = categories.find((c) => c.id === form.categoryId);
-            return category ? { ...category, title: category.title } : undefined;
+            const category = categories.find((c) => c.id === form.categoryId)
+            return category ? { ...category, title: category.title } : undefined
           })()
         : undefined
     }
@@ -196,8 +199,8 @@ export default function EventCreationPopover({
             if (form.categoryId !== (originalEvent.category?.id || "")) {
               updatedPayload.category = categories.find((c) => c.id === form.categoryId)
                 ? (() => {
-                    const category = categories.find((c) => c.id === form.categoryId);
-                    return category ? { ...category, title: category.title } : undefined;
+                    const category = categories.find((c) => c.id === form.categoryId)
+                    return category ? { ...category, title: category.title } : undefined
                   })()
                 : undefined
             }
@@ -245,18 +248,7 @@ export default function EventCreationPopover({
     } finally {
       setLoading(false)
     }
-  }, [
-    form,
-    calendars,
-    categories,
-    isEdit,
-    initialEvent,
-    updateEvent,
-    addEvent,
-    reloadEvents,
-    onClose,
-    validateForm
-  ])
+  }, [form, calendars, categories, isEdit, initialEvent, updateEvent, addEvent, reloadEvents, onClose, validateForm])
 
   return (
     <Popover

@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type NoteDto from "@/model/dto/note.dto"
 import { createCrudService } from "./crud.service"
 

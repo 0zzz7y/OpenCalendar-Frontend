@@ -1,4 +1,8 @@
-import React, { useState, useMemo, useCallback } from "react"
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
+import { useState, useMemo, useCallback } from "react"
 import { Box, Typography } from "@mui/material"
 import dayjs from "dayjs"
 import { EventCreationPopover, EventInformationPopover } from "@/component/event"

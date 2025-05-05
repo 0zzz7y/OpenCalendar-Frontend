@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { DateCalendar } from "@mui/x-date-pickers/DateCalendar"
 
 interface MonthlyCalendarProperties {

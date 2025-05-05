@@ -1,4 +1,8 @@
-import React, { useCallback } from "react"
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
+import { useCallback } from "react"
 import ViewType from "@/model/utility/viewType"
 import { FormControl, InputLabel, Select, MenuItem, type SelectChangeEvent } from "@mui/material"
 

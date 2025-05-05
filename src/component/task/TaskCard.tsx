@@ -1,9 +1,11 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography, Popover } from "@mui/material"
 import { Delete as DeleteIcon, ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from "@mui/icons-material"
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import dayjs from "dayjs"
 
 import CancelButton from "@/component/common/button/CancelButton"
 import DeleteButton from "@/component/common/button/DeleteButton"
@@ -11,7 +13,6 @@ import DeleteButton from "@/component/common/button/DeleteButton"
 import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"
 import type Task from "@/model/domain/task"
-import RecurringPattern from "@/model/domain/recurringPattern"
 import LABEL from "@/constant/ui/label"
 import FILTER from "@/constant/utility/filter"
 import MESSAGE from "@/constant/ui/message"
@@ -33,7 +34,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     description: task?.description || "",
     calendar: task?.calendar || (calendars.length > 0 ? calendars.find((c) => c.id === task.calendar.id) : undefined),
     category: task?.category || undefined,
-    status: task?.status || TaskStatus.TODO,
+    status: task?.status || TaskStatus.TODO
   })
   const [errors, setErrors] = useState({
     name: false,

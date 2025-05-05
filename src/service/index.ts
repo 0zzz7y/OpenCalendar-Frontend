@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 export { createCrudService } from "./crud.service"
 export { getCalendars, createCalendar, updateCalendar, deleteCalendar } from "./calendar.service"
 export { getCategories, createCategory, updateCategory, deleteCategory } from "./category.service"

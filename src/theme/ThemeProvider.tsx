@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import THEME from "@/constant/utility/theme"
 
 import type React from "react"

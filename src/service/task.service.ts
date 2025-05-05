@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type TaskDto from "@/model/dto/task.dto"
 import { createCrudService } from "./crud.service"
 

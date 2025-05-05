@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import { useEffect, useState } from "react"
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
 import { Box } from "@mui/material"

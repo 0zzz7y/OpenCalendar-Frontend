@@ -1,7 +1,10 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import Button from "./Button"
 import SaveIcon from "@mui/icons-material/Check"
 import BUTTON from "@/constant/ui/button"
-import COLOR from "@/constant/ui/color"
 
 interface SaveButtonProperties extends React.ComponentProps<typeof Button> {
   onClick: () => void

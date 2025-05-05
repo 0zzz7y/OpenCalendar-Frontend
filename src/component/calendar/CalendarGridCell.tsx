@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) Tomasz Wnuk
+ */
+
 import type React from "react"
 import { useEffect, useRef } from "react"
 import { Box } from "@mui/material"
@@ -15,16 +19,20 @@ export interface CalendarGridCellProps {
 export default function CalendarGridCell({ datetime, allEvents, onSave, onClick }: CalendarGridCellProps) {
   const ref = useRef<HTMLDivElement>(null)
 
-  // helper: format as local ISO for LocalDateTime
   function toLocalDateTime(date: Date): string {
     const pad = (n: number) => String(n).padStart(2, "0")
     return (
       // biome-ignore lint/style/useTemplate: <explanation>
-      date.getFullYear() + "-" +
-      pad(date.getMonth() + 1) + "-" +
-      pad(date.getDate()) + "T" +
-      pad(date.getHours()) + ":" +
-      pad(date.getMinutes()) + ":" +
+      date.getFullYear() +
+      "-" +
+      pad(date.getMonth() + 1) +
+      "-" +
+      pad(date.getDate()) +
+      "T" +
+      pad(date.getHours()) +
+      ":" +
+      pad(date.getMinutes()) +
+      ":" +
       pad(date.getSeconds())
     )
   }
