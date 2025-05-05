@@ -21,7 +21,7 @@ export default function NotesPanel() {
   }, [notes])
 
   const defaultCalendar = useMemo(() => calendars[0] || null, [calendars])
-  const defaultCategory = useMemo(() => categories[0] || undefined, [categories])
+  const defaultCategory = useMemo(() => categories.find((c) => c.id === null) || undefined, [categories])
 
   const handleUpdate = useCallback(
     (updated: Note) => {
