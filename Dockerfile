@@ -12,7 +12,11 @@ RUN pnpm install
 # ──────────────────── Builder ────────────────────
 FROM node:20-bullseye-slim AS builder
 
+ARG VITE_APP_MODE
+
 ARG VITE_BACKEND_URL
+
+ENV VITE_APP_MODE=$VITE_APP_MODE
 
 ENV VITE_BACKEND_URL=$VITE_BACKEND_URL
 
