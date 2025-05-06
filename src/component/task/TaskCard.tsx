@@ -42,7 +42,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     endDate: false,
     description: false
   })
-  const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null) // Anchor for delete confirmation popover
+  const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null)
   useEffect(() => {
     if (task) setLocal(task)
   }, [task])
@@ -66,7 +66,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     <K extends keyof Task>(field: K, value: Task[K]) => {
       setLocal((prev) => {
         const updated = { ...prev, [field]: value }
-        setErrors((prevErrors) => ({ ...prevErrors, [field]: validateField(field, value) })) // Validate the field
+        setErrors((prevErrors) => ({ ...prevErrors, [field]: validateField(field, value) }))
         return updated
       })
     },
@@ -181,7 +181,6 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
         </Box>
       </Collapse>
 
-      {/* Delete Confirmation Popover */}
       <Popover
         open={Boolean(deleteAnchorEl)}
         anchorEl={deleteAnchorEl}

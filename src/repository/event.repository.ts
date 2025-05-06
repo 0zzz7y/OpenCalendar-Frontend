@@ -1,6 +1,7 @@
 /**
  * Copyright (c) Tomasz Wnuk
  */
+
 import {
   getEvents,
   createEvent,
