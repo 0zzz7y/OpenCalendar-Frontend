@@ -149,6 +149,29 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
           />
 
           <TextField
+            label={LABEL.CALENDAR}
+            select
+            value={local.calendar?.id || ""}
+            onChange={(e) => {
+              const calendar = calendars.find((c) => c.id === e.target.value) || null
+              handleChange("calendar", calendar ? { ...calendar, emoji: calendar.emoji } : calendars[0])
+            }}
+            onBlur={handleBlur}
+            size="small"
+            fullWidth
+            sx={textFieldSx}
+          >
+            {calendars.map((calendar) => (
+              <MenuItem key={calendar.id} value={calendar.id}>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <Typography>{calendar.emoji}</Typography>
+                  <Typography>{calendar.title}</Typography>
+                </Box>
+              </MenuItem>
+            ))}
+          </TextField>
+
+          <TextField
             label={LABEL.CATEGORY}
             select
             value={local.category?.id || ""}
