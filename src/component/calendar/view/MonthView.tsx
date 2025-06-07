@@ -28,7 +28,6 @@ export default function MonthView({
   events,
   calendars,
   categories,
-  onSave,
   onSlotClick,
   onEventClick
 }: MonthViewProps) {
@@ -76,19 +75,6 @@ export default function MonthView({
     [onSlotClick]
   )
 
-  const handleSave = useCallback(
-    async (payload: Partial<Event> & { id?: string }) => {
-      if (payload.id) {
-        const original = events.find((e): e is Event => e.id === payload.id)
-        if (original) {
-          await updateEvent({ ...original, ...payload })
-          await reloadEvents()
-        }
-      }
-      closeCreation()
-    },
-    [events, updateEvent, reloadEvents, closeCreation]
-  )
 
   const handleDelete = useCallback(
     async (id: string) => {
@@ -180,7 +166,7 @@ export default function MonthView({
                   "scrollbar-width": "none"
                 }}
               >
-                {dayEvents.map((ev, index) => (
+                {dayEvents.map((ev) => (
                   <Box
                     key={ev.id}
                     sx={{

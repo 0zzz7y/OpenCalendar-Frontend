@@ -56,7 +56,6 @@ export default function CalendarPanel({
 
   const schedulables: Event[] = useMemo(() => {
     const safeEvents = Array.isArray(events) ? events : []
-    const safeTasks = Array.isArray(tasks) ? tasks : []
     const schedulables = [...safeEvents]
 
     const expandedEvents = schedulables.flatMap((event) => {

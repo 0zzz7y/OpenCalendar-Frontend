@@ -22,9 +22,9 @@ export interface YearViewProps {
   onSave: (data: Partial<Event>) => void
 }
 
-export default function YearView({ date, events, calendars, categories, onEventClick, onSave }: YearViewProps) {
+export default function YearView({ date, events, calendars, categories, onEventClick }: YearViewProps) {
   const theme = useTheme()
-  const { reloadEvents, deleteEvent, updateEvent } = useEvent()
+  const { reloadEvents, updateEvent } = useEvent()
 
   const { months, todayString } = useMemo(() => {
     const year = date.getFullYear()
@@ -111,19 +111,6 @@ export default function YearView({ date, events, calendars, categories, onEventC
     [events, updateEvent, reloadEvents, closeInfo]
   )
 
-  const handleSave = useCallback(
-    async (payload: Partial<Event> & { id?: string }) => {
-      if (payload.id) {
-        const original = events.find((e): e is Event => e.id === payload.id)
-        if (original) {
-          await updateEvent({ ...original, ...payload })
-          await reloadEvents()
-        }
-      }
-      closeEdit()
-    },
-    [events, updateEvent, reloadEvents, closeEdit]
-  )
 
   const findCalendar = (calendarId?: string) => calendars.find((c) => c.id === calendarId)
   const findCategory = (categoryId?: string) => categories.find((c) => c.id === categoryId)

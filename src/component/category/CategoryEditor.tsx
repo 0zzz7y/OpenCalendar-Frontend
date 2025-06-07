@@ -32,7 +32,6 @@ export default function CategoryEditor({
   mode,
   initialData,
   onClose,
-  onSave,
   onDelete
 }: CategoryEditorProperties) {
   const { reloadCategories, addCategory, updateCategory, deleteCategory } = useCategory()

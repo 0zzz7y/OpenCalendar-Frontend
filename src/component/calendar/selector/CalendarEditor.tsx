@@ -3,7 +3,7 @@
  */
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { Box, TextField, Typography, IconButton, ClickAwayListener, Input, Paper } from "@mui/material"
+import { Box, TextField, Typography, IconButton } from "@mui/material"
 import EmojiPicker, { type EmojiClickData, EmojiStyle, Theme } from "emoji-picker-react"
 import EmojiEmotionsIcon from "@mui/icons-material/EmojiEmotions"
 

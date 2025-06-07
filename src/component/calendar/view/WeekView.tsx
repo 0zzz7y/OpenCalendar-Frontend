@@ -181,7 +181,7 @@ export default function WeekView({ date, events, calendars, categories, onEventC
         >
           <Box display="flex">
             <HourLabelsColumn />
-            {weekDates.map((d, idx) => {
+            {weekDates.map((d) => {
               const dayEvents = events.filter((e) => e.startDate && dayjs(e.startDate).isSame(d, "day"))
               return (
                 <Box

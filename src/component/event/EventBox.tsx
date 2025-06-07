@@ -38,7 +38,7 @@ export default function EventBox({ event, dragTargetId, customStyle, onClick }: 
     [event]
   )
 
-  const [{ isDragging }, drag] = useDrag(
+  const [, drag] = useDrag(
     () => ({
       type: "event",
       item: { id: event.id, startDate: event.startDate },

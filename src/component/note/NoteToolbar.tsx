@@ -64,7 +64,7 @@ const NoteToolbar: React.FC<NoteToolbarProps> = ({
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null)
   const [categoryMenuAnchor, setCategoryMenuAnchor] = useState<HTMLElement | null>(null)
   const [calendarMenuAnchor, setCalendarMenuAnchor] = useState<HTMLElement | null>(null)
-  const [loading, setLoading] = useState(false)
+  const [, setLoading] = useState(false)
 
   const isDragging = useRef(false)
   const lastMousePos = useRef<{ x: number; y: number } | null>(null)

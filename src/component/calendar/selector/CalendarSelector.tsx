@@ -16,7 +16,6 @@ import FILTER from "@/constant/utility/filter"
 
 import Selector from "@/component/common/selector/Selector"
 import AddButton from "@/component/common/button/AddButton"
-import { isCalendarUsed } from "@/function/filter/useFilter"
 import useCalendar from "@/repository/calendar.repository"
 import { useEvent, useNote, useTask } from "@/repository"
 
