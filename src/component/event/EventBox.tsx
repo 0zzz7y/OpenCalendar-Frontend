@@ -98,7 +98,7 @@ export default function EventBox({ event, dragTargetId, customStyle, onClick }: 
         flexGrow={1}
         sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
       >
-        {event.title || "Untitled"}
+        {event.name || "Untitled"}
       </Typography>
       {emoji && (
         <Typography variant="caption" ml={1}>

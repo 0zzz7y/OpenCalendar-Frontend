@@ -91,7 +91,7 @@ export default function WeekView({ date, events, calendars, categories, onEventC
     async (id: string) => {
       const original = events.find((e): e is Event => e.id === id)
       if (original) {
-        await updateEvent({ ...original, title: "" })
+        await updateEvent({ ...original, name: "" })
         await reloadEvents()
       }
       setInfo({})
@@ -113,12 +113,12 @@ export default function WeekView({ date, events, calendars, categories, onEventC
   const newEvent: Event | undefined = creationPopover.clickedDatetime
     ? {
         id: "",
-        title: "",
+        name: "",
         description: "",
         startDate: creationPopover.clickedDatetime.toISOString(),
         endDate: dayjs(creationPopover.clickedDatetime).add(1, "hour").toISOString(),
         recurringPattern: RecurringPattern.NONE,
-        calendar: { id: calendars[0].id, title: calendars[0].title, emoji: calendars[0].emoji },
+        calendar: { id: calendars[0].id, name: calendars[0].name, emoji: calendars[0].emoji },
         category: undefined
       }
     : undefined

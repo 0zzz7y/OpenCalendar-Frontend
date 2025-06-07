@@ -43,7 +43,7 @@ export default function CategorySelector() {
     return [
       { label: FILTER.ALL, value: FILTER.ALL, color: COLOR.WHITE },
       ...categories.map((category) => ({
-        label: category.title,
+        label: category.name,
         value: category.id,
         color: category.color
       }))

@@ -12,6 +12,7 @@ import RecurringPattern from "@/model/domain/recurringPattern"
 import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"
 import useEvent from "@/repository/event.repository"
+import { updateEvent } from "@/controller/event.controller"
 export interface MonthViewProps {
   date: Date
   events: Event[]
@@ -82,13 +83,17 @@ export default function MonthView({
     },
     [onSave, closeCreation]
   )
-
+  
   const handleDelete = useCallback(
-    (id: string) => {
-      onSave({ id })
-      closeInfo()
+    async (id: string) => {
+      const original = events.find((e): e is Event => e.id === id)
+      if (original) {
+        await updateEvent({ ...original, name: "" })
+        await reloadEvents()
+      }
+      setInfo({})
     },
-    [onSave, closeInfo]
+    [events, updateEvent, reloadEvents]
   )
 
   const handleEdit = useCallback(() => {
@@ -206,7 +211,7 @@ export default function MonthView({
                         minWidth: 0
                       }}
                     >
-                      {dayjs(ev.startDate).format("H:mm")} {ev.title} {ev.calendar?.emoji}
+                      {dayjs(ev.startDate).format("H:mm")} {ev.name} {ev.calendar?.emoji}
                     </Typography>
                   </Box>
                 ))}
@@ -254,11 +259,11 @@ export default function MonthView({
               ? creation.event
               : {
                   id: "",
-                  title: "",
+                  name: "",
                   description: "",
                   startDate: creation.datetime.toISOString(),
                   endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),
-                  calendar: { ...calendars[0], title: calendars[0].title },
+                  calendar: { ...calendars[0], name: calendars[0].name },
                   category: undefined,
                   recurringPattern: RecurringPattern.NONE
                 }

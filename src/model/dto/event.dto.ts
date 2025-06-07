@@ -6,7 +6,7 @@ import type RecurringPattern from "@/model/domain/recurringPattern"
 
 interface EventDto {
   id?: string
-  title: string
+  name: string
   description?: string
   startDate: string
   endDate: string

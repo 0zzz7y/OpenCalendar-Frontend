@@ -1,25 +1,43 @@
 {
   "compilerOptions": {
+    /* Target and Module Settings */
     "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "moduleDetection": "force",
+
+    /* Language Features */
+    "lib": ["DOM", "DOM.Iterable", "ES2023"],
+    "jsx": "react-jsx",
     "useDefineForClassFields": true,
-    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowImportingTsExtensions": true,
+    "resolveJsonModule": true,
+
+    /* JavaScript Interop */
     "allowJs": false,
-    "skipLibCheck": true,
-    "esModuleInterop": false,
     "allowSyntheticDefaultImports": true,
+    "esModuleInterop": false,
+
+    /* Type Checking and Safety */
     "strict": true,
     "forceConsistentCasingInFileNames": true,
-    "module": "ESNext",
-    "moduleResolution": "Node",
-    "resolveJsonModule": true,
     "isolatedModules": true,
+    "noFallthroughCasesInSwitch": true,
+    "noUncheckedSideEffectImports": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "skipLibCheck": true,
+
+    /* Build and Output */
     "noEmit": true,
-    "jsx": "react-jsx",
+    "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
+
+    /* Path Aliases */
     "paths": {
       "@/*": ["./src/*"],
       "@test-utils": ["./test-utils"]
     }
   },
 
-  "include": ["src", "test"]
+  "include": ["src", "test", "vite.config.ts"]
 }

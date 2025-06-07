@@ -8,7 +8,7 @@ import type TaskStatus from "./taskStatus"
 
 interface Task {
   id: string
-  title: string
+  name: string
   description?: string
   status: TaskStatus
   calendar: Calendar

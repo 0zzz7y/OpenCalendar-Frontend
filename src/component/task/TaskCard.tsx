@@ -30,7 +30,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
   const [expanded, setExpanded] = useState(true)
   const [local, setLocal] = useState<Task>({
     id: task?.id || "",
-    title: task?.title || "",
+    name: task?.name || "",
     description: task?.description || "",
     calendar: task?.calendar || (calendars.length > 0 ? calendars.find((c) => c.id === task.calendar.id) : undefined),
     category: task?.category || undefined,
@@ -51,7 +51,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (field: keyof Task, value: any) => {
       switch (field) {
-        case "title":
+        case "name":
           return !value.trim()
         case "description":
           return value.length > 4096
@@ -117,8 +117,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
           </IconButton>
           <TextField
             placeholder={LABEL.NAME}
-            value={local.title}
-            onChange={(e) => handleChange("title", e.target.value)}
+            value={local.name}
+            onChange={(e) => handleChange("name", e.target.value)}
             onBlur={handleBlur}
             size="small"
             fullWidth
@@ -165,7 +165,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
               <MenuItem key={calendar.id} value={calendar.id}>
                 <Box display="flex" alignItems="center" gap={1}>
                   <Typography>{calendar.emoji}</Typography>
-                  <Typography>{calendar.title}</Typography>
+                  <Typography>{calendar.name}</Typography>
                 </Box>
               </MenuItem>
             ))}
@@ -196,7 +196,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpda
                       bgcolor: cat.color
                     }}
                   />
-                  <Typography>{cat.title}</Typography>
+                  <Typography>{cat.name}</Typography>
                 </Box>
               </MenuItem>
             ))}

@@ -31,7 +31,7 @@ export default function TasksPanel() {
     }
 
     const payload: Omit<Task, "id"> = {
-      title: title,
+      name: title,
       description: "",
       calendar: defaultCalendar,
       category: defaultCategory ?? undefined,

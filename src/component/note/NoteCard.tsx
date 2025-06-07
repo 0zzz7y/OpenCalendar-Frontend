@@ -128,13 +128,13 @@ const NoteCard = ({
         if (onUpdate) {
           onUpdate({
             id,
-            title: noteName,
+            name: noteName,
             description: currentContent,
             calendar: selectedCalendar,
             category: selectedCategory
               ? {
                   id: selectedCategory.id,
-                  title: selectedCategory.title,
+                  name: selectedCategory.name,
                   color: selectedCategory.color
                 }
               : undefined
@@ -154,10 +154,10 @@ const NoteCard = ({
       const currentContent = contentRef.current?.innerHTML || ""
       onUpdate({
         id,
-        title: noteName,
+        name: noteName,
         description: currentContent,
         calendar: selectedCalendar,
-        category: category ? { id: category.id, title: category.title, color: category.color } : undefined
+        category: category ? { id: category.id, name: category.name, color: category.color } : undefined
       })
       setLastSavedContent(currentContent)
       setLastSavedName(noteName)
@@ -173,11 +173,11 @@ const NoteCard = ({
         const currentContent = contentRef.current?.innerHTML || ""
         onUpdate({
           id,
-          title: noteName,
+          name: noteName,
           description: currentContent,
           calendar: calendar,
           category: selectedCategory
-            ? { id: selectedCategory.id, title: selectedCategory.title, color: selectedCategory.color }
+            ? { id: selectedCategory.id, name: selectedCategory.name, color: selectedCategory.color }
             : undefined
         })
         setLastSavedContent(currentContent)

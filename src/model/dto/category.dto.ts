@@ -4,7 +4,7 @@
 
 interface CategoryDto {
   id?: string
-  title: string
+  name: string
   color: string
 }
 

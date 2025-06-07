@@ -60,11 +60,11 @@ export default function CategoryEditor({
     setLoading(true)
     try {
       if (mode === EditorMode.ADD) {
-        await addCategory({ title: form.name, color: form.color })
+        await addCategory({ name: form.name, color: form.color })
       } else if (mode === EditorMode.EDIT && initialData.id) {
         await updateCategory({
           id: initialData.id,
-          title: form.name,
+          name: form.name,
           color: form.color
         })
       }

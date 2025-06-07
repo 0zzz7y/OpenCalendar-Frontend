@@ -89,12 +89,12 @@ export default function DayView({ date, events, calendars, categories, onEventCl
   const newEvent: Event | undefined = slotInfo.datetime
     ? {
         id: "",
-        title: "",
+        name: "",
         description: "",
         startDate: slotInfo.datetime.toISOString(),
         endDate: dayjs(slotInfo.datetime).add(1, "hour").toISOString(),
         recurringPattern: RecurringPattern.NONE,
-        calendar: { id: calendars[0].id, title: calendars[0].title, emoji: calendars[0].emoji },
+        calendar: { id: calendars[0].id, name: calendars[0].name, emoji: calendars[0].emoji },
         category: undefined
       }
     : undefined
@@ -162,7 +162,7 @@ export default function DayView({ date, events, calendars, categories, onEventCl
           onDelete={(id) => {
             const original = events.find((e): e is Event => e.id === id)
             if (original) {
-              updateEvent({ ...original, title: "" })
+              updateEvent({ ...original, name: "" })
               reloadEvents()
             }
             setInfoState({})

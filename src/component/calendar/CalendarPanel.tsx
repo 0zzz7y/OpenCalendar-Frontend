@@ -114,7 +114,7 @@ export default function CalendarPanel({
         }
       } else {
         const newEvent: Omit<Event, "id"> = {
-          title: data.title || "New Event",
+          name: data.name || "New Event",
           description: data.description || "",
           startDate: data.startDate,
           endDate: data.endDate || data.startDate,
@@ -221,7 +221,7 @@ export default function CalendarPanel({
           initialEvent={
             editingEvent || {
               id: "",
-              title: "",
+              name: "",
               description: "",
               startDate: creation.datetime.toISOString(),
               endDate: dayjs(creation.datetime).add(1, "hour").toISOString(),

@@ -73,7 +73,7 @@ export default function NotesPanel() {
 
     const newNote: Note = {
       id: tempId,
-      title: "New Note",
+      name: "New Note",
       description: "Description",
       calendar: calendar,
       category: category || undefined
@@ -87,7 +87,7 @@ export default function NotesPanel() {
 
     try {
       const saved: Note = await addNote({
-        title: newNote.title,
+        name: newNote.name,
         description: newNote.description,
         calendar: newNote.calendar,
         category: newNote.category
@@ -136,7 +136,7 @@ export default function NotesPanel() {
             <NoteCard
               key={note.id}
               id={note.id}
-              name={note.title}
+              name={note.name}
               content={note.description}
               calendar={note.calendar}
               category={note.category}

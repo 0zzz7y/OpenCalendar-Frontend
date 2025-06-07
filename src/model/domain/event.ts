@@ -5,7 +5,7 @@
 import type Schedulable from "./schedulable"
 
 interface Event extends Schedulable {
-  title: string
+  name: string
   startDate: string
   endDate: string
 }

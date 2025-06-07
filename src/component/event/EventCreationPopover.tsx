@@ -30,7 +30,7 @@ export interface EventCreationPopoverProps {
 }
 
 interface FormState {
-  title: string
+  name: string
   description: string
   calendarId: string
   categoryId: string
@@ -52,7 +52,7 @@ export default function EventCreationPopover({
   const { events } = useApplicationStorage()
 
   const [form, setForm] = useState<FormState>({
-    title: "",
+    name: "",
     description: "",
     calendarId: "",
     categoryId: "",
@@ -63,7 +63,7 @@ export default function EventCreationPopover({
 
   const [loading, setLoading] = useState(false)
   const [errors, setErrors] = useState({
-    title: false,
+    name: false,
     calendarId: false,
     endDate: false,
     description: false
@@ -75,7 +75,7 @@ export default function EventCreationPopover({
     if (validAnchor) {
       if (isEdit && initialEvent) {
         setForm({
-          title: initialEvent.title || "",
+          name: initialEvent.name || "",
           description: initialEvent.description || "",
           calendarId: initialEvent.calendar?.id || "",
           categoryId: initialEvent.category?.id || "",
@@ -85,7 +85,7 @@ export default function EventCreationPopover({
         })
       } else if (clickedDatetime && calendars.length > 0) {
         setForm({
-          title: "",
+          name: "",
           description: "",
           calendarId: calendars[0].id,
           categoryId: "",
@@ -123,7 +123,7 @@ export default function EventCreationPopover({
 
   const validateForm = useCallback(() => {
     const newErrors = {
-      title: !form.title.trim(),
+      name: !form.name.trim(),
       calendarId: !form.calendarId,
       endDate: form.end <= form.start,
       description: form.description.length > 4096
@@ -142,7 +142,7 @@ export default function EventCreationPopover({
     if (!validateForm()) return
 
     const payload = {
-      title: form.title,
+      name: form.name,
       description: form.description,
       startDate: dayjs(form.start).format("YYYY-MM-DDTHH:mm:ss"),
       endDate: dayjs(form.end).format("YYYY-MM-DDTHH:mm:ss"),
@@ -150,13 +150,13 @@ export default function EventCreationPopover({
       calendar: calendars.find((c) => c.id === form.calendarId)
         ? (() => {
             const calendar = calendars.find((c) => c.id === form.calendarId)
-            return calendar ? { ...calendar, title: calendar.title } : undefined
+            return calendar ? { ...calendar, name: calendar.name } : undefined
           })()
         : undefined,
       category: categories.find((c) => c.id === form.categoryId)
         ? (() => {
             const category = categories.find((c) => c.id === form.categoryId)
-            return category ? { ...category, title: category.title } : undefined
+            return category ? { ...category, name: category.name } : undefined
           })()
         : undefined
     }
@@ -173,7 +173,7 @@ export default function EventCreationPopover({
 
           if (originalEvent) {
             const basePayload = {
-              title: originalEvent.title,
+              name: originalEvent.name,
               description: originalEvent.description,
               startDate: dayjs(originalEvent.startDate).format("YYYY-MM-DDTHH:mm:ss"),
               endDate: dayjs(originalEvent.endDate).format("YYYY-MM-DDTHH:mm:ss"),
@@ -184,8 +184,8 @@ export default function EventCreationPopover({
 
             const updatedPayload = { ...basePayload }
 
-            if (form.title !== originalEvent.title) {
-              updatedPayload.title = form.title
+            if (form.name !== originalEvent.name) {
+              updatedPayload.name = form.name
             }
             if (form.description !== originalEvent.description) {
               updatedPayload.description = form.description
@@ -193,14 +193,14 @@ export default function EventCreationPopover({
             if (form.calendarId !== originalEvent.calendar?.id) {
               const selectedCalendar = calendars.find((c) => c.id === form.calendarId)
               if (selectedCalendar) {
-                updatedPayload.calendar = { ...selectedCalendar, title: selectedCalendar.title }
+                updatedPayload.calendar = { ...selectedCalendar, name: selectedCalendar.name }
               }
             }
             if (form.categoryId !== (originalEvent.category?.id || "")) {
               updatedPayload.category = categories.find((c) => c.id === form.categoryId)
                 ? (() => {
                     const category = categories.find((c) => c.id === form.categoryId)
-                    return category ? { ...category, title: category.title } : undefined
+                    return category ? { ...category, name: category.name } : undefined
                   })()
                 : undefined
             }
@@ -266,11 +266,11 @@ export default function EventCreationPopover({
 
         <TextField
           label={LABEL.NAME}
-          value={form.title}
-          onChange={(e) => handleChange("title", e.target.value)}
+          value={form.name}
+          onChange={(e) => handleChange("name", e.target.value)}
           fullWidth
-          error={errors.title}
-          helperText={errors.title ? MESSAGE.FIELD_REQUIRED : ""}
+          error={errors.name}
+          helperText={errors.name ? MESSAGE.FIELD_REQUIRED : ""}
         />
 
         <TextField
@@ -284,7 +284,7 @@ export default function EventCreationPopover({
         >
           {calendars.map((c) => (
             <MenuItem key={c.id} value={c.id}>
-              {c.emoji} {c.title}
+              {c.emoji} {c.name}
             </MenuItem>
           ))}
         </TextField>
@@ -300,7 +300,7 @@ export default function EventCreationPopover({
           {categories.map((c) => (
             <MenuItem key={c.id} value={c.id}>
               <Box display="inline-block" width={12} height={12} borderRadius={6} bgcolor={c.color} mr={1} />
-              {c.title}
+              {c.name}
             </MenuItem>
           ))}
         </TextField>

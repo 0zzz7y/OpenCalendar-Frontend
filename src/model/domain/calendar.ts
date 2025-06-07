@@ -4,7 +4,7 @@
 
 interface Calendar {
   id: string
-  title: string
+  name: string
   emoji: string
 }
 

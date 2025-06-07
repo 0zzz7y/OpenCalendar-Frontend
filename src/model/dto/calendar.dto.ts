@@ -4,7 +4,7 @@
 
 interface CalendarDto {
   id?: string
-  title: string
+  name: string
   emoji: string
 }
 

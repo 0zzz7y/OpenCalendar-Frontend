@@ -4,7 +4,7 @@
 
 interface Category {
   id: string
-  title: string
+  name: string
   color: string
 }
 

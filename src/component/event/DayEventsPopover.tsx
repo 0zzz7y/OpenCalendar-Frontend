@@ -49,7 +49,7 @@ export default function DayEventsPopover({ anchorEl, date, events, onClose }: Da
         <Box key={event.id} display="flex" alignItems="center" gap={1} mb={0.75}>
           <Box width={8} height={8} borderRadius="50%" flexShrink={0} sx={{ bgcolor: "text.primary" }} />
           <Typography variant="body2" noWrap>
-            {dayjs(event.startDate).format("H:mm")} {event.title}
+            {dayjs(event.startDate).format("H:mm")} {event.name}
           </Typography>
         </Box>
       ))}

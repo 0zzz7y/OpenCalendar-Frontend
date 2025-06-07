@@ -52,7 +52,7 @@ export default function CalendarGridCell({ datetime, allEvents, onSave, onClick 
 
         onSave({
           id: moved.id,
-          title: moved.title,
+          name: moved.name,
           description: moved.description ?? "",
           calendar: moved.calendar,
           category: moved.category,

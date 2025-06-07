@@ -11,7 +11,7 @@ import RecurringPattern from "../domain/recurringPattern"
 export function dtoToEvent(dto: EventDto, calendars: Calendar[], categories: Category[]): Event {
   return {
     id: dto.id ?? "",
-    title: dto.title,
+    name: dto.name,
     description: dto.description,
     startDate: dto.startDate,
     endDate: dto.endDate,
@@ -24,7 +24,7 @@ export function dtoToEvent(dto: EventDto, calendars: Calendar[], categories: Cat
 export function eventToDto(event: Partial<Event>): EventDto {
   return {
     id: event.id,
-    title: event.title ?? "",
+    name: event.name ?? "",
     description: event.description,
     startDate: event.startDate ?? "",
     endDate: event.endDate ?? "",

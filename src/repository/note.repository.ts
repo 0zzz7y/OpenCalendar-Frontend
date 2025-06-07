@@ -19,8 +19,8 @@ import MESSAGE from "@/constant/ui/message"
 const useCrudNote = () => {
   const { calendars, categories } = useApplicationStorage()
   const validateNote = (note: Partial<Note>) => {
-    if (!note.title || note.title.trim() === "") {
-      throw new Error("Note title is required.")
+    if (!note.name || note.name.trim() === "") {
+      throw new Error("Note name is required.")
     }
   }
 

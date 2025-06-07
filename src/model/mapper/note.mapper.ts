@@ -10,7 +10,7 @@ import type Category from "@/model/domain/category"
 export function dtoToNote(dto: NoteDto, calendars: Calendar[], categories: Category[]): Note {
   return {
     id: dto.id ?? "",
-    title: dto.title,
+    name: dto.name,
     description: dto.description,
     calendar: calendars.find((c) => c.id === dto.calendarId) as Calendar,
     category: categories.find((c) => c.id === dto.categoryId) as Category
@@ -20,7 +20,7 @@ export function dtoToNote(dto: NoteDto, calendars: Calendar[], categories: Categ
 export function noteToDto(note: Partial<Note>): NoteDto {
   return {
     id: note.id,
-    title: note.title,
+    name: note.name,
     description: note.description ?? "",
     calendarId: note.calendar?.id ?? "",
     categoryId: note.category?.id

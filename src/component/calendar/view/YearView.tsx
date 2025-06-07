@@ -318,7 +318,7 @@ export default function YearView({ date, events, calendars, categories, onEventC
                         whiteSpace: "nowrap"
                       }}
                     >
-                      {event.title} {calendar?.emoji}
+                      {event.name} {calendar?.emoji}
                     </Typography>
                   </Box>
                 )

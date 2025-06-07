@@ -58,11 +58,11 @@ export function CalendarEditor({ open, anchor, mode, initialData = {}, onClose, 
     setLoading(true)
     try {
       if (mode === EditorMode.ADD) {
-        await addCalendar({ title: form.name, emoji: form.emoji })
+        await addCalendar({ name: form.name, emoji: form.emoji })
       } else if (mode === EditorMode.EDIT && initialData.id) {
         await updateCalendar({
           id: initialData.id,
-          title: form.name,
+          name: form.name,
           emoji: form.emoji
         })
       }

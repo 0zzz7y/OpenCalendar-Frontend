@@ -34,7 +34,7 @@ export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
 
     const add = useCallback(
       async (domainObj: Partial<Domain>): Promise<Domain> => {
-        validate(domainObj) // Validate the input
+        validate(domainObj)
         const dto = toDto(domainObj)
         const raw = await createService(dto)
         const newDomain = fromDto(raw)
@@ -46,7 +46,7 @@ export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
 
     const update = useCallback(
       async (domainObj: Partial<Domain> & { id: string }): Promise<Domain> => {
-        validate(domainObj) // Validate the input
+        validate(domainObj)
         const dto = toDto(domainObj)
         const raw = await updateService(domainObj.id, dto)
         const updatedDomain = fromDto(raw)

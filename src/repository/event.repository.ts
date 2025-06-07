@@ -19,8 +19,8 @@ import MESSAGE from "@/constant/ui/message"
 const useCrudEvent = () => {
   const { calendars, categories } = useApplicationStorage()
   const validateEvent = (event: Partial<Event>) => {
-    if (!event.title) {
-      throw new Error("Event title is required.")
+    if (!event.name) {
+      throw new Error("Event name is required.")
     }
     if (!event.startDate) {
       throw new Error("Event start date is required.")

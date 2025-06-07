@@ -11,7 +11,7 @@ import TaskStatus from "../domain/taskStatus"
 export function dtoToTask(dto: TaskDto, calendars: Calendar[], categories: Category[]): Task {
   return {
     id: dto.id ?? "",
-    title: dto.title,
+    name: dto.name,
     description: dto.description,
     status: dto.status,
     calendar: calendars.find((c) => c.id === dto.calendarId) as Calendar,
@@ -22,7 +22,7 @@ export function dtoToTask(dto: TaskDto, calendars: Calendar[], categories: Categ
 export function taskToDto(task: Partial<Task>): TaskDto {
   return {
     id: task.id,
-    title: task.title ?? "",
+    name: task.name ?? "",
     description: task.description,
     status: task.status ?? TaskStatus.TODO,
     calendarId: task.calendar?.id,
