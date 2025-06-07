@@ -12,7 +12,7 @@ import RecurringPattern from "@/model/domain/recurringPattern"
 import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"
 import useEvent from "@/repository/event.repository"
-import { updateEvent } from "@/controller/event.controller"
+
 export interface MonthViewProps {
   date: Date
   events: Event[]
@@ -32,7 +32,7 @@ export default function MonthView({
   onSlotClick,
   onEventClick
 }: MonthViewProps) {
-  const { reloadEvents } = useEvent()
+  const { reloadEvents, updateEvent } = useEvent()
   const theme = useTheme()
 
   const { gridDates, todayString } = useMemo(() => {
@@ -77,13 +77,19 @@ export default function MonthView({
   )
 
   const handleSave = useCallback(
-    (data: Partial<Event>) => {
-      onSave(data)
+    async (payload: Partial<Event> & { id?: string }) => {
+      if (payload.id) {
+        const original = events.find((e): e is Event => e.id === payload.id)
+        if (original) {
+          await updateEvent({ ...original, ...payload })
+          await reloadEvents()
+        }
+      }
       closeCreation()
     },
-    [onSave, closeCreation]
+    [events, updateEvent, reloadEvents, closeCreation]
   )
-  
+
   const handleDelete = useCallback(
     async (id: string) => {
       const original = events.find((e): e is Event => e.id === id)

@@ -45,6 +45,18 @@ export default function DayView({ date, events, calendars, categories, onEventCl
     clickedDatetime: Date | null
   }>({ anchorEl: null, clickedDatetime: null })
 
+  const handleDelete = useCallback(
+    async (id: string) => {
+      const original = events.find((e): e is Event => e.id === id)
+      if (original) {
+        await updateEvent({ ...original, name: "" })
+        await reloadEvents()
+      }
+      setInfoState({})
+    },
+    [events, updateEvent, reloadEvents]
+  )
+
   const handleSlotClick = useCallback((anchor: HTMLElement, datetime: Date) => {
     setCreationPopover({
       anchorEl: anchor,
@@ -159,14 +171,7 @@ export default function DayView({ date, events, calendars, categories, onEventCl
             setSlotInfo({ anchor, datetime: new Date(event.startDate) })
             setInfoState({})
           }}
-          onDelete={(id) => {
-            const original = events.find((e): e is Event => e.id === id)
-            if (original) {
-              updateEvent({ ...original, name: "" })
-              reloadEvents()
-            }
-            setInfoState({})
-          }}
+          onDelete={handleDelete}
         />
       )}
 

@@ -24,7 +24,7 @@ export interface YearViewProps {
 
 export default function YearView({ date, events, calendars, categories, onEventClick, onSave }: YearViewProps) {
   const theme = useTheme()
-  const { reloadEvents, deleteEvent } = useEvent()
+  const { reloadEvents, deleteEvent, updateEvent } = useEvent()
 
   const { months, todayString } = useMemo(() => {
     const year = date.getFullYear()
@@ -101,20 +101,28 @@ export default function YearView({ date, events, calendars, categories, onEventC
 
   const handleDelete = useCallback(
     async (id: string) => {
-      await deleteEvent(id)
-      reloadEvents()
+      const original = events.find((e): e is Event => e.id === id)
+      if (original) {
+        await updateEvent({ ...original, name: "" })
+        await reloadEvents()
+      }
       closeInfo()
     },
-    [deleteEvent, reloadEvents, closeInfo]
+    [events, updateEvent, reloadEvents, closeInfo]
   )
 
   const handleSave = useCallback(
-    async (data: Partial<Event>) => {
-      await onSave(data)
-      await reloadEvents()
+    async (payload: Partial<Event> & { id?: string }) => {
+      if (payload.id) {
+        const original = events.find((e): e is Event => e.id === payload.id)
+        if (original) {
+          await updateEvent({ ...original, ...payload })
+          await reloadEvents()
+        }
+      }
       closeEdit()
     },
-    [onSave, reloadEvents, closeEdit]
+    [events, updateEvent, reloadEvents, closeEdit]
   )
 
   const findCalendar = (calendarId?: string) => calendars.find((c) => c.id === calendarId)
