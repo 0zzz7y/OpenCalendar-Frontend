@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type PaginatedResponse from "@/model/communication/paginatedResponse"
 
 export interface CrudService<TDto> {

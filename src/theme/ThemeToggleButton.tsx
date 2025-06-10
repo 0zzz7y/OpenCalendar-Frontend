@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import THEME from "@/constant/utility/theme"
 import { useThemeMode } from "./ThemeProvider"
 

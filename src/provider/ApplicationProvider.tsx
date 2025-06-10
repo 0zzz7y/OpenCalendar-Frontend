@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { CssBaseline } from "@mui/material"
 import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"

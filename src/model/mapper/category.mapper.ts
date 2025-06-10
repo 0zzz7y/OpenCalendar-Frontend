@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type Category from "@/model/domain/category"
 import type CategoryDto from "@/model/dto/category.dto"
 

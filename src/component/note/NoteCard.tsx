@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Box, Paper, Collapse } from "@mui/material"
 import NoteToolbar from "./NoteToolbar"

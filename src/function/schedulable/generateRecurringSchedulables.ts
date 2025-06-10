@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import dayjs from "dayjs"
 import type Event from "@/model/domain/event"
 import RecurringPattern from "@/model/domain/recurringPattern"

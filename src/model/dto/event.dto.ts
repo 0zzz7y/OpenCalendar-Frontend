@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type RecurringPattern from "@/model/domain/recurringPattern"
 
 interface EventDto {

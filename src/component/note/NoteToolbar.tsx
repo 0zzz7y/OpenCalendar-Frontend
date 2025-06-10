@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type React from "react"
 import { useState, useCallback, useRef } from "react"
 import { Box, IconButton, Popover, Typography, TextField, MenuItem, Menu } from "@mui/material"

@@ -1,8 +1,88 @@
-node_modules
-build
-dist
+# ──────────────────── Dependency ────────────────────
+node_modules/
+bower_components/
+jspm_packages/
+web_modules/
+
+# ──────────────────── Build ────────────────────
+build/
+dist/
+.next/
+.nuxt/
+out/
+public/
+.temp/
+.cache/
+.parcel-cache/
+.vuepress/dist/
+.docusaurus/
+.serverless/
+.fusebox/
+.dynamodb/
+rpt2_cache/
+rts2_cache_cjs/
+rts2_cache_es/
+rts2_cache_umd/
+lib-cov/
+
+# ──────────────────── Logs ────────────────────
 *.log
-.idea
-.vscode
-.env
 npm-debug.log
+yarn-debug.log
+lerna-debug.log
+.pnpm-debug.log
+
+# ──────────────────── Diagnostic Reports ────────────────────
+report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
+
+# ──────────────────── Runtime Data ────────────────────
+pids/
+*.pid
+*.seed
+*.pid.lock
+
+# ──────────────────── IDE / Editor ────────────────────
+.idea/
+.vscode/
+.vscode-test/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+
+# ──────────────────── OS / Miscellaneous ────────────────────
+.DS_Store
+Thumbs.db
+Desktop.ini
+Icon?
+node-repl-history
+.lock-wscript
+*.orig
+
+# ──────────────────── TypeScript Cache ────────────────────
+*.tsbuildinfo
+
+# ──────────────────── Cache Files ────────────────────
+.nyc_output/
+.eslintcache
+.stylelintcache
+
+# ──────────────────── Package Manager ────────────────────
+package-lock.json
+pnpm-lock.yaml
+yarn.lock
+
+# ──────────────────── Environment Variables ────────────────────
+.env
+.env.*
+.env.local
+
+# ──────────────────── Binary Archives ────────────────────
+*.tgz
+*.gz
+*.zip
+
+# ──────────────────── Other ────────────────────
+*.bak
+*.temp
+*.tmp

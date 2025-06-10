@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { create } from "zustand"
 import type Calendar from "@/model/domain/calendar"
 import type Category from "@/model/domain/category"

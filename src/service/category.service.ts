@@ -1,12 +1,7 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type CategoryDto from "@/model/dto/category.dto"
 import { createCrudService } from "./crud.service"
-import getServiceUrl from "@/utilities/getServiceUrl"
 
-const serviceUrl = getServiceUrl("categories")
+const serviceUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 export const {
   getAll: getCategories,

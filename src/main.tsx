@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { StrictMode } from "react"
 
 import ReactDOM from "react-dom/client"

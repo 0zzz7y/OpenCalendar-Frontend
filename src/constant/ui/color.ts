@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 enum COLOR {
   PRIMARY = "#007bff",
   SECONDARY = "#6c757d",

@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type Event from "@/model/domain/event"
 import type EventDto from "@/model/dto/event.dto"
 import type Calendar from "@/model/domain/calendar"

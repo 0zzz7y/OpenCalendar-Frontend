@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { useState, useMemo, useCallback } from "react"
 import { Box, Typography, useTheme } from "@mui/material"
 import dayjs from "dayjs"

@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type Task from "@/model/domain/task"
 import type Event from "@/model/domain/event"
 import type Note from "@/model/domain/note"

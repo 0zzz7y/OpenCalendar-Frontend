@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import BUTTON from "@/constant/ui/button"
 import MESSAGE from "@/constant/ui/message"
 import useEvent from "@/repository/event.repository"

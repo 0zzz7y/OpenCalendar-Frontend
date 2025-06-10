@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type TaskStatus from "@/model/domain/taskStatus"
 
 interface TaskDto {

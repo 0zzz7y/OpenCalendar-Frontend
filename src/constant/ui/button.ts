@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 enum BUTTON {
   ADD = "ADD",
   EDIT = "EDIT",

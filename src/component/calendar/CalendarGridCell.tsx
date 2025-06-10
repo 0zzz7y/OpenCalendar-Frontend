@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type React from "react"
 import { useEffect, useRef } from "react"
 import { Box } from "@mui/material"

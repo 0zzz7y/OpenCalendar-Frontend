@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { useState, useEffect, useCallback } from "react"
 import { Popover, TextField, MenuItem, Stack, Divider, Typography, Box } from "@mui/material"
 import { DateCalendar, TimePicker } from "@mui/x-date-pickers"

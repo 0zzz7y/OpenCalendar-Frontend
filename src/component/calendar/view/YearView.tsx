@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { useState, useMemo, useCallback } from "react"
 import { Box, Typography, Paper, Popover, Stack, useTheme } from "@mui/material"
 import { lighten, darken } from "@mui/material/styles"

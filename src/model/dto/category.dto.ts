@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 interface CategoryDto {
   id?: string
   name: string

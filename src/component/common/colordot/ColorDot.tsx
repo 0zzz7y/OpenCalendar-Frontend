@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { Box } from "@mui/material"
 
 interface ColorDotProperties {

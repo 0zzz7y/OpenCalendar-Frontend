@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 enum LABEL {
   NAME = "Name",
   DESCRIPTION = "Description",

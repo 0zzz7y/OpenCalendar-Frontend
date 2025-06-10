@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type React from "react"
 import { useRef, useState, useEffect, useMemo, useCallback } from "react"
 import { Box, Typography } from "@mui/material"

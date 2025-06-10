@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import React from "react"
 import { Box, Typography, useTheme } from "@mui/material"
 

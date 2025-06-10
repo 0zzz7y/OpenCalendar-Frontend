@@ -1,12 +1,7 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type EventDto from "@/model/dto/event.dto"
 import { createCrudService } from "./crud.service"
-import getServiceUrl from "@/utilities/getServiceUrl"
 
-const serviceUrl = getServiceUrl("events")
+const serviceUrl = import.meta.env.VITE_API_URL || "http://localhost:8080"
 
 export const {
   getAll: getEvents,

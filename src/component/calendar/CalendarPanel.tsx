@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { useMemo, useCallback, useState, useEffect } from "react"
 import { Box, Typography, Button } from "@mui/material"
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft"
@@ -76,7 +72,7 @@ export default function CalendarPanel({
       const catMatch = !selectedCategory || selectedCategory === FILTER.ALL || item.category?.id === selectedCategory
       return calMatch && catMatch
     })
-  }, [events, tasks, selectedCalendar, selectedCategory])
+  }, [events, selectedCalendar, selectedCategory])
 
   const [creation, setCreation] = useState<{ anchor?: HTMLElement; datetime?: Date }>({})
   const [info, setInfo] = useState<{ anchor?: HTMLElement; event?: Event }>({})

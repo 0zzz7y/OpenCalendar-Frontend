@@ -1,10 +1,6 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import useApplicationStorage from "@/storage/useApplicationStorage"
 import type { CrudService } from "@/service/crud.service"
-import capitalize from "@/utilities/capitalize"
+import capitalize from "@/utility/capitalize"
 
 type AppState = ReturnType<typeof useApplicationStorage.getState>
 

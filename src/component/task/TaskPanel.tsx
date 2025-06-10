@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { useState, useCallback, useMemo } from "react"
 import { Box, TextField } from "@mui/material"
 

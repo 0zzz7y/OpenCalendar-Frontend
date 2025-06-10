@@ -1,12 +1,7 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type CalendarDto from "@/model/dto/calendar.dto"
 import { createCrudService } from "./crud.service"
-import getServiceUrl from "@/utilities/getServiceUrl"
 
-const serviceUrl = getServiceUrl("calendars")
+const serviceUrl = import.meta.env.VITE_API_URL || "http://localhost:8080";
 
 export const {
   getAll: getCalendars,

@@ -17,8 +17,5 @@
   },
   "organizeImports": {
     "enabled": true
-  },
-  "files": {
-    "maxSize": 2097152
   }
 }

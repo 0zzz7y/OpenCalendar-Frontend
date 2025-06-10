@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { Box, Typography } from "@mui/material"
 import InfoIcon from "@mui/icons-material/Info"
 import type { ReactNode } from "react"

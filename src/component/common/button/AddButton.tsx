@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { IconButton, Tooltip } from "@mui/material"
 import AddCircleIcon from "@mui/icons-material/AddCircle"
 import type { MouseEventHandler } from "react"

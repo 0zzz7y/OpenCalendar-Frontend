@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 enum EditorMode {
   ADD = "add",
   EDIT = "edit",

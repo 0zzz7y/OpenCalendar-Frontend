@@ -4,7 +4,7 @@
 
 import { useCallback } from "react"
 import useApplicationStorage from "@/storage/useApplicationStorage"
-import capitalize from "@/utilities/capitalize"
+import capitalize from "@/utility/capitalize"
 
 export function createUseCrud<Domain extends { id: string }, CreateDto, RawDto>(
   resourceKey: string,

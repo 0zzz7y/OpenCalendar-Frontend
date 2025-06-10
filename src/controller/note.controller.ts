@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import * as noteService from "@/service/note.service"
 import { dtoToNote, noteToDto } from "@/model/mapper/note.mapper"
 import { createCrudController } from "./crud.controller"

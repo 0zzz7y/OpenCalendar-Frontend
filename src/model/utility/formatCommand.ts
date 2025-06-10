@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type TOOLBAR from "@/constant/utility/toolbar"
 
 type FormatCommand = TOOLBAR.BOLD | TOOLBAR.ITALIC | TOOLBAR.UNDERLINE

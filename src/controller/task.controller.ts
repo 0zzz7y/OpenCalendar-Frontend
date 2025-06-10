@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import * as taskService from "@/service/task.service"
 import { dtoToTask, taskToDto } from "@/model/mapper/task.mapper"
 import { createCrudController } from "./crud.controller"

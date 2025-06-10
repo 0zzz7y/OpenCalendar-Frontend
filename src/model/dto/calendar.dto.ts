@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 interface CalendarDto {
   id?: string
   name: string

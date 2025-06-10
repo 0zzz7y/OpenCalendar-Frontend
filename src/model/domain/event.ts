@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import type Schedulable from "./schedulable"
 
 interface Event extends Schedulable {

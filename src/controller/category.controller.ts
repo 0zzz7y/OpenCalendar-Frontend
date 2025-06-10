@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import * as categoryService from "@/service/category.service"
 import { dtoToCategory, categoryToDto } from "@/model/mapper/category.mapper"
 import { createCrudController } from "./crud.controller"

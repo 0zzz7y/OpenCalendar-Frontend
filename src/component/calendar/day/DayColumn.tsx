@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import React, { useMemo, useCallback } from "react"
 import type { FC, CSSProperties } from "react"
 import { Box } from "@mui/material"

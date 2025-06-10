@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import Button from "./Button"
 import CloseIcon from "@mui/icons-material/Close"
 import BUTTON from "@/constant/ui/button"

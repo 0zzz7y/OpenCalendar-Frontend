@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import { Box, Paper, Typography } from "@mui/material"
 import type { ReactNode } from "react"
 

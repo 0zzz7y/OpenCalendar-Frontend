@@ -1,7 +1,3 @@
-/**
- * Copyright (c) Tomasz Wnuk
- */
-
 import Button from "./Button"
 import SaveIcon from "@mui/icons-material/Check"
 import BUTTON from "@/constant/ui/button"
