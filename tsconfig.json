@@ -1,4 +1,5 @@
 {
+  /* Compiler Options */
   "compilerOptions": {
     /* Target and Module Settings */
     "target": "ESNext",
@@ -39,5 +40,6 @@
     }
   },
 
+  /* Project Structure */
   "include": ["src", "test", "vite.config.ts"]
 }
