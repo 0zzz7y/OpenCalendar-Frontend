@@ -37,7 +37,7 @@ export default function CalendarPanel({
   jumpToDate,
   setJumpToDate
 }: CalendarPanelProperties) {
-  const { events, tasks, calendars, categories, selectedCalendar, selectedCategory } = useApplicationStorage()
+  const { events, calendars, categories, selectedCalendar, selectedCategory } = useApplicationStorage()
   const { addEvent, updateEvent, deleteEvent, reloadEvents } = useEvent()
 
   const navigate = useCallback(
