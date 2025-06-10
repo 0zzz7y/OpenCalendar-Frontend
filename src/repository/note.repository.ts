@@ -9,7 +9,6 @@ import type Note from "@/model/domain/note"
 import type NoteDto from "@/model/dto/note.dto"
 import { createUseCrud } from "@/repository/crud.repository"
 import useApplicationStorage from "@/storage/useApplicationStorage"
-import { showToast } from "@/component/toast/Toast"
 import MESSAGE from "@/constant/ui/message"
 
 const useCrudNote = () => {
@@ -40,10 +39,8 @@ export function useNote() {
   const addNote = async (data: Partial<Note>): Promise<Note> => {
     try {
       const savedNote = await add(data)
-      showToast("success", MESSAGE.NOTE_CREATED_SUCCESSFULLY)
       return savedNote
     } catch {
-      showToast("error", MESSAGE.NOTE_CREATE_FAILED)
       throw new Error(MESSAGE.NOTE_CREATE_FAILED)
     }
   }
@@ -51,10 +48,8 @@ export function useNote() {
   const updateNote = async (data: Partial<Note> & { id: string }): Promise<Note> => {
     try {
       const updatedNote = await update(data)
-      showToast("success", MESSAGE.NOTE_UPDATED_SUCCESSFULLY)
       return updatedNote
     } catch {
-      showToast("error", MESSAGE.NOTE_CREATE_FAILED)
       throw new Error(MESSAGE.NOTE_CREATE_FAILED)
     }
   }
@@ -62,9 +57,7 @@ export function useNote() {
   const deleteNote = async (id: string): Promise<void> => {
     try {
       await remove(id)
-      showToast("success", MESSAGE.NOTE_DELETED_SUCCESSFULLY)
     } catch {
-      showToast("error", MESSAGE.NOTE_DELETE_FAILED)
       throw new Error(MESSAGE.NOTE_DELETE_FAILED)
     }
   }
