@@ -8,4 +8,4 @@ export const {
   create: createEvent,
   update: updateEvent,
   delete: deleteEvent
-} = createCrudService<EventDto>(`${serviceUrl}/events`)
+} = createCrudService<EventDto>(`${serviceUrl}/api/v1/events`)

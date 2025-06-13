@@ -7,6 +7,14 @@ export interface CrudService<TDto> {
   delete: (id: string) => Promise<void>
 }
 
+function getAuthHeaders(): HeadersInit {
+  const token = localStorage.getItem("token")
+  return {
+    "Content-Type": "application/json",
+    ...(token ? { Authorization: `Bearer ${token}` } : {})
+  }
+}
+
 export function createCrudService<TDto>(resource: string): CrudService<TDto> {
   const url = `${resource}`
 
@@ -16,7 +24,9 @@ export function createCrudService<TDto>(resource: string): CrudService<TDto> {
     let totalPages = 1
 
     while (pageIndex < totalPages) {
-      const res = await fetch(`${url}?page=${pageIndex}`)
+      const res = await fetch(`${url}?page=${pageIndex}`, {
+        headers: getAuthHeaders()
+      })
       if (!res.ok) {
         throw new Error(`Failed to fetch ${resource} page ${pageIndex}: ${res.statusText}`)
       }
@@ -32,7 +42,7 @@ export function createCrudService<TDto>(resource: string): CrudService<TDto> {
   async function create(dto: TDto): Promise<TDto> {
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(dto)
     })
     if (!res.ok) throw new Error(`Failed to create ${resource}: ${res.statusText}`)
@@ -42,7 +52,7 @@ export function createCrudService<TDto>(resource: string): CrudService<TDto> {
   async function update(id: string, dto: TDto): Promise<TDto> {
     const res = await fetch(`${url}/${id}`, {
       method: "PUT",
-      headers: { "Content-Type": "application/json" },
+      headers: getAuthHeaders(),
       body: JSON.stringify(dto)
     })
     if (!res.ok) throw new Error(`Failed to update ${resource}/${id}: ${res.statusText}`)
@@ -50,7 +60,10 @@ export function createCrudService<TDto>(resource: string): CrudService<TDto> {
   }
 
   async function remove(id: string): Promise<void> {
-    const res = await fetch(`${url}/${id}`, { method: "DELETE" })
+    const res = await fetch(`${url}/${id}`, {
+      method: "DELETE",
+      headers: getAuthHeaders()
+    })
     if (!res.ok) throw new Error(`Failed to delete ${resource}/${id}: ${res.statusText}`)
   }
 

@@ -107,7 +107,6 @@ export default function YearView({ date, events, calendars, categories, onEventC
     [events, updateEvent, reloadEvents, closeInfo]
   )
 
-
   const findCalendar = (calendarId?: string) => calendars.find((c) => c.id === calendarId)
   const findCategory = (categoryId?: string) => categories.find((c) => c.id === categoryId)
 

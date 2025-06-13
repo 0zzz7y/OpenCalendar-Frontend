@@ -8,4 +8,4 @@ export const {
   create: createTask,
   update: updateTask,
   delete: deleteTask
-} = createCrudService<TaskDto>(`${serviceUrl}/tasks`)
+} = createCrudService<TaskDto>(`${serviceUrl}/api/v1/tasks`)

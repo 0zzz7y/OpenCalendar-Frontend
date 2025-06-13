@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react"
 import { PanelGroup, Panel, PanelResizeHandle } from "react-resizable-panels"
-import { Box } from "@mui/material"
+import { Box, Button } from "@mui/material"
 
 import { CalendarSelector, CalendarPanel } from "@/component/calendar"
 import { CategorySelector } from "@/component/category"
@@ -10,6 +10,7 @@ import TasksPanel from "@/component/task/TaskPanel"
 import ThemeToggleButton from "@/theme/ThemeToggleButton"
 import { loadCalendars, loadCategories, loadEvents, loadTasks, loadNotes } from "@/controller"
 import ViewType from "@/model/utility/viewType"
+import { logout } from "@/service/authentication.service"
 
 const panelStyle = {
   border: "2px solid #ccc",
@@ -63,7 +64,18 @@ const Dashboard = () => {
               <Box flexGrow={1} overflow="auto">
                 <NotesPanel />
               </Box>
-              <Box sx={{ position: "absolute", bottom: 0, left: 0, p: 1.5, width: "100%", zIndex: 2 }}>
+              <Box
+                sx={{
+                  position: "absolute",
+                  bottom: 0,
+                  left: 0,
+                  p: 1.5,
+                  width: "100%",
+                  zIndex: 2,
+                  display: "flex",
+                  justifyContent: "space-between"
+                }}
+              >
                 <ThemeToggleButton />
               </Box>
             </Box>
@@ -90,6 +102,23 @@ const Dashboard = () => {
         <Box display="flex" flexDirection="column" height="100%" sx={{ ...panelStyle, m: "10px 10px 5px 5px" }}>
           <Box flexGrow={1} overflow="auto">
             <TasksPanel />
+          </Box>
+          <Box>
+            <Button
+              variant="outlined"
+              color="error"
+              size="small"
+              onClick={async () => {
+                try {
+                  await logout()
+                } finally {
+                  localStorage.removeItem("token")
+                  window.location.href = "/login"
+                }
+              }}
+            >
+              Logout
+            </Button>
           </Box>
         </Box>
       </Panel>

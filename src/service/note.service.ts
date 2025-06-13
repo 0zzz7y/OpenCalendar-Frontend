@@ -8,4 +8,4 @@ export const {
   create: createNote,
   update: updateNote,
   delete: deleteNote
-} = createCrudService<NoteDto>(`${serviceUrl}/notes`)
+} = createCrudService<NoteDto>(`${serviceUrl}/api/v1/notes`)

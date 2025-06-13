@@ -19,14 +19,7 @@ export interface MonthViewProps {
   onEventClick?: (event: Event) => void
 }
 
-export default function MonthView({
-  date,
-  events,
-  calendars,
-  categories,
-  onSlotClick,
-  onEventClick
-}: MonthViewProps) {
+export default function MonthView({ date, events, calendars, categories, onSlotClick, onEventClick }: MonthViewProps) {
   const { reloadEvents, updateEvent } = useEvent()
   const theme = useTheme()
 
@@ -70,7 +63,6 @@ export default function MonthView({
     },
     [onSlotClick]
   )
-
 
   const handleDelete = useCallback(
     async (id: string) => {

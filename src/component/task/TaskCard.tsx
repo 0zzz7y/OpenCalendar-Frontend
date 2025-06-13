@@ -1,49 +1,29 @@
-import type React from "react";
-import { useState, useEffect, useCallback } from "react";
-import {
-  Box,
-  Card,
-  Collapse,
-  IconButton,
-  MenuItem,
-  TextField,
-  Typography,
-  Popover,
-  Menu
-} from "@mui/material";
-import {
-  Delete as DeleteIcon,
-  ExpandLess as ExpandLessIcon,
-  ExpandMore as ExpandMoreIcon
-} from "@mui/icons-material";
+import type React from "react"
+import { useState, useEffect, useCallback } from "react"
+import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography, Popover, Menu } from "@mui/material"
+import { Delete as DeleteIcon, ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from "@mui/icons-material"
 
-import CancelButton from "@/component/common/button/CancelButton";
-import DeleteButton from "@/component/common/button/DeleteButton";
+import CancelButton from "@/component/common/button/CancelButton"
+import DeleteButton from "@/component/common/button/DeleteButton"
 
-import type Calendar from "@/model/domain/calendar";
-import type Category from "@/model/domain/category";
-import type Task from "@/model/domain/task";
-import LABEL from "@/constant/ui/label";
-import FILTER from "@/constant/utility/filter";
-import MESSAGE from "@/constant/ui/message";
-import TaskStatus from "@/model/domain/taskStatus";
+import type Calendar from "@/model/domain/calendar"
+import type Category from "@/model/domain/category"
+import type Task from "@/model/domain/task"
+import LABEL from "@/constant/ui/label"
+import FILTER from "@/constant/utility/filter"
+import MESSAGE from "@/constant/ui/message"
+import TaskStatus from "@/model/domain/taskStatus"
 
 export interface TaskCardProps {
-  task: Task;
-  calendars: Calendar[];
-  categories: Category[];
-  onUpdate: (task: Task) => void;
-  onDelete: (id: string) => void;
+  task: Task
+  calendars: Calendar[]
+  categories: Category[]
+  onUpdate: (task: Task) => void
+  onDelete: (id: string) => void
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({
-  task,
-  calendars,
-  categories,
-  onUpdate,
-  onDelete
-}) => {
-  const [expanded, setExpanded] = useState(true);
+const TaskCard: React.FC<TaskCardProps> = ({ task, calendars, categories, onUpdate, onDelete }) => {
+  const [expanded, setExpanded] = useState(true)
   const [local, setLocal] = useState<Task>({
     id: task?.id || "",
     name: task?.name || "",
@@ -51,112 +31,112 @@ const TaskCard: React.FC<TaskCardProps> = ({
     calendar: task?.calendar || calendars[0],
     category: task?.category || undefined,
     status: task?.status || TaskStatus.TODO
-  });
+  })
 
   const [errors, setErrors] = useState({
     name: false,
     description: false
-  });
+  })
 
-  const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null);
-  const [categoryAnchorEl, setCategoryAnchorEl] = useState<HTMLElement | null>(null);
-  const [calendarAnchorEl, setCalendarAnchorEl] = useState<HTMLElement | null>(null);
+  const [deleteAnchorEl, setDeleteAnchorEl] = useState<HTMLElement | null>(null)
+  const [categoryAnchorEl, setCategoryAnchorEl] = useState<HTMLElement | null>(null)
+  const [calendarAnchorEl, setCalendarAnchorEl] = useState<HTMLElement | null>(null)
 
   useEffect(() => {
-    if (task) setLocal(task);
-  }, [task]);
+    if (task) setLocal(task)
+  }, [task])
 
   const validateField = useCallback(
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
     (field: keyof Task, value: any) => {
       switch (field) {
         case "name":
-          return !value.trim();
+          return !value.trim()
         case "description":
-          return value.length > 4096;
+          return value.length > 4096
         default:
-          return false;
+          return false
       }
     },
     []
-  );
+  )
 
   const handleChange = useCallback(
     <K extends keyof Task>(field: K, value: Task[K]) => {
       setLocal((prev) => {
-        const updated = { ...prev, [field]: value };
+        const updated = { ...prev, [field]: value }
         setErrors((prevErrors) => ({
           ...prevErrors,
           [field]: validateField(field, value)
-        }));
-        return updated;
-      });
+        }))
+        return updated
+      })
     },
     [validateField]
-  );
+  )
 
   const handleBlur = useCallback(() => {
-    onUpdate(local);
-  }, [local, onUpdate]);
+    onUpdate(local)
+  }, [local, onUpdate])
 
   const handleDeleteClick = (event: React.MouseEvent<HTMLElement>) => {
-    setDeleteAnchorEl(event.currentTarget);
-  };
+    setDeleteAnchorEl(event.currentTarget)
+  }
 
   const handleDeleteConfirm = () => {
-    onDelete(local.id);
-    setDeleteAnchorEl(null);
-  };
+    onDelete(local.id)
+    setDeleteAnchorEl(null)
+  }
 
   const handleDeleteCancel = () => {
-    setDeleteAnchorEl(null);
-  };
+    setDeleteAnchorEl(null)
+  }
 
   const handleCategoryMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    setCategoryAnchorEl(e.currentTarget);
-  };
+    e.stopPropagation()
+    setCategoryAnchorEl(e.currentTarget)
+  }
 
   const handleCategoryMenuClose = () => {
-    setCategoryAnchorEl(null);
-  };
+    setCategoryAnchorEl(null)
+  }
 
   const handleCategorySelect = (categoryId: string | null) => {
-    const selectedCategory = categories.find((c) => c.id === categoryId) || undefined;
-    handleChange("category", selectedCategory);
-    handleBlur();
-    handleCategoryMenuClose();
-  };
+    const selectedCategory = categories.find((c) => c.id === categoryId) || undefined
+    handleChange("category", selectedCategory)
+    handleBlur()
+    handleCategoryMenuClose()
+  }
 
   const handleCalendarMenuOpen = (e: React.MouseEvent<HTMLElement>) => {
-    e.stopPropagation();
-    setCalendarAnchorEl(e.currentTarget);
-  };
+    e.stopPropagation()
+    setCalendarAnchorEl(e.currentTarget)
+  }
 
   const handleCalendarMenuClose = () => {
-    setCalendarAnchorEl(null);
-  };
+    setCalendarAnchorEl(null)
+  }
 
   const handleCalendarSelect = (calendarId: string) => {
-    const selectedCalendar = calendars.find((c) => c.id === calendarId);
+    const selectedCalendar = calendars.find((c) => c.id === calendarId)
     if (selectedCalendar) {
-      handleChange("calendar", selectedCalendar);
-      handleBlur();
+      handleChange("calendar", selectedCalendar)
+      handleBlur()
     }
-    handleCalendarMenuClose();
-  };
+    handleCalendarMenuClose()
+  }
 
-  const selectedCategoryColor = local.category?.color || "#fff";
-  const currentCalendar = local.calendar;
+  const selectedCategoryColor = local.category?.color || "#fff"
+  const currentCalendar = local.calendar
 
-  const cardColor = selectedCategoryColor ?? "#f5f5f5";
+  const cardColor = selectedCategoryColor ?? "#f5f5f5"
 
   const textFieldSx = {
     "& .MuiOutlinedInput-root": { backgroundColor: "#fff", borderRadius: 1 },
     "& .MuiInputBase-input": { color: "#000" },
     "& .MuiInputLabel-root": { color: "#000" },
     "& .MuiSelect-icon": { color: "#000" }
-  };
+  }
 
   return (
     <Card
@@ -190,28 +170,14 @@ const TaskCard: React.FC<TaskCardProps> = ({
 
           {/* Category Selector */}
           <IconButton size="small" onClick={handleCategoryMenuOpen} sx={{ color: "#000" }}>
-            <Box
-              width={14}
-              height={14}
-              borderRadius="50%"
-              bgcolor={selectedCategoryColor}
-              border="1px solid #333"
-            />
+            <Box width={14} height={14} borderRadius="50%" bgcolor={selectedCategoryColor} border="1px solid #333" />
           </IconButton>
-          <Menu
-            anchorEl={categoryAnchorEl}
-            open={Boolean(categoryAnchorEl)}
-            onClose={handleCategoryMenuClose}
-          >
+          <Menu anchorEl={categoryAnchorEl} open={Boolean(categoryAnchorEl)} onClose={handleCategoryMenuClose}>
             <MenuItem onClick={() => handleCategorySelect(null)} sx={{ color: "#000" }}>
               {FILTER.ALL}
             </MenuItem>
             {categories.map((category) => (
-              <MenuItem
-                key={category.id}
-                onClick={() => handleCategorySelect(category.id)}
-                sx={{ color: "#000" }}
-              >
+              <MenuItem key={category.id} onClick={() => handleCategorySelect(category.id)} sx={{ color: "#000" }}>
                 <Box
                   width={14}
                   height={14}
@@ -231,17 +197,9 @@ const TaskCard: React.FC<TaskCardProps> = ({
               {currentCalendar?.emoji || "📅"}
             </Typography>
           </IconButton>
-          <Menu
-            anchorEl={calendarAnchorEl}
-            open={Boolean(calendarAnchorEl)}
-            onClose={handleCalendarMenuClose}
-          >
+          <Menu anchorEl={calendarAnchorEl} open={Boolean(calendarAnchorEl)} onClose={handleCalendarMenuClose}>
             {calendars.map((calendar) => (
-              <MenuItem
-                key={calendar.id}
-                onClick={() => handleCalendarSelect(calendar.id)}
-                sx={{ color: "#000" }}
-              >
+              <MenuItem key={calendar.id} onClick={() => handleCalendarSelect(calendar.id)} sx={{ color: "#000" }}>
                 <Typography fontSize="18px" mr={1} sx={{ color: "#000" }}>
                   {calendar.emoji}
                 </Typography>
@@ -290,7 +248,7 @@ const TaskCard: React.FC<TaskCardProps> = ({
         </Box>
       </Popover>
     </Card>
-  );
-};
+  )
+}
 
-export default TaskCard;
+export default TaskCard

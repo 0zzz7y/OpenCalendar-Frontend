@@ -8,4 +8,4 @@ export const {
   create: createCategory,
   update: updateCategory,
   delete: deleteCategory
-} = createCrudService<CategoryDto>(`${serviceUrl}/categories`)
+} = createCrudService<CategoryDto>(`${serviceUrl}/api/v1/categories`)
