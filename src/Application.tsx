@@ -4,7 +4,13 @@ import Login from "@/page/Login"
 import Register from "@/page/Registration"
 import ApplicationProvider from "@/provider/ApplicationProvider"
 
-const Application = () => {
+import { ApplicationProvider } from "@/ApplicationProvider"
+
+import Dashboard from "@/pages/Dashboard"
+import Login from "@/pages/Login"
+import Register from "@/pages/Registration"
+
+export const Application = () => {
   return (
     <Router>
       <ApplicationProvider>
@@ -18,5 +24,3 @@ const Application = () => {
     </Router>
   )
 }
-
-export default Application
