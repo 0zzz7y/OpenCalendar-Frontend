@@ -3,16 +3,16 @@ import { useState, useEffect, useCallback } from "react"
 import { Box, Card, Collapse, IconButton, MenuItem, TextField, Typography, Popover, Menu } from "@mui/material"
 import { Delete as DeleteIcon, ExpandLess as ExpandLessIcon, ExpandMore as ExpandMoreIcon } from "@mui/icons-material"
 
-import CancelButton from "@/component/common/button/CancelButton"
-import DeleteButton from "@/component/common/button/DeleteButton"
+import { CancelButton } from "../library/button/CancelButton"
+import { DeleteButton } from "../library/button/DeleteButton"
 
-import type Calendar from "@/model/domain/calendar"
-import type Category from "@/model/domain/category"
-import type Task from "@/model/domain/task"
-import LABEL from "@/constant/ui/label"
-import FILTER from "@/constant/utility/filter"
-import MESSAGE from "@/constant/ui/message"
-import TaskStatus from "@/model/domain/taskStatus"
+import type { Calendar } from "@/features/calendar/calendar.model"
+import type { Category } from "@/features/category/category.model"
+import type { Task } from "@/features/task/task.model"
+import { LABEL } from "../shared/label.constant"
+import { Filter } from "@/features/filter/filter.type"
+import { MESSAGE } from "../shared/message.constant"
+import { TaskStatus } from "@/features/task/taskStatus.type"
 
 export interface TaskCardProps {
   task: Task

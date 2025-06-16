@@ -1,7 +1,6 @@
-// src/page/Register.tsx
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { register } from "@/service/authentication.service"
+import { register } from "@/features/authentication/authentication.service"
 import { Box, Button, Container, TextField, Typography, Alert, Paper } from "@mui/material"
 
 const Register = () => {

@@ -1,7 +1,6 @@
-// src/page/Login.tsx
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
-import { login } from "@/service/authentication.service"
+import { login } from "@/features/authentication/authentication.service"
 import { Box, Button, Container, TextField, Typography, Alert, Paper } from "@mui/material"
 
 const Login = () => {
