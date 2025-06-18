@@ -5,8 +5,8 @@ import { Box, Button, Container, TextField, Typography, Alert, Paper } from "@mu
 
 const Login = () => {
   const navigate = useNavigate()
-  const [username, setUsername] = useState("")
-  const [password, setPassword] = useState("")
+  const [username, setUsername] = useState("test")
+  const [password, setPassword] = useState("password")
   const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,7 +29,6 @@ const Login = () => {
         {error && <Alert severity="error">{error}</Alert>}
         <Box component="form" onSubmit={handleSubmit} mt={2}>
           <TextField
-            defaultValue="test"
             label="Username"
             fullWidth
             margin="normal"
@@ -37,7 +36,6 @@ const Login = () => {
             onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
-            defaultValue="password"
             label="Password"
             type="password"
             fullWidth
