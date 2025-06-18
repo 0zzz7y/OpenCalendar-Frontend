@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { Box, Paper, Collapse } from "@mui/material"
 import Toolbar from "./NoteToolbar"
-import type { FormatCommand }from "@/components/shared/formatCommand"
+import type { FormatCommand } from "@/components/shared/formatCommand"
 import type { Calendar } from "@/features/calendar/calendar.model"
 import type { Category } from "@/features/category/category.model"
 import { MESSAGE } from "@/components/shared/message.constant"

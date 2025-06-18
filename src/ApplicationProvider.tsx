@@ -5,7 +5,8 @@ import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { DndProvider } from "react-dnd"
 import { HTML5Backend } from "react-dnd-html5-backend"
 
-import { ThemeProvider } from "@/themes/ThemeProvider"
+import "@/index"
+import { ThemeProvider } from "./themes/ThemeProvider"
 
 export const ApplicationProvider = ({ children }: { children: React.ReactNode }) => {
   return (

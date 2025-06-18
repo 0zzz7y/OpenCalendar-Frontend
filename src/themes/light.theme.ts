@@ -19,5 +19,8 @@ export const lightTheme = createTheme({
       primary: "#222",
       secondary: "#555"
     }
+  },
+  typography: {
+    fontFamily: "Lato"
   }
 })

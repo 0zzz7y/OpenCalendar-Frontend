@@ -9,7 +9,7 @@ export const darkTheme = createTheme({
     },
 
     background: {
-      default: "#2a2a2a",
+      default: "#1a1a1a",
       paper: "#3a3a3a"
     },
 
@@ -19,5 +19,8 @@ export const darkTheme = createTheme({
       primary: "#e0e0e0",
       secondary: "#bbb"
     }
+  },
+  typography: {
+    fontFamily: "Lato"
   }
 })

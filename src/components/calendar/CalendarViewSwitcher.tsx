@@ -8,7 +8,10 @@ export interface CalendarViewSwitcherProps {
 }
 
 export default function CalendarViewSwitcher({ view, onChange }: CalendarViewSwitcherProps) {
-  const handleChange = useCallback((e: SelectChangeEvent<CalendarView>) => onChange(e.target.value as CalendarView), [onChange])
+  const handleChange = useCallback(
+    (e: SelectChangeEvent<CalendarView>) => onChange(e.target.value as CalendarView),
+    [onChange]
+  )
 
   return (
     <FormControl size="small" sx={{ mb: 2, minWidth: 120 }}>
