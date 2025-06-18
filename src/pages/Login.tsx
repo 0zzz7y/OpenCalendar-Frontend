@@ -29,6 +29,7 @@ const Login = () => {
         {error && <Alert severity="error">{error}</Alert>}
         <Box component="form" onSubmit={handleSubmit} mt={2}>
           <TextField
+            defaultValue="test"
             label="Username"
             fullWidth
             margin="normal"
@@ -36,6 +37,7 @@ const Login = () => {
             onChange={(e) => setUsername(e.target.value)}
           />
           <TextField
+            defaultValue="password"
             label="Password"
             type="password"
             fullWidth
