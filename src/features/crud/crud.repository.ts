@@ -3,10 +3,10 @@ import { useStorage } from "@/storage/useStorage.hook"
 import { capitalize } from "@/utilities/text.utility"
 
 export interface CrudRepository<T> {
-  getAll: () => T[]
   getById: (id: string) => T | undefined
-  setAll: (list: T[]) => void
+  getAll: () => T[]
   setById: (item: T) => void
+  setAll: (list: T[]) => void
   add: (item: T) => void
   update: (item: T) => void
   remove: (id: string) => void
@@ -19,20 +19,20 @@ export function createCrudRepository<Domain extends { id: string }>(resourceKey:
     items: Domain[]
   ) => void
 
-  function getAll(): Domain[] {
-    return items
-  }
-
   function getById(id: string): Domain | undefined {
     return items.find((i) => i.id === id)
   }
 
-  function setAll(list: Domain[]): void {
-    setItems(list)
+  function getAll(): Domain[] {
+    return items
   }
 
   function setById(item: Domain): void {
     setItems(items.map((i) => (i.id === item.id ? item : i)))
+  }
+
+  function setAll(list: Domain[]): void {
+    setItems(list)
   }
 
   function add(item: Domain): void {
@@ -48,10 +48,10 @@ export function createCrudRepository<Domain extends { id: string }>(resourceKey:
   }
 
   return {
-    getAll,
     getById,
-    setAll,
+    getAll,
     setById,
+    setAll,
     add,
     update,
     remove

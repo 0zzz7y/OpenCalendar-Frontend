@@ -2,8 +2,8 @@ import type { PaginatedResponse } from "@/features/crud/paginatedResponse.type"
 
 export interface CrudController<TDto> {
   create: (dto: TDto) => Promise<TDto>
-  getAll: () => Promise<TDto[]>
   getById: (id: string) => Promise<TDto>
+  getAll: () => Promise<TDto[]>
   update: (id: string, dto: TDto) => Promise<TDto>
   delete: (id: string) => Promise<void>
 }
@@ -38,6 +38,13 @@ export function createCrudController<TDto>(resource: string): CrudController<TDt
     return await handleResponse<TDto>(response)
   }
 
+  async function getById(id: string): Promise<TDto> {
+    const response = await fetch(`${url}/${id}`, {
+      headers: getAuthenticationHeaders()
+    })
+    return await handleResponse<TDto>(response)
+  }
+
   async function getAll(): Promise<TDto[]> {
     const allItems: TDto[] = []
     let pageIndex = 0
@@ -54,13 +61,6 @@ export function createCrudController<TDto>(resource: string): CrudController<TDt
     }
 
     return allItems
-  }
-
-  async function getById(id: string): Promise<TDto> {
-    const response = await fetch(`${url}/${id}`, {
-      headers: getAuthenticationHeaders()
-    })
-    return await handleResponse<TDto>(response)
   }
 
   async function update(id: string, dto: TDto): Promise<TDto> {
