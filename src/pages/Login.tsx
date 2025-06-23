@@ -5,8 +5,8 @@ import { Box, Button, Container, TextField, Typography, Alert, Paper } from "@mu
 
 const Login = () => {
   const navigate = useNavigate()
-  const [username, setUsername] = useState("test")
-  const [password, setPassword] = useState("password")
+  const [username, setUsername] = useState("test5")
+  const [password, setPassword] = useState("test12345")
   const [error, setError] = useState("")
 
   const handleSubmit = async (e: React.FormEvent) => {
