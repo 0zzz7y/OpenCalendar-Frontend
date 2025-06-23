@@ -2,7 +2,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom"
 
 import { ApplicationProvider } from "@/ApplicationProvider"
 
-import TestPage from "@/pages/Dashboard"
+import Dashboard from "@/pages/Dashboard"
 import Login from "@/pages/Login"
 import Register from "@/pages/Registration"
 
@@ -11,7 +11,7 @@ export const Application = () => {
     <BrowserRouter>
       <ApplicationProvider>
         <Routes>
-          <Route path="*" element={<TestPage />} />
+          <Route path="*" element={<Dashboard />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
         </Routes>

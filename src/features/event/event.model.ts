@@ -1,5 +1,4 @@
 import type { Schedulable } from "@/features/event/schedulable.model"
-
 import type { Calendar } from "@/features/calendar/calendar.model"
 import type { Category } from "@/features/category/category.model"
 
