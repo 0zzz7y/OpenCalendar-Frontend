@@ -1,26 +1,51 @@
 import { createTheme } from "@mui/material/styles"
 
+import { Theme } from "@/themes/theme.type"
+import { COLOR } from "@/themes/color.constant"
+import { FONT } from "@/themes/font.constant"
+
 export const lightTheme = createTheme({
   palette: {
-    mode: "light",
+    mode: Theme.LIGHT,
 
     primary: {
-      main: "#1976d2"
+      main: COLOR.PRIMARY,
+    },
+
+    secondary: {
+      main: COLOR.SECONDARY,
+    },
+
+    success: {
+      main: COLOR.SUCCESS,
+    },
+
+    error: {
+      main: COLOR.DANGER,
+    },
+
+    warning: {
+      main: COLOR.WARNING,
+    },
+
+    info: {
+      main: COLOR.INFO,
     },
 
     background: {
-      default: "#f3f3f3",
-      paper: "#ffffff"
+      default: COLOR.LIGHT_GRAY,
+      paper: COLOR.WHITE,
     },
 
-    divider: "#ddd",
+    divider: COLOR.BORDER_GRAY,
 
     text: {
-      primary: "#222",
-      secondary: "#555"
-    }
+      primary: COLOR.DARK_TEXT,
+      secondary: COLOR.MUTED_TEXT,
+    },
   },
+
   typography: {
-    fontFamily: "Lato"
+    fontFamily: FONT.DEFAULT,
   }
 })
